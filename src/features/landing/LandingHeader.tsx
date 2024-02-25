@@ -2,13 +2,7 @@
 
 import { LogoSvg } from "@/components/svg/LogoSvg";
 import { SiteConfig } from "@/site-config";
-import {
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useEffect } from "react";
 import { AuthButtonClient } from "../auth/SignInButton";
 import { ThemeToggle } from "../theme/ThemeToggle";
@@ -61,11 +55,6 @@ export function LandingHeader() {
     <motion.header
       style={{
         height: useTransform(scrollYBoundedProgressDelayed, [0, 1], [80, 50]),
-        backgroundColor: useMotionTemplate`rgb(var(--background) / ${useTransform(
-          scrollYBoundedProgressDelayed,
-          [0, 1],
-          [1, 0.1],
-        )})`,
       }}
       className="fixed inset-x-0 z-50 flex h-20 w-screen shadow backdrop-blur-md"
     >
