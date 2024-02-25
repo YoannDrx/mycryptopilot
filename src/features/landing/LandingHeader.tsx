@@ -4,8 +4,6 @@ import { LogoSvg } from "@/components/svg/LogoSvg";
 import { SiteConfig } from "@/site-config";
 import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useEffect } from "react";
-import { AuthButtonClient } from "../auth/SignInButton";
-import { ThemeToggle } from "../theme/ThemeToggle";
 
 function useBoundedScroll(threshold: number) {
   const { scrollY } = useScroll();
@@ -60,7 +58,7 @@ export function LandingHeader() {
     >
       <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 lg:px-8">
         <div className="flex items-center gap-1">
-          <LogoSvg size={32} />
+          <LogoSvg size={24} />
           <motion.p
             style={{
               scale: useTransform(
@@ -69,7 +67,7 @@ export function LandingHeader() {
                 [1, 0.9],
               ),
             }}
-            className="flex origin-left items-center text-xl font-semibold uppercase"
+            className="flex origin-left items-center text-xl font-semibold uppercase max-sm:hidden"
           >
             {SiteConfig.title}
           </motion.p>
@@ -86,8 +84,8 @@ export function LandingHeader() {
         >
           <a href="#features">Features</a>
           <a href="#pricing">Pricing</a>
-          <AuthButtonClient />
-          <ThemeToggle />
+          <a href="#about">About</a>
+          <a href="/posts">Blog</a>
         </motion.nav>
       </div>
     </motion.header>
