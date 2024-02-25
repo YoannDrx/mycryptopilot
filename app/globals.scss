@@ -111,3 +111,42 @@
   );
   background-size: var(--size, 10px) var(--size, 10px);
 }
+
+.prose {
+  scroll-margin-top: 40px;
+
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+    position: relative;
+    scroll-margin-top: 70px;
+
+    &:hover {
+      & .icon-link {
+        opacity: 1;
+      }
+    }
+  }
+
+  & .icon.icon-link {
+    width: 20px;
+    height: 100%;
+    display: block;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: -24px;
+
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    &::before {
+      content: "#";
+      font-size: 1.5rem;
+      color: hsl(var(--primary));
+    }
+  }
+}

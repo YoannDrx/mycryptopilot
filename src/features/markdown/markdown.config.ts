@@ -1,14 +1,17 @@
+import rehypeAutolinkHeading from "rehype-autolink-headings";
 import rehypePrism from "rehype-prism-plus";
+import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
-import type { Pluggable } from "unified";
 
-export const rehypePlugins: Pluggable[] = [
+export const rehypePlugins = [
   [
     rehypePrism,
     {
       ignoreMissing: true,
     },
   ],
+  rehypeSlug,
+  rehypeAutolinkHeading,
 ];
 
 export const remarkPlugins = [remarkGfm];

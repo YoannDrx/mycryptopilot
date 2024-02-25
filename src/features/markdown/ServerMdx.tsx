@@ -1,3 +1,4 @@
+import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/utils";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { Suspense } from "react";
@@ -14,13 +15,13 @@ const MdxComponent = {} satisfies Record<string, React.ComponentType>;
 
 export const ServerMdx = (props: ServerMdxProps) => {
   return (
-    <div className={cn("prose dark:prose-invert", props.className)}>
-      <ErrorBoundary>
-        <Suspense fallback={<div>Loading...</div>}>
+    <ErrorBoundary>
+      <div className={cn("prose dark:prose-invert", props.className)}>
+        <Suspense fallback={<Loader />}>
           <RenderMdx {...props} />
         </Suspense>
-      </ErrorBoundary>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 
@@ -32,7 +33,7 @@ const RenderMdx = (props: ServerMdxProps) => {
       options={{
         mdxOptions: {
           // * We need to use `as never` because `MDXRemote` has legacy version of "unified"
-          remarkPlugins: remarkPlugins,
+          remarkPlugins: remarkPlugins as never,
           rehypePlugins: rehypePlugins as never,
           format: "mdx",
         },
