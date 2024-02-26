@@ -26,6 +26,12 @@ export const SignInProviders = () => {
     );
   }
 
+  if (typeof providers !== "object") {
+    return (
+      <p>The providers are not available. Please check the configuration.</p>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {providers.resend && !providers.credentials ? (

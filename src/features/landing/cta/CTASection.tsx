@@ -3,7 +3,7 @@ import { Typography } from "@/components/ui/typography";
 import Link from "next/link";
 import { SectionLayout } from "../SectionLayout";
 
-export default function CtaSection() {
+export function CtaSection() {
   return (
     <SectionLayout className="lg:flex lg:items-center lg:justify-between lg:px-8">
       <Typography variant="h3">

@@ -7,7 +7,7 @@ import { usePlausible } from "next-plausible";
 import Link from "next/link";
 import { SectionLayout } from "../SectionLayout";
 
-export default function CTASectionCard() {
+export function CTASectionCard() {
   const plausible = usePlausible();
 
   return (
