@@ -33,7 +33,7 @@ const stats: StatProps[] = [
   },
 ];
 
-export default function StatsSection() {
+export function StatsSection() {
   return (
     <SectionLayout size="sm">
       <div className="grid max-w-sm items-start gap-12 sm:grid-cols-2 md:-mx-5 md:max-w-none md:grid-cols-4 md:gap-0">
