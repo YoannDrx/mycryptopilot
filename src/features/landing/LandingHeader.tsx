@@ -4,8 +4,7 @@ import { LogoSvg } from "@/components/svg/LogoSvg";
 import { SiteConfig } from "@/site-config";
 import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
 import { useEffect } from "react";
-import { SignInButton } from "../auth/SignInButton";
-import { ThemeToggle } from "../theme/ThemeToggle";
+import { AuthButtonClient, SignInButton } from "../auth/SignInButton";
 
 function useBoundedScroll(threshold: number) {
   const { scrollY } = useScroll();
@@ -88,7 +87,7 @@ export function LandingHeader() {
           <a href="#pricing">Pricing</a>
           <a href="/posts">Blog</a>
           <SignInButton />
-          <ThemeToggle />
+          <AuthButtonClient />
         </motion.nav>
       </div>
     </motion.header>
