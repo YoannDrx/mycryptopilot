@@ -8,14 +8,14 @@ export const PainSection = () => {
     <SectionLayout
       variant="card"
       size="base"
-      className=" flex flex-col items-center justify-center gap-4"
+      className="flex flex-col items-center justify-center gap-4"
     >
       <div className="flex w-full flex-col items-center gap-3 lg:gap-4 xl:gap-6">
         <Typography variant="h1">I love posting on Threads...</Typography>
         <Typography variant="large">
           But I loose my time going and publishing each days
         </Typography>
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-4 max-lg:flex-col">
           <div className="flex-1 rounded bg-red-500/30 p-4">
             <Typography variant="h3" className="text-red-500">
               😞 Posting without Threader

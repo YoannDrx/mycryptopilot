@@ -36,7 +36,7 @@ const stats: StatProps[] = [
 export function StatsSection() {
   return (
     <SectionLayout size="sm">
-      <div className="grid max-w-sm items-start gap-12 sm:grid-cols-2 md:-mx-5 md:max-w-none md:grid-cols-4 md:gap-0">
+      <div className="grid w-full items-center gap-12 sm:grid-cols-2 md:-mx-5 md:max-w-none md:grid-cols-4 md:gap-0">
         {stats.map((stat, index) => (
           <div key={index} className="relative text-center md:px-5">
             <h4 className="mb-2 text-2xl font-bold tabular-nums md:text-3xl">
