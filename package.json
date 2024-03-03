@@ -13,7 +13,8 @@
     "email": "email dev",
     "stripe-webhooks": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "clean": "next lint --fix && tsc --noEmit && prettier --write ."
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.4.0",

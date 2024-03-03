@@ -58,7 +58,7 @@ export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={(v) => setOpen(v)}>
-      <DialogTrigger asChild> 
+      <DialogTrigger asChild>
         {props.children ? (
           props.children
         ) : (

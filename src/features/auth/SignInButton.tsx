@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { displayName } from "@/lib/format/displayName";
 import type { VariantProps } from "class-variance-authority";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useIsClient } from "usehooks-ts";
 import { UserDropdown } from "./UserDropdown";
@@ -32,17 +31,6 @@ export const SignInButton = (props: VariantProps<typeof buttonVariants>) => {
       Sign in
     </Link>
   );
-};
-
-export const AuthButtonClient = () => {
-  const session = useSession();
-
-  if (session.data?.user) {
-    const user = session.data.user;
-    return <LoggedInButton user={user} />;
-  }
-
-  return <SignInButton />;
 };
 
 export const LoggedInButton = ({
