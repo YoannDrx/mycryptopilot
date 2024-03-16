@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { InlineTooltip } from "@/components/ui/tooltip";
 import { SubmitButton } from "@/features/form/SubmitButton";
 import type { User } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
 import { BadgeCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,42 +22,45 @@ import { updateProfileAction } from "./edit-profile.action";
 import type { ProfileFormType } from "./edit-profile.schema";
 import { ProfileFormSchema } from "./edit-profile.schema";
 
-type SchoolFormProps = {
+type EditProfileFormProps = {
   defaultValues: User;
 };
 
-export const EditProfileForm = ({ defaultValues }: SchoolFormProps) => {
+export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
   const form = useZodForm({
     schema: ProfileFormSchema,
     defaultValues: defaultValues,
   });
   const router = useRouter();
 
-  const onSubmit = async (values: ProfileFormType) => {
-    const { data, serverError } = await updateProfileAction(values);
+  const updateProfileMutation = useMutation({
+    mutationFn: async (values: ProfileFormType) => {
+      const { data, serverError } = await updateProfileAction(values);
 
-    if (values.email !== defaultValues.email) {
-      await createVerifyEmailAction(values.email);
-      toast.success(
-        "You have updated your email. We have sent you a new email verification link.",
-      );
-      router.push("/");
-      return;
-    }
+      if (values.email !== defaultValues.email) {
+        await createVerifyEmailAction(values.email);
+        toast.success(
+          "You have updated your email. We have sent you a new email verification link.",
+        );
+        router.push("/");
+        return;
+      }
 
-    if (!data) {
-      toast.error(serverError);
-      return;
-    }
+      if (!data) {
+        toast.error(serverError);
+        return;
+      }
 
-    toast.success("Profile updated");
-    router.refresh();
-  };
+      toast.success("Profile updated");
+      router.refresh();
+    },
+  });
 
   return (
     <Form
       form={form}
-      onSubmit={async (v) => onSubmit(v)}
+      onSubmit={async (v) => updateProfileMutation.mutateAsync(v)}
+      disabled={updateProfileMutation.isPending}
       className="flex flex-col gap-4"
     >
       <FormField

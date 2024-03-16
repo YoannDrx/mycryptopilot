@@ -1,9 +1,11 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Divider } from "@/components/ui/divider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Typography } from "@/components/ui/typography";
 import { useQuery } from "@tanstack/react-query";
+import { AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { MagicLinkForm } from "./MagicLinkForm";
 import { ProviderButton } from "./ProviderButton";
@@ -28,7 +30,20 @@ export const SignInProviders = () => {
 
   if (typeof providers !== "object") {
     return (
-      <p>The providers are not available. Please check the configuration.</p>
+      <Alert>
+        <AlertTriangle size={16} />
+        <AlertTitle>
+          The provider is not available. It's due to a misconfiguration in the
+          <Typography variant="code">auth.ts</Typography> file.
+        </AlertTitle>
+        <AlertDescription>
+          Please go to{" "}
+          <Typography variant="link" as={Link} href="">
+            the Now.TS documentation
+          </Typography>{" "}
+          to resolve the issue.
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -52,7 +67,9 @@ export const SignInProviders = () => {
       <div className="flex flex-col gap-2">
         {/* ℹ️ Add provider you want to support here */}
         {providers.github ? <ProviderButton providerId="github" /> : null}
+        {providers.google ? <ProviderButton providerId="google" /> : null}
       </div>
+
       {providers.credentials ? (
         <Typography variant="small">
           You don't have an account?{" "}
