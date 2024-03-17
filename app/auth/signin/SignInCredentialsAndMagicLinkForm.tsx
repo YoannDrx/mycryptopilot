@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useLocalStorage } from "usehooks-ts";
+import { useLocalStorage } from "react-use";
 import { z } from "zod";
 
 const LoginCredentialsFormScheme = z.object({

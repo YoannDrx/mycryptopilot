@@ -1,11 +1,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { AuthButton } from "@/features/auth/AuthButton";
+import { SignInButton } from "@/features/auth/SignInButton";
 import { UserDropdown } from "@/features/auth/UserDropdown";
 import { ContactFeedbackPopover } from "@/features/contact/feedback/ContactFeedbackPopover";
+import { ContactSupportDialog } from "@/features/contact/support/ContactSupportDialog";
+import {
+  LayoutContent,
+  LayoutHeader,
+  LayoutTitle,
+} from "@/features/page/layout";
 import { ThemeToggle } from "@/features/theme/ThemeToggle";
-import { requiredAuth } from "@/lib/auth/helper";
+import { auth } from "@/lib/auth/helper";
 import { SiteConfig } from "@/site-config";
+import { Layout } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
@@ -14,7 +22,8 @@ import { MobileDropdownMenu } from "../../src/features/navigation/MobileDropdown
 import { DASHBOARD_LINKS } from "./dashboard-links";
 
 export const DashboardNavigation = async (props: PropsWithChildren) => {
-  const user = await requiredAuth();
+  const user = await auth();
+
   return (
     <div className="flex h-full flex-col lg:flex-row lg:overflow-hidden">
       {/* Desktop ONLY Navigation bar */}
@@ -33,17 +42,19 @@ export const DashboardNavigation = async (props: PropsWithChildren) => {
         <div className="h-10" />
         <DesktopVerticalMenu links={DASHBOARD_LINKS} />
         <div className="flex-1" />
-        <UserDropdown>
-          <Button variant="outline" size="sm">
-            <Avatar className="mr-2 size-6">
-              <AvatarFallback>
-                {user.email ? user.email.slice(0, 2) : "??"}
-              </AvatarFallback>
-              {user.image && <AvatarImage src={user.image} />}
-            </Avatar>
-            <span className="max-lg:hidden">{user.name}</span>
-          </Button>
-        </UserDropdown>
+        {user ? (
+          <UserDropdown>
+            <Button variant="outline" size="sm">
+              <Avatar className="mr-2 size-6">
+                <AvatarFallback>
+                  {user.email ? user.email.slice(0, 2) : "??"}
+                </AvatarFallback>
+                {user.image && <AvatarImage src={user.image} />}
+              </Avatar>
+              <span className="max-lg:hidden">{user.name}</span>
+            </Button>
+          </UserDropdown>
+        ) : null}
       </div>
       {/* Main container */}
       <div className="flex-1">
@@ -84,7 +95,25 @@ export const DashboardNavigation = async (props: PropsWithChildren) => {
 
         {/* Content of the page */}
         <main className="py-4 lg:max-h-[calc(100vh_-_64px)] lg:flex-1 lg:overflow-auto lg:py-8">
-          {props.children}
+          {user ? (
+            props.children
+          ) : (
+            <Layout>
+              <LayoutHeader>
+                <LayoutTitle>
+                  Sorry, you need to be authenticated to access this resource.
+                </LayoutTitle>
+              </LayoutHeader>
+              <LayoutContent className="flex gap-4">
+                <SignInButton />
+                <ContactSupportDialog>
+                  <Button variant="secondary" size="sm">
+                    Contact support
+                  </Button>
+                </ContactSupportDialog>
+              </LayoutContent>
+            </Layout>
+          )}
         </main>
       </div>
     </div>

@@ -2,12 +2,13 @@ import { SiteConfig } from "@/site-config";
 import Image from "next/image";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
+import { Layout } from "../page/layout";
 import { ThemeToggle } from "../theme/ThemeToggle";
 
 export function HeaderBase({ children }: PropsWithChildren) {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+      <Layout className="my-2">
         <div className="flex items-center gap-2">
           <Image
             src={SiteConfig.appIcon}
@@ -15,7 +16,7 @@ export function HeaderBase({ children }: PropsWithChildren) {
             width={32}
             height={32}
           />
-          <Link href="/" className="text-xl font-bold">
+          <Link href="/" className="text-base font-bold">
             {SiteConfig.title}
           </Link>
         </div>
@@ -26,7 +27,7 @@ export function HeaderBase({ children }: PropsWithChildren) {
             <ThemeToggle />
           </nav>
         </div>
-      </div>
+      </Layout>
     </header>
   );
 }
