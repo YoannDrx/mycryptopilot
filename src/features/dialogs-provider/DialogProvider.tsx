@@ -56,7 +56,6 @@ const useDialogStore = create<DialogStore>((set, get) => ({
                 });
               });
           } else {
-            dialog.action?.onClick();
             removeDialog(id);
           }
         },
