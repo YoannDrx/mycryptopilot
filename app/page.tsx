@@ -21,6 +21,7 @@ export default function HomePage() {
   return (
     <div className="relative flex h-fit flex-col bg-background text-foreground">
       <div className="mt-16"></div>
+
       <LandingHeader />
 
       <Hero />
@@ -55,6 +56,7 @@ export default function HomePage() {
           },
         ]}
       />
+
       <SectionDivider />
 
       <ReviewSingle
@@ -131,7 +133,9 @@ export default function HomePage() {
       />
 
       <CTAImageSection />
+
       <CTASectionCard />
+
       <CtaSection />
 
       <Pricing
@@ -173,6 +177,7 @@ export default function HomePage() {
           },
         ]}
       />
+
       <FAQSection
         faq={[
           {
@@ -214,6 +219,7 @@ export default function HomePage() {
       />
 
       <SectionDivider />
+
       <ReviewGrid
         reviews={[
           {
@@ -292,6 +298,7 @@ export default function HomePage() {
       <EmailFormSection />
 
       <SectionDivider />
+
       <Footer />
     </div>
   );
