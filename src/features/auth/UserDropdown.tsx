@@ -10,9 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Loader } from "@/components/ui/loader";
+import { Typography } from "@/components/ui/typography";
 import { useMutation } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut, User2 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { LayoutDashboard, LogOut, Settings } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
 
@@ -20,16 +21,21 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
   const logout = useMutation({
     mutationFn: () => signOut(),
   });
+  const session = useSession();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Accounts</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          <Typography variant="small">{session.data?.user.name}</Typography>
+          <Typography variant="muted">{session.data?.user.email}</Typography>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/account">
-            <User2 className="mr-2 size-4" />
-            My account
+            <Settings className="mr-2 size-4" />
+            Settings
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

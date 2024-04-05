@@ -1,9 +1,8 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { useIsClient } from "@/hooks/useIsClient";
-import { displayName } from "@/lib/format/displayName";
 import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { UserDropdown } from "./UserDropdown";
@@ -44,15 +43,14 @@ export const LoggedInButton = ({
 }) => {
   return (
     <UserDropdown>
-      <Button variant="outline" size="sm">
-        <Avatar className="mr-2 size-6 bg-card">
+      <button className="group size-9 rounded-full">
+        <Avatar className="mr-2 size-full group-active:scale-95">
           <AvatarFallback className="bg-card">
             {user.email.slice(0, 1).toUpperCase()}
           </AvatarFallback>
           {user.image && <AvatarImage src={user.image} />}
         </Avatar>
-        <span className="max-lg:hidden">{displayName(user)}</span>
-      </Button>
+      </button>
     </UserDropdown>
   );
 };
