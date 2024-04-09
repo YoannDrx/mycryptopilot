@@ -6,7 +6,7 @@ import NextAuth from "next-auth";
 import { env } from "../env";
 import { prisma } from "../prisma";
 import { setupResendCustomer, setupStripeCustomer } from "./auth-config-setup";
-import { getNextAuthConfigProviders } from "./getProviders";
+import { getNextAuthConfigProviders } from "./getNextAuthConfigProviders";
 
 export const { handlers, auth: baseAuth } = NextAuth((req) => ({
   pages: {
