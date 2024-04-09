@@ -6,6 +6,7 @@ import { UserDropdown } from "@/features/auth/UserDropdown";
 import { ContactFeedbackPopover } from "@/features/contact/feedback/ContactFeedbackPopover";
 import { ContactSupportDialog } from "@/features/contact/support/ContactSupportDialog";
 import {
+  Layout,
   LayoutContent,
   LayoutHeader,
   LayoutTitle,
@@ -13,7 +14,6 @@ import {
 import { ThemeToggle } from "@/features/theme/ThemeToggle";
 import { auth } from "@/lib/auth/helper";
 import { SiteConfig } from "@/site-config";
-import { Layout } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
