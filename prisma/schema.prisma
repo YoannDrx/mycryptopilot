@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Account {
-  id                    String  @id @default(cuid())
+  id                    String  @id @default(nanoid(11))
   userId                String
   type                  String
   provider              String
@@ -40,7 +40,7 @@ model VerificationToken {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(nanoid(11))
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
@@ -51,7 +51,7 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(nanoid(11))
   name          String?
   email         String    @unique
   emailVerified DateTime?
@@ -75,7 +75,7 @@ model User {
 }
 
 model Feedback {
-  id      String  @id @default(cuid())
+  id      String  @id @default(nanoid(11))
   review  Int
   message String
   email   String?
