@@ -57,7 +57,7 @@ export default async function RoutePage(props: PageParams<{}>) {
           >
             <Badge
               variant={
-                activeTags && activeTags.includes(tag) ? "default" : "outline"
+                activeTags?.includes(tag) ? "default" : "outline"
               }
             >
               {tag}
