@@ -1,3 +1,5 @@
+"use server";
+
 import { authAction } from "@/lib/server-actions/safe-actions";
 import { z } from "zod";
 import {

@@ -20,7 +20,7 @@ import {
 import type { TypeOf, ZodSchema } from "zod";
 import { Label } from "./label";
 
-export type FormProps<T extends FieldValues> = Omit<
+type FormProps<T extends FieldValues> = Omit<
   React.ComponentProps<"form">,
   "onSubmit"
 > & {
@@ -228,3 +228,5 @@ export {
   useFormField,
   useZodForm,
 };
+
+export type { FormProps };
