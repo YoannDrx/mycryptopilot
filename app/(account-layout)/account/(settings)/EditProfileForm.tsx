@@ -97,7 +97,7 @@ export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
           </FormItem>
         )}
       />
-      <SubmitButton className="w-fit" size="sm">
+      <SubmitButton className="w-fit self-end" size="sm">
         Save
       </SubmitButton>
     </Form>

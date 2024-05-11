@@ -1,12 +1,6 @@
 "use client";
 
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
   Form,
   FormControl,
   FormField,
@@ -37,62 +31,55 @@ export const EditPasswordForm = () => {
   };
 
   return (
-    <Accordion type="multiple">
-      <AccordionItem value="1">
-        <AccordionTrigger>Change password</AccordionTrigger>
-        <AccordionContent className="px-4">
-          <Form
-            form={form}
-            onSubmit={async (v) => onSubmit(v)}
-            className="flex flex-col gap-4"
-          >
-            <FormField
-              control={form.control}
-              name="currentPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Current Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
+    <Form
+      form={form}
+      onSubmit={async (v) => onSubmit(v)}
+      className="flex flex-col gap-4"
+    >
+      <FormField
+        control={form.control}
+        name="currentPassword"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Current Password</FormLabel>
+            <FormControl>
+              <Input type="password" {...field} />
+            </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="newPassword"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>New Password</FormLabel>
+            <FormControl>
+              <Input type="password" {...field} />
+            </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm new Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="confirmPassword"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Confirm new Password</FormLabel>
+            <FormControl>
+              <Input type="password" {...field} />
+            </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-            <SubmitButton>Save</SubmitButton>
-          </Form>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+      <SubmitButton className="w-fit self-end">Save</SubmitButton>
+    </Form>
   );
 };
