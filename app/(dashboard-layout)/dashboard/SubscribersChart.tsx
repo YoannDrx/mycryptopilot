@@ -36,7 +36,6 @@ const SUBSCRIBERS: { date: string; amount: number }[] = [
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TooltipChart, TooltipChartItem } from "@/features/chart/TooltipChart";
-import { formatPrice } from "@/lib/format";
 import {
   Area,
   AreaChart,
@@ -108,11 +107,11 @@ export const SubscribersChart = () => {
                   return (
                     <TooltipChart>
                       <TooltipChartItem label="Amount">
-                        {formatPrice(payload[0].payload.amount)}
+                        {Intl.NumberFormat().format(payload[0].payload.value)}
                       </TooltipChartItem>
 
                       <TooltipChartItem label="Date">
-                        {payload[0].payload.date}
+                        {new Date(payload[0].payload.date).toLocaleDateString()}
                       </TooltipChartItem>
                     </TooltipChart>
                   );
