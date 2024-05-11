@@ -14,8 +14,8 @@ export const ClientMarkdown = ({
   return (
     <ErrorBoundary>
       <Markdown
-        rehypePlugins={rehypePlugins as never}
-        remarkPlugins={remarkPlugins as never}
+        rehypePlugins={rehypePlugins}
+        remarkPlugins={remarkPlugins}
         className={cn("prose dark:prose-invert", className)}
         {...props}
       >

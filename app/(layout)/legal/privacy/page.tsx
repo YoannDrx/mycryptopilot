@@ -1,6 +1,6 @@
 import { Typography } from "@/components/ui/typography";
 import { Layout, LayoutContent } from "@/features/page/layout";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import { MDXRemote } from "next-mdx-remote-client/rsc";
 
 const markdown = `Privacy demo`;
 
