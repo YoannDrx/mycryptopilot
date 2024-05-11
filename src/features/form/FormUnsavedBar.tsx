@@ -43,7 +43,7 @@ export const FormUnsavedBar = <T extends FieldValues>(props: FormProps<T>) => {
         <button type="submit" className="hidden" ref={buttonRef} />
       </Form>
       {createPortal(
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-center overflow-hidden py-4">
           <AnimatePresence>
             {isDirty ? (
               <motion.div
