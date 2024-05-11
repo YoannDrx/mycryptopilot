@@ -16,7 +16,7 @@ export const PainSection = () => {
           But I loose my time going and publishing each days
         </Typography>
         <div className="flex items-start gap-4 max-lg:flex-col">
-          <div className="flex-1 rounded bg-red-500/30 p-4">
+          <div className="flex-1 rounded-lg bg-red-500/20 p-4 lg:p-6">
             <Typography variant="h3" className="text-red-500">
               😞 Posting without Threader
             </Typography>
@@ -27,7 +27,7 @@ export const PainSection = () => {
               <li>Incosistent</li>
             </ul>
           </div>
-          <div className="flex-1 rounded bg-green-500/30 p-4">
+          <div className="flex-1 rounded-lg bg-green-500/20 p-4 lg:p-6">
             <Typography variant="h3" className="text-green-500">
               😎 Posting WITH Threader
             </Typography>

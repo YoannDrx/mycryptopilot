@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -8,6 +7,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { LoadingButton } from "@/features/form/SubmitButton";
 import { getServerUrl } from "@/lib/server-url";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "next-auth/react";
@@ -23,7 +23,7 @@ export const MagicLinkForm = () => {
     schema: FormSchema,
   });
   const searchParams = useSearchParams();
-  const emailSignInMutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async (email: string) => {
       await signIn("resend", {
         callbackUrl: searchParams.get("callbackUrl") ?? `${getServerUrl()}/`,
@@ -38,7 +38,7 @@ export const MagicLinkForm = () => {
       <Form
         form={form}
         onSubmit={async (values) => {
-          await emailSignInMutation.mutateAsync(values.email);
+          await mutation.mutateAsync(values.email);
         }}
         className="flex w-full items-center gap-2"
       >
@@ -54,9 +54,9 @@ export const MagicLinkForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" size="sm">
+        <LoadingButton loading={mutation.isPending} type="submit" size="sm">
           Sign in
-        </Button>
+        </LoadingButton>
       </Form>
     </>
   );

@@ -19,26 +19,34 @@ export default async function EditProfilePage() {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <Avatar className="size-16">
-            <AvatarFallback>{user.email.slice(0, 2)}</AvatarFallback>
-            {user.image ? <AvatarImage src={user.image} /> : null}
-          </Avatar>
+    <div className="flex flex-col gap-4 lg:gap-8">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Avatar className="size-16">
+              <AvatarFallback>{user.email.slice(0, 2)}</AvatarFallback>
+              {user.image ? <AvatarImage src={user.image} /> : null}
+            </Avatar>
 
-          <CardTitle>{displayName(user)}</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <EditProfileForm defaultValues={user} />
-        {Boolean(hasPassword) && (
-          <>
-            <div className="h-16" />
-            <EditPasswordForm />
-          </>
-        )}
-      </CardContent>
-    </Card>
+            <CardTitle>{displayName(user)}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <EditProfileForm defaultValues={user} />
+        </CardContent>
+      </Card>
+      {Boolean(hasPassword) ? (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Change Password</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EditPasswordForm />
+            </CardContent>
+          </Card>
+        </>
+      ) : null}
+    </div>
   );
 }

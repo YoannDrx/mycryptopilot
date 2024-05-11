@@ -31,6 +31,7 @@ export default function RootLayout({
           <PlausibleProvider domain={SiteConfig.domain} />
         </head>
         <body
+          suppressHydrationWarning
           className={cn(
             "h-full bg-background font-sans antialiased",
             GeistMono.variable,

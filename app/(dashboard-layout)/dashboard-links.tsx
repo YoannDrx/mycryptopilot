@@ -1,5 +1,5 @@
 import type { NavigationLinkGroups } from "@/features/navigation/navigation.type";
-import { LayoutDashboard, User2 } from "lucide-react";
+import { LayoutDashboard, Settings, User2 } from "lucide-react";
 
 export const DASHBOARD_LINKS: NavigationLinkGroups[] = [
   {
@@ -8,6 +8,11 @@ export const DASHBOARD_LINKS: NavigationLinkGroups[] = [
         title: "Dashboard",
         icon: <LayoutDashboard />,
         url: "/dashboard",
+      },
+      {
+        title: "Settings",
+        icon: <Settings />,
+        url: "/settings",
       },
     ],
   },

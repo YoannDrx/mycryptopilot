@@ -228,3 +228,5 @@ export {
   useFormField,
   useZodForm,
 };
+
+export type { FormProps };
