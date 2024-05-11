@@ -2,7 +2,8 @@
 
 /* eslint-disable no-nested-ternary */
 import * as NProgress from "nprogress";
-import { useEffect } from "react";
+import * as React from "react";
+import { create } from "zustand";
 
 export type NextTopLoaderProps = {
   /**
@@ -76,6 +77,16 @@ const isAnchorOfCurrentUrl = (currentUrl: string, newUrl: string) => {
   );
 };
 
+export const useNextTopLoaderStore = create<{
+  isEnable: boolean;
+  disable: () => void;
+  enable: () => void;
+}>((set) => ({
+  isEnable: true,
+  disable: () => set({ isEnable: false }),
+  enable: () => set({ isEnable: true }),
+}));
+
 export const NextTopLoader = ({
   color = "#29d",
   height = 3,
@@ -102,7 +113,7 @@ export const NextTopLoader = ({
     </style>
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     NProgress.configure({
       showSpinner,
       trickle: crawl,
@@ -124,7 +135,7 @@ export const NextTopLoader = ({
       window.history.pushState = function (...args) {
         isDone = true;
         NProgress.done();
-        for (const el of Array.from(document.querySelectorAll("html"))) {
+        for (const el of document.querySelectorAll("html")) {
           el.classList.remove("nprogress-busy");
         }
         return originalPushState.apply(window.history, args);
@@ -135,13 +146,15 @@ export const NextTopLoader = ({
       if (delay === 0) {
         NProgress.start();
         NProgress.done();
-        for (const el of Array.from(document.querySelectorAll("html"))) {
+        for (const el of document.querySelectorAll("html")) {
           el.classList.remove("nprogress-busy");
         }
       }
     };
 
     const handleClick = (event: MouseEvent) => {
+      if (useNextTopLoaderStore.getState().isEnable === false) return;
+
       // if ctrl or cmd key is pressed, don't intercept
       if (event.ctrlKey || event.metaKey) return;
 
@@ -155,6 +168,9 @@ export const NextTopLoader = ({
         const newUrl = anchor.href;
         const isExternalLink = anchor.target === "_blank";
         const isAnchor = isAnchorOfCurrentUrl(currentUrl, newUrl);
+        const isDisabled = anchor.getAttribute("data-toploader-disabled");
+
+        if (isDisabled === "true") return;
 
         if (newUrl === currentUrl || isAnchor || isExternalLink) {
           handleQuickProgress();
@@ -177,4 +193,14 @@ export const NextTopLoader = ({
   }, []);
 
   return styles;
+};
+
+export const stopLoading = () => {
+  setTimeout(() => {
+    NProgress.start();
+    NProgress.done();
+    for (const el of document.querySelectorAll("html")) {
+      el.classList.remove("nprogress-busy");
+    }
+  }, 100);
 };

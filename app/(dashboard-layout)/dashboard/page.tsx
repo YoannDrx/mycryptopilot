@@ -8,6 +8,8 @@ import {
 } from "@/features/page/layout";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
+import InformationCards from "./InformationCards";
+import { SubscribersChart } from "./SubscribersChart";
 
 export default async function RoutePage(props: PageParams<{}>) {
   return (
@@ -15,7 +17,9 @@ export default async function RoutePage(props: PageParams<{}>) {
       <LayoutHeader>
         <LayoutTitle>Dashboard</LayoutTitle>
       </LayoutHeader>
-      <LayoutContent>
+      <LayoutContent className="flex flex-col gap-4 lg:gap-8">
+        <InformationCards />
+        <SubscribersChart />
         <div className="flex flex-wrap items-start gap-4">
           <Card>
             <CardHeader>
