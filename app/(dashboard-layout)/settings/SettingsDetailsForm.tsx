@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { updateSettingsAction } from "./settings.action";
 import {
   SettingsDetailsFormSchema,
   type SettingsDetailsFormType,
@@ -36,13 +38,15 @@ export const SettingsDetailsForm = ({ defaultValues }: ProductFormProps) => {
 
   const mutation = useMutation({
     mutationFn: async (values: SettingsDetailsFormType) => {
-      // Some async logic here
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const { data, serverError } = await updateSettingsAction(values);
 
-      // After each mutation, we refresh the router to update the URL
-      // And we reset the form to set `isDirty` to false
+      if (!data || serverError) {
+        toast.error("Failed to update settings");
+        throw new Error("Failed to update settings");
+      }
+
       router.refresh();
-      form.reset(values);
+      form.reset(data as SettingsDetailsFormType);
     },
   });
 
