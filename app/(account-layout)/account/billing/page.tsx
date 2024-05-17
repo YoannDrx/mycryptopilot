@@ -52,7 +52,7 @@ export default async function DeleteProfilePage() {
           className={cn(buttonVariants({ variant: "outline" }), "w-fit")}
           href={stripeSession.url}
         >
-          Update billing informations
+          Update billing information
         </Link>
       </CardContent>
     </Card>
