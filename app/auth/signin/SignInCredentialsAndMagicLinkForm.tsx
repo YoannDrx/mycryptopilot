@@ -51,9 +51,6 @@ export const SignInCredentialsAndMagicLinkForm = () => {
 
   return (
     <Form form={form} onSubmit={onSubmit} className="max-w-lg space-y-4">
-      <Typography variant="small">
-        {isUsingCredentials ? "Authenticate with credentials" : "Magic link ✨"}
-      </Typography>
       <FormField
         control={form.control}
         name="email"
