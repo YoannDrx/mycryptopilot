@@ -25,7 +25,7 @@ export const buyButtonAction = action(BuyButtonSchema, async (data) => {
     customer: stripeCustomerId,
     mode: priceType === "one_time" ? "payment" : "subscription",
     payment_method_types: ["card", "link"],
-    customer_creation: "always",
+    customer_creation: "if_required",
     line_items: [
       {
         price: priceId,
