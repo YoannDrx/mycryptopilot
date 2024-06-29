@@ -41,12 +41,12 @@ const getUser = async () => {
 
 export const authAction = createSafeActionClient({
   handleReturnedServerError,
+}).use(async ({ next }) => {
+  const user = await getUser();
 
-  async middleware() {
-    const user = await getUser();
-
-    return {
+  return next({
+    ctx: {
       user: user as User,
-    };
-  },
+    },
+  });
 });

@@ -1,21 +1,18 @@
 "use server";
 
-import { requiredAuth } from "@/lib/auth/helper";
+import { ActionError, authAction } from "@/lib/backend/safe-actions";
 import { env } from "@/lib/env";
 import { resend } from "@/lib/mail/resend";
-import { ActionError, authAction } from "@/lib/server-actions/safe-actions";
 import { z } from "zod";
 
 const ToggleSubscribedActionSchema = z.object({
   unsubscribed: z.boolean(),
 });
 
-export const toggleSubscribedAction = authAction(
-  ToggleSubscribedActionSchema,
-  async (data) => {
-    const user = await requiredAuth();
-
-    if (!user.resendContactId) {
+export const toggleSubscribedAction = authAction
+  .schema(ToggleSubscribedActionSchema)
+  .action(async ({ parsedInput: input, ctx }) => {
+    if (!ctx.user.resendContactId) {
       throw new ActionError("User has no resend contact");
     }
 
@@ -25,10 +22,9 @@ export const toggleSubscribedAction = authAction(
 
     const updateContact = await resend.contacts.update({
       audienceId: env.RESEND_AUDIENCE_ID,
-      id: user.resendContactId,
-      unsubscribed: data.unsubscribed,
+      id: ctx.user.resendContactId,
+      unsubscribed: input.unsubscribed,
     });
 
     return updateContact;
-  },
-);
+  });

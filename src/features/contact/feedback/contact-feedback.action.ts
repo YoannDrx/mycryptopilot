@@ -1,15 +1,15 @@
 "use server";
 
 import { auth } from "@/lib/auth/helper";
+import { action } from "@/lib/backend/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
-import { action } from "@/lib/server-actions/safe-actions";
 import { SiteConfig } from "@/site-config";
 import { ContactFeedbackSchema } from "./contact-feedback.schema";
 
-export const contactSupportAction = action(
-  ContactFeedbackSchema,
-  async (data) => {
+export const contactSupportAction = action
+  .schema(ContactFeedbackSchema)
+  .action(async ({ parsedInput: data }) => {
     const user = await auth();
 
     const email = user?.email ?? data.email;
@@ -32,5 +32,4 @@ export const contactSupportAction = action(
     });
 
     return { message: "Your feedback has been sent to support." };
-  },
-);
+  });

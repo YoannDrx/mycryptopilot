@@ -5,17 +5,17 @@ import {
   validatePassword,
 } from "@/lib/auth/credentials-provider";
 import { requiredAuth } from "@/lib/auth/helper";
+import { ActionError, authAction } from "@/lib/backend/safe-actions";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
-import { ActionError, authAction } from "@/lib/server-actions/safe-actions";
 import {
   EditPasswordFormSchema,
   ProfileFormSchema,
 } from "./edit-profile.schema";
 
-export const updateProfileAction = authAction(
-  ProfileFormSchema,
-  async (input, ctx) => {
+export const updateProfileAction = authAction
+  .schema(ProfileFormSchema)
+  .action(async ({ parsedInput: input, ctx }) => {
     const previousEmail = ctx.user.email;
 
     const user = await prisma.user.update({
@@ -30,12 +30,11 @@ export const updateProfileAction = authAction(
     });
 
     return user;
-  },
-);
+  });
 
-export const editPasswordAction = authAction(
-  EditPasswordFormSchema,
-  async (input, ctx) => {
+export const editPasswordAction = authAction
+  .schema(EditPasswordFormSchema)
+  .action(async ({ parsedInput: input, ctx }) => {
     const user = await requiredAuth();
     const { passwordHash } = await prisma.user.findUniqueOrThrow({
       where: {
@@ -79,5 +78,4 @@ export const editPasswordAction = authAction(
     });
 
     return updatedUser;
-  },
-);
+  });
