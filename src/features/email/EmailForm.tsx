@@ -35,13 +35,13 @@ export const EmailForm = ({
 
   const submit = useMutation({
     mutationFn: async ({ email }: EmailActionSchemaType) => {
-      const { serverError, data } = await addEmailAction({ email });
+      const result = await addEmailAction({ email });
       plausible("Email+Submit");
 
-      if (data) {
-        return data;
+      if (result?.data) {
+        return result.data;
       } else {
-        throw new Error(serverError);
+        throw new Error(result?.serverError || "Unknown error");
       }
     },
   });

@@ -35,10 +35,10 @@ export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (values: ProfileFormType) => {
-      const { data, serverError } = await updateProfileAction(values);
+      const result = await updateProfileAction(values);
 
       if (values.email !== defaultValues.email) {
-        await createVerifyEmailAction(values.email);
+        await createVerifyEmailAction("");
         toast.success(
           "You have updated your email. We have sent you a new email verification link.",
         );
@@ -46,8 +46,8 @@ export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
         return;
       }
 
-      if (!data) {
-        toast.error(serverError);
+      if (!result?.data) {
+        toast.error(result?.serverError);
         return;
       }
 

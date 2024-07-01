@@ -27,16 +27,16 @@ export const BuyButton = ({ priceId, ...props }: BuyButtonProps) => {
   const router = useRouter();
   const mutation = useMutation({
     mutationFn: async () => {
-      const { data, serverError } = await buyButtonAction({
+      const result = await buyButtonAction({
         priceId: priceId,
       });
 
-      if (data) {
-        router.push(data.url);
+      if (result?.data) {
+        router.push(result.data.url);
         return;
       }
 
-      toast.error(serverError ?? "Something went wrong");
+      toast.error(result?.serverError ?? "Something went wrong");
     },
   });
 

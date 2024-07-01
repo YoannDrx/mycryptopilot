@@ -44,10 +44,10 @@ export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
   });
 
   const onSubmit = async (values: ContactSupportSchemaType) => {
-    const { data, serverError } = await contactSupportAction(values);
+    const result = await contactSupportAction(values);
 
-    if (!data) {
-      toast.error(serverError);
+    if (!result?.data) {
+      toast.error(result?.serverError);
       return;
     }
 

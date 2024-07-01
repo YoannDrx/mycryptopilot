@@ -17,12 +17,12 @@ export const ToggleEmailCheckbox = ({
 }: ToggleEmailCheckboxProps) => {
   const mutation = useMutation({
     mutationFn: async (unsubscribed: boolean) => {
-      const { data, serverError } = await toggleSubscribedAction({
+      const result = await toggleSubscribedAction({
         unsubscribed,
       });
 
-      if (!data) {
-        toast.error(serverError);
+      if (!result?.data) {
+        toast.error(result?.serverError ?? "An error occurred");
         return;
       }
 

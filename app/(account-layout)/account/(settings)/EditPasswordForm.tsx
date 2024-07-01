@@ -22,9 +22,9 @@ export const EditPasswordForm = () => {
   });
 
   const onSubmit = async (values: EditPasswordFormType) => {
-    const { serverError } = await editPasswordAction(values);
-    if (serverError) {
-      toast.error(serverError);
+    const result = await editPasswordAction(values);
+    if (result?.serverError) {
+      toast.error(result.serverError);
       return;
     }
     toast.success("Password updated");

@@ -42,10 +42,10 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
   });
 
   const onSubmit = async (values: ContactFeedbackSchemaType) => {
-    const { data, serverError } = await contactSupportAction(values);
+    const result = await contactSupportAction(values);
 
-    if (!data) {
-      toast.error(serverError);
+    if (!result?.data) {
+      toast.error(result?.serverError);
       return;
     }
 

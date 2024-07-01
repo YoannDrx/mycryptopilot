@@ -38,15 +38,15 @@ export const SettingsDetailsForm = ({ defaultValues }: ProductFormProps) => {
 
   const mutation = useMutation({
     mutationFn: async (values: SettingsDetailsFormType) => {
-      const { data, serverError } = await updateSettingsAction(values);
+      const result = await updateSettingsAction(values);
 
-      if (!data || serverError) {
+      if (!result || result.serverError) {
         toast.error("Failed to update settings");
         throw new Error("Failed to update settings");
       }
 
       router.refresh();
-      form.reset(data as SettingsDetailsFormType);
+      form.reset(result.data as SettingsDetailsFormType);
     },
   });
 
