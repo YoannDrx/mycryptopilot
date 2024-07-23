@@ -33,7 +33,7 @@ export default function DeleteProfilePage() {
               action: {
                 label: "Delete",
                 onClick: async () => {
-                  await deleteAccountAction(null);
+                  await deleteAccountAction();
                   toast.success("Your profile has been deleted.");
                 },
               },

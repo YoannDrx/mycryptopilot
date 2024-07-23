@@ -22,7 +22,7 @@ export const CTAImageSection = () => {
         >
           Start getting a lot of followers
         </Typography>
-        <Typography variant="base" className="text-center font-bold">
+        <Typography className="text-center font-bold">
           By posting every day with Threader !
         </Typography>
         <Link href="#pricing" className={buttonVariants({ size: "lg" })}>

@@ -47,7 +47,7 @@ export const PricingCard = (props: PricingCardProps) => {
         </p>
         <div className="flex items-end justify-center gap-2">
           <p className="text-5xl font-extrabold">${props.price}</p>
-          <Typography variant="base">{props.currency ?? "USD"}</Typography>
+          <Typography>{props.currency ?? "USD"}</Typography>
 
           {props.barredPrice ? (
             <div className="relative self-start">

@@ -14,7 +14,7 @@ export function CTASectionCard() {
     <SectionLayout>
       <Card className="relative isolate overflow-hidden px-6 py-24 text-center shadow-2xl sm:rounded-3xl sm:px-16">
         <Typography variant="h2">It's time to start.</Typography>
-        <Typography variant="base" className="mt-4 text-muted-foreground">
+        <Typography className="mt-4 text-muted-foreground">
           Create an account and start posting today.
         </Typography>
         <div className="mt-10 flex items-center justify-center gap-6">

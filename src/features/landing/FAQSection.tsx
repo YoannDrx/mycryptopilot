@@ -23,10 +23,7 @@ export const FAQSection = (props: FeaturesPreviewProps) => {
   return (
     <SectionLayout size="lg" className="flex max-lg:flex-col">
       <div className="flex-1 space-y-2">
-        <Typography
-          variant="base"
-          className="font-extrabold uppercase text-primary"
-        >
+        <Typography className="font-extrabold uppercase text-primary">
           FAQ
         </Typography>
         <Typography variant="h2" className="text-5xl">

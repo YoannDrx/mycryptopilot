@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from "@/lib/utils";
 import type { VariantProps } from "class-variance-authority";
@@ -78,7 +79,7 @@ type ElementTypeForVariant<TVariant extends keyof ElementMapping> =
  * @param ref The ref of the element. Untyped because it's a generic
  * @returns
  */
-const Typography = <
+const InnerTypography = <
   TAs extends ElementType,
   TVariant extends TypographyCvaProps["variant"] = "default",
 >(
@@ -110,4 +111,4 @@ const Typography = <
   );
 };
 
-export const Typo = fixedForwardRef(Typography);
+export const Typography = fixedForwardRef(InnerTypography);

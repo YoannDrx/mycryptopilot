@@ -9,7 +9,7 @@ export function Page404() {
       <div className="space-y-3 text-center">
         <Typography variant="code">404</Typography>
         <Typography variant="h1">Page not found</Typography>
-        <Typography variant="base">
+        <Typography>
           Sorry, we couldn't find the page you're looking for.
         </Typography>
       </div>

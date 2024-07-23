@@ -9,7 +9,7 @@ export function Page400() {
       <div className="max-w-lg space-y-3 text-center">
         <Typography variant="code">400</Typography>
         <Typography variant="h1">Oh No! Unexpected Error.</Typography>
-        <Typography variant="base">
+        <Typography>
           It seems we're experiencing some technical difficulties. Not to worry,
           our team is working on it. In the meantime, try refreshing the page or
           visiting us a bit later.

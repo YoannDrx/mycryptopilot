@@ -60,9 +60,7 @@ export const FeaturesPreviewSection = (props: FeaturesPreviewProps) => {
                       exit={{ height: 0, opacity: 0 }}
                     >
                       <div className="h-4" />
-                      <Typography variant="base">
-                        {feature.description}
-                      </Typography>
+                      <Typography>{feature.description}</Typography>
                     </motion.div>
                   )}
                 </AnimatePresence>
