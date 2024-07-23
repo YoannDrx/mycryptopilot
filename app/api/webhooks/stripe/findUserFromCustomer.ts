@@ -31,7 +31,9 @@ export const findUserFromCustomer = async (
       },
     });
     return user;
-  } catch {}
+  } catch {
+    // ignore
+  }
 
   const customer = await stripe.customers.retrieve(stripeCustomerId);
   if (customer.deleted) {

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+ 
 import { Typography } from "@/components/ui/typography";
 import { SiteConfig } from "@/site-config";
 import Link from "next/link";

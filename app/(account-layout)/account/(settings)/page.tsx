@@ -35,7 +35,7 @@ export default async function EditProfilePage() {
           <EditProfileForm defaultValues={user} />
         </CardContent>
       </Card>
-      {Boolean(hasPassword) ? (
+      {hasPassword ? (
         <>
           <Card>
             <CardHeader>

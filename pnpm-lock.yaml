@@ -11,9 +11,6 @@ importers:
       '@auth/prisma-adapter':
         specifier: ^2.4.1
         version: 2.4.1(@prisma/client@5.17.0(prisma@5.17.0))
-      '@eslint/js':
-        specifier: ^9.7.0
-        version: 9.7.0
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.9.0(react-hook-form@7.52.1(react@18.3.1))
@@ -219,6 +216,15 @@ importers:
       '@eslint/compat':
         specifier: ^1.1.1
         version: 1.1.1
+      '@eslint/eslintrc':
+        specifier: ^3.1.0
+        version: 3.1.0
+      '@eslint/js':
+        specifier: ^9.7.0
+        version: 9.7.0
+      '@next/eslint-plugin-next':
+        specifier: ^14.2.5
+        version: 14.2.5
       '@tailwindcss/typography':
         specifier: ^0.5.13
         version: 0.5.13(tailwindcss@3.4.6)
@@ -255,6 +261,12 @@ importers:
       eslint-config-next:
         specifier: 14.2.5
         version: 14.2.5(eslint@9.7.0)(typescript@5.5.4)
+      eslint-plugin-react:
+        specifier: ^7.35.0
+        version: 7.35.0(eslint@9.7.0)
+      eslint-plugin-react-hooks:
+        specifier: 5.1.0-rc-d025ddd3-20240722
+        version: 5.1.0-rc-d025ddd3-20240722(eslint@9.7.0)
       eslint-plugin-tailwindcss:
         specifier: ^3.17.4
         version: 3.17.4(tailwindcss@3.4.6)
@@ -2644,6 +2656,12 @@ packages:
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
+
+  eslint-plugin-react-hooks@5.1.0-rc-d025ddd3-20240722:
+    resolution: {integrity: sha512-Nh+NRc59nor6YujgoBOKaZhpHl453+3CWGHrk81G4EqaINMK+Wnp2pZkiOHqS9CdQDYs12i6VPgHR/PEFm3FYA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
 
   eslint-plugin-react@7.35.0:
     resolution: {integrity: sha512-v501SSMOWv8gerHkk+IIQBkcGRGrO2nfybfj5pLxuJNFTPxxA3PSryhXTK+9pNbtkggheDdsC0E9Q8CuPk6JKA==}
@@ -7573,6 +7591,10 @@ snapshots:
       string.prototype.includes: 2.0.0
 
   eslint-plugin-react-hooks@4.6.2(eslint@9.7.0):
+    dependencies:
+      eslint: 9.7.0
+
+  eslint-plugin-react-hooks@5.1.0-rc-d025ddd3-20240722(eslint@9.7.0):
     dependencies:
       eslint: 9.7.0
 

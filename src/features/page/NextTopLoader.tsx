@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable no-nested-ternary */
 import * as NProgress from "nprogress";
 import * as React from "react";
 import { create } from "zustand";
