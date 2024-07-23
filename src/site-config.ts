@@ -2,7 +2,7 @@ export const SiteConfig = {
   title: "Now.ts",
   description: "A template description for Now.ts",
   prodUrl: "https://demo.nowts.app",
-  domain: "demo.nowts.app",
+  domain: "nowts.app",
   appIcon: "/images/icon.png",
   company: {
     name: "NowTS Inc.",
@@ -12,7 +12,7 @@ export const SiteConfig = {
     primary: "#007291",
   },
   email: {
-    from: "NowTS <nowts@resend.dev>", // Replace this with your domaine email
+    from: "NowTS <contact@nowts.app>", // Replace this with your domaine email
     contact: "contact@nowts.app",
   },
   maker: {

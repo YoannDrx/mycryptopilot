@@ -19,26 +19,28 @@ import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updateSettingsAction } from "./settings.action";
+import { updateOrganizationDetailsAction } from "../organization.schema";
 import {
-  SettingsDetailsFormSchema,
-  type SettingsDetailsFormType,
-} from "./settings.schema";
+  OrganizationDetailsFormSchema,
+  type OrganizationDetailsFormSchemaType,
+} from "../settings.schema";
 
 type ProductFormProps = {
-  defaultValues: SettingsDetailsFormType;
+  defaultValues: OrganizationDetailsFormSchemaType;
 };
 
-export const SettingsDetailsForm = ({ defaultValues }: ProductFormProps) => {
+export const OrganizationDetailsForm = ({
+  defaultValues,
+}: ProductFormProps) => {
   const form = useZodForm({
-    schema: SettingsDetailsFormSchema,
+    schema: OrganizationDetailsFormSchema,
     defaultValues,
   });
   const router = useRouter();
 
   const mutation = useMutation({
-    mutationFn: async (values: SettingsDetailsFormType) => {
-      const result = await updateSettingsAction(values);
+    mutationFn: async (values: OrganizationDetailsFormSchemaType) => {
+      const result = await updateOrganizationDetailsAction(values);
 
       if (!result || result.serverError) {
         toast.error("Failed to update settings");
@@ -46,7 +48,7 @@ export const SettingsDetailsForm = ({ defaultValues }: ProductFormProps) => {
       }
 
       router.refresh();
-      form.reset(result.data as SettingsDetailsFormType);
+      form.reset(result.data as OrganizationDetailsFormSchemaType);
     },
   });
 
@@ -58,9 +60,10 @@ export const SettingsDetailsForm = ({ defaultValues }: ProductFormProps) => {
     >
       <Card>
         <CardHeader>
-          <CardTitle>Name</CardTitle>
+          <CardTitle>Organization's name</CardTitle>
           <CardDescription>
-            Use a descriptive name to help you identify this product/bundle.
+            Use your organization's name or your name if you don't have an
+            organization.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -80,9 +83,9 @@ export const SettingsDetailsForm = ({ defaultValues }: ProductFormProps) => {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Email</CardTitle>
+          <CardTitle>Organization's email</CardTitle>
           <CardDescription>
-            Use a valid email address to receive important notifications.
+            Use a valid email address to receive billing and invoices.
           </CardDescription>
         </CardHeader>
         <CardContent>

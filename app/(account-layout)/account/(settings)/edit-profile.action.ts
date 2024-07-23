@@ -1,11 +1,11 @@
 "use server";
 
+import { ActionError, authAction } from "@/lib/actions/safe-actions";
 import {
   hashStringWithSalt,
   validatePassword,
 } from "@/lib/auth/credentials-provider";
 import { requiredAuth } from "@/lib/auth/helper";
-import { ActionError, authAction } from "@/lib/backend/safe-actions";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import {

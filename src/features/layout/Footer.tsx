@@ -2,12 +2,11 @@ import { Typography } from "@/components/ui/typography";
 import { Layout, LayoutContent } from "@/features/page/layout";
 import { SiteConfig } from "@/site-config";
 import Link from "next/link";
-import { Maker } from "../maker/Maker";
 
 export const Footer = () => {
   return (
-    <footer className="bg-card">
-      <Layout className="mt-24 py-24">
+    <footer className="border border-border bg-card">
+      <Layout className="py-24">
         <LayoutContent className="flex justify-between max-lg:flex-col">
           <div className="flex flex-col gap-4">
             <div className="space-y-1">
@@ -15,7 +14,6 @@ export const Footer = () => {
               <Typography>{SiteConfig.company.name}</Typography>
               <Typography>{SiteConfig.company.address}</Typography>
             </div>
-            <Maker />
             <Typography variant="muted" className="italic">
               © {new Date().getFullYear()} {SiteConfig.company.name} - All
               rights reserved.

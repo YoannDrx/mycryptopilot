@@ -17,8 +17,8 @@ import { SiteConfig } from "@/site-config";
 import Image from "next/image";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
-import { DesktopVerticalMenu } from "../../src/features/navigation/DesktopVerticalMenu";
-import { MobileDropdownMenu } from "../../src/features/navigation/MobileDropdownMenu";
+import { DesktopVerticalMenu } from "../../../src/features/navigation/DesktopVerticalMenu";
+import { MobileDropdownMenu } from "../../../src/features/navigation/MobileDropdownMenu";
 import { DASHBOARD_LINKS } from "./dashboard-links";
 
 export const DashboardNavigation = async (props: PropsWithChildren) => {

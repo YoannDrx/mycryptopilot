@@ -9,7 +9,7 @@ import {
 import type { LayoutParams } from "@/types/next";
 
 export default async function RouteLayout(
-  props: LayoutParams<{ productId: string }>,
+  props: LayoutParams<{ productId: string; organizationId: string }>,
 ) {
   return (
     <Layout>
@@ -24,12 +24,12 @@ export default async function RouteLayout(
         <SettingsNavigation
           links={[
             {
-              href: `/settings`,
+              href: `/${props.params.organizationId}/settings`,
               label: "General",
             },
             {
-              href: `/settings/notifications`,
-              label: "Invoices",
+              href: `/${props.params.organizationId}/settings/members`,
+              label: "Members",
             },
           ]}
         />

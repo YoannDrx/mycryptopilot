@@ -1,5 +1,6 @@
 "use server";
 
+import { ActionError, action } from "@/lib/actions/safe-actions";
 import {
   setupResendCustomer,
   setupStripeCustomer,
@@ -8,7 +9,6 @@ import {
   hashStringWithSalt,
   validatePassword,
 } from "@/lib/auth/credentials-provider";
-import { ActionError, action } from "@/lib/backend/safe-actions";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { LoginCredentialsFormScheme } from "./signup.schema";

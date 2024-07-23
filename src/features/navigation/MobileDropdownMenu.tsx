@@ -13,7 +13,7 @@ import { Typography } from "@/components/ui/typography";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { Fragment, cloneElement, useState } from "react";
-import { DASHBOARD_LINKS } from "../../../app/(dashboard-layout)/dashboard-links";
+import { DASHBOARD_LINKS } from "../../../app/[organizationId]/(navigation)/dashboard-links";
 import type { NavigationLinkGroups } from "./navigation.type";
 
 export const MobileDropdownMenu = ({

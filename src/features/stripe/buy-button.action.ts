@@ -1,7 +1,7 @@
 "use server";
 
+import { ActionError, action } from "@/lib/actions/safe-actions";
 import { auth } from "@/lib/auth/helper";
-import { ActionError, action } from "@/lib/backend/safe-actions";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 import { z } from "zod";

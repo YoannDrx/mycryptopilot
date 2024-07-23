@@ -1,7 +1,7 @@
 "use server";
 
+import { action } from "@/lib/actions/safe-actions";
 import { auth } from "@/lib/auth/helper";
-import { action } from "@/lib/backend/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";

@@ -1,6 +1,8 @@
-import type { User } from "@prisma/client";
+import { OrganizationMembershipRole, type User } from "@prisma/client";
 import { createSafeActionClient } from "next-safe-action";
+import { z } from "zod";
 import { auth } from "../auth/helper";
+import { getRequiredCurrentOrganization } from "../organizations/getCurrentOrganization";
 
 export class ActionError extends Error {
   constructor(message: string) {
@@ -49,4 +51,24 @@ export const authAction = createSafeActionClient({
       user: user as User,
     },
   });
+});
+
+export const organizationAction = createSafeActionClient({
+  handleReturnedServerError,
+  defineMetadataSchema() {
+    return z.object({
+      roles: z.array(z.nativeEnum(OrganizationMembershipRole)),
+    });
+  },
+}).use(async ({ next }) => {
+  try {
+    const organization = await getRequiredCurrentOrganization();
+    return next({
+      ctx: organization,
+    });
+  } catch (e) {
+    throw new ActionError(
+      "You need to be part of an organization to access this resource.",
+    );
+  }
 });

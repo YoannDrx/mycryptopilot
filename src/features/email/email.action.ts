@@ -1,10 +1,10 @@
 "use server";
 
+import { ActionError, action } from "@/lib/actions/safe-actions";
 import {
   setupResendCustomer,
   setupStripeCustomer,
 } from "@/lib/auth/auth-config-setup";
-import { ActionError, action } from "@/lib/backend/safe-actions";
 import { prisma } from "@/lib/prisma";
 import { EmailActionSchema } from "./email.schema";
 
