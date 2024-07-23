@@ -12,10 +12,8 @@ export const Footer = () => {
           <div className="flex flex-col gap-4">
             <div className="space-y-1">
               <Typography variant="h3">{SiteConfig.title}</Typography>
-              <Typography variant="base">{SiteConfig.company.name}</Typography>
-              <Typography variant="base">
-                {SiteConfig.company.address}
-              </Typography>
+              <Typography>{SiteConfig.company.name}</Typography>
+              <Typography>{SiteConfig.company.address}</Typography>
             </div>
             <Maker />
             <Typography variant="muted" className="italic">
