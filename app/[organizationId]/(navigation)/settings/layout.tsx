@@ -14,10 +14,9 @@ export default async function RouteLayout(
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>Settings</LayoutTitle>
+        <LayoutTitle>Organization</LayoutTitle>
         <LayoutDescription>
-          This is a modern form for your application. Feel free to edit it as
-          you like.
+          The organization is the hub for your billing, members, and more.
         </LayoutDescription>
       </LayoutHeader>
       <LayoutContent className="mt-8 flex items-start gap-4 max-lg:flex-col">
@@ -30,6 +29,10 @@ export default async function RouteLayout(
             {
               href: `/${props.params.organizationId}/settings/members`,
               label: "Members",
+            },
+            {
+              href: `/${props.params.organizationId}/settings/billing`,
+              label: "Billing",
             },
           ]}
         />

@@ -15,15 +15,15 @@ const useCurrentPath = (links: { href: string }[], organizationId: string) => {
     .filter(Boolean);
   console.log({ currentPath, links });
 
-  const linkMatchCounts = links.map((link) => ({
-    url: link.href,
-    matchCount: link.href
-      .split("/")
-
-      .filter((segment, index) => segment === currentPath[index]).length,
-  }));
-
-  console.log({ linkMatchCounts });
+  const linkMatchCounts = links.map((link) => {
+    return {
+      url: link.href,
+      matchCount: link.href
+        .split("/")
+        .filter(Boolean)
+        .filter((segment, index) => segment === currentPath[index]).length,
+    };
+  });
 
   const mostMatchingLink = linkMatchCounts.reduce(
     (maxMatchLink, currentLink) =>
@@ -33,7 +33,7 @@ const useCurrentPath = (links: { href: string }[], organizationId: string) => {
     { url: "", matchCount: 0 },
   );
 
-  return mostMatchingLink.url;
+  return mostMatchingLink.url || links[0].href;
 };
 
 export function OrganizationLinks({

@@ -42,6 +42,7 @@ export const getCurrentOrganization = async (
       name: true,
       plan: true,
       email: true,
+      stripeCustomerId: true,
       members: {
         where: {
           userId: user.id,
