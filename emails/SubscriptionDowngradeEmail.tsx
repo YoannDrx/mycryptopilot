@@ -4,7 +4,7 @@ import { Preview, Section, Text } from "@react-email/components";
 import Link from "next/link";
 import { EmailLayout } from "./utils/EmailLayout";
 
-export default function SubscribtionDowngradeEmail() {
+export default function SubscriptionDowngradeEmail() {
   return (
     <EmailLayout>
       <Preview>Your Premium Access Has Been Paused</Preview>

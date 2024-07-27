@@ -4,7 +4,7 @@ import { Preview, Section, Text } from "@react-email/components";
 import Link from "next/link";
 import { EmailLayout } from "./utils/EmailLayout";
 
-export default function SubscribtionFailedEmail() {
+export default function SubscriptionFailedEmail() {
   return (
     <EmailLayout>
       <Preview>

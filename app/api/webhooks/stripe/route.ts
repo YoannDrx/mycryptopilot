@@ -1,11 +1,9 @@
-import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { stripe } from "@/lib/stripe";
-import { headers } from "next/dist/client/components/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { findUserFromCustomer } from "./findUserFromCustomer";
+import { findOrganizationFromCustomer } from "./findUserFromCustomer";
 import {
   downgradeUserFromPlan,
   getPlanFromLineItem,
@@ -14,6 +12,7 @@ import {
   notifyUserOfPremiumUpgrade,
   upgradeUserToPlan,
 } from "./premium.helper";
+import { constructStripeEvent } from "./webhooks.stripe.utils";
 
 /**
  * Stripe Webhooks
@@ -24,119 +23,109 @@ import {
  */
 export const POST = async (req: NextRequest) => {
   const body = await req.text();
-  const headerList = headers();
 
-  const stripeSignature = headerList.get("stripe-signature");
-
-  let event: Stripe.Event | null = null;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      stripeSignature ?? "",
-      env.STRIPE_WEBHOOK_SECRET ?? "",
-    );
-  } catch {
-    logger.error("Request Failed - STRIPE_WEBHOOK_SECRET may be invalid");
-    return NextResponse.json({ error: "invalid" }, { status: 400 });
+    const event = await constructStripeEvent(body);
+
+    switch (event.type) {
+      case "checkout.session.completed":
+        await onCheckoutSessionCompleted(event.data.object);
+        break;
+
+      case "checkout.session.expired":
+        await onCheckoutSessionExpired(event.data.object);
+        break;
+
+      case "invoice.paid":
+        await onInvoicePaid(event.data.object);
+        break;
+
+      case "invoice.payment_failed":
+        await onInvoicePaymentFailed(event.data.object);
+        break;
+
+      case "customer.subscription.deleted":
+        await onCustomerSubscriptionDeleted(event.data.object);
+        break;
+
+      case "customer.subscription.updated":
+        await onCustomerSubscriptionUpdated(event.data.object);
+        break;
+
+      default:
+        return NextResponse.json({
+          ok: true,
+        });
+    }
+
+    return NextResponse.json({
+      ok: true,
+    });
+  } catch (e) {
+    logger.error("Stripe Webhook Error", e);
+    return NextResponse.json({
+      ok: false,
+    });
   }
-
-  switch (event.type) {
-    case "checkout.session.completed":
-      await onCheckoutSessionCompleted(event.data.object);
-      break;
-
-    case "checkout.session.expired":
-      await onCheckoutSessionExpired(event.data.object);
-      break;
-
-    case "invoice.paid":
-      await onInvoicePaid(event.data.object);
-      break;
-
-    case "invoice.payment_failed":
-      await onInvoicePaymentFailed(event.data.object);
-      break;
-
-    case "customer.subscription.deleted":
-      await onCustomerSubscriptionDeleted(event.data.object);
-      break;
-
-    case "customer.subscription.updated":
-      await onCustomerSubscriptionUpdated(event.data.object);
-      break;
-
-    default:
-      return NextResponse.json({
-        ok: true,
-      });
-  }
-
-  return NextResponse.json({
-    ok: true,
-  });
 };
 
 async function onCheckoutSessionCompleted(object: Stripe.Checkout.Session) {
   // The user paid and the subscription is active
   // ✅ Grant access to your service
-  const user = await findUserFromCustomer(object.customer);
+  const organization = await findOrganizationFromCustomer(object.customer);
+
+  logger.debug("Organization", organization);
 
   const lineItems = await stripe.checkout.sessions.listLineItems(object.id, {
     limit: 1,
   });
-  logger.debug("Line-items", lineItems);
 
-  await upgradeUserToPlan(user.id, await getPlanFromLineItem(lineItems.data));
-  await notifyUserOfPremiumUpgrade(user);
+  await upgradeUserToPlan(
+    organization.id,
+    await getPlanFromLineItem(lineItems.data),
+  );
+  await notifyUserOfPremiumUpgrade(organization);
 }
 
+// The user stop the checkout process
 async function onCheckoutSessionExpired(object: Stripe.Checkout.Session) {
-  // The user stop the checkout process
-  // 📤 Send email if you want
   logger.debug("Checkout session expired", object);
 }
 
+// A payment was made through the invoice (usually a recurring payment for a subscription)
 async function onInvoicePaid(object: Stripe.Invoice) {
-  // A payment was made through the invoice (usually a recurring payment for a subscription)
-  // ✅ Give access to your service
-  const user = await findUserFromCustomer(object.customer);
+  const organization = await findOrganizationFromCustomer(object.customer);
 
-  if (user.plan !== "FREE") return;
+  if (organization.planId !== "FREE") return;
 
   await upgradeUserToPlan(
-    user.id,
-    // TODO :Verify if it's right values
+    organization.id,
     await getPlanFromLineItem(object.lines.data),
   );
 }
 
+// A payment failed, usually a recurring payment for a subscription
 async function onInvoicePaymentFailed(object: Stripe.Invoice) {
-  // A payment failed, usually a recurring payment for a subscription
-  // ❌ Revoke access to your service
-  // OR send email to user to pay/update payment method
-  // and wait for 'customer.subscription.deleted' event to revoke access
-
-  const user = await findUserFromCustomer(object.customer);
+  const user = await findOrganizationFromCustomer(object.customer);
 
   await downgradeUserFromPlan(user.id);
   await notifyUserOfPaymentFailure(user);
 }
 
+// The subscription was canceled
 async function onCustomerSubscriptionDeleted(object: Stripe.Subscription) {
-  // The subscription was canceled
-  // ❌ Revoke access to your service
-
-  const user = await findUserFromCustomer(object.customer);
-  await downgradeUserFromPlan(user.id);
-  await notifyUserOfPremiumDowngrade(user);
+  const organization = await findOrganizationFromCustomer(object.customer);
+  await downgradeUserFromPlan(organization.id);
+  await notifyUserOfPremiumDowngrade(organization);
 }
 
+// The subscription was updated
 async function onCustomerSubscriptionUpdated(object: Stripe.Subscription) {
-  const user = await findUserFromCustomer(object.customer);
+  const organization = await findOrganizationFromCustomer(object.customer);
 
   await upgradeUserToPlan(
-    user.id,
+    organization.id,
     await getPlanFromLineItem(object.items.data),
   );
-  await notifyUserOfPremiumUpgrade(user);
+  await notifyUserOfPremiumUpgrade(organization);
 }

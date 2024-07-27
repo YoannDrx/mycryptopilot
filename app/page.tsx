@@ -10,11 +10,11 @@ import { StatsSection } from "@/features/landing/StatsSection";
 import { CTASectionCard } from "@/features/landing/cta/CTACardSection";
 import { CTAImageSection } from "@/features/landing/cta/CTAImageSection";
 import { CtaSection } from "@/features/landing/cta/CTASection";
-import { Pricing } from "@/features/landing/pricing/PricingSection";
 import { ReviewGrid } from "@/features/landing/review/ReviewGrid";
 import { ReviewSingle } from "@/features/landing/review/ReviewSingle";
 import { ReviewTriple } from "@/features/landing/review/ReviewTriple";
 import { Footer } from "@/features/layout/Footer";
+import { Pricing } from "@/features/plans/PricingSection";
 import Image from "next/image";
 
 export default function HomePage() {
@@ -138,45 +138,7 @@ export default function HomePage() {
 
       <CtaSection />
 
-      <Pricing
-        cards={[
-          {
-            type: "monthly",
-            id: "Free",
-            title: "Threader Free",
-            subtitle: "Perfect for tiny creator",
-            price: 0,
-            currency: "USD",
-            features: [
-              "Scehdule 1 post in advance",
-              "See what you scheduled",
-              "Auto-repost your thread",
-            ],
-            cta: "Start now",
-            ctaSubtitle: "Free forever",
-            priceId: "",
-          },
-          {
-            isPopular: true,
-            type: "monthly",
-            id: "premium",
-            title: "Threader Premium",
-            subtitle: "Perfect for content creator",
-            price: 49,
-            barredPrice: 59,
-            currency: "USD",
-            features: [
-              "Schedule Infinite post in advance",
-              "See what you scheduled",
-              "Auto-repost your thread",
-              "Preview your post",
-            ],
-            cta: "Start 7 days trial",
-            ctaSubtitle: "Then $49/month",
-            priceId: "",
-          },
-        ]}
-      />
+      <Pricing />
 
       <FAQSection
         faq={[

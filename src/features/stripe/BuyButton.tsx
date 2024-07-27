@@ -1,6 +1,8 @@
 "use client";
 
+import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { ButtonProps } from "../../components/ui/button";
@@ -9,6 +11,7 @@ import { buyButtonAction } from "./buy-button.action";
 
 export type BuyButtonProps = {
   priceId: string;
+  organizationId: string;
 } & ButtonProps;
 
 /**
@@ -23,20 +26,34 @@ export type BuyButtonProps = {
  * @param props.priceId This is the Stripe price ID to use for the checkout session
  * @returns
  */
-export const BuyButton = ({ priceId, ...props }: BuyButtonProps) => {
+export const BuyButton = ({
+  priceId,
+  organizationId,
+  ...props
+}: BuyButtonProps) => {
   const router = useRouter();
+  const session = useSession();
+
   const mutation = useMutation({
     mutationFn: async () => {
-      const result = await buyButtonAction({
-        priceId: priceId,
-      });
-
-      if (result?.data) {
-        router.push(result.data.url);
+      if (session.status !== "authenticated") {
+        router.push("/auth/signin");
+        toast.error("You must be authenticated to buy a plan");
         return;
       }
 
-      toast.error(result?.serverError ?? "Something went wrong");
+      const result = await buyButtonAction({
+        priceId: priceId,
+        organizationId: organizationId,
+      });
+
+      console.log({ result });
+      if (!isActionSuccessful(result)) {
+        toast.error(result?.serverError ?? "Something went wrong");
+        return;
+      }
+
+      router.push(result.data.url);
     },
   });
 
@@ -44,7 +61,7 @@ export const BuyButton = ({ priceId, ...props }: BuyButtonProps) => {
     <Button
       onClick={() => mutation.mutate()}
       {...props}
-      disabled={mutation.isPending || props.disabled}
+      disabled={session.status === "loading"}
     />
   );
 };

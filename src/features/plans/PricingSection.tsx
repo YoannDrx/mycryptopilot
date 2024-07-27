@@ -1,12 +1,9 @@
 import { Typography } from "@/components/ui/typography";
-import { SectionLayout } from "../SectionLayout";
-import { PricingCard, type PricingCardProps } from "./PricingCard";
+import { SectionLayout } from "../landing/SectionLayout";
+import { PricingCard } from "./PricingCard";
+import { PLANS } from "./plan";
 
-export type PricingProps = {
-  cards: PricingCardProps[];
-};
-
-export const Pricing = (props: PricingProps) => {
+export const Pricing = () => {
   return (
     <SectionLayout
       size="base"
@@ -25,7 +22,7 @@ export const Pricing = (props: PricingProps) => {
         </Typography>
       </div>
       <div className="flex w-full justify-center gap-4 max-md:flex-col lg:gap-8 xl:gap-12">
-        {props.cards.map((card, i) => (
+        {PLANS.map((card, i) => (
           <PricingCard key={i} {...card} />
         ))}
       </div>

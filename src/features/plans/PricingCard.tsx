@@ -7,24 +7,14 @@ import { Typography } from "@/components/ui/typography";
 import { BuyButton } from "@/features/stripe/BuyButton";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { useParams } from "next/navigation";
+import { Plan } from "./plan";
 
-export type PricingCardProps = {
-  isPopular?: boolean;
-  type: "monthly" | "yearly" | "one-time";
-  id: string;
-  title: string;
-  subtitle: string;
-  price: number;
-  barredPrice?: number;
-  currency?: string;
-  features: string[];
-  cta: string;
-  ctaSubtitle: string;
-  priceId: string;
-  className?: string;
-};
+export const PricingCard = (props: Plan) => {
+  const params = useParams();
 
-export const PricingCard = (props: PricingCardProps) => {
+  const organizationId = params.organizationId ? params.organizationId : "";
+
   return (
     <Card
       className={cn(
@@ -43,7 +33,7 @@ export const PricingCard = (props: PricingCardProps) => {
       ) : null}
       <CardHeader className="flex flex-col items-start gap-6 lg:gap-8">
         <p className="gap-4 text-lg font-bold uppercase text-primary">
-          {props.title}
+          {props.name}
         </p>
         <div className="flex items-end justify-center gap-2">
           <p className="text-5xl font-extrabold">${props.price}</p>
@@ -72,6 +62,7 @@ export const PricingCard = (props: PricingCardProps) => {
       </CardHeader>
       <CardFooter className="flex flex-col items-stretch gap-2">
         <BuyButton
+          organizationId={String(organizationId)}
           variant={props.isPopular ? "default" : "outline"}
           priceId={props.priceId}
         >

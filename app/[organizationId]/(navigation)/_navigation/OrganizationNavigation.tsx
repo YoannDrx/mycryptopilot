@@ -1,13 +1,8 @@
-import { CircleUser, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
+import { LogoSvg } from "@/components/svg/LogoSvg";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserDropdown } from "@/features/auth/UserDropdown";
 import { prisma } from "@/lib/prisma";
@@ -16,6 +11,7 @@ import { PropsWithChildren } from "react";
 import { OrganizationCommand } from "./OrganizationCommand";
 import { OrganizationLinks } from "./OrganizationLinks";
 import { OrganizationsSelect } from "./OrganizationsSelect";
+import { UpgradeCard } from "./UpgradeCard";
 
 export async function OrganizationNavigation({ children }: PropsWithChildren) {
   const { organization, user, roles } =
@@ -37,7 +33,8 @@ export async function OrganizationNavigation({ children }: PropsWithChildren) {
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+          <div className="flex h-14 items-center gap-2 border-b px-4 lg:h-[60px] lg:px-6">
+            <LogoSvg size={32} />
             <OrganizationsSelect
               currentOrganizationId={organization.id}
               organizations={userOrganizations}
@@ -51,24 +48,11 @@ export async function OrganizationNavigation({ children }: PropsWithChildren) {
             />
           </div>
           <div className="mt-auto p-4">
-            <Card x-chunk="dashboard-02-chunk-0">
-              <CardHeader className="p-2 pt-0 md:p-4">
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>
-                  Unlock all features and get unlimited access to our support
-                  team.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                <Button size="sm" className="w-full">
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
+            <UpgradeCard />
           </div>
         </div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex max-h-screen flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           <Sheet>
             <SheetTrigger asChild>
@@ -82,30 +66,20 @@ export async function OrganizationNavigation({ children }: PropsWithChildren) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
-              <OrganizationsSelect
-                currentOrganizationId={organization.id}
-                organizations={userOrganizations}
-              />
+              <div className="flex items-center gap-2">
+                <LogoSvg size={32} />
+                <OrganizationsSelect
+                  currentOrganizationId={organization.id}
+                  organizations={userOrganizations}
+                />
+              </div>
               <OrganizationLinks
                 variant="mobile"
                 organizationId={organization.id}
                 roles={roles}
               />
               <div className="mt-auto">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upgrade to Pro</CardTitle>
-                    <CardDescription>
-                      Unlock all features and get unlimited access to our
-                      support team.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button size="sm" className="w-full">
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
+                <UpgradeCard />
               </div>
             </SheetContent>
           </Sheet>
@@ -113,13 +87,17 @@ export async function OrganizationNavigation({ children }: PropsWithChildren) {
             <OrganizationCommand />
           </div>
           <UserDropdown>
-            <Button variant="secondary" size="icon" className="rounded-full">
-              <CircleUser className="size-5" />
-              <span className="sr-only">Toggle user menu</span>
+            <Button variant="ghost" className="size-10 rounded-full" size="sm">
+              <Avatar className="size-8">
+                <AvatarFallback>
+                  {user.email ? user.email.slice(0, 2) : "??"}
+                </AvatarFallback>
+                {user.image && <AvatarImage src={user.image} />}
+              </Avatar>
             </Button>
           </UserDropdown>
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <main className="flex flex-1 flex-col gap-4 overflow-auto p-4 lg:gap-6 lg:p-6">
           {children}
         </main>
       </div>

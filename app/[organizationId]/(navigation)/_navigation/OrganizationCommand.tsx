@@ -35,11 +35,11 @@ export function OrganizationCommand() {
 
   return (
     <>
-      <div className="relative w-full max-w-[300px] md:w-2/3 lg:w-1/3">
+      <div className="relative w-full max-w-[200px] md:w-2/3 lg:w-1/3">
         <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search products..."
+          placeholder="Search..."
           className="w-full appearance-none bg-background pl-8 shadow-none"
           onClick={() => {
             setOpen(true);
