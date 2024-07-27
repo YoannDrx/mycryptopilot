@@ -8,6 +8,7 @@ import type { LayoutParams } from "@/types/next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
+import PlausibleProvider from "next-plausible";
 import type { ReactNode } from "react";
 import "./code-theme.scss";
 import "./globals.scss";
@@ -26,6 +27,9 @@ export default function RootLayout({
   return (
     <>
       <html lang="en" className="h-full" suppressHydrationWarning>
+        <head>
+          <PlausibleProvider domain={SiteConfig.domain} />
+        </head>
         <body
           suppressHydrationWarning
           className={cn(
