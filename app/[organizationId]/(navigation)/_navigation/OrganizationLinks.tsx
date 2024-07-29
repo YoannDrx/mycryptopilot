@@ -6,11 +6,19 @@ import Link from "next/link";
 import { isInRoles } from "@/lib/organizations/isInRoles";
 import { OrganizationMembershipRole } from "@prisma/client";
 import { usePathname } from "next/navigation";
+import { ACCOUNT_LINKS } from "../../../(account-layout)/account-links";
 import { ORGANIZATION_LINKS } from "./navigation.links";
 
-const useCurrentPath = (links: { href: string }[], organizationId: string) => {
+export type NavigationLink = {
+  href: string;
+  icon: React.ComponentType;
+  label: string;
+  roles?: OrganizationMembershipRole[];
+};
+
+const useCurrentPath = (links: { href: string }[], organizationId?: string) => {
   const currentPath = usePathname()
-    .replace(`/${organizationId}`, "/")
+    .replace(`/${organizationId ?? "replace-nothing"}`, "/")
     .split("/")
     .filter(Boolean);
   console.log({ currentPath, links });
@@ -36,16 +44,26 @@ const useCurrentPath = (links: { href: string }[], organizationId: string) => {
   return mostMatchingLink.url || links[0].href;
 };
 
-export function OrganizationLinks({
+const NavigationLinkMapping = {
+  organization: ORGANIZATION_LINKS,
+  account: ACCOUNT_LINKS,
+} as const;
+
+type NavigationLinkMappingKey = keyof typeof NavigationLinkMapping;
+
+export function NavigationLinks({
   variant,
   organizationId,
   roles,
+  links: linksKey,
 }: {
   variant?: "default" | "mobile";
-  organizationId: string;
+  organizationId?: string;
   roles?: OrganizationMembershipRole[];
+  links: NavigationLinkMappingKey;
 }) {
-  const currentPath = useCurrentPath(ORGANIZATION_LINKS, organizationId);
+  const baseLinks = NavigationLinkMapping[linksKey];
+  const currentPath = useCurrentPath(baseLinks, organizationId);
   // filter links by roles
   const links = roles
     ? ORGANIZATION_LINKS.filter((link) =>
@@ -59,7 +77,9 @@ export function OrganizationLinks({
         {links.map((link, index) => (
           <Link
             key={index}
-            href={`/${organizationId}/${link.href}`}
+            href={
+              organizationId ? `/${organizationId}/${link.href}` : link.href
+            }
             className={cn(
               `mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2`,
               {

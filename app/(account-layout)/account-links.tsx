@@ -1,21 +1,25 @@
-import type { NavigationLinkGroups } from "@/features/navigation/navigation.type";
 import { AlertCircle, Coins, Mail, User2 } from "lucide-react";
+import { NavigationLink } from "../[organizationId]/(navigation)/_navigation/OrganizationLinks";
 
-export const ACCOUNT_LINKS: NavigationLinkGroups[] = [
+export const ACCOUNT_LINKS: NavigationLink[] = [
   {
-    title: "PERSONAL INFORMATION",
-    links: [
-      { url: "/account", title: "Profile", icon: <User2 /> },
-      {
-        url: "/account/delete",
-        title: "Delete profile",
-        icon: <AlertCircle />,
-      },
-      { url: "/account/billing", title: "Billing", icon: <Coins /> },
-    ],
+    href: "/account",
+    icon: User2,
+    label: "Profile",
   },
   {
-    title: "EMAIL SETTINGS",
-    links: [{ url: "/account/email", title: "Settings", icon: <Mail /> }],
+    href: "/account/delete",
+    icon: AlertCircle,
+    label: "Delete profile",
+  },
+  {
+    href: "/account/billing",
+    icon: Coins,
+    label: "Billing",
+  },
+  {
+    href: "/account/email",
+    icon: Mail,
+    label: "Settings",
   },
 ];

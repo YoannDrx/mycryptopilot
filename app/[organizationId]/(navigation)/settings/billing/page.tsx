@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Typography } from "@/components/ui/typography";
 import { Pricing } from "@/features/plans/PricingSection";
 import { formatDate } from "@/lib/format/date";
@@ -78,15 +79,25 @@ const PremiumCard = async () => {
           {firstSubscription.cancel_at ? "(Canceled)" : ""}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <Typography variant="muted">Price</Typography>
-        <Typography variant="large">
-          ${(price.unit_amount ?? 0) / 100}
-        </Typography>
-        <Typography variant="muted">Renew date</Typography>
-        <Typography variant="large">
-          {formatDate(new Date(nextRenewDate * 1000))}
-        </Typography>
+      <CardContent className="flex flex-col gap-4 md:flex-row">
+        <div>
+          <Typography variant="muted">Price</Typography>
+          <Typography variant="large">
+            ${(price.unit_amount ?? 0) / 100}
+          </Typography>
+        </div>
+        <Separator
+          orientation="vertical"
+          className="hidden h-10 self-center md:block"
+        />
+        <div>
+          <Typography variant="muted">
+            {firstSubscription.cancel_at ? "Cancel at" : "Renew at"}
+          </Typography>
+          <Typography variant="large">
+            {formatDate(new Date(nextRenewDate * 1000))}
+          </Typography>
+        </div>
       </CardContent>
       <CardFooter>
         <Link className={buttonVariants()} href={customerPortal.url}>

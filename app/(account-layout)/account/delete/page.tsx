@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { enqueueDialog } from "@/features/dialogs-provider/DialogProvider";
 import { toast } from "sonner";
-import { deleteAccountAction } from "./delete-account.action";
+import { askForAccountDeletionAction } from "./delete-account.action";
 
 export default function DeleteProfilePage() {
   return (
@@ -22,19 +22,27 @@ export default function DeleteProfilePage() {
           permanently erased and your ongoing subscription will be terminated.
           Please be aware that this action is irreversible.
         </CardDescription>
+        <CardDescription>
+          Also, if you are the owner of an organization, the organization will
+          be deleted and your subscription will be cancelled. All your data will
+          be lost.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Button
           variant="destructive"
           onClick={() => {
             enqueueDialog({
-              title: "Delete your profile",
+              title: "Delete your account ?",
               description: "Are you sure you want to delete your profile?",
               action: {
                 label: "Delete",
                 onClick: async () => {
-                  await deleteAccountAction();
-                  toast.success("Your profile has been deleted.");
+                  await askForAccountDeletionAction();
+                  toast.success("Your deletion has been asked.", {
+                    description:
+                      "Please check your email for further instructions.",
+                  });
                 },
               },
             });

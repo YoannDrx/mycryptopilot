@@ -23,6 +23,11 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
     <Select
       value={props.currentOrganizationId}
       onValueChange={(value) => {
+        if (value === "new") {
+          router.push("/organizations/new");
+          return;
+        }
+
         const currentUrl = window.location.href;
         const newUrl = currentUrl.replace(
           `/${props.currentOrganizationId}`,
@@ -31,7 +36,7 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
         router.push(newUrl);
       }}
     >
-      <SelectTrigger>
+      <SelectTrigger className="border-none bg-transparent hover:bg-accent [&>svg]:hidden hover:[&>svg]:block">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -40,6 +45,7 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
             {organization.name}
           </SelectItem>
         ))}
+        <SelectItem value="new">Add a new organization</SelectItem>
       </SelectContent>
     </Select>
   );

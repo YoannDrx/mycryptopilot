@@ -22,10 +22,10 @@ model User {
   // For the Credentials provider
   passwordHash    String?
 
-  sessions     Session[]
-  accounts     Account[]
-  feedbacks    Feedback[]
-  organization OrganizationMembership[]
+  sessions      Session[]
+  accounts      Account[]
+  feedbacks     Feedback[]
+  organizations OrganizationMembership[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

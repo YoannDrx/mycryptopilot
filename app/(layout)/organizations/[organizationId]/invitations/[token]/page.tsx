@@ -83,9 +83,7 @@ export default async function RoutePage(
     return "Invalid token";
   }
 
-  const tokenData = TokenSchema.parse(
-    JSON.parse(String(verificationToken.data)),
-  );
+  const tokenData = TokenSchema.parse(String(verificationToken.data));
 
   if (tokenData.organizationId !== organization.id) {
     return "Invalid token";

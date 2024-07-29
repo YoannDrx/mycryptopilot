@@ -1,12 +1,5 @@
-import { OrganizationMembershipRole } from "@prisma/client";
 import { Home, Settings } from "lucide-react";
-
-type OrganizationLink = {
-  href: string;
-  icon: React.ComponentType;
-  label: string;
-  roles?: OrganizationMembershipRole[];
-};
+import { NavigationLink } from "./OrganizationLinks";
 
 export const ORGANIZATION_LINKS = [
   {
@@ -20,4 +13,4 @@ export const ORGANIZATION_LINKS = [
     label: "Settings",
     roles: ["OWNER", "ADMIN"],
   },
-] satisfies OrganizationLink[];
+] satisfies NavigationLink[];

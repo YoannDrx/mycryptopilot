@@ -52,9 +52,9 @@ export const inviteUserInOrganizationAction = organizationAction
         identifier: email,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
         token: nanoid(32),
-        data: {
+        data: JSON.stringify({
           organizationId: ctx.organization.id,
-        },
+        }),
       },
     });
 

@@ -1,24 +1,47 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SettingsNavigation } from "@/features/layout/SettingsNavigation";
+import {
+  Layout,
+  LayoutContent,
+  LayoutDescription,
+  LayoutHeader,
+  LayoutTitle,
+} from "@/features/page/layout";
 import { requiredAuth } from "@/lib/auth/helper";
 import type { LayoutParams } from "@/types/next";
-import { VerifyEmailButton } from "./verify-email/VerifyEmailButton";
 
-export default async function RouteLayout(props: LayoutParams<{}>) {
+export default async function RouteLayout(
+  props: LayoutParams<{ productId: string; organizationId: string }>,
+) {
   const user = await requiredAuth();
-
-  const isEmailNotVerified = user.email && !user.emailVerified;
   return (
-    <>
-      {isEmailNotVerified ? (
-        <Alert className="mb-4">
-          <AlertTitle>Email not verified</AlertTitle>
-          <AlertDescription>
-            Please verify your email to access your account.
-          </AlertDescription>
-          <VerifyEmailButton />
-        </Alert>
-      ) : null}
-      {props.children}
-    </>
+    <Layout>
+      <LayoutHeader>
+        <LayoutTitle>
+          {user.name ? `${user.name}'s` : "Your"} Settings
+        </LayoutTitle>
+        <LayoutDescription>
+          Edit your personal information and account details.
+        </LayoutDescription>
+      </LayoutHeader>
+      <LayoutContent className="mt-8 flex items-start gap-4 max-lg:flex-col">
+        <SettingsNavigation
+          links={[
+            {
+              href: `/account`,
+              label: "General",
+            },
+            {
+              href: `/account/email`,
+              label: "Email",
+            },
+            {
+              href: `/account/delete`,
+              label: "Delete account",
+            },
+          ]}
+        />
+        <div className="w-full flex-1">{props.children}</div>
+      </LayoutContent>
+    </Layout>
   );
 }

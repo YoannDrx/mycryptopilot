@@ -1,6 +1,9 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import type { LayoutParams } from "@/types/next";
+import { Loader } from "@/components/ui/loader";
 
-export default async function RouteLayout(props: LayoutParams<{}>) {
-  return <Skeleton className="h-12" />;
+export default async function RouteLoading() {
+  return (
+    <div className="flex items-center justify-center p-4">
+      <Loader size={32} />
+    </div>
+  );
 }
