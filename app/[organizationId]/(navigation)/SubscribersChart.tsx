@@ -1,142 +1,128 @@
 "use client";
 
-const SUBSCRIBERS: { date: string; amount: number }[] = [
-  { date: "2023-05-01", amount: 12000 },
-  { date: "2023-05-02", amount: 12050 },
-  { date: "2023-05-03", amount: 12120 },
-  { date: "2023-05-04", amount: 12200 },
-  { date: "2023-05-05", amount: 12300 },
-  { date: "2023-05-06", amount: 12420 },
-  { date: "2023-05-07", amount: 12500 },
-  { date: "2023-05-08", amount: 12630 },
-  { date: "2023-05-09", amount: 12700 },
-  { date: "2023-05-10", amount: 12850 },
-  { date: "2023-05-11", amount: 13000 },
-  { date: "2023-05-12", amount: 13150 },
-  { date: "2023-05-13", amount: 13300 },
-  { date: "2023-05-14", amount: 13450 },
-  { date: "2023-05-15", amount: 13600 },
-  { date: "2023-05-16", amount: 13750 },
-  { date: "2023-05-17", amount: 13920 },
-  { date: "2023-05-18", amount: 14050 },
-  { date: "2023-05-19", amount: 14200 },
-  { date: "2023-05-20", amount: 14350 },
-  { date: "2023-05-21", amount: 14500 },
-  { date: "2023-05-22", amount: 14650 },
-  { date: "2023-05-23", amount: 14800 },
-  { date: "2023-05-24", amount: 14950 },
-  { date: "2023-05-25", amount: 15100 },
-  { date: "2023-05-26", amount: 15250 },
-  { date: "2023-05-27", amount: 15400 },
-  { date: "2023-05-28", amount: 15550 },
-  { date: "2023-05-29", amount: 15700 },
-  { date: "2023-05-30", amount: 15850 },
-  { date: "2023-05-31", amount: 16000 },
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+const chartData = [
+  { month: "January", 2023: 186, 2024: 80 },
+  { month: "February", 2023: 305, 2024: 200 },
+  { month: "March", 2023: 237, 2024: 120 },
+  { month: "April", 2023: 73, 2024: 190 },
+  { month: "May", 2023: 209, 2024: 130 },
+  { month: "June", 2023: 214, 2024: 140 },
 ];
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TooltipChart, TooltipChartItem } from "@/features/chart/TooltipChart";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Scatter,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+const chartConfig = {
+  2023: {
+    label: "2023",
+    color: "hsl(var(--chart-1))",
+  },
+  2024: {
+    label: "2024",
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig;
 
-export const SubscribersChart = () => {
+export function SubscribersChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Subscriber Growth</CardTitle>
+        <CardTitle>New users</CardTitle>
+        <CardDescription>
+          Showing new users for the last 6 months compared to the previous year
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={200}>
+        <ChartContainer className="h-64 w-full" config={chartConfig}>
           <AreaChart
-            data={SUBSCRIBERS}
-            margin={{ top: 0, right: 20, bottom: 0, left: 20 }}
-            title="Subscriber growth"
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
           >
-            <CartesianGrid
-              strokeDasharray="5 5"
-              vertical={false}
-              stroke="hsl(var(--muted-foreground) / 0.2)"
-            />
-            <Area
-              type="monotone"
-              dataKey="amount"
-              stroke="hsl(var(--primary) / 1)"
-              fill={`url(#color-primary)`}
-              dot={{
-                stroke: "hsl(var(--primary) / 0.5)",
-                strokeWidth: 1,
-                r: 2,
-                strokeDasharray: "",
-              }}
-              activeDot={{
-                stroke: "hsl(var(--primary) / 1)",
-                strokeWidth: 1,
-                r: 4,
-                strokeDasharray: "",
-              }}
-            />
-            <Scatter dataKey="amount" fill="hsl(var(--primary))" />
+            <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
-              stroke="hsl(var(--muted-foreground) / 0.5)"
-              fontSize={10}
+              dataKey="month"
               tickLine={false}
               axisLine={false}
-              interval={5}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
             />
-            <YAxis
-              stroke="hsl(var(--muted-foreground) / 0.5)"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => Intl.NumberFormat().format(value)}
-              dataKey={"amount"}
-            />
-            <Tooltip
-              cursor={{ stroke: "hsl(var(--primary) / 0.2)", strokeWidth: 2 }}
-              content={({ active, payload }) => {
-                if (active && payload && payload.length > 0) {
-                  return (
-                    <TooltipChart>
-                      <TooltipChartItem label="Amount">
-                        {Intl.NumberFormat().format(payload[0].payload.value)}
-                      </TooltipChartItem>
-
-                      <TooltipChartItem label="Date">
-                        {new Date(payload[0].payload.date).toLocaleDateString()}
-                      </TooltipChartItem>
-                    </TooltipChart>
-                  );
-                }
-
-                return null;
-              }}
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
-              <linearGradient id={`color-primary`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="2023" x1="0" y1="0" x2="0" y2="1">
                 <stop
-                  offset="0%"
-                  stopColor="hsl(var(--primary))"
-                  stopOpacity={0.4}
-                ></stop>
+                  offset="5%"
+                  stopColor="var(--color-2023)"
+                  stopOpacity={0.8}
+                />
                 <stop
-                  offset="75%"
-                  stopColor="hsl(var(--primary))"
-                  stopOpacity={0.05}
-                ></stop>
+                  offset="95%"
+                  stopColor="var(--color-2023)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fill2024" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-2024)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-2024)"
+                  stopOpacity={0.1}
+                />
               </linearGradient>
             </defs>
+            <Area
+              dataKey="2024"
+              type="natural"
+              fill="url(#fill2024)"
+              fillOpacity={0.4}
+              stroke="var(--color-2024)"
+              stackId="a"
+            />
+            <Area
+              dataKey="2023"
+              type="natural"
+              fill="url(#2023)"
+              fillOpacity={0.4}
+              stroke="var(--color-2023)"
+              stackId="a"
+            />
           </AreaChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
+      <CardFooter>
+        <div className="flex w-full items-start gap-2 text-sm">
+          <div className="grid gap-2">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              Trending up by 5.2% this month <TrendingUp className="size-4" />
+            </div>
+            <div className="flex items-center gap-2 leading-none text-muted-foreground">
+              January - June 2024
+            </div>
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   );
-};
+}
