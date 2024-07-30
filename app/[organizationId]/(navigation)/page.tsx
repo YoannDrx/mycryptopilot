@@ -1,7 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Layout,
+  LayoutActions,
   LayoutContent,
   LayoutHeader,
   LayoutTitle,
@@ -11,46 +11,27 @@ import Link from "next/link";
 import InformationCards from "./InformationCards";
 import { SubscribersChart } from "./SubscribersChart";
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(
+  props: PageParams<{
+    organizationId: string;
+  }>,
+) {
   return (
     <Layout>
       <LayoutHeader>
         <LayoutTitle>Dashboard</LayoutTitle>
       </LayoutHeader>
+      <LayoutActions>
+        <Link
+          href={`/${props.params.organizationId}/settings/members`}
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Invite member
+        </Link>
+      </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-8">
         <InformationCards />
         <SubscribersChart />
-        <div className="flex flex-wrap items-start gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-light">
-                Thread Created
-              </CardTitle>
-              <CardTitle>201</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-light">
-                Thread Published
-              </CardTitle>
-              <CardTitle>177</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card className="flex-1">
-            <CardHeader>
-              <CardTitle className="text-lg font-light">Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="flex gap-2">
-              <Link
-                className={buttonVariants({ size: "sm", variant: "outline" })}
-                href="/dashboard/posts/new"
-              >
-                New post
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
       </LayoutContent>
     </Layout>
   );
