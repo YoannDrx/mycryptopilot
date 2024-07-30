@@ -48,13 +48,13 @@ export const SignInProviders = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 lg:gap-6">
       {providers.resend && !providers.credentials ? (
-        <>
+        <div className="flex flex-col gap-2 lg:gap-4">
           <Typography variant="small">Magic link ✨</Typography>
           <MagicLinkForm />
           <Divider>or</Divider>
-        </>
+        </div>
       ) : null}
 
       {providers.credentials ? (
@@ -64,7 +64,7 @@ export const SignInProviders = () => {
         </>
       ) : null}
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 lg:gap-4">
         {/* ℹ️ Add provider you want to support here */}
         {providers.github ? <ProviderButton providerId="github" /> : null}
         {providers.google ? <ProviderButton providerId="google" /> : null}

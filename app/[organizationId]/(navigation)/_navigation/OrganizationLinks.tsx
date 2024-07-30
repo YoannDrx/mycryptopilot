@@ -18,10 +18,9 @@ export type NavigationLink = {
 
 const useCurrentPath = (links: { href: string }[], organizationId?: string) => {
   const currentPath = usePathname()
-    .replace(`/${organizationId ?? "replace-nothing"}`, "/")
+    .replace(`:organizationId`, organizationId ?? "")
     .split("/")
     .filter(Boolean);
-  console.log({ currentPath, links });
 
   const linkMatchCounts = links.map((link) => {
     return {
@@ -63,13 +62,14 @@ export function NavigationLinks({
   links: NavigationLinkMappingKey;
 }) {
   const baseLinks = NavigationLinkMapping[linksKey];
+
   const currentPath = useCurrentPath(baseLinks, organizationId);
   // filter links by roles
   const links = roles
-    ? ORGANIZATION_LINKS.filter((link) =>
+    ? baseLinks.filter((link) =>
         link.roles ? isInRoles(roles, link.roles) : true,
       )
-    : ORGANIZATION_LINKS;
+    : baseLinks;
 
   if (variant === "mobile") {
     return (
@@ -77,9 +77,7 @@ export function NavigationLinks({
         {links.map((link, index) => (
           <Link
             key={index}
-            href={
-              organizationId ? `/${organizationId}/${link.href}` : link.href
-            }
+            href={link.href.replaceAll(":organizationId", organizationId ?? "")}
             className={cn(
               `mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2`,
               {
@@ -101,7 +99,7 @@ export function NavigationLinks({
       {links.map((link, index) => (
         <Link
           key={index}
-          href={`/${organizationId}/${link.href}`}
+          href={link.href.replaceAll(":organizationId", organizationId ?? "")}
           className={cn(`flex items-center gap-3 rounded-lg px-3 py-2`, {
             "text-primary hover:text-primary": currentPath === link.href,
             "text-muted-foreground hover:text-foreground":

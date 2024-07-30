@@ -1,4 +1,3 @@
-import { SettingsNavigation } from "@/features/layout/SettingsNavigation";
 import {
   Layout,
   LayoutContent,
@@ -23,25 +22,7 @@ export default async function RouteLayout(
           Edit your personal information and account details.
         </LayoutDescription>
       </LayoutHeader>
-      <LayoutContent className="mt-8 flex items-start gap-4 max-lg:flex-col">
-        <SettingsNavigation
-          links={[
-            {
-              href: `/account`,
-              label: "General",
-            },
-            {
-              href: `/account/email`,
-              label: "Email",
-            },
-            {
-              href: `/account/delete`,
-              label: "Delete account",
-            },
-          ]}
-        />
-        <div className="w-full flex-1">{props.children}</div>
-      </LayoutContent>
+      <LayoutContent>{props.children}</LayoutContent>
     </Layout>
   );
 }

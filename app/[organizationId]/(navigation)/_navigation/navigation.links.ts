@@ -3,12 +3,12 @@ import { NavigationLink } from "./OrganizationLinks";
 
 export const ORGANIZATION_LINKS = [
   {
-    href: "/",
+    href: "/:organizationId/",
     icon: Home,
     label: "Dashboard",
   },
   {
-    href: "/settings",
+    href: "/:organizationId/settings",
     icon: Settings,
     label: "Settings",
     roles: ["OWNER", "ADMIN"],

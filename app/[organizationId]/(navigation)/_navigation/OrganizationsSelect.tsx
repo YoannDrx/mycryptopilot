@@ -8,9 +8,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
 
 export type OrganizationsSelectProps = {
-  currentOrganizationId: string;
+  currentOrganizationId?: string;
+  children?: ReactNode;
   organizations: {
     id: string;
     name: string;
@@ -23,21 +25,22 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
     <Select
       value={props.currentOrganizationId}
       onValueChange={(value) => {
+        console.log("Value change", value);
         if (value === "new") {
           router.push("/organizations/new");
           return;
         }
 
         const currentUrl = window.location.href;
-        const newUrl = currentUrl.replace(
-          `/${props.currentOrganizationId}`,
-          `/${value}`,
-        );
+        const newUrl = props.currentOrganizationId
+          ? currentUrl.replace(`/${props.currentOrganizationId}`, `/${value}`)
+          : `/${value}`;
+        console.log({ newUrl });
         router.push(newUrl);
       }}
     >
-      <SelectTrigger className="border-none bg-transparent hover:bg-accent [&>svg]:hidden hover:[&>svg]:block">
-        <SelectValue />
+      <SelectTrigger className="justify-start gap-2 border-none bg-transparent hover:bg-accent [&>svg]:hidden hover:[&>svg]:block">
+        {props.children ? props.children : <SelectValue />}
       </SelectTrigger>
       <SelectContent>
         {props.organizations.map((organization) => (
