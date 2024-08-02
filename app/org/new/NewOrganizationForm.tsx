@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -58,14 +51,7 @@ export const NewOrganizationForm = () => {
       className="flex w-full flex-col gap-6 lg:gap-8"
     >
       <Card className="overflow-hidden bg-card">
-        <CardHeader>
-          <CardTitle>Create your organization</CardTitle>
-          <CardDescription>
-            The organization is the place where you will manage your members and
-            subscriptions.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="mt-6 flex flex-col gap-4 lg:gap-6">
           <FormField
             control={form.control}
             name="name"

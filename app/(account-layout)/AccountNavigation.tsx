@@ -7,22 +7,15 @@ import { PropsWithChildren } from "react";
 import { NavigationWrapper } from "../../src/features/navigation/Navigation";
 import { NavigationLinks } from "../org/[orgId]/(navigation)/_navigation/OrganizationLinks";
 import { OrganizationsSelect } from "../org/[orgId]/(navigation)/_navigation/OrganizationsSelect";
+import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 
 export async function AccountNavigation({ children }: PropsWithChildren) {
   const user = await requiredAuth();
-  const userOrganizations = await prisma.organization.findMany({
-    where: {
-      members: {
-        some: {
-          userId: user.id,
-        },
-      },
-    },
-  });
+  const userOrgs = await getUsersOrgs();
   return (
     <NavigationWrapper
       logoChildren={
-        <OrganizationsSelect organizations={userOrganizations}>
+        <OrganizationsSelect organizations={userOrgs}>
           <Avatar className="size-8">
             <AvatarFallback>
               {user.email ? user.email.slice(0, 2) : "??"}

@@ -1,11 +1,11 @@
 import type { User } from "next-auth";
 import { z } from "zod";
+import { createOrganizationQuery } from "../../query/org/org-create.query";
 import { env } from "../env";
 import { getIdFromUser } from "../format/id";
 import { logger } from "../logger";
 import { resend } from "../mail/resend";
 import { prisma } from "../prisma";
-import { createOrganizationQuery } from "../query/org/org-create.query";
 import { stripe } from "../stripe";
 
 export const setupStripeCustomer = async (user: User) => {

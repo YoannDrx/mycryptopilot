@@ -1,7 +1,7 @@
 "use server";
 
 import { authAction } from "@/lib/actions/safe-actions";
-import { createOrganizationQuery } from "@/lib/query/org/org-create.query";
+import { createOrganizationQuery } from "@/query/org/org-create.query";
 import { NewOrgsSchema } from "./new-organizations.schema";
 
 export const createOrganizationAction = authAction

@@ -3,8 +3,8 @@
 import { ActionError, orgAction } from "@/lib/actions/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
-import { deleteOrganizationQuery } from "@/lib/query/org/org-delete.query";
 import { getServerUrl } from "@/lib/server-url";
+import { deleteOrganizationQuery } from "@/query/org/org-delete.query";
 import { SiteConfig } from "@/site-config";
 import OrgAskDeletionEmail from "@email/OrgAskDeletion.email";
 import OrgConfirmDeletionEmail from "@email/OrgConfirmDeletion.email";

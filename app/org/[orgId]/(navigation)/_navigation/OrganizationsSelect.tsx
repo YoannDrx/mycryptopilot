@@ -32,7 +32,10 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
 
         const currentUrl = window.location.href;
         const newUrl = props.currentOrganizationId
-          ? currentUrl.replace(`/${props.currentOrganizationId}`, `/${value}`)
+          ? currentUrl.replace(
+              `/org/${props.currentOrganizationId}`,
+              `/org/${value}`,
+            )
           : `/${value}`;
         console.log({ newUrl });
         router.push(newUrl);
