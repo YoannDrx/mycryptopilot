@@ -4,9 +4,9 @@ import { UserDropdown } from "@/features/auth/UserDropdown";
 import { requiredAuth } from "@/lib/auth/helper";
 import { prisma } from "@/lib/prisma";
 import { PropsWithChildren } from "react";
-import { NavigationLinks } from "../[organizationId]/(navigation)/_navigation/OrganizationLinks";
-import { OrganizationsSelect } from "../[organizationId]/(navigation)/_navigation/OrganizationsSelect";
-import { NavigationWrapper } from "../_navigation/Navigation";
+import { NavigationWrapper } from "../../src/features/navigation/Navigation";
+import { NavigationLinks } from "../org/[orgId]/(navigation)/_navigation/OrganizationLinks";
+import { OrganizationsSelect } from "../org/[orgId]/(navigation)/_navigation/OrganizationsSelect";
 
 export async function AccountNavigation({ children }: PropsWithChildren) {
   const user = await requiredAuth();

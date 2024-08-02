@@ -6,7 +6,7 @@ import NextAuth from "next-auth";
 import { env } from "../env";
 import { prisma } from "../prisma";
 import {
-  setupOrganizationIfPendingInvitation,
+  setupDefaultOrganizationsOrInviteUser,
   setupResendCustomer,
 } from "./auth-config-setup";
 import { getNextAuthConfigProviders } from "./getNextAuthConfigProviders";
@@ -17,7 +17,7 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
     signOut: "/auth/signout",
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
-    newUser: "/organizations/new",
+    newUser: "/org",
   },
   adapter: PrismaAdapter(prisma),
   providers: getNextAuthConfigProviders(),
@@ -53,7 +53,7 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
 
       const resendContactId = await setupResendCustomer(user);
 
-      await setupOrganizationIfPendingInvitation(user);
+      await setupDefaultOrganizationsOrInviteUser(user);
 
       await prisma.user.update({
         where: {

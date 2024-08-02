@@ -1,7 +1,32 @@
 import { OrganizationMembershipRole } from "@prisma/client";
 import { headers } from "next/headers";
 import { auth } from "../auth/helper";
+import { logger } from "../logger";
 import { prisma } from "../prisma";
+
+const getOrganizationIdFromUrl = () => {
+  const headerList = headers();
+  const xURL = headerList.get("x-url");
+
+  if (!xURL) {
+    return null;
+  }
+
+  // get the parameters after /o/ or /organizations/ at the beginning of the url
+  const match = xURL.match(/\/(?:org|organizations)\/([^/]+)/);
+  logger.debug({ match });
+  if (!match) {
+    return null;
+  }
+
+  const organizationId = match[1];
+
+  if (!organizationId) {
+    return null;
+  }
+
+  return organizationId;
+};
 
 export const getCurrentOrganization = async (
   roles?: OrganizationMembershipRole[],
@@ -12,18 +37,13 @@ export const getCurrentOrganization = async (
     return null;
   }
 
-  const headerList = headers();
-  const xURL = headerList.get("x-url");
-  console.log({ xURL });
+  const organizationId = getOrganizationIdFromUrl();
 
-  if (!xURL) {
+  if (!organizationId) {
     return null;
   }
 
-  // get the first parameter of the url
-  const [, , , organizationId] = xURL.split("/");
-
-  const organization = await prisma.organization.findFirst({
+  const org = await prisma.organization.findFirst({
     where: {
       id: organizationId,
       members: {
@@ -54,14 +74,14 @@ export const getCurrentOrganization = async (
     },
   });
 
-  if (!organization) {
+  if (!org) {
     return null;
   }
 
   return {
-    organization,
+    org,
     user,
-    roles: organization.members.map((m) => m.role),
+    roles: org.members.map((m) => m.role),
   };
 };
 

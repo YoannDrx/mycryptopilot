@@ -1,10 +1,7 @@
 "use server";
 
 import { ActionError, action } from "@/lib/actions/safe-actions";
-import {
-  setupResendCustomer,
-  setupStripeCustomer,
-} from "@/lib/auth/auth-config-setup";
+import { setupResendCustomer } from "@/lib/auth/auth-config-setup";
 import {
   hashStringWithSalt,
   validatePassword,
@@ -29,13 +26,11 @@ export const signUpAction = action
         name,
       };
 
-      const stripeCustomerId = await setupStripeCustomer(userData);
       const resendContactId = await setupResendCustomer(userData);
 
       const user = await prisma.user.create({
         data: {
           ...userData,
-          stripeCustomerId,
           resendContactId,
         },
       });

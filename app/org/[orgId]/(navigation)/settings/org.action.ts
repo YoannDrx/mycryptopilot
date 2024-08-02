@@ -7,14 +7,13 @@ import OrganizationInvitationEmail from "@email/OrganizationInvitationEmail.emai
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import {
-  OrganizationDetailsFormSchema,
-  OrganizationMemberFormSchema,
-} from "./settings.schema";
+  OrgDangerFormSchema,
+  OrgDetailsFormSchema,
+  OrgMemberFormSchema,
+} from "./org.schema";
 
 export const updateOrganizationMemberAction = authAction
-  .schema(
-    z.union([OrganizationDetailsFormSchema, OrganizationMemberFormSchema]),
-  )
+  .schema(z.union([OrgDetailsFormSchema, OrgMemberFormSchema]))
   .action(async ({ parsedInput: input }) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     // Update the data from the server and return the fresh data
@@ -22,7 +21,7 @@ export const updateOrganizationMemberAction = authAction
   });
 
 export const updateOrganizationDetailsAction = orgAction
-  .schema(OrganizationDetailsFormSchema)
+  .schema(z.union([OrgDetailsFormSchema, OrgDangerFormSchema]))
   .metadata({
     roles: ["OWNER"],
   })
@@ -52,9 +51,9 @@ export const inviteUserInOrganizationAction = orgAction
         identifier: email,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
         token: nanoid(32),
-        data: JSON.stringify({
+        data: {
           orgId: ctx.org.id,
-        }),
+        },
       },
     });
 

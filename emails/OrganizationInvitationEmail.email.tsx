@@ -5,14 +5,14 @@ import { EmailLayout } from "./utils/EmailLayout";
 
 export default function OrganizationInvitationEmail({
   token,
-  organizationId,
+  orgId,
   organizationName,
 }: {
   token: string;
-  organizationId: string;
+  orgId: string;
   organizationName: string;
 }) {
-  const url = `${getServerUrl()}/organizations/${organizationId}/invitations/${token}`;
+  const url = `${getServerUrl()}/org/${orgId}/invitations/${token}`;
   return (
     <EmailLayout>
       <Preview>You are invited to join {organizationName}</Preview>

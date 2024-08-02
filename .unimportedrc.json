@@ -1,0 +1,24 @@
+{
+  "entry": [
+    "app/**/*.{js,ts,tsx,jsx}",
+    "pages/**/*.{js,ts,tsx,jsx}"
+  ],
+  "extensions": [
+    ".ts",
+    ".js",
+    ".tsx",
+    ".jsx"
+  ],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "private/**",
+    "__tests__/**",
+    ".next/**",
+    ".react-email/**",
+    ".vercel/**",
+    ".vscode/**",
+    "test/**",
+    "src/server/db/seed.ts"
+  ],
+  "respectGitignore": true
+}

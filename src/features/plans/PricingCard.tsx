@@ -62,7 +62,7 @@ export const PricingCard = (props: Plan) => {
       </CardHeader>
       <CardFooter className="flex flex-col items-stretch gap-2">
         <BuyButton
-          organizationId={String(organizationId)}
+          orgId={String(organizationId)}
           variant={props.isPopular ? "default" : "outline"}
           priceId={props.priceId}
         >

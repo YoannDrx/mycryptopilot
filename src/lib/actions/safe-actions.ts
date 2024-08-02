@@ -53,18 +53,18 @@ export const authAction = createSafeActionClient({
   });
 });
 
-export const organizationAction = createSafeActionClient({
+export const orgAction = createSafeActionClient({
   handleReturnedServerError,
   defineMetadataSchema() {
     return z.object({
       roles: z.array(z.nativeEnum(OrganizationMembershipRole)),
     });
   },
-}).use(async ({ next }) => {
+}).use(async ({ next, metadata }) => {
   try {
-    const organization = await getRequiredCurrentOrganization();
+    const org = await getRequiredCurrentOrganization(metadata.roles);
     return next({
-      ctx: organization,
+      ctx: org,
     });
   } catch (e) {
     throw new ActionError(

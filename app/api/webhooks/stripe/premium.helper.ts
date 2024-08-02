@@ -8,14 +8,11 @@ import SuccessUpgradeEmail from "@email/SuccessUpgradeEmail.email";
 import type { Organization } from "@prisma/client";
 import type Stripe from "stripe";
 
-export const upgradeUserToPlan = async (
-  organizationId: string,
-  plan: string,
-) => {
-  logger.debug("Upgrade user to plan", organizationId, plan);
+export const upgradeUserToPlan = async (orgId: string, plan: string) => {
+  logger.debug("Upgrade user to plan", orgId, plan);
   await prisma.organization.update({
     where: {
-      id: organizationId,
+      id: orgId,
     },
     data: {
       planId: plan,
@@ -23,10 +20,10 @@ export const upgradeUserToPlan = async (
   });
 };
 
-export const downgradeUserFromPlan = async (organizationId: string) => {
+export const downgradeUserFromPlan = async (orgId: string) => {
   await prisma.organization.update({
     where: {
-      id: organizationId,
+      id: orgId,
     },
     data: {
       planId: "FREE",

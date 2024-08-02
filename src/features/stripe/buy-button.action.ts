@@ -9,12 +9,12 @@ import { z } from "zod";
 
 const BuyButtonSchema = z.object({
   priceId: z.string(),
-  organizationId: z.string(),
+  orgId: z.string(),
 });
 
 export const buyButtonAction = action
   .schema(BuyButtonSchema)
-  .action(async ({ parsedInput: { priceId, organizationId } }) => {
+  .action(async ({ parsedInput: { priceId, orgId } }) => {
     const user = await auth();
 
     if (!user) {
@@ -23,7 +23,7 @@ export const buyButtonAction = action
 
     const organization = await prisma.organization.findFirst({
       where: {
-        id: organizationId,
+        id: orgId,
         members: {
           some: {
             userId: user.id,

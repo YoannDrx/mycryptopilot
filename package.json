@@ -14,7 +14,9 @@
     "stripe-webhooks": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "postinstall": "prisma generate",
-    "clean": "next lint --fix && tsc --noEmit && prettier --write ."
+    "clean": "next lint --fix && tsc --noEmit && prettier --write .",
+    "unimported": "pnpm dlx unimported",
+    "depcheck": "pnpm dlx depcheck"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
@@ -62,6 +64,7 @@
     "next-mdx-remote-client": "^1.0.3",
     "next-plausible": "^3.12.0",
     "next-safe-action": "^7.4.2",
+    "next-safe-route": "^0.0.19",
     "next-themes": "^0.3.0",
     "nprogress": "^0.2.0",
     "nuqs": "^1.17.5",

@@ -1,8 +1,11 @@
 import type { User } from "next-auth";
 import { z } from "zod";
 import { env } from "../env";
+import { getIdFromUser } from "../format/id";
+import { logger } from "../logger";
 import { resend } from "../mail/resend";
 import { prisma } from "../prisma";
+import { createOrganizationQuery } from "../query/org/org-create.query";
 import { stripe } from "../stripe";
 
 export const setupStripeCustomer = async (user: User) => {
@@ -40,10 +43,10 @@ export const setupResendCustomer = async (user: User) => {
 };
 
 const TokenSchema = z.object({
-  organizationId: z.string(),
+  orgId: z.string(),
 });
 
-export const setupOrganizationIfPendingInvitation = async (user: User) => {
+export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
   if (!user.email || !user.id) {
     return;
   }
@@ -54,17 +57,31 @@ export const setupOrganizationIfPendingInvitation = async (user: User) => {
     },
   });
 
+  // If there is no token, there is no invitation
+  // We create a default organization for the user
   if (tokens.length === 0) {
-    return;
+    logger.debug("Create organization for user", user.email);
+    const name = getIdFromUser(user);
+    await createOrganizationQuery({
+      id: name,
+      name: name,
+      email: user.email,
+      members: {
+        create: {
+          userId: user.id,
+          role: "OWNER",
+        },
+      },
+    });
   }
 
   for await (const token of tokens) {
     const tokenData = TokenSchema.parse(token.data);
 
-    if (tokenData.organizationId) {
+    if (tokenData.orgId) {
       await prisma.organizationMembership.create({
         data: {
-          organizationId: tokenData.organizationId,
+          organizationId: tokenData.orgId,
           userId: user.id,
           role: "MEMBER",
         },
