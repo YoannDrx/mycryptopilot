@@ -15,7 +15,7 @@ import {
 } from "@/features/page/layout";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
-import { confirmAccountDeletionAction } from "../delete-account.action";
+import { orgConfirmDeletionAction } from "../delete-account.action";
 
 export default async function RoutePage(props: PageParams<{}>) {
   const token = props.searchParams.token;
@@ -47,7 +47,7 @@ export default async function RoutePage(props: PageParams<{}>) {
                 formAction={async () => {
                   "use server";
 
-                  await confirmAccountDeletionAction({
+                  await orgConfirmDeletionAction({
                     token: String(token),
                   });
                 }}

@@ -1,10 +1,14 @@
 import { SiteConfig } from "@/site-config";
-import { Section, Text } from "@react-email/components";
+import { Preview, Section, Text } from "@react-email/components";
 import { EmailLayout } from "./utils/EmailLayout";
 
 export default function AccountConfirmDeletionEmail() {
   return (
     <EmailLayout>
+      <Preview>
+        Your account has been deleted. All your data, including any
+        organizations you owned, have been removed from our system.
+      </Preview>
       <Section className="my-6">
         <Text className="text-lg leading-6">Hi,</Text>
         <Text className="text-lg leading-6">

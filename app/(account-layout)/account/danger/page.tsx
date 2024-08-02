@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { enqueueDialog } from "@/features/dialogs-provider/DialogProvider";
 import { toast } from "sonner";
-import { askForAccountDeletionAction } from "./delete-account.action";
+import { accountAskDeletionAction } from "./delete-account.action";
 
 export default function DeleteProfilePage() {
   return (
@@ -38,7 +38,7 @@ export default function DeleteProfilePage() {
               action: {
                 label: "Delete",
                 onClick: async () => {
-                  await askForAccountDeletionAction();
+                  await accountAskDeletionAction();
                   toast.success("Your deletion has been asked.", {
                     description:
                       "Please check your email for further instructions.",

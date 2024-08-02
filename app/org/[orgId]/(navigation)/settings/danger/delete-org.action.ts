@@ -8,6 +8,7 @@ import { getServerUrl } from "@/lib/server-url";
 import { SiteConfig } from "@/site-config";
 import OrgAskDeletionEmail from "@email/OrgAskDeletion.email";
 import OrgConfirmDeletionEmail from "@email/OrgConfirmDeletion.email";
+import { addHours } from "date-fns";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 
@@ -17,7 +18,7 @@ export const orgAskDeletionAction = orgAction
     const token = await prisma.verificationToken.create({
       data: {
         identifier: `${ctx.user.email}-${ctx.org.id}`,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        expires: addHours(new Date(), 1),
         data: {
           deleteOrg: true,
           orgId: ctx.org.id,
@@ -73,6 +74,10 @@ export const orgConfirmDeletionAction = orgAction
 
     if (verificationToken.identifier !== `${ctx.user.email}-${ctx.org.id}`) {
       throw new ActionError("Invalid token");
+    }
+
+    if (verificationToken.expires < new Date()) {
+      throw new ActionError("Token expired");
     }
 
     await deleteOrganizationQuery(ctx.org.id);

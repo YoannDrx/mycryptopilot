@@ -8,68 +8,65 @@ import { getServerUrl } from "@/lib/server-url";
 import { SiteConfig } from "@/site-config";
 import AccountAskDeletionEmail from "@email/AccountAskDeletion.email";
 import AccountConfirmDeletionEmail from "@email/AccountConfirmDeletion.email";
+import { addHours } from "date-fns";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 
-export const askForAccountDeletionAction = authAction.action(
-  async ({ ctx }) => {
-    const userId = ctx.user.id;
+export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
+  const userId = ctx.user.id;
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: {
-        organization: {
-          where: {
-            role: "OWNER",
-          },
-          select: {
-            organization: {
-              select: {
-                name: true,
-              },
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      organization: {
+        where: {
+          role: "OWNER",
+        },
+        select: {
+          organization: {
+            select: {
+              name: true,
             },
           },
         },
       },
-    });
+    },
+  });
 
-    if (!user) {
-      throw new ActionError("You don't have an account!");
-    }
+  if (!user) {
+    throw new ActionError("You don't have an account!");
+  }
 
-    const token = await prisma.verificationToken.create({
+  const token = await prisma.verificationToken.create({
+    data: {
+      identifier: `${user.email}-delete-account`,
+      expires: addHours(new Date(), 1),
       data: {
-        identifier: `${user.email}-delete-account`,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        data: {
-          deleteAccount: true,
-        },
-        token: nanoid(32),
+        deleteAccount: true,
       },
-    });
+      token: nanoid(32),
+    },
+  });
 
-    await sendEmail({
-      from: SiteConfig.email.from,
-      subject: "[Action required] Confirm your account deletion",
-      to: user.email,
-      react: AccountAskDeletionEmail({
-        email: user.email ?? "",
-        organizationsToDelete: user.organization?.map(
-          (o) => o.organization.name,
-        ),
-        confirmUrl: `${getServerUrl()}/account/delete/confirm?token=${token.token}`,
-      }),
-    });
-  },
-);
+  await sendEmail({
+    from: SiteConfig.email.from,
+    subject: "[Action required] Confirm your account deletion",
+    to: user.email,
+    react: AccountAskDeletionEmail({
+      email: user.email ?? "",
+      organizationsToDelete: user.organization?.map((o) => o.organization.name),
+      confirmUrl: `${getServerUrl()}/account/delete/confirm?token=${token.token}`,
+    }),
+  });
+});
 
 const TokenSchema = z.object({
   deleteAccount: z.boolean(),
 });
 
-export const confirmAccountDeletionAction = authAction
+export const orgConfirmDeletionAction = authAction
   .schema(
     z.object({
       token: z.string(),
@@ -94,6 +91,10 @@ export const confirmAccountDeletionAction = authAction
 
     if (verificationToken.identifier !== `${ctx.user.email}-delete-account`) {
       throw new ActionError("Invalid token");
+    }
+
+    if (verificationToken.expires < new Date()) {
+      throw new ActionError("Token expired");
     }
 
     // first delete all organizations linked to the user
