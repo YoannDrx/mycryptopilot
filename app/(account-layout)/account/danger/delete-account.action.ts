@@ -20,7 +20,7 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
       id: userId,
     },
     include: {
-      organization: {
+      organizations: {
         where: {
           role: "OWNER",
         },
@@ -56,7 +56,9 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
     to: user.email,
     react: AccountAskDeletionEmail({
       email: user.email ?? "",
-      organizationsToDelete: user.organization?.map((o) => o.organization.name),
+      organizationsToDelete: user.organizations?.map(
+        (o) => o.organization.name,
+      ),
       confirmUrl: `${getServerUrl()}/account/delete/confirm?token=${token.token}`,
     }),
   });
