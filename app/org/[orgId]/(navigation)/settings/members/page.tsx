@@ -1,6 +1,7 @@
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import { getOrgsMembers } from "@/query/org/get-orgs-members";
 import type { PageParams } from "@/types/next";
 import { OrgMembersForm } from "./OrgMembersForm";
 
@@ -11,23 +12,7 @@ export const generateMetadata = combineWithParentMetadata({
 
 export default async function RoutePage(props: PageParams<{}>) {
   const { org } = await getRequiredCurrentOrgCache(["ADMIN"]);
-  const members = await prisma.organizationMembership.findMany({
-    where: {
-      organizationId: org.id,
-    },
-    select: {
-      user: {
-        select: {
-          image: true,
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      id: true,
-      role: true,
-    },
-  });
+  const members = await getOrgsMembers(org.id);
 
   const invitations = await prisma.verificationToken.findMany({
     where: {
@@ -50,9 +35,9 @@ export default async function RoutePage(props: PageParams<{}>) {
   return (
     <OrgMembersForm
       defaultValues={{
-        members: members.map((m) => ({ role: m.role, id: m.user.id })),
+        members: members.map((m) => ({ role: m.role, id: m.id })),
       }}
-      members={members.map((m) => ({ role: m.role, ...m.user }))}
+      members={members.map((m) => ({ role: m.role, ...m.user, id: m.id }))}
       invitedEmail={invitedEmail}
     />
   );

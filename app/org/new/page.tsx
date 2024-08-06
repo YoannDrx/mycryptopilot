@@ -1,4 +1,4 @@
-import LoggedInNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
+import AuthNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
 import {
   Layout,
   LayoutContent,
@@ -10,7 +10,7 @@ import { NewOrganizationForm } from "./NewOrgForm";
 
 export default async function RoutePage() {
   return (
-    <LoggedInNavigationWrapper>
+    <AuthNavigationWrapper>
       <Layout>
         <LayoutHeader>
           <LayoutTitle>Create a new organization</LayoutTitle>
@@ -23,6 +23,6 @@ export default async function RoutePage() {
           <NewOrganizationForm />
         </LayoutContent>
       </Layout>
-    </LoggedInNavigationWrapper>
+    </AuthNavigationWrapper>
   );
 }

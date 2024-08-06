@@ -1,5 +1,6 @@
 import { OrganizationMembershipRole } from "@prisma/client";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { auth } from "../auth/helper";
 import { logger } from "../logger";
 import { prisma } from "../prisma";
@@ -89,7 +90,7 @@ export const getRequiredCurrentOrg = async (
   const result = await getCurrentOrg(roles);
 
   if (!result) {
-    throw new Error("No organization found");
+    notFound();
   }
 
   return result;

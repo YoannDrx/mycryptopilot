@@ -11,6 +11,10 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
+import {
+  CmdOrOption,
+  KeyboardShortcut,
+} from "@/components/ui/keyboard-shortcut";
 import { Search } from "lucide-react";
 import { useKey } from "react-use";
 import { ORGANIZATION_LINKS } from "./navigation.links";
@@ -45,9 +49,13 @@ export function OrganizationCommand() {
             setOpen(true);
           }}
         />
-        <kbd className="pointer-events-none absolute right-2.5 top-2.5 inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">⌘</span>K
-        </kbd>
+
+        <div className="pointer-events-none absolute right-2.5 top-2.5 inline-flex h-5 select-none items-center gap-1">
+          <KeyboardShortcut eventKey="cmd">
+            <CmdOrOption />
+          </KeyboardShortcut>
+          <KeyboardShortcut eventKey="k">K</KeyboardShortcut>
+        </div>
       </div>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />

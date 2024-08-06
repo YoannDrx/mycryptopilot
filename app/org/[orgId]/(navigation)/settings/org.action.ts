@@ -1,8 +1,9 @@
 "use server";
 
-import { authAction, orgAction } from "@/lib/actions/safe-actions";
+import { orgAction } from "@/lib/actions/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
+import { getOrgsMembers } from "@/query/org/get-orgs-members";
 import OrganizationInvitationEmail from "@email/OrganizationInvitationEmail.email";
 import { nanoid } from "nanoid";
 import { z } from "zod";
@@ -12,12 +13,41 @@ import {
   OrgMemberFormSchema,
 } from "./org.schema";
 
-export const updateOrganizationMemberAction = authAction
-  .schema(z.union([OrgDetailsFormSchema, OrgMemberFormSchema]))
-  .action(async ({ parsedInput: input }) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Update the data from the server and return the fresh data
-    return input;
+export const updateOrganizationMemberAction = orgAction
+  .metadata({
+    roles: ["OWNER"],
+  })
+  .schema(OrgMemberFormSchema)
+  .action(async ({ parsedInput: input, ctx }) => {
+    const members = input.members.filter((member) => member.id !== ctx.user.id);
+
+    const deletedMembers = prisma.organizationMembership.deleteMany({
+      where: {
+        organizationId: ctx.org.id,
+        id: {
+          notIn: members.map((m) => m.id),
+        },
+        role: {
+          notIn: ["OWNER"],
+        },
+      },
+    });
+
+    const updatedMembers = members.map((member) => {
+      return prisma.organizationMembership.update({
+        where: {
+          organizationId: ctx.org.id,
+          id: member.id,
+        },
+        data: {
+          role: member.role,
+        },
+      });
+    });
+
+    await prisma.$transaction([deletedMembers, ...updatedMembers]);
+
+    return { members: await getOrgsMembers(ctx.org.id) };
   });
 
 export const updateOrganizationDetailsAction = orgAction

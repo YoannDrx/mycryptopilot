@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoadingButton } from "@/features/form/SubmitButton";
-import LoggedInNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
+import AuthNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
 import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
 import {
   Layout,
@@ -62,7 +62,7 @@ export default async function RoutePage(
   const tokenData = TokenSchema.parse(verificationToken.data);
 
   if (tokenData.orgId !== organization.id) {
-    return "Invalid token";
+    return "Invalid token. (orgId doesn't match)";
   }
 
   if (!user) {
@@ -115,7 +115,7 @@ export default async function RoutePage(
   }
 
   return (
-    <LoggedInNavigationWrapper>
+    <AuthNavigationWrapper>
       <Layout>
         <LayoutHeader>
           <LayoutTitle>
@@ -158,6 +158,6 @@ export default async function RoutePage(
           </Card>
         </LayoutContent>
       </Layout>
-    </LoggedInNavigationWrapper>
+    </AuthNavigationWrapper>
   );
 }

@@ -52,18 +52,19 @@ export const KeyboardShortcut = ({
   children,
   variant,
   size,
+  eventKey,
   ...props
 }: KeyboardShortcutProps) => {
   const [isKeyDown, setIsKeyDown] = useState(false);
 
   useKey(
-    (event) => keyCondition(event, props.eventKey),
+    (event) => keyCondition(event, eventKey),
     () => setIsKeyDown(true),
     { event: "keydown" },
   );
 
   useKey(
-    (event) => keyCondition(event, props.eventKey),
+    (event) => keyCondition(event, eventKey),
     () => setIsKeyDown(false),
     { event: "keyup" },
   );

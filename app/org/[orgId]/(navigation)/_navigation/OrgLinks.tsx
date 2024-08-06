@@ -6,7 +6,7 @@ import Link from "next/link";
 import { isInRoles } from "@/lib/organizations/isInRoles";
 import { OrganizationMembershipRole } from "@prisma/client";
 import { usePathname } from "next/navigation";
-import { ACCOUNT_LINKS } from "../../../../(account-layout)/account-links";
+import { ACCOUNT_LINKS } from "../../../../(logged-in)/(account-layout)/account-links";
 import { ORGANIZATION_LINKS } from "./navigation.links";
 
 export type NavigationLink = {

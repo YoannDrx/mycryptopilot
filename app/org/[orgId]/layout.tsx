@@ -5,7 +5,6 @@ import { Metadata } from "next";
 export async function generateMetadata({
   params,
 }: PageParams<{ orgId: string }>): Promise<Metadata> {
-  console.log({ params });
   return orgMetadata(params.orgId);
 }
 
