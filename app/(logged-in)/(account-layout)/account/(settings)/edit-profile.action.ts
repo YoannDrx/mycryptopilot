@@ -8,7 +8,6 @@ import {
 } from "@/lib/auth/credentials-provider";
 import { requiredAuth } from "@/lib/auth/helper";
 import { env } from "@/lib/env";
-import { logger } from "@/lib/logger";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import MarkdownEmail from "@email/Markdown.email";
@@ -126,7 +125,7 @@ export const sendUpdateEmailVerificationCodeAction = authAction.action(
       },
     });
 
-    const result = await sendEmail({
+    await sendEmail({
       to: ctx.user.email,
       subject: "[Action required] Update your profile",
       react: MarkdownEmail({
@@ -142,7 +141,6 @@ Best,`,
         preview: "Request to update your profile email",
       }),
     });
-    logger.debug({ result });
 
     return {
       send: true,

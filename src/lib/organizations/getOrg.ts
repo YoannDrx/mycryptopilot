@@ -2,7 +2,6 @@ import { OrganizationMembershipRole } from "@prisma/client";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { auth } from "../auth/helper";
-import { logger } from "../logger";
 import { prisma } from "../prisma";
 
 const getOrgIdFromUrl = () => {
@@ -15,7 +14,7 @@ const getOrgIdFromUrl = () => {
 
   // get the parameters after /o/ or /organizations/ at the beginning of the url
   const match = xURL.match(/\/(?:org|organizations)\/([^/]+)/);
-  logger.debug({ match });
+
   if (!match) {
     return null;
   }

@@ -1,4 +1,3 @@
-import { logger } from "@/lib/logger";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
@@ -9,7 +8,6 @@ import type { Organization } from "@prisma/client";
 import type Stripe from "stripe";
 
 export const upgradeUserToPlan = async (orgId: string, plan: string) => {
-  logger.debug("Upgrade user to plan", orgId, plan);
   await prisma.organization.update({
     where: {
       id: orgId,

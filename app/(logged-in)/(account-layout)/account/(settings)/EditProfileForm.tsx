@@ -21,7 +21,6 @@ import { InlineTooltip } from "@/components/ui/tooltip";
 import { Typography } from "@/components/ui/typography";
 import { LoadingButton } from "@/features/form/SubmitButton";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
-import { logger } from "@/lib/logger";
 import type { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { differenceInMinutes } from "date-fns";
@@ -62,7 +61,6 @@ export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
       const result = await sendUpdateEmailVerificationCodeAction();
 
       if (!isActionSuccessful(result)) {
-        logger.debug(result);
         setVerification({
           isDialogOpen: false,
           token: "",

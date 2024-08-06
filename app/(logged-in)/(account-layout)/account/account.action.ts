@@ -9,7 +9,7 @@ import { z } from "zod";
 import {
   OrganizationDetailsFormSchema,
   OrganizationMemberFormSchema,
-} from "./settings.schema";
+} from "./account.schema";
 
 export const updateOrganizationMemberAction = authAction
   .schema(

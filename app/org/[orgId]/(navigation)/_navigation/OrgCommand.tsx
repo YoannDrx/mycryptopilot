@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import {
   CommandDialog,
   CommandEmpty,
@@ -16,11 +14,12 @@ import {
   KeyboardShortcut,
 } from "@/components/ui/keyboard-shortcut";
 import { Search } from "lucide-react";
+import { useState } from "react";
 import { useKey } from "react-use";
 import { ORGANIZATION_LINKS } from "./navigation.links";
 
 export function OrganizationCommand() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const down = () => {
     setOpen((open) => !open);

@@ -74,8 +74,6 @@ async function onCheckoutSessionCompleted(object: Stripe.Checkout.Session) {
   // ✅ Grant access to your service
   const organization = await findOrganizationFromCustomer(object.customer);
 
-  logger.debug("Organization", organization);
-
   const lineItems = await stripe.checkout.sessions.listLineItems(object.id, {
     limit: 1,
   });
