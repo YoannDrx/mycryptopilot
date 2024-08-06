@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserDropdown } from "@/features/auth/UserDropdown";
-import { NavigationWrapper } from "@/features/navigation/Navigation";
+import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";

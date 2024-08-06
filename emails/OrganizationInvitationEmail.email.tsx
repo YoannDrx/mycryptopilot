@@ -20,7 +20,9 @@ export default function OrganizationInvitationEmail({
         <Text className="text-lg leading-6">
           {organizationName} has invited you to join their organization.
         </Text>
-        <Text>If you didn't request this, please ignore this email.</Text>
+        <Text className="text-lg leading-6">
+          If you didn't request this, please ignore this email.
+        </Text>
         <Text className="text-lg leading-6">
           <Link className="text-sky-500 hover:underline" href={url}>
             👉 Click here to accept the invitation 👈

@@ -57,6 +57,28 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  :root {
+    --success: 151deg 55% 41%;
+    --success-foreground: 137deg 72% 94%;
+
+    --warning: 24deg 94% 50%;
+    --warning-foreground: 24deg 97% 93%;
+
+    --info: 221.2 83.2% 53.3%;
+    --info-foreground: 210 40% 98%;
+  }
+
+  .dark {
+    --success: 151deg 55% 41.5%;
+    --success-foreground: 137 72% 94%;
+
+    --warning: 24deg 94% 50%;
+    --warning-foreground: 24deg 97% 93.2%;
+
+    --info: 217.2 91.2% 59.8%;
+    --info-foreground: 222.2 47.4% 11.2%;
+  }
 }
 
 @layer base {

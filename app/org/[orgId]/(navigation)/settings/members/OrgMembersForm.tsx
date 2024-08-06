@@ -9,13 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { FormField, FormItem, useZodForm } from "@/components/ui/form";
 import {
   Select,
@@ -29,7 +22,7 @@ import { Typography } from "@/components/ui/typography";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { OrganizationMembershipRole } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { Mail, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateOrganizationMemberAction } from "../org.action";
@@ -45,11 +38,13 @@ type ProductFormProps = {
     email: string;
     image?: string | null;
   }[];
+  invitedEmail: string[];
 };
 
 export const OrgMembersForm = ({
   defaultValues,
   members,
+  invitedEmail,
 }: ProductFormProps) => {
   const form = useZodForm({
     schema: OrgMemberFormSchema,
@@ -161,20 +156,13 @@ export const OrgMembersForm = ({
               </div>
             );
           })}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button type="button" variant="outline">
-                <Mail className="mr-2" size={16} />
-                Invite member
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Invite member</DialogTitle>
-              </DialogHeader>
-              <OrganizationInviteMemberForm />
-            </DialogContent>
-          </Dialog>
+          <Typography variant="h3">Invited</Typography>
+          <ul className="list-inside list-disc text-sm text-muted-foreground">
+            {invitedEmail.map((email) => (
+              <li key={email}>{email}</li>
+            ))}
+          </ul>
+          <OrganizationInviteMemberForm />
         </CardContent>
       </Card>
     </FormUnsavedBar>

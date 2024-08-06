@@ -4,7 +4,7 @@ import { UserDropdown } from "@/features/auth/UserDropdown";
 import { requiredAuth } from "@/lib/auth/helper";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";
-import { NavigationWrapper } from "../../src/features/navigation/Navigation";
+import { NavigationWrapper } from "../../src/features/navigation/NavigationWrapper";
 import { NavigationLinks } from "../org/[orgId]/(navigation)/_navigation/OrgLinks";
 import { OrgsSelect } from "../org/[orgId]/(navigation)/_navigation/OrgsSelect";
 

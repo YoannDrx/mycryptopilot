@@ -45,6 +45,7 @@ export const MagicLinkForm = () => {
         <FormField
           control={form.control}
           name="email"
+          defaultValue={searchParams.get("email")?.replace(" ", "+") ?? ""}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormControl className="w-full">

@@ -53,9 +53,13 @@ export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
 
   const tokens = await prisma.verificationToken.findMany({
     where: {
-      identifier: user.email,
+      identifier: {
+        startsWith: `${user.email}-invite-`,
+      },
     },
   });
+
+  logger.debug({ tokens, t: `${user.email}-invite-` });
 
   // If there is no token, there is no invitation
   // We create a default organization for the user

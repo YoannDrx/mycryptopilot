@@ -48,11 +48,12 @@ export const inviteUserInOrganizationAction = orgAction
   .action(async ({ parsedInput: { email }, ctx }) => {
     const verificationToken = await prisma.verificationToken.create({
       data: {
-        identifier: email,
+        identifier: `${email}-invite-${ctx.org.id}`,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
         token: nanoid(32),
         data: {
           orgId: ctx.org.id,
+          email,
         },
       },
     });
