@@ -15,7 +15,8 @@ export const getOrgsMembers = (orgId: string) => {
         },
       },
       id: true,
-      role: true,
+      roles: true,
+      userId: true,
     },
   });
 };

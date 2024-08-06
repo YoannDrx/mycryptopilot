@@ -13,6 +13,8 @@ import { UpgradeCard } from "./UpgradeCard";
 export async function OrgNavigation({ children }: PropsWithChildren) {
   const { org, user, roles } = await getRequiredCurrentOrgCache();
 
+  console.log({ roles });
+
   const userOrganizations = await getUsersOrgs();
 
   return (

@@ -47,9 +47,9 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
       members: {
         some: {
           userId: user.id,
-          role: roles
+          roles: roles
             ? {
-                in: [...roles, "OWNER"],
+                hasSome: [...roles, "OWNER"],
               }
             : undefined,
         },
@@ -66,7 +66,7 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
           userId: user.id,
         },
         select: {
-          role: true,
+          roles: true,
         },
       },
     },
@@ -79,7 +79,7 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
   return {
     org,
     user,
-    roles: org.members.map((m) => m.role),
+    roles: org.members[0].roles,
   };
 };
 

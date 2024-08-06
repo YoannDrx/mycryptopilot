@@ -21,26 +21,42 @@ export const updateOrganizationMemberAction = orgAction
   .action(async ({ parsedInput: input, ctx }) => {
     const members = input.members.filter((member) => member.id !== ctx.user.id);
 
+    const currentMembers = await prisma.organizationMembership.findMany({
+      where: {
+        organizationId: ctx.org.id,
+      },
+    });
+
+    const memberIdToDelete = currentMembers
+      .filter(
+        (member) =>
+          !members.some((m) => m.id === member.id) &&
+          !member.roles.includes("OWNER"),
+      )
+      .map((member) => member.id);
+
     const deletedMembers = prisma.organizationMembership.deleteMany({
       where: {
         organizationId: ctx.org.id,
         id: {
-          notIn: members.map((m) => m.id),
-        },
-        role: {
-          notIn: ["OWNER"],
+          in: memberIdToDelete,
         },
       },
     });
 
-    const updatedMembers = members.map((member) => {
+    const memberToUpdate = members.filter((member) => {
+      const currentMember = currentMembers.find((m) => m.id === member.id);
+      return currentMember && !currentMember.roles.includes("OWNER");
+    });
+
+    const updatedMembers = memberToUpdate.map((member) => {
       return prisma.organizationMembership.update({
         where: {
           organizationId: ctx.org.id,
           id: member.id,
         },
         data: {
-          role: member.role,
+          roles: member.roles,
         },
       });
     });

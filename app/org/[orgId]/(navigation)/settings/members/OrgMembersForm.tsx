@@ -9,18 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FormField, FormItem, useZodForm } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useZodForm } from "@/components/ui/form";
 import { InlineTooltip } from "@/components/ui/tooltip";
 import { Typography } from "@/components/ui/typography";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
-import { OrganizationMembershipRole } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -29,6 +21,7 @@ import { updateOrganizationMemberAction } from "../org.action";
 import type { OrgMemberFormSchemaType } from "../org.schema";
 import { OrgMemberFormSchema } from "../org.schema";
 import { OrganizationInviteMemberForm } from "./OrgInviteMemberForm";
+import { OrgMemberRoleField } from "./OrgMemberRoleField";
 
 type ProductFormProps = {
   defaultValues: OrgMemberFormSchemaType;
@@ -97,47 +90,27 @@ export const OrgMembersForm = ({
                     <Typography variant="muted">{member.email}</Typography>
                   </div>
                   <div className="flex-1"></div>
-                  {baseMember.role === "OWNER" ? (
+                  {baseMember.roles.includes("OWNER") ? (
                     <InlineTooltip title="You can't change the role of an owner">
                       <Button type="button" variant="outline">
                         OWNER
                       </Button>
                     </InlineTooltip>
                   ) : (
-                    <FormField
-                      control={form.control}
-                      name={`members.${index}.role`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <Select
-                            value={field.value}
-                            onValueChange={(v) => {
-                              field.onChange(v);
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.values(OrganizationMembershipRole).map(
-                                (role) => {
-                                  return (
-                                    <SelectItem key={role} value={role}>
-                                      {role}
-                                    </SelectItem>
-                                  );
-                                },
-                              )}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
+                    <OrgMemberRoleField
+                      roles={form.watch(`members.${index}.roles`)}
+                      setRoles={(roles) => {
+                        form.setValue(`members.${index}.roles`, roles, {
+                          shouldDirty: true,
+                        });
+                      }}
+                      className="max-w-[300px]"
                     />
                   )}
 
                   <Button
                     type="button"
-                    disabled={baseMember.role === "OWNER"}
+                    disabled={baseMember.roles.includes("OWNER")}
                     variant="outline"
                     onClick={() => {
                       const newMembers = [...form.getValues("members")].filter(
@@ -156,12 +129,16 @@ export const OrgMembersForm = ({
               </div>
             );
           })}
-          <Typography variant="h3">Invited</Typography>
-          <ul className="list-inside list-disc text-sm text-muted-foreground">
-            {invitedEmail.map((email) => (
-              <li key={email}>{email}</li>
-            ))}
-          </ul>
+          {invitedEmail.length > 0 && (
+            <>
+              <Typography variant="h3">Invited</Typography>
+              <ul className="list-inside list-disc text-sm text-muted-foreground">
+                {invitedEmail.map((email) => (
+                  <li key={email}>{email}</li>
+                ))}
+              </ul>
+            </>
+          )}
           <OrganizationInviteMemberForm />
         </CardContent>
       </Card>

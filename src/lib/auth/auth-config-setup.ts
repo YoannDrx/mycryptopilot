@@ -69,7 +69,7 @@ export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
       members: {
         create: {
           userId: user.id,
-          role: "OWNER",
+          roles: ["OWNER"],
         },
       },
     });
@@ -83,7 +83,7 @@ export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
         data: {
           organizationId: tokenData.orgId,
           userId: user.id,
-          role: "MEMBER",
+          roles: ["MEMBER"],
         },
       });
       await prisma.verificationToken.delete({

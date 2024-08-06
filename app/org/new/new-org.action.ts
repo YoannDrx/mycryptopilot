@@ -14,7 +14,7 @@ export const createOrganizationAction = authAction
       members: {
         create: {
           userId: ctx.user.id,
-          role: "OWNER",
+          roles: ["OWNER"],
         },
       },
     });

@@ -21,8 +21,8 @@ model Organization {
 }
 
 model OrganizationMembership {
-  id   String                     @id @default(nanoid(11))
-  role OrganizationMembershipRole @default(MEMBER)
+  id    String                       @id @default(nanoid(11))
+  roles OrganizationMembershipRole[] @default([MEMBER])
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

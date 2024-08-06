@@ -35,9 +35,13 @@ export default async function RoutePage(props: PageParams<{}>) {
   return (
     <OrgMembersForm
       defaultValues={{
-        members: members.map((m) => ({ role: m.role, id: m.id })),
+        members: members.map((m) => ({
+          roles: m.roles,
+          id: m.id,
+          userId: m.userId,
+        })),
       }}
-      members={members.map((m) => ({ role: m.role, ...m.user, id: m.id }))}
+      members={members.map((m) => ({ role: m.roles, ...m.user, id: m.id }))}
       invitedEmail={invitedEmail}
     />
   );

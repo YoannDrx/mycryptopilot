@@ -140,7 +140,7 @@ export default async function RoutePage(
                       data: {
                         organizationId: organization.id,
                         userId: user.id,
-                        role: "MEMBER",
+                        roles: ["MEMBER"],
                       },
                     });
                     await prisma.verificationToken.delete({

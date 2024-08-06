@@ -18,7 +18,7 @@ export const OrgMemberFormSchema = z.object({
   members: z.array(
     z.object({
       id: z.string(),
-      role: z.nativeEnum(OrganizationMembershipRole),
+      roles: z.array(z.nativeEnum(OrganizationMembershipRole)),
     }),
   ),
 });
