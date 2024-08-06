@@ -1,12 +1,16 @@
+import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
-import { getRequiredCurrentOrganizationCache } from "@/lib/react/cache";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
-import { OrganizationMembersForm } from "./OrganizationMembersForm";
+import { OrgMembersForm } from "./OrgMembersForm";
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Members",
+  description: "Manage your organization members.",
+});
 
 export default async function RoutePage(props: PageParams<{}>) {
-  const { org: organization } = await getRequiredCurrentOrganizationCache([
-    "ADMIN",
-  ]);
+  const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
   const members = await prisma.organizationMembership.findMany({
     where: {
       organizationId: organization.id,
@@ -25,7 +29,7 @@ export default async function RoutePage(props: PageParams<{}>) {
     },
   });
   return (
-    <OrganizationMembersForm
+    <OrgMembersForm
       defaultValues={{
         members: members.map((m) => ({ role: m.role, id: m.user.id })),
       }}

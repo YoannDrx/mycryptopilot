@@ -1,5 +1,5 @@
 import { Home, Settings } from "lucide-react";
-import { NavigationLink } from "./OrganizationLinks";
+import { NavigationLink } from "./OrgLinks";
 
 export const ORGANIZATION_LINKS = [
   {

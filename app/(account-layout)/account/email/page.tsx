@@ -10,7 +10,13 @@ import { ContactSupportDialog } from "@/features/contact/support/ContactSupportD
 import { requiredAuth } from "@/lib/auth/helper";
 import { env } from "@/lib/env";
 import { resend } from "@/lib/mail/resend";
+import { combineWithParentMetadata } from "@/lib/metadata";
 import { ToggleEmailCheckbox } from "./ToggleEmailCheckbox";
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Email",
+  description: "Update your email notifications settings.",
+});
 
 export default async function MailProfilePage() {
   const user = await requiredAuth();

@@ -6,15 +6,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
-import { getRequiredCurrentOrganizationCache } from "@/lib/react/cache";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
-import { OrganizationDangerForm } from "./OrganizationDangerForm";
-import { OrganizationDelete } from "./OrganizationDelete";
+import { OrganizationDangerForm } from "./OrgDangerForm";
+import { OrganizationDelete } from "./OrgDelete";
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Danger",
+  description: "Delete your organization.",
+});
 
 export default async function RoutePage(props: PageParams<{}>) {
-  const { org, user } = await getRequiredCurrentOrganizationCache(["ADMIN"]);
+  const { org, user } = await getRequiredCurrentOrgCache(["ADMIN"]);
 
   const usersOrganizationsCount = await prisma.organizationMembership.count({
     where: {

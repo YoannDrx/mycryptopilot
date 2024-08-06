@@ -11,19 +11,19 @@ import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 export type OrganizationsSelectProps = {
-  currentOrganizationId?: string;
+  currentOrgId?: string;
   children?: ReactNode;
-  organizations: {
+  orgs: {
     id: string;
     name: string;
   }[];
 };
 
-export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
+export const OrgsSelect = (props: OrganizationsSelectProps) => {
   const router = useRouter();
   return (
     <Select
-      value={props.currentOrganizationId}
+      value={props.currentOrgId}
       onValueChange={(value) => {
         if (value === "new") {
           router.push("/org/new");
@@ -31,13 +31,10 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
         }
 
         const currentUrl = window.location.href;
-        const newUrl = props.currentOrganizationId
-          ? currentUrl.replace(
-              `/org/${props.currentOrganizationId}`,
-              `/org/${value}`,
-            )
+        const newUrl = props.currentOrgId
+          ? currentUrl.replace(`/org/${props.currentOrgId}`, `/org/${value}`)
           : `/${value}`;
-        console.log({ newUrl });
+
         router.push(newUrl);
       }}
     >
@@ -45,7 +42,7 @@ export const OrganizationsSelect = (props: OrganizationsSelectProps) => {
         {props.children ? props.children : <SelectValue />}
       </SelectTrigger>
       <SelectContent>
-        {props.organizations.map((organization) => (
+        {props.orgs.map((organization) => (
           <SelectItem key={organization.id} value={organization.id}>
             {organization.name}
           </SelectItem>

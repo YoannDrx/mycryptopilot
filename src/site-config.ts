@@ -1,7 +1,7 @@
 export const SiteConfig = {
   title: "Now.ts",
   description: "A template description for Now.ts",
-  prodUrl: "https://demo.nowts.app",
+  prodUrl: "https://demo.nowts.app/",
   domain: "nowts.app",
   appIcon: "/images/icon.png",
   company: {

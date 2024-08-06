@@ -4,7 +4,7 @@ import { auth } from "../auth/helper";
 import { logger } from "../logger";
 import { prisma } from "../prisma";
 
-const getOrganizationIdFromUrl = () => {
+const getOrgIdFromUrl = () => {
   const headerList = headers();
   const xURL = headerList.get("x-url");
 
@@ -28,16 +28,14 @@ const getOrganizationIdFromUrl = () => {
   return organizationId;
 };
 
-export const getCurrentOrganization = async (
-  roles?: OrganizationMembershipRole[],
-) => {
+export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
   const user = await auth();
 
   if (!user) {
     return null;
   }
 
-  const organizationId = getOrganizationIdFromUrl();
+  const organizationId = getOrgIdFromUrl();
 
   if (!organizationId) {
     return null;
@@ -85,10 +83,10 @@ export const getCurrentOrganization = async (
   };
 };
 
-export const getRequiredCurrentOrganization = async (
+export const getRequiredCurrentOrg = async (
   roles?: OrganizationMembershipRole[],
 ) => {
-  const result = await getCurrentOrganization(roles);
+  const result = await getCurrentOrg(roles);
 
   if (!result) {
     throw new Error("No organization found");

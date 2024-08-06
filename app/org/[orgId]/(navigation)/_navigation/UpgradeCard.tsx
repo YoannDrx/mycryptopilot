@@ -6,11 +6,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getRequiredCurrentOrganizationCache } from "@/lib/react/cache";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import Link from "next/link";
 
 export const UpgradeCard = async () => {
-  const { org: organization } = await getRequiredCurrentOrganizationCache();
+  const { org: organization } = await getRequiredCurrentOrgCache();
 
   if (organization.plan.id !== "FREE") return null;
 

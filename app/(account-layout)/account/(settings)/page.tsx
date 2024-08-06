@@ -2,9 +2,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requiredAuth } from "@/lib/auth/helper";
 import { displayName } from "@/lib/format/displayName";
+import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { EditPasswordForm } from "./EditPasswordForm";
 import { EditProfileForm } from "./EditProfileForm";
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Settings",
+  description: "Update your profile.",
+});
 
 export default async function EditProfilePage() {
   const user = await requiredAuth();

@@ -11,7 +11,9 @@ export default function VerifyEmail({ url }: { url: string }) {
           You requested to verify your email address for your account at{" "}
           {SiteConfig.title}.
         </Text>
-        <Text>If you didn't request this, please ignore this email.</Text>
+        <Text className="text-lg leading-6">
+          If you didn't request this, please ignore this email.
+        </Text>
         <Text className="text-lg leading-6">
           <Link className="text-sky-500 hover:underline" href={url}>
             👉 Click here to verify your email 👈

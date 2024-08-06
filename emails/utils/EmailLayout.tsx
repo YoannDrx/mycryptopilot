@@ -7,26 +7,41 @@ import {
   Hr,
   Html,
   Img,
-  Link,
   Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
 import type { PropsWithChildren } from "react";
 
-export const EmailLayout = ({ children }: PropsWithChildren) => {
+/**
+ * EmailLayout is used to create a layout for your email.
+ * @param props.children The children of the layout
+ * @param props.disableTailwind If true, the children will be rendered without the Tailwind CSS. It's useful when you want use <Markdown /> tag.
+ * @returns
+ */
+export const EmailLayout = (
+  props: PropsWithChildren<{ disableTailwind?: boolean }>,
+) => {
   const baseUrl = getServerUrl();
   return (
-    <Tailwind
-      config={
-        {
-          // Theme can go here
-        }
-      }
-    >
-      <Html>
-        <Head />
-        <Body className="bg-white font-sans">
-          <Container className="mx-auto bg-contain bg-bottom bg-no-repeat p-6">
+    <Html>
+      <Head />
+      <Body
+        style={{
+          backgroundColor: "#ffffff",
+          fontFamily:
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+        }}
+      >
+        <Container
+          style={{
+            margin: "0 auto",
+            backgroundSize: "contain",
+            backgroundPosition: "bottom",
+            backgroundRepeat: "no-repeat",
+            padding: "1.5rem",
+          }}
+        >
+          <Tailwind>
             <table cellPadding={0} cellSpacing={0}>
               <tr>
                 <td className="pr-2">
@@ -43,7 +58,13 @@ export const EmailLayout = ({ children }: PropsWithChildren) => {
                 </td>
               </tr>
             </table>
-            {children}
+          </Tailwind>
+          {props.disableTailwind ? (
+            props.children
+          ) : (
+            <Tailwind>{props.children}</Tailwind>
+          )}
+          <Tailwind>
             <Hr className="mt-12 border-gray-300" />
             <Img
               src={`${baseUrl}${SiteConfig.appIcon}`}
@@ -52,16 +73,15 @@ export const EmailLayout = ({ children }: PropsWithChildren) => {
               className="inline"
               alt={`${SiteConfig.company.name}'s logo`}
             />
-            <Link href={`${baseUrl}/api/emails/unsubscribe`}>Unsubscribe</Link>
             <Text className="ml-1 text-sm text-gray-500">
               {SiteConfig.company.name}
             </Text>
             <Text className="ml-1 text-sm text-gray-500">
               {SiteConfig.company.address}
             </Text>
-          </Container>
-        </Body>
-      </Html>
-    </Tailwind>
+          </Tailwind>
+        </Container>
+      </Body>
+    </Html>
   );
 };

@@ -1,15 +1,16 @@
 "use client";
 
+import { ButtonProps } from "@/components/ui/button";
 import { LoadingButton } from "@/features/form/SubmitButton";
 import { useMutation } from "@tanstack/react-query";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { createVerifyEmailAction } from "./verify-email.action";
 
-export const VerifyEmailButton = () => {
+export const VerifyEmailButton = (props: ButtonProps) => {
   const mutation = useMutation({
     mutationFn: async () => {
-      const result = await createVerifyEmailAction("");
+      const result = await createVerifyEmailAction();
 
       if (result?.serverError) {
         toast.error(result.serverError ?? "An error occurred");
@@ -24,8 +25,9 @@ export const VerifyEmailButton = () => {
     <LoadingButton
       loading={mutation.isPending}
       variant="invert"
-      className="mt-2"
+      size="sm"
       onClick={() => mutation.mutate()}
+      {...props}
     >
       {mutation.isError ? <X size={16} className="mr-2" /> : null}
       {mutation.isSuccess ? <Check size={16} className="mr-2" /> : null}

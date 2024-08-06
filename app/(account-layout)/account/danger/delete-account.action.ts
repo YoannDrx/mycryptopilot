@@ -68,6 +68,34 @@ const TokenSchema = z.object({
   deleteAccount: z.boolean(),
 });
 
+export async function verifyDeleteAccountToken(token: string, userEmail: string) {
+  const verificationToken = await prisma.verificationToken.findUnique({
+    where: {
+      token,
+    },
+  });
+
+  if (!verificationToken) {
+    throw new ActionError("Invalid token");
+  }
+
+  const tokenData = TokenSchema.parse(String(verificationToken.data));
+
+  if (!tokenData.deleteAccount) {
+    throw new ActionError("Invalid token");
+  }
+
+  if (verificationToken.identifier !== `${userEmail}-delete-account`) {
+    throw new ActionError("Invalid token");
+  }
+
+  if (verificationToken.expires < new Date()) {
+    throw new ActionError("Token expired");
+  }
+
+  return verificationToken;
+}
+
 export const orgConfirmDeletionAction = authAction
   .schema(
     z.object({
@@ -75,29 +103,7 @@ export const orgConfirmDeletionAction = authAction
     }),
   )
   .action(async ({ parsedInput: { token }, ctx }) => {
-    const verificationToken = await prisma.verificationToken.findUnique({
-      where: {
-        token,
-      },
-    });
-
-    if (!verificationToken) {
-      throw new ActionError("Invalid token");
-    }
-
-    const tokenData = TokenSchema.parse(String(verificationToken.data));
-
-    if (!tokenData.deleteAccount) {
-      throw new ActionError("Invalid token");
-    }
-
-    if (verificationToken.identifier !== `${ctx.user.email}-delete-account`) {
-      throw new ActionError("Invalid token");
-    }
-
-    if (verificationToken.expires < new Date()) {
-      throw new ActionError("Token expired");
-    }
+    await verifyDeleteAccountToken(token, ctx.user.email);
 
     // first delete all organizations linked to the user
     const organizationsToDelete = await prisma.organization.findMany({

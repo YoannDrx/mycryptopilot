@@ -17,11 +17,8 @@ import { formatId } from "@/lib/format/id";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createOrganizationAction } from "./new-organizations.action";
-import {
-  NewOrganizationSchemaType,
-  NewOrgsSchema,
-} from "./new-organizations.schema";
+import { createOrganizationAction } from "./new-org.action";
+import { NewOrganizationSchemaType, NewOrgsSchema } from "./new-org.schema";
 
 export const NewOrganizationForm = () => {
   const form = useZodForm({

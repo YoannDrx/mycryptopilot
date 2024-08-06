@@ -2,7 +2,7 @@
 import { createSafeRoute } from "next-safe-route";
 import { NextResponse } from "next/server";
 import { auth } from "../auth/helper";
-import { getRequiredCurrentOrganization } from "../organizations/getCurrentOrganization";
+import { getRequiredCurrentOrg } from "../organizations/getOrg";
 
 export class RouteError extends Error {
   status?: number;
@@ -40,9 +40,9 @@ export const authRoute = route.use(async () => {
 });
 
 // Can only be used in /api/organizations/[organizationId]/* routes !
-export const organizationRoute = authRoute.use(async () => {
+export const orgRoute = authRoute.use(async () => {
   try {
-    const organization = await getRequiredCurrentOrganization();
+    const organization = await getRequiredCurrentOrg();
 
     if (!organization) {
       throw new Error("Organization not found!");

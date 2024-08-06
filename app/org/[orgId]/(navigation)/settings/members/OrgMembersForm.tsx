@@ -35,7 +35,7 @@ import { toast } from "sonner";
 import { updateOrganizationMemberAction } from "../org.action";
 import type { OrgMemberFormSchemaType } from "../org.schema";
 import { OrgMemberFormSchema } from "../org.schema";
-import { OrganizationInviteMemberForm } from "./OrganizationInviteMemberForm";
+import { OrganizationInviteMemberForm } from "./OrgInviteMemberForm";
 
 type ProductFormProps = {
   defaultValues: OrgMemberFormSchemaType;
@@ -47,7 +47,7 @@ type ProductFormProps = {
   }[];
 };
 
-export const OrganizationMembersForm = ({
+export const OrgMembersForm = ({
   defaultValues,
   members,
 }: ProductFormProps) => {

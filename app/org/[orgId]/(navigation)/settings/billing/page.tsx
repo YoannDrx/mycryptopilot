@@ -11,16 +11,20 @@ import { Separator } from "@/components/ui/separator";
 import { Typography } from "@/components/ui/typography";
 import { Pricing } from "@/features/plans/PricingSection";
 import { formatDate } from "@/lib/format/date";
-import { getRequiredCurrentOrganizationCache } from "@/lib/react/cache";
+import { combineWithParentMetadata } from "@/lib/metadata";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
 
+export const generateMetadata = combineWithParentMetadata({
+  title: "Billing",
+  description: "Manage your organization billing.",
+});
+
 export default async function RoutePage(props: PageParams<{}>) {
-  const { org: organization } = await getRequiredCurrentOrganizationCache([
-    "ADMIN",
-  ]);
+  const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
 
   if (!organization.stripeCustomerId) {
     throw new Error("Organization has no Stripe customer");
@@ -50,9 +54,7 @@ export default async function RoutePage(props: PageParams<{}>) {
 }
 
 const PremiumCard = async () => {
-  const { org: organization } = await getRequiredCurrentOrganizationCache([
-    "ADMIN",
-  ]);
+  const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
   console.log({ organization });
 
   if (!organization.stripeCustomerId) {

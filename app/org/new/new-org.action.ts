@@ -2,7 +2,7 @@
 
 import { authAction } from "@/lib/actions/safe-actions";
 import { createOrganizationQuery } from "@/query/org/org-create.query";
-import { NewOrgsSchema } from "./new-organizations.schema";
+import { NewOrgsSchema } from "./new-org.schema";
 
 export const createOrganizationAction = authAction
   .schema(NewOrgsSchema)

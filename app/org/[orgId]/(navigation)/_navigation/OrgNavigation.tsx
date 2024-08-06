@@ -2,46 +2,29 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserDropdown } from "@/features/auth/UserDropdown";
 import { NavigationWrapper } from "@/features/navigation/Navigation";
-import { prisma } from "@/lib/prisma";
-import { getRequiredCurrentOrganizationCache } from "@/lib/react/cache";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";
-import { OrganizationCommand } from "./OrganizationCommand";
-import { NavigationLinks } from "./OrganizationLinks";
-import { OrganizationsSelect } from "./OrganizationsSelect";
+import { OrganizationCommand } from "./OrgCommand";
+import { NavigationLinks } from "./OrgLinks";
+import { OrgsSelect } from "./OrgsSelect";
 import { UpgradeCard } from "./UpgradeCard";
 
-export async function OrganizationNavigation({ children }: PropsWithChildren) {
-  const {
-    org: organization,
-    user,
-    roles,
-  } = await getRequiredCurrentOrganizationCache();
-  const userOrganizations = await prisma.organization.findMany({
-    where: {
-      members: {
-        some: {
-          userId: user.id,
-        },
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+export async function OrgNavigation({ children }: PropsWithChildren) {
+  const { org, user, roles } = await getRequiredCurrentOrgCache();
+
+  const userOrganizations = await getUsersOrgs();
+
   return (
     <NavigationWrapper
       logoChildren={
-        <OrganizationsSelect
-          currentOrganizationId={organization.id}
-          organizations={userOrganizations}
-        />
+        <OrgsSelect currentOrgId={org.id} orgs={userOrganizations} />
       }
       navigationChildren={
         <NavigationLinks
           links="organization"
           variant="default"
-          organizationId={organization.id}
+          organizationId={org.id}
           roles={roles}
         />
       }

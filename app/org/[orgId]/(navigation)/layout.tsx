@@ -1,6 +1,6 @@
 import type { LayoutParams } from "@/types/next";
-import { OrganizationNavigation } from "./_navigation/OrganizationNavigation";
+import { OrgNavigation } from "./_navigation/OrgNavigation";
 
 export default async function RouteLayout(props: LayoutParams<{}>) {
-  return <OrganizationNavigation>{props.children}</OrganizationNavigation>;
+  return <OrgNavigation>{props.children}</OrgNavigation>;
 }

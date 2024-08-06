@@ -13,10 +13,16 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { combineWithParentMetadata } from "@/lib/metadata";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { orgConfirmDeletionAction } from "../delete-org.action";
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Confirm deletion",
+  description: "One last step to delete your organization.",
+});
 
 export default async function RoutePage(props: PageParams<{}>) {
   const token = props.searchParams.token;

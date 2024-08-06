@@ -2,7 +2,8 @@ import { OrganizationMembershipRole, type User } from "@prisma/client";
 import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
 import { auth } from "../auth/helper";
-import { getRequiredCurrentOrganization } from "../organizations/getCurrentOrganization";
+import { logger } from "../logger";
+import { getRequiredCurrentOrg } from "../organizations/getOrg";
 
 export class ActionError extends Error {
   constructor(message: string) {
@@ -14,8 +15,11 @@ type HandleReturnedServerError = (e: Error) => string;
 
 const handleReturnedServerError: HandleReturnedServerError = (e) => {
   if (e instanceof ActionError) {
+    logger.debug("[DEV] - Action Error", e.message);
     return e.message;
   }
+
+  logger.debug("[DEV] - Unknown Error", e);
 
   return "An unexpected error occurred.";
 };
@@ -62,7 +66,7 @@ export const orgAction = createSafeActionClient({
   },
 }).use(async ({ next, metadata }) => {
   try {
-    const org = await getRequiredCurrentOrganization(metadata.roles);
+    const org = await getRequiredCurrentOrg(metadata.roles);
     return next({
       ctx: org,
     });

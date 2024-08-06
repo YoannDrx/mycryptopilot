@@ -12,8 +12,8 @@ import {
 import { requiredAuth } from "@/lib/auth/helper";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import type { PageParams } from "@/types/next";
-import { OrganizationsSelect } from "../[orgId]/(navigation)/_navigation/OrganizationsSelect";
-import { NewOrganizationForm } from "./NewOrganizationForm";
+import { OrgsSelect } from "../[orgId]/(navigation)/_navigation/OrgsSelect";
+import { NewOrganizationForm } from "./NewOrgForm";
 
 export default async function RoutePage(props: PageParams<{}>) {
   const user = await requiredAuth();
@@ -22,12 +22,9 @@ export default async function RoutePage(props: PageParams<{}>) {
   return (
     <NavigationWrapper
       logoChildren={
-        <OrganizationsSelect
-          organizations={userOrgs}
-          currentOrganizationId="new"
-        >
+        <OrgsSelect orgs={userOrgs} currentOrgId="new">
           <span>Create organization</span>
-        </OrganizationsSelect>
+        </OrgsSelect>
       }
       topBarCornerLeftChildren={
         <UserDropdown>

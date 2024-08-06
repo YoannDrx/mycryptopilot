@@ -14,6 +14,7 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { auth } from "@/lib/auth/helper";
+import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import type { PageParams } from "@/types/next";
@@ -23,6 +24,11 @@ import { z } from "zod";
 
 const TokenSchema = z.object({
   orgId: z.string(),
+});
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Invitation",
+  description: "You receive an invitation to join an organization.",
 });
 
 export default async function RoutePage(

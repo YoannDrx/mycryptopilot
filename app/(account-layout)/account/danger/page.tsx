@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -28,9 +28,10 @@ export default function DeleteProfilePage() {
           be lost.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardFooter className="flex justify-end gap-2">
         <Button
           variant="destructive"
+          size="lg"
           onClick={() => {
             enqueueDialog({
               title: "Delete your account ?",
@@ -50,7 +51,7 @@ export default function DeleteProfilePage() {
         >
           Delete
         </Button>
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 }

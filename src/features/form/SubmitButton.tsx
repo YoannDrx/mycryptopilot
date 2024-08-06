@@ -30,6 +30,7 @@ export const LoadingButton = ({
   return (
     <Button {...props} className={cn(className, "relative")}>
       <motion.span
+        className="flex items-center gap-1"
         animate={{
           opacity: loading ? 0 : 1,
           y: loading ? -10 : 0,
