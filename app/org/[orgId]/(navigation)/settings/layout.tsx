@@ -7,6 +7,7 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { combineWithParentMetadata } from "@/lib/metadata";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { LayoutParams } from "@/types/next";
 
 export const generateMetadata = combineWithParentMetadata({
@@ -17,6 +18,7 @@ export const generateMetadata = combineWithParentMetadata({
 export default async function RouteLayout(
   props: LayoutParams<{ productId: string; orgId: string }>,
 ) {
+  const { roles } = await getRequiredCurrentOrgCache();
   return (
     <Layout>
       <LayoutHeader>
@@ -27,22 +29,27 @@ export default async function RouteLayout(
       </LayoutHeader>
       <LayoutContent className="mt-8 flex items-start gap-4 max-lg:flex-col">
         <SettingsNavigation
+          roles={roles}
           links={[
             {
               href: `/org/${props.params.orgId}/settings`,
               label: "General",
+              roles: ["ADMIN"],
             },
             {
               href: `/org/${props.params.orgId}/settings/members`,
               label: "Members",
+              roles: ["ADMIN"],
             },
             {
               href: `/org/${props.params.orgId}/settings/billing`,
               label: "Billing",
+              roles: ["ADMIN"],
             },
             {
               href: `/org/${props.params.orgId}/settings/danger`,
               label: "Danger Zone",
+              roles: ["OWNER"],
             },
           ]}
         />

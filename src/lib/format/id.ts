@@ -1,5 +1,4 @@
 import { nanoid } from "nanoid";
-import { User } from "next-auth";
 
 export const formatId = (id: string) => {
   return id
@@ -8,15 +7,22 @@ export const formatId = (id: string) => {
     .toLowerCase();
 };
 
-export const getIdFromUser = (user: User) => {
+export const getIdFromUser = (user: {
+  name?: string | null;
+  email?: string | null;
+}) => {
   if (user.name) {
     return `${formatId(user.name)}-${nanoid(3)}`;
   }
 
   if (user.email) {
-    const email = user.email.split("@")[0].split("+")[0];
-    return `${formatId(email)}-${nanoid(3)}`;
+    const name = getNameFromEmail(user.email);
+    return `${formatId(name)}-${nanoid(3)}`;
   }
 
   return nanoid(6);
+};
+
+export const getNameFromEmail = (email: string) => {
+  return email.split("@")[0].split("+")[0];
 };

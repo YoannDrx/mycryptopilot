@@ -48,7 +48,9 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
           <SelectItem key={org.id} value={org.id}>
             <span className="inline-flex items-center gap-2">
               <Avatar className="size-6">
-                <AvatarFallback>{org.name.slice(0, 2)}</AvatarFallback>
+                <AvatarFallback>
+                  {org.name.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
                 {org.image ? <AvatarImage src={org.image} /> : null}
               </Avatar>
               {org.name}
