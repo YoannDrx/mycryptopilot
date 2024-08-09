@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-const StripeWebhookSchema = z.object({
+const ResendWebhookSchema = z.object({
   type: z.string(),
   created_at: z.string(),
   data: z.any(),
@@ -18,7 +18,7 @@ const StripeWebhookSchema = z.object({
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
 
-  const event = StripeWebhookSchema.parse(body);
+  const event = ResendWebhookSchema.parse(body);
 
   switch (event.type) {
     case "email.complained":
