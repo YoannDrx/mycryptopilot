@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
+import { ImageFormItem } from "@/features/images/ImageFormItem";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -29,9 +30,7 @@ type ProductFormProps = {
   defaultValues: OrgDetailsFormSchemaType;
 };
 
-export const OrganizationDetailsForm = ({
-  defaultValues,
-}: ProductFormProps) => {
+export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
   const form = useZodForm({
     schema: OrgDetailsFormSchema,
     defaultValues,
@@ -58,6 +57,32 @@ export const OrganizationDetailsForm = ({
       onSubmit={async (v) => mutation.mutateAsync(v)}
       className="flex w-full flex-col gap-6 lg:gap-8"
     >
+      <Card>
+        <CardHeader>
+          <CardTitle>Organization's image</CardTitle>
+          <CardDescription>
+            Add a custom image to your organization.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ImageFormItem
+                    className="size-32 rounded-full"
+                    onChange={(url) => field.onChange(url)}
+                    imageUrl={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Organization's name</CardTitle>

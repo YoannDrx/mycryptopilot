@@ -7,6 +7,7 @@
 model Organization {
   id               String           @id @default(nanoid(11))
   name             String
+  image            String?
   planId           String           @default("FREE")
   plan             OrganizationPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   email            String

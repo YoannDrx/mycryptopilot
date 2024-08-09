@@ -33,7 +33,7 @@ export const PLANS = [
     subtitle: "Perfect for content creator",
     price: 49,
     currency: "USD",
-    features: ["Unlimited users"],
+    features: ["5 users"],
     isPopular: true,
     type: "monthly",
     priceId: "price_1PgRQOGPhxExaYaQmEaLIPz4",

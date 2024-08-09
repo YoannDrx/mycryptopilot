@@ -3,6 +3,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { DialogRenderer } from "@/features/dialogs-provider/DialogProvider";
 import { GlobalDialogLazy } from "@/features/global-dialog/GlobalDialogLazy";
+import { SearchParamsMessageToastSuspended } from "@/features/searchparams-message/SearchParamsMessageToast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
@@ -18,6 +19,7 @@ export const Providers = ({ children }: PropsWithChildren) => {
           <Toaster />
           <DialogRenderer />
           <GlobalDialogLazy />
+          <SearchParamsMessageToastSuspended />
           {children}
         </QueryClientProvider>
       </SessionProvider>

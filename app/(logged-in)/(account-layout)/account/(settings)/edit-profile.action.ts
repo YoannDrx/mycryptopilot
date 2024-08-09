@@ -52,6 +52,7 @@ export const updateProfileAction = authAction
       data: {
         name: input.name,
         email: input.email,
+        image: input.image,
         emailVerified: previousEmail === input.email ? undefined : null,
       },
     });

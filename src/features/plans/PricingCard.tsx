@@ -13,7 +13,7 @@ import { Plan } from "./plan";
 export const PricingCard = (props: Plan) => {
   const params = useParams();
 
-  const organizationId = params.organizationId ? params.organizationId : "";
+  const organizationId = params.orgId ? params.orgId : "";
 
   return (
     <Card

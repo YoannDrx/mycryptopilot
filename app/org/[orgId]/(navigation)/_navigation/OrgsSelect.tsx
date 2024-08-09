@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -16,6 +17,7 @@ export type OrganizationsSelectProps = {
   orgs: {
     id: string;
     name: string;
+    image: string | null;
   }[];
 };
 
@@ -42,9 +44,15 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
         {props.children ? props.children : <SelectValue />}
       </SelectTrigger>
       <SelectContent>
-        {props.orgs.map((organization) => (
-          <SelectItem key={organization.id} value={organization.id}>
-            {organization.name}
+        {props.orgs.map((org) => (
+          <SelectItem key={org.id} value={org.id}>
+            <span className="inline-flex items-center gap-2">
+              <Avatar className="size-6">
+                <AvatarFallback>{org.name.slice(0, 2)}</AvatarFallback>
+                {org.image ? <AvatarImage src={org.image} /> : null}
+              </Avatar>
+              {org.name}
+            </span>
           </SelectItem>
         ))}
         <SelectItem value="new">Add a new organization</SelectItem>

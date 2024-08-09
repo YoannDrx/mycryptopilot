@@ -24,4 +24,7 @@ export const SiteConfig = {
   auth: {
     password: false as boolean,
   },
+  features: {
+    imageUpload: false as boolean,
+  },
 };

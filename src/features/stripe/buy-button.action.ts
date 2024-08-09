@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 import { z } from "zod";
+import { createSearchParamsMessageUrl } from "../searchparams-message/createSearchParamsMessageUrl";
 
 const BuyButtonSchema = z.object({
   priceId: z.string(),
@@ -21,18 +22,21 @@ export const buyButtonAction = action
       throw new ActionError("You must be authenticated to buy a plan");
     }
 
-    const organization = await prisma.organization.findFirst({
+    const org = await prisma.organization.findFirst({
       where: {
         id: orgId,
         members: {
           some: {
             userId: user.id,
+            roles: {
+              hasSome: ["OWNER"],
+            },
           },
         },
       },
     });
 
-    const stripeCustomerId = organization?.stripeCustomerId ?? undefined;
+    const stripeCustomerId = org?.stripeCustomerId ?? undefined;
 
     if (!stripeCustomerId) {
       throw new ActionError(
@@ -54,8 +58,20 @@ export const buyButtonAction = action
           quantity: 1,
         },
       ],
-      success_url: `${getServerUrl()}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${getServerUrl()}/payment/cancel`,
+      success_url: createSearchParamsMessageUrl(
+        `${getServerUrl()}/org/${orgId}/settings/billing?session_id={CHECKOUT_SESSION_ID}`,
+        {
+          type: "success",
+          message: "Your payment has been successful",
+        },
+      ),
+      cancel_url: createSearchParamsMessageUrl(
+        `${getServerUrl()}/org/${orgId}/settings/billing`,
+        {
+          type: "error",
+          message: "Your payment has been cancelled",
+        },
+      ),
     });
 
     if (!session.url) {

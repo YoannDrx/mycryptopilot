@@ -1,8 +1,8 @@
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
-import { OrganizationDetailsForm } from "./(details)/OrganizationDetailsForm";
+import { OrgDetailsForm } from "./(details)/OrgDetailsForm";
 
 export default async function RoutePage(props: PageParams<{}>) {
   const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
-  return <OrganizationDetailsForm defaultValues={organization} />;
+  return <OrgDetailsForm defaultValues={organization} />;
 }

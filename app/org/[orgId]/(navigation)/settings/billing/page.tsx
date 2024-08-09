@@ -30,7 +30,7 @@ export default async function RoutePage(props: PageParams<{}>) {
     throw new Error("Organization has no Stripe customer");
   }
 
-  if (organization.plan.name === "FREE") {
+  if (organization.plan.id === "FREE") {
     return (
       <div className="flex flex-col gap-4">
         <Card>
@@ -55,7 +55,6 @@ export default async function RoutePage(props: PageParams<{}>) {
 
 const PremiumCard = async () => {
   const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
-  console.log({ organization });
 
   if (!organization.stripeCustomerId) {
     throw new Error("Organization has no Stripe customer");

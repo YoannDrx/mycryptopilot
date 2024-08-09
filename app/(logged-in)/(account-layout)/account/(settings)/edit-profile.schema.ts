@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 export const ProfileFormSchema = z.object({
-  name: z.string().optional().nullable(),
+  name: z.string().nullable(),
   email: z.string().email(),
+  image: z.string().nullable(),
 });
 
 export const EditPasswordFormSchema = z.object({

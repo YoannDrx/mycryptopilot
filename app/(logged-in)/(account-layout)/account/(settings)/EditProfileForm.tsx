@@ -1,6 +1,13 @@
 "use client";
 
 import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,7 +27,9 @@ import { Input } from "@/components/ui/input";
 import { InlineTooltip } from "@/components/ui/tooltip";
 import { Typography } from "@/components/ui/typography";
 import { LoadingButton } from "@/features/form/SubmitButton";
+import { ImageFormItem } from "@/features/images/ImageFormItem";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
+import { displayName } from "@/lib/format/displayName";
 import type { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { differenceInMinutes } from "date-fns";
@@ -40,7 +49,9 @@ type EditProfileFormProps = {
   defaultValues: User;
 };
 
-export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
+export const EditProfileCardForm = ({
+  defaultValues,
+}: EditProfileFormProps) => {
   const form = useZodForm({
     schema: ProfileFormSchema,
     defaultValues: defaultValues,
@@ -95,55 +106,79 @@ export const EditProfileForm = ({ defaultValues }: EditProfileFormProps) => {
     },
   });
 
+  const email = form.watch("email");
+  const image = form.watch("image");
+
   return (
     <>
       <Form
         form={form}
         onSubmit={async (v) => updateProfileMutation.mutateAsync(v)}
         disabled={updateProfileMutation.isPending}
-        className="flex flex-col gap-4"
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} value={field.value ?? ""} />
-              </FormControl>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <ImageFormItem
+                className="size-16 rounded-full"
+                onChange={(url) => form.setValue("image", url)}
+                imageUrl={image}
+              />
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-1">
-                <span>Email</span>
-                {defaultValues.emailVerified ? (
-                  <InlineTooltip title="Email verified. If you change your email, you will need to verify it again.">
-                    <BadgeCheck size={16} />
-                  </InlineTooltip>
-                ) : null}
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <LoadingButton
-          loading={updateProfileMutation.isPending}
-          className="w-fit self-end"
-          size="sm"
-        >
-          Save
-        </LoadingButton>
+              <CardTitle>
+                {displayName({
+                  email,
+                  name: form.watch("name"),
+                })}
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1">
+                    <span>Email</span>
+                    {defaultValues.emailVerified ? (
+                      <InlineTooltip title="Email verified. If you change your email, you will need to verify it again.">
+                        <BadgeCheck size={16} />
+                      </InlineTooltip>
+                    ) : null}
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            <LoadingButton loading={updateProfileMutation.isPending}>
+              Save
+            </LoadingButton>
+          </CardFooter>
+        </Card>
       </Form>
       <EmailVerificationDialog
         verification={verification}

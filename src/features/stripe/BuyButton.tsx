@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { ButtonProps } from "../../components/ui/button";
-import { Button } from "../../components/ui/button";
+import { LoadingButton } from "../form/SubmitButton";
 import { buyButtonAction } from "./buy-button.action";
 
 export type BuyButtonProps = {
@@ -43,7 +43,6 @@ export const BuyButton = ({ priceId, orgId, ...props }: BuyButtonProps) => {
         orgId: orgId,
       });
 
-      console.log({ result });
       if (!isActionSuccessful(result)) {
         toast.error(result?.serverError ?? "Something went wrong");
         return;
@@ -54,9 +53,10 @@ export const BuyButton = ({ priceId, orgId, ...props }: BuyButtonProps) => {
   });
 
   return (
-    <Button
+    <LoadingButton
       onClick={() => mutation.mutate()}
       {...props}
+      loading={mutation.isPending}
       disabled={session.status === "loading"}
     />
   );

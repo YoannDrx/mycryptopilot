@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsClient } from "@/hooks/useIsClient";
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { useState, type ComponentPropsWithoutRef } from "react";
@@ -80,7 +81,12 @@ export const KeyboardShortcut = ({
 };
 
 export const CmdOrOption = () => {
+  const isClient = useIsClient();
   const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
+
+  if (!isClient) {
+    return "⌘";
+  }
 
   if (userAgent.includes("Mac OS X")) {
     return "⌘";

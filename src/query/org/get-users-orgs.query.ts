@@ -11,6 +11,11 @@ export async function getUsersOrgs() {
         },
       },
     },
+    select: {
+      id: true,
+      image: true,
+      name: true,
+    },
   });
 
   return userOrganizations;

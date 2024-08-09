@@ -60,6 +60,7 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
       name: true,
       plan: true,
       email: true,
+      image: true,
       stripeCustomerId: true,
       members: {
         where: {
