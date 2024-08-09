@@ -11,6 +11,6 @@ export const ORGANIZATION_LINKS = [
     href: "/org/:organizationId/settings",
     icon: Settings,
     label: "Settings",
-    roles: ["OWNER", "ADMIN"],
+    roles: ["ADMIN"],
   },
 ] satisfies NavigationLink[];

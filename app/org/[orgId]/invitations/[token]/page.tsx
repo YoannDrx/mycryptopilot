@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LoadingButton } from "@/features/form/SubmitButton";
+import { SubmitButton } from "@/features/form/SubmitButton";
 import AuthNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
 import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
 import {
@@ -133,7 +133,7 @@ export default async function RoutePage(
             </CardHeader>
             <CardContent>
               <form>
-                <LoadingButton
+                <SubmitButton
                   formAction={async () => {
                     "use server";
                     await prisma.organizationMembership.create({
@@ -152,7 +152,7 @@ export default async function RoutePage(
                   }}
                 >
                   Join {organization.name}
-                </LoadingButton>
+                </SubmitButton>
               </form>
             </CardContent>
           </Card>

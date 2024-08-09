@@ -53,7 +53,7 @@ type NavigationLinkMappingKey = keyof typeof NavigationLinkMapping;
 export function NavigationLinks({
   variant,
   organizationId,
-  roles,
+  roles: userRoles,
   links: linksKey,
 }: {
   variant?: "default" | "mobile";
@@ -65,9 +65,9 @@ export function NavigationLinks({
 
   const currentPath = useCurrentPath(baseLinks, organizationId);
   // filter links by roles
-  const links = roles
+  const links = userRoles
     ? baseLinks.filter((link) =>
-        link.roles ? isInRoles(roles, link.roles) : true,
+        link.roles ? isInRoles(userRoles, link.roles) : true,
       )
     : baseLinks;
 
