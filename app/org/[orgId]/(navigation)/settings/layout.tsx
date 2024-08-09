@@ -53,7 +53,7 @@ export default async function RouteLayout(
             },
           ]}
         />
-        <div className="w-full flex-1">{props.children}</div>
+        <div className="mb-12 w-full flex-1">{props.children}</div>
       </LayoutContent>
     </Layout>
   );

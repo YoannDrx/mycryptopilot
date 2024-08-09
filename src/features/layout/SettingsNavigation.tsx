@@ -21,7 +21,10 @@ export const SettingsNavigation = (props: SettingsNavigationProps) => {
   const matchingLink = useMatchingPathname(props.links.map((l) => l.href));
 
   return (
-    <div className="flex gap-2 lg:flex-col" style={{ minWidth: 150 }}>
+    <div
+      className="top-4 flex gap-2 lg:sticky lg:flex-col"
+      style={{ minWidth: 150 }}
+    >
       {props.links.map((link) => {
         const isMatching = link.href === matchingLink;
 
