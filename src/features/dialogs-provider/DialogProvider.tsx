@@ -1,5 +1,6 @@
 "use client";
 
+import { logger } from "@/lib/logger";
 import { toast } from "sonner";
 import { create } from "zustand";
 import type { ConfirmationDialogProps } from "./DialogProviderDialog";
@@ -11,7 +12,7 @@ type DialogType = ConfirmationDialogProps & {
 
 type DialogStore = {
   dialogs: DialogType[];
-  addDialog: (dialog: ConfirmationDialogProps) => void;
+  addDialog: (dialog: ConfirmationDialogProps) => string;
   removeDialog: (dialogId: string) => void;
 };
 
@@ -26,40 +27,55 @@ const useDialogStore = create<DialogStore>((set, get) => ({
       cancel: {
         label: dialog.cancel?.label ?? "Cancel",
         onClick: () => {
-          removeDialog(id);
-          dialog.cancel?.onClick();
-        },
-      },
-      action: {
-        label: dialog.action?.label ?? "",
-        onClick: () => {
-          // check if it's a promise
-          const onClickReturn = dialog.action?.onClick();
-          if (onClickReturn instanceof Promise) {
-            set((state) => {
-              const dialog = state.dialogs.find((dialog) => dialog.id === id);
-
-              if (dialog) {
-                dialog.loading = true;
-              }
-
-              return { dialogs: [...state.dialogs] };
-            });
-
-            onClickReturn
-              .then(() => {
-                removeDialog(id);
-              })
-              .catch((e) => {
-                toast.error("Some error occurred", {
-                  description: e.message,
-                });
-              });
-          } else {
-            removeDialog(id);
+          if (dialog.cancel && "onClick" in dialog.cancel) {
+            dialog.cancel?.onClick();
+            return;
           }
+          removeDialog(id);
         },
       },
+      action:
+        dialog.action && "onClick" in dialog.action
+          ? {
+              label: dialog.action?.label ?? "",
+              onClick: () => {
+                if (dialog.action && "onClick" in dialog.action === false) {
+                  logger.error("Invalid dialog action");
+                  removeDialog(id);
+                  return;
+                }
+
+                // check if it's a promise
+                const onClickReturn = dialog.action?.onClick();
+
+                if (onClickReturn instanceof Promise) {
+                  set((state) => {
+                    const dialog = state.dialogs.find(
+                      (dialog) => dialog.id === id,
+                    );
+
+                    if (dialog) {
+                      dialog.loading = true;
+                    }
+
+                    return { dialogs: [...state.dialogs] };
+                  });
+
+                  onClickReturn
+                    .then(() => {
+                      removeDialog(id);
+                    })
+                    .catch((e) => {
+                      toast.error("Some error occurred", {
+                        description: e.message,
+                      });
+                    });
+                } else {
+                  removeDialog(id);
+                }
+              },
+            }
+          : dialog.action,
       loading: false,
       id,
     };
@@ -88,3 +104,10 @@ export const DialogRenderer = () => {
 
 export const enqueueDialog = (dialog: ConfirmationDialogProps) =>
   useDialogStore.getState().addDialog(dialog);
+
+export const dialog = {
+  add: (dialog: ConfirmationDialogProps) =>
+    useDialogStore.getState().addDialog(dialog),
+  remove: (dialogId: string) =>
+    useDialogStore.getState().removeDialog(dialogId),
+};

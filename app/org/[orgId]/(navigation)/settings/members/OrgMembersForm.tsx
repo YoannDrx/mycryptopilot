@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,11 +11,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useZodForm } from "@/components/ui/form";
+import { Progress } from "@/components/ui/progress";
 import { InlineTooltip } from "@/components/ui/tooltip";
 import { Typography } from "@/components/ui/typography";
+import { dialog } from "@/features/dialogs-provider/DialogProvider";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
+import { openGlobalDialog } from "@/features/global-dialog/GlobalDialogStore";
 import { useMutation } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateOrganizationMemberAction } from "../org.action";
@@ -23,7 +27,7 @@ import { OrgMemberFormSchema } from "../org.schema";
 import { OrganizationInviteMemberForm } from "./OrgInviteMemberForm";
 import { OrgMemberRoleField } from "./OrgMemberRoleField";
 
-type ProductFormProps = {
+type OrgMembersFormProps = {
   defaultValues: OrgMemberFormSchemaType;
   members: {
     id: string;
@@ -32,13 +36,15 @@ type ProductFormProps = {
     image?: string | null;
   }[];
   invitedEmail: string[];
+  maxMembers: number;
 };
 
 export const OrgMembersForm = ({
   defaultValues,
   members,
   invitedEmail,
-}: ProductFormProps) => {
+  maxMembers,
+}: OrgMembersFormProps) => {
   const form = useZodForm({
     schema: OrgMemberFormSchema,
     defaultValues,
@@ -139,7 +145,56 @@ export const OrgMembersForm = ({
               </ul>
             </>
           )}
-          <OrganizationInviteMemberForm />
+          {form.watch("members").length < maxMembers ? (
+            <OrganizationInviteMemberForm />
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const dialogId = dialog.add({
+                  title: "Oh no ! You've reached the maximum number of members",
+                  description: (
+                    <>
+                      <Typography>
+                        You can't add more members to your organization. Please
+                        upgrade your plan to add more members.
+                      </Typography>
+                      <Alert className="flex flex-col gap-2">
+                        <Progress
+                          value={
+                            (form.getValues("members").length / maxMembers) *
+                            100
+                          }
+                        />
+                        <Typography variant="small">
+                          You have {form.getValues("members").length} members
+                          out of {maxMembers} members
+                        </Typography>
+                      </Alert>
+                    </>
+                  ),
+                  action: (
+                    <Button
+                      onClick={() => {
+                        openGlobalDialog("org-plan");
+                        dialog.remove(dialogId);
+                      }}
+                    >
+                      <Zap className="mr-2" size={16} />
+                      Upgrade your plan
+                    </Button>
+                  ),
+                });
+              }}
+            >
+              <Zap className="mr-2" size={16} />
+              Invite member
+            </Button>
+          )}
         </CardContent>
       </Card>
     </FormUnsavedBar>

@@ -2,6 +2,7 @@
 
 import { Toaster } from "@/components/ui/sonner";
 import { DialogRenderer } from "@/features/dialogs-provider/DialogProvider";
+import { GlobalDialogLazy } from "@/features/global-dialog/GlobalDialogLazy";
 import { SiteConfig } from "@/site-config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
@@ -19,6 +20,7 @@ export const Providers = ({ children }: PropsWithChildren) => {
           <QueryClientProvider client={queryClient}>
             <Toaster />
             <DialogRenderer />
+            <GlobalDialogLazy />
             {children}
           </QueryClientProvider>
         </SessionProvider>

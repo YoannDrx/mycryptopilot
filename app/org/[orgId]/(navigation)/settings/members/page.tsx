@@ -41,6 +41,7 @@ export default async function RoutePage(props: PageParams<{}>) {
           userId: m.userId,
         })),
       }}
+      maxMembers={org.plan.maximumMembers}
       members={members.map((m) => ({ role: m.roles, ...m.user, id: m.id }))}
       invitedEmail={invitedEmail}
     />
