@@ -1,5 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { createSearchParamsMessageUrl } from "@/features/searchparams-message/createSearchParamsMessageUrl";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import type { PageParams } from "@/types/next";
@@ -16,23 +17,6 @@ export default async function RoutePage(props: PageParams<{}>) {
     typeof props.searchParams.token === "string"
       ? props.searchParams.token
       : null;
-
-  const success = props.searchParams.success === "true";
-
-  if (success) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Email verified</CardTitle>
-        </CardHeader>
-        <CardFooter>
-          <Link className={buttonVariants()} href="/account">
-            Account
-          </Link>
-        </CardFooter>
-      </Card>
-    );
-  }
 
   if (!token) {
     return (
@@ -94,17 +78,11 @@ export default async function RoutePage(props: PageParams<{}>) {
   }
 
   if (user.emailVerified) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Email verified.</CardTitle>
-        </CardHeader>
-        <CardFooter>
-          <Link className={buttonVariants()} href="/account">
-            Account
-          </Link>
-        </CardFooter>
-      </Card>
+    redirect(
+      createSearchParamsMessageUrl("/account", {
+        type: "success",
+        message: "Your email has been verified.",
+      }),
     );
   }
 
@@ -123,5 +101,10 @@ export default async function RoutePage(props: PageParams<{}>) {
     },
   });
 
-  redirect("/account/verify-email?success=true");
+  redirect(
+    createSearchParamsMessageUrl("/account", {
+      type: "success",
+      message: "Your email has been verified.",
+    }),
+  );
 }

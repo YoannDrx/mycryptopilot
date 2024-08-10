@@ -21,7 +21,13 @@ import type { PropsWithChildren } from "react";
 export const EmailLayout = (
   props: PropsWithChildren<{ disableTailwind?: boolean }>,
 ) => {
-  const baseUrl = getServerUrl();
+  let baseUrl = getServerUrl();
+
+  // Email software can't handle localhost URL
+  if (baseUrl.startsWith("http://localhost")) {
+    baseUrl = SiteConfig.prodUrl;
+  }
+
   return (
     <Html>
       <Head />
@@ -65,18 +71,28 @@ export const EmailLayout = (
             <Tailwind>{props.children}</Tailwind>
           )}
           <Tailwind>
-            <Hr className="mt-12 border-gray-300" />
-            <Img
-              src={`${baseUrl}${SiteConfig.appIcon}`}
-              width={32}
-              height={32}
-              className="inline"
-              alt={`${SiteConfig.company.name}'s logo`}
-            />
-            <Text className="ml-1 text-sm text-gray-500">
+            <Hr className="mb-6 mt-12 border-gray-300" />
+
+            <table cellPadding={0} cellSpacing={0}>
+              <tr>
+                <td className="pr-2">
+                  <Img
+                    src={`${baseUrl}${SiteConfig.appIcon}`}
+                    width={32}
+                    height={32}
+                    className="inline"
+                    alt={`${SiteConfig.title}'s logo`}
+                  />
+                </td>
+                <td>
+                  <Text className="text-xl">{SiteConfig.title}</Text>
+                </td>
+              </tr>
+            </table>
+            <Text className="text-sm text-gray-500">
               {SiteConfig.company.name}
             </Text>
-            <Text className="ml-1 text-sm text-gray-500">
+            <Text className="text-sm text-gray-500">
               {SiteConfig.company.address}
             </Text>
           </Tailwind>

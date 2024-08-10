@@ -18,6 +18,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/features/form/SubmitButton";
 import { useMutation } from "@tanstack/react-query";
 import { Mail, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -84,10 +85,10 @@ export const OrganizationInviteMemberForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit">
+          <SubmitButton type="submit">
             <Plus size={16} className="mr-2" />
             Invite
-          </Button>
+          </SubmitButton>
         </Form>
       </DialogContent>
     </Dialog>

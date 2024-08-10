@@ -18,7 +18,7 @@ const ROLES = Object.values(OrganizationMembershipRole).filter(
   (role) => role !== "OWNER",
 );
 
-export function OrgMemberRoleField(props: {
+export function OrgMemberRolesField(props: {
   roles: OrganizationMembershipRole[];
   setRoles: (roles: OrganizationMembershipRole[]) => void;
   className?: string;
@@ -96,10 +96,10 @@ export function OrgMemberRoleField(props: {
           />
         </div>
       </div>
-      <div className="relative mt-2">
+      <div className="relative z-50 mt-2">
         <CommandList>
           {open && selectables.length > 0 ? (
-            <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+            <div className="absolute top-0 z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
               <CommandGroup className="h-full overflow-auto">
                 {selectables.map((role) => {
                   return (

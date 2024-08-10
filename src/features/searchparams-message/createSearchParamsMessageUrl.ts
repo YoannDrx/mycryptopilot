@@ -1,3 +1,5 @@
+import { getServerUrl } from "@/lib/server-url";
+
 export const SearchParamsMessageKeys = {
   error: "spm-error",
   message: "spm-message",
@@ -13,8 +15,18 @@ export const createSearchParamsMessageUrl = (
     message: string;
   },
 ): string => {
+  // Determine if running on the server or client
+  const isServer = typeof window === "undefined";
+
+  // Convert relative URL to absolute URL if necessary
+  const absoluteBaseUrl = baseUrl.startsWith("/")
+    ? isServer
+      ? `${getServerUrl()}${baseUrl}`
+      : `${window.location.origin}${baseUrl}`
+    : baseUrl;
+
   const searchParamsKey = SearchParamsMessageKeys[message.type];
-  const url = new URL(baseUrl);
+  const url = new URL(absoluteBaseUrl);
 
   url.searchParams.set(searchParamsKey, message.message);
 

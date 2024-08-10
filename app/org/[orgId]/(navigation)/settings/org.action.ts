@@ -4,8 +4,12 @@ import { orgAction } from "@/lib/actions/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { getOrgsMembers } from "@/query/org/get-orgs-members";
+import MarkdownEmail from "@email/Markdown.email";
 import OrganizationInvitationEmail from "@email/OrganizationInvitationEmail.email";
+import { addHours } from "date-fns";
 import { nanoid } from "nanoid";
+import {} from "next/server";
+import { CreateEmailResponse } from "resend";
 import { z } from "zod";
 import {
   OrgDangerFormSchema,
@@ -25,24 +29,54 @@ export const updateOrganizationMemberAction = orgAction
       where: {
         organizationId: ctx.org.id,
       },
+      select: {
+        id: true,
+        roles: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
     });
 
-    const memberIdToDelete = currentMembers
-      .filter(
-        (member) =>
-          !members.some((m) => m.id === member.id) &&
-          !member.roles.includes("OWNER"),
-      )
-      .map((member) => member.id);
+    const membersToDelete = currentMembers.filter(
+      (member) =>
+        !members.some((m) => m.id === member.id) &&
+        !member.roles.includes("OWNER"),
+    );
 
     const deletedMembers = prisma.organizationMembership.deleteMany({
       where: {
         organizationId: ctx.org.id,
         id: {
-          in: memberIdToDelete,
+          in: membersToDelete.map((m) => m.id),
         },
       },
     });
+
+    const promises: Promise<CreateEmailResponse>[] = [];
+
+    for await (const member of membersToDelete) {
+      promises.push(
+        sendEmail({
+          to: member.user.email,
+          subject: `[${ctx.org.name}] You've been removed from the organization`,
+          react: MarkdownEmail({
+            preview: `You've been removed from the organization ${ctx.org.name}.`,
+            markdown: `Hi,
+
+You've been removed from the organization ${ctx.org.name}.
+
+If you think it's a mistake, please contact organization's owner : ${ctx.org.email}
+
+Best,
+          `,
+          }),
+        }),
+      );
+    }
 
     const memberToUpdate = members.filter((member) => {
       const currentMember = currentMembers.find((m) => m.id === member.id);
@@ -62,6 +96,7 @@ export const updateOrganizationMemberAction = orgAction
     });
 
     await prisma.$transaction([deletedMembers, ...updatedMembers]);
+    await Promise.all(promises);
 
     return { members: await getOrgsMembers(ctx.org.id) };
   });
@@ -95,7 +130,7 @@ export const inviteUserInOrganizationAction = orgAction
     const verificationToken = await prisma.verificationToken.create({
       data: {
         identifier: `${email}-invite-${ctx.org.id}`,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        expires: addHours(new Date(), 1),
         token: nanoid(32),
         data: {
           orgId: ctx.org.id,

@@ -1,7 +1,8 @@
 import { getServerUrl } from "@/lib/server-url";
 import { SiteConfig } from "@/site-config";
-import { Link, Preview, Section, Text } from "@react-email/components";
+import { Preview, Text } from "@react-email/components";
 import { EmailLayout } from "./utils/EmailLayout";
+import { EmailLink, EmailSection, EmailText } from "./utils/components.utils";
 
 export default function OrganizationInvitationEmail({
   token,
@@ -16,22 +17,22 @@ export default function OrganizationInvitationEmail({
   return (
     <EmailLayout>
       <Preview>You are invited to join {organizationName}</Preview>
-      <Section className="my-6">
-        <Text className="text-lg leading-6">
+      <EmailSection>
+        <EmailText>
           {organizationName} has invited you to join their organization.
-        </Text>
-        <Text className="text-lg leading-6">
+        </EmailText>
+        <EmailText>
           If you didn't request this, please ignore this email.
-        </Text>
-        <Text className="text-lg leading-6">
-          <Link className="text-sky-500 hover:underline" href={url}>
+        </EmailText>
+        <EmailText>
+          <EmailLink href={url}>
             👉 Click here to accept the invitation 👈
-          </Link>
-        </Text>
-        <Text className="text-lg leading-6">
+          </EmailLink>
+        </EmailText>
+        <EmailText>
           If you don't have an account, you will need to create one.
-        </Text>
-      </Section>
+        </EmailText>
+      </EmailSection>
       <Text className="text-lg leading-6">
         Best,
         <br />- {SiteConfig.maker.name} from {SiteConfig.title}

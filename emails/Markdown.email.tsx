@@ -18,6 +18,9 @@ export default function MarkdownEmail(props: {
             fontSize: "1.125rem",
             lineHeight: "1.5rem",
           },
+          link: {
+            color: "#6366f1",
+          },
         }}
       >
         {props.markdown}

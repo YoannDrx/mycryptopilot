@@ -5,6 +5,7 @@ import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import VerifyEmail from "@email/VerifyEmail.email";
+import { addHours } from "date-fns";
 import { nanoid } from "nanoid";
 
 export const createVerifyEmailAction = authAction.action(async ({ ctx }) => {
@@ -15,7 +16,7 @@ export const createVerifyEmailAction = authAction.action(async ({ ctx }) => {
   const verificationToken = await prisma.verificationToken.create({
     data: {
       identifier: ctx.user.email,
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      expires: addHours(new Date(), 1),
       token: nanoid(32),
     },
   });

@@ -10,13 +10,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useZodForm } from "@/components/ui/form";
+import { FormField, useZodForm } from "@/components/ui/form";
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorInput,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from "@/components/ui/multi-select";
 import { Progress } from "@/components/ui/progress";
 import { InlineTooltip } from "@/components/ui/tooltip";
 import { Typography } from "@/components/ui/typography";
 import { dialog } from "@/features/dialogs-provider/DialogProvider";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { openGlobalDialog } from "@/features/global-dialog/GlobalDialogStore";
+import { OrganizationMembershipRole } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { X, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -25,7 +34,6 @@ import { updateOrganizationMemberAction } from "../org.action";
 import type { OrgMemberFormSchemaType } from "../org.schema";
 import { OrgMemberFormSchema } from "../org.schema";
 import { OrganizationInviteMemberForm } from "./OrgInviteMemberForm";
-import { OrgMemberRoleField } from "./OrgMemberRoleField";
 
 type OrgMembersFormProps = {
   defaultValues: OrgMemberFormSchemaType;
@@ -103,14 +111,38 @@ export const OrgMembersForm = ({
                       </Button>
                     </InlineTooltip>
                   ) : (
-                    <OrgMemberRoleField
-                      roles={form.watch(`members.${index}.roles`)}
-                      setRoles={(roles) => {
-                        form.setValue(`members.${index}.roles`, roles, {
-                          shouldDirty: true,
-                        });
-                      }}
-                      className="max-w-[300px]"
+                    <FormField
+                      control={form.control}
+                      name={`members.${index}.roles`}
+                      render={({ field }) => (
+                        <MultiSelector
+                          values={field.value}
+                          onValuesChange={field.onChange}
+                          loop
+                          className="w-fit"
+                        >
+                          <MultiSelectorTrigger className="w-[250px]">
+                            <MultiSelectorInput
+                              className="w-[50px]"
+                              placeholder="roles"
+                            />
+                          </MultiSelectorTrigger>
+                          <MultiSelectorContent>
+                            <MultiSelectorList>
+                              {Object.keys(OrganizationMembershipRole).map(
+                                (role) => {
+                                  if (role === "OWNER") return null;
+                                  return (
+                                    <MultiSelectorItem key={role} value={role}>
+                                      {role}
+                                    </MultiSelectorItem>
+                                  );
+                                },
+                              )}
+                            </MultiSelectorList>
+                          </MultiSelectorContent>
+                        </MultiSelector>
+                      )}
                     />
                   )}
 

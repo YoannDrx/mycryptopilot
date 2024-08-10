@@ -1,27 +1,28 @@
 import { SiteConfig } from "@/site-config";
-import { Preview, Section, Text } from "@react-email/components";
+import { Preview, Text } from "@react-email/components";
 import { EmailLayout } from "./utils/EmailLayout";
+import { EmailSection, EmailText } from "./utils/components.utils";
 
 export default function SuccessUpgradeEmail() {
   return (
     <EmailLayout>
       <Preview>
-        You have successfully upgraded your account to ${SiteConfig.title}
+        You have successfully upgraded your account to {SiteConfig.title}
       </Preview>
-      <Section className="my-6">
-        <Text className="text-lg leading-6">Hello,</Text>
-        <Text className="text-lg leading-6">
+      <EmailSection>
+        <EmailText>Hello,</EmailText>
+        <EmailText>
           Great news! Your payment was successful, and you now have full access
           to all our premium features. Get ready to explore everything we have
           to offer!
-        </Text>
-        <Text className="text-lg leading-6">
+        </EmailText>
+        <EmailText>
           If you have any questions or need assistance as you dive in, feel free
           to reach out to us. We're here to help you make the most of your
           experience.
-        </Text>
-        <Text className="text-lg leading-6">Happy exploring,</Text>
-      </Section>
+        </EmailText>
+        <EmailText>Happy exploring,</EmailText>
+      </EmailSection>
       <Text className="text-lg leading-6">
         Best,
         <br />- {SiteConfig.maker.name} from {SiteConfig.title}
