@@ -70,7 +70,7 @@ export const orgAction = createSafeActionClient({
     return next({
       ctx: org,
     });
-  } catch (e) {
+  } catch {
     throw new ActionError(
       "You need to be part of an organization to access this resource.",
     );

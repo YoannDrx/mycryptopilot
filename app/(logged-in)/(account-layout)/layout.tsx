@@ -14,9 +14,9 @@ import { VerifyEmailButton } from "./account/verify-email/VerifyEmailButton";
 export const metadata: Metadata = {
   title: "Account",
   description: "Manage your account settings.",
-};p
+};
 
-export default async function RouteLayout(props: LayoutParams<{}>) {
+export default async function RouteLayout(props: LayoutParams) {
   const user = await auth();
 
   if (!user) {

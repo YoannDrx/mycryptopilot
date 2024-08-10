@@ -10,7 +10,7 @@ export const generateMetadata = combineWithParentMetadata({
   description: "Manage your organization members.",
 });
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   const { org } = await getRequiredCurrentOrgCache(["ADMIN"]);
   const members = await getOrgsMembers(org.id);
 

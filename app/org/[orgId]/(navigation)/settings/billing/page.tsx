@@ -23,7 +23,7 @@ export const generateMetadata = combineWithParentMetadata({
   description: "Manage your organization billing.",
 });
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
 
   if (!organization.stripeCustomerId) {

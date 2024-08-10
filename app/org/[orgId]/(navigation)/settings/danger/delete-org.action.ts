@@ -32,7 +32,6 @@ export const orgAskDeletionAction = orgAction
       subject: "[Action required] Confirm your organization deletion",
       to: ctx.user.email,
       react: OrgAskDeletionEmail({
-        email: ctx.user.email ?? "",
         org: ctx.org.name,
         confirmUrl: `${getServerUrl()}/org/${ctx.org.id}/settings/danger/confirm?token=${token.token}`,
       }),
@@ -87,7 +86,6 @@ export const orgConfirmDeletionAction = orgAction
       subject: `Your organization has been deleted (${ctx.org.id})`,
       to: ctx.user.email,
       react: OrgConfirmDeletionEmail({
-        email: ctx.user.email ?? "",
         org: ctx.org.name,
       }),
     });

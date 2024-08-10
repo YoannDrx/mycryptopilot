@@ -51,7 +51,7 @@ export const orgRoute = authRoute.use(async () => {
     return {
       organization,
     };
-  } catch (e) {
+  } catch {
     throw new RouteError(
       "You need to be part of an organization to access this resource.",
     );

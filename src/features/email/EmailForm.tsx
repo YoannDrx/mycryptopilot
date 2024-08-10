@@ -36,7 +36,9 @@ export const EmailForm = ({
   const submit = useMutation({
     mutationFn: async ({ email }: EmailActionSchemaType) => {
       const result = await addEmailAction({ email });
-      plausible("Email+Submit");
+      plausible("Email+Submit", {
+        props: {},
+      });
 
       if (result?.data) {
         return result.data;

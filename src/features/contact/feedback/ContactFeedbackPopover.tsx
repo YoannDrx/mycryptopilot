@@ -28,7 +28,7 @@ import { contactSupportAction } from "./contact-feedback.action";
 import type { ContactFeedbackSchemaType } from "./contact-feedback.schema";
 import { ContactFeedbackSchema } from "./contact-feedback.schema";
 
-export type ContactFeedbackPopoverProps = PropsWithChildren<{}>;
+export type ContactFeedbackPopoverProps = PropsWithChildren;
 
 export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
   const [open, setOpen] = useState(false);

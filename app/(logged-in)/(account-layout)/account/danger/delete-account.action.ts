@@ -22,7 +22,9 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
     include: {
       organizations: {
         where: {
-          role: "OWNER",
+          roles: {
+            hasSome: ["OWNER"],
+          },
         },
         select: {
           organization: {
@@ -36,7 +38,7 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
   });
 
   if (!user) {
-    throw new ActionError("You don't have an account!");
+    throw new ActionError("You are not logged in!");
   }
 
   const token = await prisma.verificationToken.create({
@@ -55,7 +57,6 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
     subject: "[Action required] Confirm your account deletion",
     to: user.email,
     react: AccountAskDeletionEmail({
-      email: user.email ?? "",
       organizationsToDelete: user.organizations?.map(
         (o) => o.organization.name,
       ),
@@ -68,7 +69,10 @@ const TokenSchema = z.object({
   deleteAccount: z.boolean(),
 });
 
-export async function verifyDeleteAccountToken(token: string, userEmail: string) {
+export async function verifyDeleteAccountToken(
+  token: string,
+  userEmail: string,
+) {
   const verificationToken = await prisma.verificationToken.findUnique({
     where: {
       token,
@@ -111,7 +115,9 @@ export const orgConfirmDeletionAction = authAction
         members: {
           some: {
             userId: ctx.user.id,
-            role: "OWNER",
+            roles: {
+              hasSome: ["OWNER"],
+            },
           },
         },
       },

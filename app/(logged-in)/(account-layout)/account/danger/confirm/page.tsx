@@ -21,7 +21,7 @@ export const generateMetadata = combineWithParentMetadata({
   description: "One last step to delete your account.",
 });
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   const token = props.searchParams.token;
   const user = await requiredAuth();
 
@@ -47,7 +47,7 @@ export default async function RoutePage(props: PageParams<{}>) {
     }
 
     await verifyDeleteAccountToken(String(token), user.email);
-  } catch (e) {
+  } catch {
     return invalidTokenCard;
   }
 

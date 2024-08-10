@@ -1,5 +1,6 @@
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
+import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 import SubscriptionDowngradeEmail from "@email/SubscriptionDowngradeEmail.email";
 import SubscriptionFailedEmail from "@email/SubscriptionFailedEmail.email";
@@ -37,19 +38,23 @@ export const notifyUserOfPremiumUpgrade = async (user: Organization) => {
   });
 };
 
-export const notifyUserOfPremiumDowngrade = async (user: Organization) => {
+export const notifyUserOfPremiumDowngrade = async (org: Organization) => {
   await sendEmail({
-    to: user.email,
+    to: org.email,
     subject: `Important Update: Changes to Your Account Status`,
-    react: SubscriptionDowngradeEmail(),
+    react: SubscriptionDowngradeEmail({
+      url: `${getServerUrl()}/${org.id}/settings/billing`,
+    }),
   });
 };
 
-export const notifyUserOfPaymentFailure = async (user: Organization) => {
+export const notifyUserOfPaymentFailure = async (org: Organization) => {
   await sendEmail({
-    to: user.email,
+    to: org.email,
     subject: `Action Needed: Update Your Payment to Continue Enjoying Our Services`,
-    react: SubscriptionFailedEmail(),
+    react: SubscriptionFailedEmail({
+      url: `${getServerUrl()}/${org.id}/settings/billing`,
+    }),
   });
 };
 

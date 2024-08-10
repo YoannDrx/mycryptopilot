@@ -24,7 +24,7 @@ export const generateMetadata = combineWithParentMetadata({
   description: "One last step to delete your organization.",
 });
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   const token = props.searchParams.token;
   return (
     <Layout>

@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import { getError } from "../error/auth-error-mapping";
 import { SignInProviders } from "./SignInProviders";
 
-export default async function AuthSignInPage(props: PageParams<{}>) {
+export default async function AuthSignInPage(props: PageParams) {
   const { errorMessage, error } = getError(props.searchParams.error);
 
   const user = await auth();

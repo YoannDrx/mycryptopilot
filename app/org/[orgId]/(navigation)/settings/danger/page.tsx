@@ -19,7 +19,7 @@ export const generateMetadata = combineWithParentMetadata({
   description: "Delete your organization.",
 });
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   const { org, user } = await getRequiredCurrentOrgCache(["ADMIN"]);
 
   const usersOrganizationsCount = await prisma.organizationMembership.count({

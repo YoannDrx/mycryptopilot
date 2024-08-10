@@ -29,7 +29,7 @@ const getTags = (
   return undefined;
 };
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   const activeTags = getTags(props.searchParams.tag);
   const tags = await getPostsTags();
   const posts = await getPosts(activeTags);
@@ -55,11 +55,7 @@ export default async function RoutePage(props: PageParams<{}>) {
               },
             }}
           >
-            <Badge
-              variant={
-                activeTags?.includes(tag) ? "default" : "outline"
-              }
-            >
+            <Badge variant={activeTags?.includes(tag) ? "default" : "outline"}>
               {tag}
             </Badge>
           </Link>

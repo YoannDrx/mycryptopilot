@@ -9,9 +9,9 @@ export const uploadImageAction = authAction
       formData: z.instanceof(FormData),
     }),
   )
-  .action(async ({ parsedInput: input }) => {
-    const formData = input.formData;
-    const file = formData.get("file");
+  .action(async ({ parsedInput: props }) => {
+    // const formData = input.formData;
+    // const file = formData.get("file");
     // TODO : Implement your file upload logic here
 
     return { url: "https://example.com/image.png" };

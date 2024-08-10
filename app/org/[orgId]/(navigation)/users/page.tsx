@@ -10,11 +10,11 @@ import type { PageParams } from "@/types/next";
 import { DonutChart } from "./donuts-chart";
 import { UsersChart } from "./users-chart";
 
-export default async function RoutePage(props: PageParams<{}>) {
+export default async function RoutePage(props: PageParams) {
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>Demo Shart</LayoutTitle>
+        <LayoutTitle>Demo Page</LayoutTitle>
       </LayoutHeader>
       <LayoutActions className="flex gap-2">
         <Button variant="outline">Delete</Button>

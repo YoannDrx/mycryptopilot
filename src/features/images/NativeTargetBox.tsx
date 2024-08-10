@@ -1,9 +1,4 @@
-import React, {
-  ComponentPropsWithoutRef,
-  forwardRef,
-  useRef,
-  useState,
-} from "react";
+import React, { ComponentPropsWithoutRef, forwardRef, useRef } from "react";
 
 type DragAndDropProps = {
   onFileDrop: (item: { files: File[] }) => unknown;
@@ -25,27 +20,23 @@ type DragAndDropProps = {
  */
 export const NativeTargetBox = forwardRef<HTMLDivElement, DragAndDropProps>(
   ({ onFileDrop, children, isLoading, accept, ...props }, ref) => {
-    const [isDrop, setIsDrop] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
       props.onDragOver?.(e);
       if (isLoading) return;
       e.preventDefault();
-      setIsDrop(true);
     };
 
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
       props.onDragLeave?.(e);
       if (isLoading) return;
       e.preventDefault();
-      setIsDrop(false);
     };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
       if (isLoading) return;
       e.preventDefault();
-      setIsDrop(false);
 
       const files = Array.from(e.dataTransfer.files).filter((file) =>
         accept?.some((type) => {
