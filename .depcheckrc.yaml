@@ -1,3 +1,0 @@
-ignores: ["eslint", "babel-*"]
-skip-missing: true
-ignore-path: .eslintignore

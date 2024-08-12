@@ -15,7 +15,7 @@ type Faq = {
   answer: string;
 };
 
-export type FeaturesPreviewProps = {
+type FeaturesPreviewProps = {
   faq: Faq[];
 };
 

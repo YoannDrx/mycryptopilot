@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
-export type OrganizationsSelectProps = {
+type OrganizationsSelectProps = {
   currentOrgId?: string;
   children?: ReactNode;
   orgs: {

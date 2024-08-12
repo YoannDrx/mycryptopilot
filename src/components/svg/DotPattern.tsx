@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { ComponentPropsWithoutRef } from "react";
 
-export type DotPatternProps = ComponentPropsWithoutRef<"div">;
+type DotPatternProps = ComponentPropsWithoutRef<"div">;
 
 export const DotPattern = ({
   children,

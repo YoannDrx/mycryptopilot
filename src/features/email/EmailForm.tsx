@@ -19,7 +19,7 @@ import { addEmailAction } from "./email.action";
 import type { EmailActionSchemaType } from "./email.schema";
 import { EmailActionSchema } from "./email.schema";
 
-export type EmailFormProps = {
+type EmailFormProps = {
   submitButtonLabel?: string;
   successMessage?: string;
 };

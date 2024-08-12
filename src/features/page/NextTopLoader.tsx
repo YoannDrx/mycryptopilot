@@ -4,7 +4,7 @@ import * as NProgress from "nprogress";
 import * as React from "react";
 import { create } from "zustand";
 
-export type NextTopLoaderProps = {
+type NextTopLoaderProps = {
   /**
    * Color for the TopLoader.
    * @default "#29d"

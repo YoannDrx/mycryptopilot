@@ -9,7 +9,7 @@ import type { ButtonProps } from "../../components/ui/button";
 import { LoadingButton } from "../form/SubmitButton";
 import { buyButtonAction } from "./buy-button.action";
 
-export type BuyButtonProps = {
+type BuyButtonProps = {
   priceId: string;
   orgId: string;
 } & ButtonProps;

@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "../../components/utils/ErrorBoundaries";
 import { rehypePlugins, remarkPlugins } from "./markdown.config";
 
-export type ServerMdxProps = {
+type ServerMdxProps = {
   source: string;
   className?: string;
 };

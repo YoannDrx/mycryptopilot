@@ -3,7 +3,7 @@ import { Typography } from "@/components/ui/typography";
 import { ClientMarkdown } from "@/features/markdown/ClientMarkdown";
 import { Layout } from "@/features/page/layout";
 
-export type ReviewSingleProps = {
+type ReviewSingleProps = {
   /**
    * The image of the user.
    */

@@ -15,8 +15,7 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "postinstall": "prisma generate",
     "clean": "next lint --fix && tsc --noEmit && prettier --write .",
-    "unimported": "pnpm dlx unimported",
-    "depcheck": "pnpm dlx depcheck"
+    "knip": "knip"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.2",
@@ -47,7 +46,6 @@
     "@t3-oss/env-nextjs": "^0.11.0",
     "@tanstack/react-query": "^5.51.23",
     "ajv": "^8.17.1",
-    "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^0.2.0",
@@ -111,6 +109,7 @@
     "eslint-plugin-react-hooks": "5.1.0-rc-d025ddd3-20240722",
     "eslint-plugin-tailwindcss": "^3.17.4",
     "globals": "^15.9.0",
+    "knip": "^5.27.2",
     "postcss": "^8.4.41",
     "prettier": "^3.3.3",
     "prisma": "^5.18.0",

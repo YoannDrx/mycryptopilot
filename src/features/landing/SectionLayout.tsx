@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { ComponentPropsWithoutRef } from "react";
 
-export type SectionLayoutProps = {
+type SectionLayoutProps = {
   /**
    * The section size.
    * sm = 896px
