@@ -52,7 +52,7 @@ export const getNextAuthConfigProviders = (): Providers => {
     );
   }
 
-  if (SiteConfig.auth.password) {
+  if (SiteConfig.features.enablePasswordAuth) {
     providers.push(getCredentialsProvider());
   }
 

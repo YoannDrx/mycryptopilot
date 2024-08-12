@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { env } from "../env";
 import { prisma } from "../prisma";
+import { AUTH_COOKIE_NAME } from "./auth.const";
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
@@ -62,11 +63,6 @@ export const getCredentialsProvider = () => {
   });
 };
 
-const tokenName =
-  env.NODE_ENV === "development"
-    ? "authjs.session-token"
-    : "__Secure-authjs.session-token";
-
 type SignInCallback = NonNullable<NextAuthConfig["events"]>["signIn"];
 
 type JwtOverride = NonNullable<NextAuthConfig["jwt"]>;
@@ -106,7 +102,7 @@ export const credentialsSignInCallback =
 
     const cookieList = cookies();
 
-    cookieList.set(tokenName, uuid, {
+    cookieList.set(AUTH_COOKIE_NAME, uuid, {
       expires: expireAt,
       path: "/",
       sameSite: "lax",

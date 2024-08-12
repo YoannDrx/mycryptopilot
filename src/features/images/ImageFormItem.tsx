@@ -42,7 +42,7 @@ export const ImageFormItem = ({
         className="absolute inset-0 object-contain object-center"
         alt=""
       />
-      {SiteConfig.features.imageUpload ? (
+      {SiteConfig.features.enableImageUpload ? (
         <UseImageUpload onChange={onChange} />
       ) : (
         <UseImageButton

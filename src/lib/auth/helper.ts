@@ -1,4 +1,5 @@
 import type { User } from "@prisma/client";
+import { env } from "../env";
 import { baseAuth } from "./auth";
 
 export class AuthError extends Error {
