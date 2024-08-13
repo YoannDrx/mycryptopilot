@@ -51,7 +51,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
                 </AvatarFallback>
                 {org.image ? <AvatarImage src={org.image} /> : null}
               </Avatar>
-              <span className="line-clamp-1">{org.name}</span>
+              <span className="line-clamp-1 text-left">{org.name}</span>
             </span>
           </SelectItem>
         ))}

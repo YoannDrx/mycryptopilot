@@ -1,7 +1,10 @@
 "use server";
 
 import { ActionError, action } from "@/lib/actions/safe-actions";
-import { setupResendCustomer } from "@/lib/auth/auth-config-setup";
+import {
+  setupDefaultOrganizationsOrInviteUser,
+  setupResendCustomer,
+} from "@/lib/auth/auth-config-setup";
 import {
   hashStringWithSalt,
   validatePassword,
@@ -34,6 +37,8 @@ export const signUpAction = action
           resendContactId,
         },
       });
+
+      setupDefaultOrganizationsOrInviteUser(user);
 
       return user;
     } catch {

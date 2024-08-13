@@ -13,9 +13,11 @@ export const useCurrentOrg = create<CurrentOrgStore | null>(() => null);
 
 export const InjectCurrentOrgStore = (
   props: PropsWithChildren<{
-    org: CurrentOrgStore;
+    org?: CurrentOrgStore;
   }>,
 ) => {
+  if (!props.org) return props.children;
+
   useCurrentOrg.setState({
     id: props.org.id,
     name: props.org.name,

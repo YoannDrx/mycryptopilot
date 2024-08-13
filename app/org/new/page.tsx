@@ -7,11 +7,14 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { createSearchParamsMessageUrl } from "@/features/searchparams-message/createSearchParamsMessageUrl";
+import { requiredAuth } from "@/lib/auth/helper";
 import { SiteConfig } from "@/site-config";
 import { redirect } from "next/navigation";
 import { NewOrganizationForm } from "./NewOrgForm";
 
 export default async function RoutePage() {
+  await requiredAuth();
+
   if (SiteConfig.features.enableSingleMemberOrg) {
     redirect(
       createSearchParamsMessageUrl(`/org`, {

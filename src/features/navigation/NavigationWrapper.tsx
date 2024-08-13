@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Typography } from "@/components/ui/typography";
 import { ReactNode } from "react";
+import { ThemeToggle } from "../theme/ThemeToggle";
 
 export async function NavigationWrapper({
   children,
@@ -59,7 +60,10 @@ export async function NavigationWrapper({
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1">{topBarChildren}</div>
-          {topBarCornerLeftChildren}
+          <div className="flex items-center gap-2">
+            {topBarCornerLeftChildren}
+            <ThemeToggle />
+          </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 overflow-auto lg:gap-6 lg:p-6">
           {children}
