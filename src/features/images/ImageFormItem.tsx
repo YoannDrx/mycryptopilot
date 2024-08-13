@@ -6,6 +6,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
 import { Typography } from "@/components/ui/typography";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { cn } from "@/lib/utils";
@@ -73,7 +74,24 @@ const Overlay = (props: PropsWithChildren<{ isLoading?: boolean }>) => {
 };
 
 const UseImageUpload = ({ onChange }: { onChange: (url: string) => void }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const uploadImageMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.set("name", file.name);
+      formData.set("file", file);
+
+      const result = await uploadImageAction({
+        formData,
+      });
+
+      if (!isActionSuccessful(result)) {
+        toast.error(result?.serverError ?? "Something went wrong");
+        return;
+      }
+
+      onChange(result.data.url);
+    },
+  });
 
   const handleDrop = async (item: { files: File[] }) => {
     const file = item.files[0] as File;
@@ -94,34 +112,22 @@ const UseImageUpload = ({ onChange }: { onChange: (url: string) => void }) => {
       return;
     }
 
-    const formData = new FormData();
-    formData.set("name", file.name);
-    formData.set("file", file);
-
-    setIsLoading(true);
-
-    const result = await uploadImageAction({
-      formData,
-    });
-
-    if (!isActionSuccessful(result)) {
-      toast.error(result?.serverError ?? "Something went wrong");
-      return;
-    }
-
-    onChange(result.data.url);
-    setIsLoading(false);
+    uploadImageMutation.mutate(file);
   };
 
   return (
-    <Overlay isLoading={isLoading}>
+    <Overlay isLoading={uploadImageMutation.isPending}>
       <NativeTargetBox
         className="absolute inset-0 flex h-auto items-center justify-center"
-        isLoading={isLoading}
+        isLoading={uploadImageMutation.isPending}
         onFileDrop={handleDrop}
         accept={["*.png"]}
       >
-        <Typography variant="muted">Upload</Typography>
+        {uploadImageMutation.isPending ? (
+          <Loader />
+        ) : (
+          <Typography variant="muted">Upload</Typography>
+        )}
       </NativeTargetBox>
     </Overlay>
   );

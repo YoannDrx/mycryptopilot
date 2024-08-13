@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { UserDropdown } from "@/features/auth/UserDropdown";
+import { ContactFeedbackPopover } from "@/features/contact/feedback/ContactFeedbackPopover";
 import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
@@ -30,16 +31,23 @@ export async function OrgNavigation({ children }: PropsWithChildren) {
       }
       bottomNavigationChildren={<UpgradeCard />}
       topBarCornerLeftChildren={
-        <UserDropdown>
-          <Button variant="ghost" className="size-10 rounded-full" size="sm">
-            <Avatar className="size-8">
-              <AvatarFallback>
-                {user.email ? user.email.slice(0, 2) : "??"}
-              </AvatarFallback>
-              {user.image && <AvatarImage src={user.image} />}
-            </Avatar>
-          </Button>
-        </UserDropdown>
+        <>
+          <ContactFeedbackPopover>
+            <Button size="sm" variant="outline">
+              Feedback
+            </Button>
+          </ContactFeedbackPopover>
+          <UserDropdown>
+            <Button variant="ghost" className="size-10 rounded-full" size="sm">
+              <Avatar className="size-8">
+                <AvatarFallback>
+                  {user.email ? user.email.slice(0, 2) : "??"}
+                </AvatarFallback>
+                {user.image && <AvatarImage src={user.image} />}
+              </Avatar>
+            </Button>
+          </UserDropdown>
+        </>
       }
       topBarChildren={<OrganizationCommand />}
     >
