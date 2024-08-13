@@ -6,6 +6,8 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { isInRoles } from "@/lib/organizations/isInRoles";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
 import InformationCards from "./InformationCards";
@@ -16,18 +18,21 @@ export default async function RoutePage(
     orgId: string;
   }>,
 ) {
+  const org = await getRequiredCurrentOrgCache();
   return (
     <Layout>
       <LayoutHeader>
         <LayoutTitle>Dashboard</LayoutTitle>
       </LayoutHeader>
       <LayoutActions>
-        <Link
-          href={`/org/${props.params.orgId}/settings/members`}
-          className={buttonVariants({ variant: "outline" })}
-        >
-          Invite member
-        </Link>
+        {isInRoles(org.roles, ["ADMIN"]) ? (
+          <Link
+            href={`/org/${props.params.orgId}/settings/members`}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            Invite member
+          </Link>
+        ) : null}
       </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-8">
         <InformationCards />

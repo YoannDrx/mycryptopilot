@@ -1,6 +1,8 @@
 import { orgMetadata } from "@/lib/metadata";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { LayoutParams, PageParams } from "@/types/next";
 import { Metadata } from "next";
+import { InjectCurrentOrgStore } from "./useCurrentOrg";
 
 export async function generateMetadata({
   params,
@@ -11,5 +13,8 @@ export async function generateMetadata({
 export default async function RouteLayout(
   props: LayoutParams<{ orgId: string }>,
 ) {
-  return <>{props.children}</>;
+  const { org } = await getRequiredCurrentOrgCache();
+  return (
+    <InjectCurrentOrgStore org={org}>{props.children}</InjectCurrentOrgStore>
+  );
 }

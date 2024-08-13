@@ -61,7 +61,7 @@ export async function NavigationWrapper({
           <div className="w-full flex-1">{topBarChildren}</div>
           {topBarCornerLeftChildren}
         </header>
-        <main className="flex flex-1 flex-col gap-4 overflow-auto p-4 lg:gap-6 lg:p-6">
+        <main className="flex flex-1 flex-col gap-4 overflow-auto lg:gap-6 lg:p-6">
           {children}
         </main>
       </div>

@@ -8,7 +8,7 @@ import { BuyButton } from "@/features/stripe/BuyButton";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Plan } from "./plan";
+import { Plan } from "./plans";
 
 export const PricingCard = (props: Plan) => {
   const params = useParams();

@@ -1,7 +1,7 @@
 import { Typography } from "@/components/ui/typography";
 import { SectionLayout } from "../landing/SectionLayout";
 import { PricingCard } from "./PricingCard";
-import { PLANS } from "./plan";
+import { PLANS } from "./plans";
 
 export const Pricing = () => {
   return (

@@ -15,7 +15,9 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { dialog } from "@/features/dialogs-provider/DialogProvider";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
+import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { formatId } from "@/lib/format/id";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -38,12 +40,16 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
     mutationFn: async (values: OrgDangerFormSchemaType) => {
       const result = await updateOrganizationDetailsAction(values);
 
-      if (!result || result.serverError) {
+      if (!isActionSuccessful(result)) {
         toast.error("Failed to update settings");
         throw new Error("Failed to update settings");
       }
 
-      router.refresh();
+      const newUrl = window.location.href.replace(
+        `/org/${defaultValues.id}/`,
+        `/org/${result.data.id}/`,
+      );
+      router.push(newUrl);
       form.reset(result.data as OrgDangerFormSchemaType);
     },
   });
@@ -51,7 +57,19 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
   return (
     <FormUnsavedBar
       form={form}
-      onSubmit={async (v) => mutation.mutateAsync(v)}
+      onSubmit={(v) => {
+        dialog.add({
+          title: "Are you sure ?",
+          description:
+            "You are about to change the unique identifier of your organization. All the previous URLs will be changed.",
+          action: {
+            label: "Yes, change the id",
+            onClick: () => {
+              mutation.mutate(v);
+            },
+          },
+        });
+      }}
       className="flex w-full flex-col gap-6 lg:gap-8"
     >
       <Card>

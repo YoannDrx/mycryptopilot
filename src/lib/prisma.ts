@@ -1,40 +1,20 @@
+import { SiteConfig } from "@/site-config";
 import { PrismaClient } from "@prisma/client";
-import { stripe } from "./stripe";
+import {
+  onOrganizationUpdate,
+  onUserUpdateSyncWithOrganization,
+} from "./prisma.extends";
 
 const prismaClientSingleton = () => {
   return new PrismaClient().$extends({
     query: {
       organization: {
-        async update({ args, query }) {
-          const email = args.data.email;
-          const orgId = args.where.id;
-
-          if (!email || typeof email !== "string") {
-            return query(args);
-          }
-
-          if (!orgId) {
-            return query(args);
-          }
-
-          const org = await prisma.organization.findUnique({
-            where: {
-              id: orgId,
-            },
-          });
-
-          const stripeCustomerId = org?.stripeCustomerId;
-
-          if (!stripeCustomerId) {
-            return query(args);
-          }
-
-          await stripe.customers.update(stripeCustomerId, {
-            email: email,
-          });
-
-          return query(args);
-        },
+        update: onOrganizationUpdate,
+      },
+      user: {
+        update: SiteConfig.features.enableSingleMemberOrg
+          ? onUserUpdateSyncWithOrganization
+          : undefined,
       },
     },
   });

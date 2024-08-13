@@ -16,7 +16,7 @@ import {
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { useKey } from "react-use";
-import { ORGANIZATION_LINKS } from "./navigation.links";
+import { ORGANIZATION_LINKS } from "./org-navigation.links";
 
 export function OrganizationCommand() {
   const [open, setOpen] = useState(false);

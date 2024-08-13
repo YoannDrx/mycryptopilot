@@ -6,9 +6,15 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { combineWithParentMetadata } from "@/lib/metadata";
 import type { PageParams } from "@/types/next";
 import { DonutChart } from "./donuts-chart";
 import { UsersChart } from "./users-chart";
+
+export const generateMetadata = combineWithParentMetadata({
+  title: "Users",
+  description: "Manage leads",
+});
 
 export default async function RoutePage(props: PageParams) {
   return (

@@ -18,7 +18,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SubmitButton } from "@/features/form/SubmitButton";
+import { LoadingButton } from "@/features/form/SubmitButton";
 import { useMutation } from "@tanstack/react-query";
 import { Mail, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -85,10 +85,10 @@ export const OrganizationInviteMemberForm = () => {
               </FormItem>
             )}
           />
-          <SubmitButton type="submit">
+          <LoadingButton loading={mutation.isPending} type="submit">
             <Plus size={16} className="mr-2" />
             Invite
-          </SubmitButton>
+          </LoadingButton>
         </Form>
       </DialogContent>
     </Dialog>

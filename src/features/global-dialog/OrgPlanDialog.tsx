@@ -5,14 +5,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PLANS } from "../plans/plan";
+import { PLANS } from "../plans/plans";
 import { PricingCard } from "../plans/PricingCard";
 import { closeGlobalDialog } from "./GlobalDialogStore";
 
 export const OrgPlanDialog = () => {
   return (
     <Dialog open={true} onOpenChange={() => closeGlobalDialog()}>
-      <DialogContent className="max-w-3xl px-8 py-6 lg:px-16 lg:py-14">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-auto px-8 py-6 lg:px-16 lg:py-14">
         <DialogHeader className="w-full text-center">
           <DialogTitle className="text-center font-bold lg:text-3xl">
             Choose a plan and start growing

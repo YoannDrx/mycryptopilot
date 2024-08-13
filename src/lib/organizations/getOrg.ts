@@ -12,8 +12,8 @@ const getOrgIdFromUrl = () => {
     return null;
   }
 
-  // get the parameters after /o/ or /organizations/ at the beginning of the url
-  const match = xURL.match(/\/(?:org|organizations)\/([^/]+)/);
+  // get the parameters after /org/ or /organizations/ and before a / or ? (if there are params)
+  const match = xURL.match(/\/(?:org|organizations)\/([^/?]+)(?:[/?]|$)/);
 
   if (!match) {
     return null;

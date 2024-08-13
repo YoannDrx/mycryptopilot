@@ -66,13 +66,14 @@ const PremiumCard = async () => {
   const subscriptions = await stripe.subscriptions.list({
     customer: stripeCustomer.id,
   });
+
   const firstSubscription = subscriptions.data[0];
-  const nextRenewDate = firstSubscription.current_period_end;
-  const price = firstSubscription.items.data[0].price;
+  const nextRenewDate = firstSubscription?.current_period_end;
+  const price = firstSubscription?.items.data[0].price;
 
   const customerPortal = await stripe.billingPortal.sessions.create({
     customer: stripeCustomer.id,
-    return_url: `${getServerUrl()}/${organization.id}/settings/billing`,
+    return_url: `${getServerUrl()}/org/${organization.id}/settings/billing`,
   });
 
   return (
@@ -81,28 +82,37 @@ const PremiumCard = async () => {
         <CardDescription>Plan</CardDescription>
         <CardTitle>
           {organization.plan.name}{" "}
-          {firstSubscription.cancel_at ? "(Canceled)" : ""}
+          {firstSubscription?.cancel_at ? "(Canceled)" : ""}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 md:flex-row">
-        <div>
-          <Typography variant="muted">Price</Typography>
-          <Typography variant="large">
-            ${(price.unit_amount ?? 0) / 100}
-          </Typography>
-        </div>
-        <Separator
-          orientation="vertical"
-          className="hidden h-10 self-center md:block"
-        />
-        <div>
-          <Typography variant="muted">
-            {firstSubscription.cancel_at ? "Cancel at" : "Renew at"}
-          </Typography>
-          <Typography variant="large">
-            {formatDate(new Date(nextRenewDate * 1000))}
-          </Typography>
-        </div>
+        {firstSubscription ? (
+          <>
+            <div>
+              <Typography variant="muted">Price</Typography>
+              <Typography variant="large">
+                ${(price.unit_amount ?? 0) / 100}
+              </Typography>
+            </div>
+            <Separator
+              orientation="vertical"
+              className="hidden h-10 self-center md:block"
+            />
+            <div>
+              <Typography variant="muted">
+                {firstSubscription.cancel_at ? "Cancel at" : "Renew at"}
+              </Typography>
+              <Typography variant="large">
+                {formatDate(new Date(nextRenewDate * 1000))}
+              </Typography>
+            </div>
+          </>
+        ) : (
+          <div>
+            <Typography variant="muted">Renew at</Typography>
+            <Typography variant="large">LIFETIME</Typography>
+          </div>
+        )}
       </CardContent>
       <CardFooter>
         <Link className={buttonVariants()} href={customerPortal.url}>

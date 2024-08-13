@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SiteConfig } from "@/site-config";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -32,10 +33,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
           return;
         }
 
-        const currentUrl = window.location.href;
-        const newUrl = props.currentOrgId
-          ? currentUrl.replace(`/org/${props.currentOrgId}`, `/org/${value}`)
-          : `/org/${value}`;
+        const newUrl = `/org/${value}`;
 
         router.push(newUrl);
       }}
@@ -57,7 +55,9 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
             </span>
           </SelectItem>
         ))}
-        <SelectItem value="new">Add a new organization</SelectItem>
+        {!SiteConfig.features.enableSingleMemberOrg ? (
+          <SelectItem value="new">Add a new organization</SelectItem>
+        ) : null}
       </SelectContent>
     </Select>
   );
