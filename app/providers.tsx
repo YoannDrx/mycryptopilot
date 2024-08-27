@@ -1,7 +1,7 @@
 "use client";
 
 import { Toaster } from "@/components/ui/sonner";
-import { AlertDialogRenderer } from "@/features/alert-dialog/DialogProvider";
+import { AlertDialogRenderer } from "@/features/alert-dialog/AlertDialogRenderer";
 import { GlobalDialogLazy } from "@/features/global-dialog/GlobalDialogLazy";
 import { SearchParamsMessageToastSuspended } from "@/features/searchparams-message/SearchParamsMessageToast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

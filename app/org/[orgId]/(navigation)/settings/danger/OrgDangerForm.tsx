@@ -15,7 +15,6 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { alertDialog } from "@/features/alert-dialog/DialogProvider";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { formatId } from "@/lib/format/id";
@@ -24,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateOrganizationDetailsAction } from "../org.action";
 import { OrgDangerFormSchema, OrgDangerFormSchemaType } from "../org.schema";
+import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
 
 type ProductFormProps = {
   defaultValues: OrgDangerFormSchemaType;

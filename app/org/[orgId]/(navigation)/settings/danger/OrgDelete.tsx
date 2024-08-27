@@ -8,9 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { alertDialog } from "@/features/alert-dialog/DialogProvider";
 import { toast } from "sonner";
 import { orgAskDeletionAction } from "./delete-org.action";
+import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
 
 export const OrganizationDelete = () => {
   return (
