@@ -1,8 +1,8 @@
 // app/api/hello/route.ts
-import { createSafeRoute } from "next-safe-route";
+import { createZodRoute } from "next-zod-route";
 import { NextResponse } from "next/server";
-import { auth } from "../auth/helper";
-import { getRequiredCurrentOrg } from "../organizations/getOrg";
+import { auth } from "./auth/helper";
+import { getRequiredCurrentOrg } from "./organizations/getOrg";
 
 export class RouteError extends Error {
   status?: number;
@@ -12,7 +12,7 @@ export class RouteError extends Error {
   }
 }
 
-export const route = createSafeRoute({
+export const route = createZodRoute({
   handleServerError: (e: Error) => {
     if (e instanceof RouteError) {
       return NextResponse.json(
@@ -39,7 +39,7 @@ export const authRoute = route.use(async () => {
   };
 });
 
-// Can only be used in /api/organizations/[organizationId]/* routes !
+// Can only be used in /api/org/[organizationId]/* routes !
 export const orgRoute = authRoute.use(async () => {
   try {
     const organization = await getRequiredCurrentOrg();

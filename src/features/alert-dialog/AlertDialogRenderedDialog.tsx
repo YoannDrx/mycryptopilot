@@ -13,7 +13,7 @@ import {
 } from "../../components/ui/alert-dialog";
 import { Loader } from "../../components/ui/loader";
 
-export type ConfirmationDialogProps = {
+export type AlertDialogRenderedDialogProps = {
   title?: string;
   description?: ReactNode;
   action?:
@@ -31,14 +31,14 @@ export type ConfirmationDialogProps = {
   children?: ReactNode;
 };
 
-export const ProviderConfirmationDialog = ({
+export const AlertDialogRenderedDialog = ({
   title,
   description,
   loading,
   action,
   cancel,
   children,
-}: ConfirmationDialogProps) => {
+}: AlertDialogRenderedDialogProps) => {
   return (
     <AlertDialog open={true}>
       <AlertDialogContent>

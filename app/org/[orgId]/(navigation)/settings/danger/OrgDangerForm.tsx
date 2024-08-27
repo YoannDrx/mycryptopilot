@@ -15,7 +15,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { dialog } from "@/features/dialogs-provider/DialogProvider";
+import { alertDialog } from "@/features/alert-dialog/DialogProvider";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { formatId } from "@/lib/format/id";
@@ -58,7 +58,7 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
     <FormUnsavedBar
       form={form}
       onSubmit={(v) => {
-        dialog.add({
+        alertDialog.add({
           title: "Are you sure ?",
           description:
             "You are about to change the unique identifier of your organization. All the previous URLs will be changed.",

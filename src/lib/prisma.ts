@@ -1,9 +1,6 @@
-import { SiteConfig } from "@/site-config";
 import { PrismaClient } from "@prisma/client";
-import {
-  onOrganizationUpdate,
-  onUserUpdateSyncWithOrganization,
-} from "./prisma.extends";
+import { onOrganizationUpdate } from "./prisma/prisma.org.extends";
+import { onUserUpdate } from "./prisma/prisma.user.extends";
 
 const prismaClientSingleton = () => {
   return new PrismaClient().$extends({
@@ -12,9 +9,7 @@ const prismaClientSingleton = () => {
         update: onOrganizationUpdate,
       },
       user: {
-        update: SiteConfig.features.enableSingleMemberOrg
-          ? onUserUpdateSyncWithOrganization
-          : undefined,
+        update: onUserUpdate,
       },
     },
   });

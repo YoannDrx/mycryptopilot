@@ -36,7 +36,7 @@ export const PLANS = [
     features: ["5 users"],
     isPopular: true,
     type: "monthly",
-    priceId: "price_1PgRQOGPhxExaYaQmEaLIPz4",
+    priceId: "price_1PmuveGPhxExaYaQXj6bys02",
     cta: "Start now",
     ctaSubtitle: "Then $49/month",
   },

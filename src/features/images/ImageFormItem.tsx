@@ -16,7 +16,7 @@ import { PropsWithChildren, useState } from "react";
 import { toast } from "sonner";
 import { LoadingButton } from "../form/SubmitButton";
 import { NativeTargetBox } from "./NativeTargetBox";
-import { uploadImageAction } from "./uploadImageAction";
+import { uploadImageAction } from "./upload-image.action";
 
 type ImageFormItemProps = {
   onChange: (url: string) => void;
@@ -120,7 +120,7 @@ const UseImageUpload = ({ onChange }: { onChange: (url: string) => void }) => {
       <NativeTargetBox
         className="absolute inset-0 flex h-auto items-center justify-center"
         isLoading={uploadImageMutation.isPending}
-        onFileDrop={handleDrop}
+        onDrop={handleDrop}
         accept={["*.png"]}
       >
         {uploadImageMutation.isPending ? (

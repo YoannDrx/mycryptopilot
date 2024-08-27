@@ -1,7 +1,7 @@
 "use client";
 
 import { Toaster } from "@/components/ui/sonner";
-import { DialogRenderer } from "@/features/dialogs-provider/DialogProvider";
+import { AlertDialogRenderer } from "@/features/alert-dialog/DialogProvider";
 import { GlobalDialogLazy } from "@/features/global-dialog/GlobalDialogLazy";
 import { SearchParamsMessageToastSuspended } from "@/features/searchparams-message/SearchParamsMessageToast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ export const Providers = ({ children }: PropsWithChildren) => {
       <SessionProvider>
         <QueryClientProvider client={queryClient}>
           <Toaster />
-          <DialogRenderer />
+          <AlertDialogRenderer />
           <GlobalDialogLazy />
           <SearchParamsMessageToastSuspended />
           {children}

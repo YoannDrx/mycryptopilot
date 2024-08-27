@@ -12,6 +12,7 @@ export const generateMetadata = combineWithParentMetadata({
 
 export default async function RoutePage(props: PageParams) {
   const { org } = await getRequiredCurrentOrgCache(["ADMIN"]);
+
   const members = await getOrgsMembers(org.id);
 
   const invitations = await prisma.verificationToken.findMany({

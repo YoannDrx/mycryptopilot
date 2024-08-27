@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { dialog } from "@/features/dialogs-provider/DialogProvider";
+import { alertDialog } from "@/features/alert-dialog/DialogProvider";
 import { toast } from "sonner";
 import { orgAskDeletionAction } from "./delete-org.action";
 
@@ -27,7 +27,7 @@ export const OrganizationDelete = () => {
         <Button
           variant="destructive"
           onClick={() => {
-            dialog.add({
+            alertDialog.add({
               title: "Delete your organization ?",
               description: "Are you sure you want to delete your organization?",
               action: {

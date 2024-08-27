@@ -3,26 +3,25 @@
 import { logger } from "@/lib/logger";
 import { toast } from "sonner";
 import { create } from "zustand";
-import type { ConfirmationDialogProps } from "./DialogProviderDialog";
-import { ProviderConfirmationDialog } from "./DialogProviderDialog";
+import type { AlertDialogRenderedDialogProps } from "./AlertDialogRenderedDialog";
 
-type DialogType = ConfirmationDialogProps & {
+export type AlertDialogType = AlertDialogRenderedDialogProps & {
   id: string;
 };
 
-type DialogStore = {
-  dialogs: DialogType[];
-  addDialog: (dialog: ConfirmationDialogProps) => string;
+type AlertDialogStore = {
+  dialogs: AlertDialogType[];
+  addDialog: (dialog: AlertDialogRenderedDialogProps) => string;
   removeDialog: (dialogId: string) => void;
 };
 
-const useDialogStore = create<DialogStore>((set, get) => ({
+export const useAlertDialogStore = create<AlertDialogStore>((set, get) => ({
   dialogs: [],
   addDialog: (dialog) => {
     const id = Math.random().toString(36).slice(2, 9);
     const { removeDialog } = get();
 
-    const newDialog: DialogType = {
+    const newDialog: AlertDialogType = {
       ...dialog,
       cancel: {
         label: dialog.cancel?.label ?? "Cancel",
@@ -90,24 +89,9 @@ const useDialogStore = create<DialogStore>((set, get) => ({
     })),
 }));
 
-export const DialogRenderer = () => {
-  const dialogs = useDialogStore((state) => state.dialogs);
-
-  const dialog = dialogs[0] as DialogType | undefined;
-
-  if (dialog) {
-    return <ProviderConfirmationDialog {...dialog} />;
-  }
-
-  return null;
-};
-
-export const enqueueDialog = (dialog: ConfirmationDialogProps) =>
-  useDialogStore.getState().addDialog(dialog);
-
-export const dialog = {
-  add: (dialog: ConfirmationDialogProps) =>
-    useDialogStore.getState().addDialog(dialog),
+export const alertDialog = {
+  add: (dialog: AlertDialogRenderedDialogProps) =>
+    useAlertDialogStore.getState().addDialog(dialog),
   remove: (dialogId: string) =>
-    useDialogStore.getState().removeDialog(dialogId),
+    useAlertDialogStore.getState().removeDialog(dialogId),
 };
