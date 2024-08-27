@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { alertDialog } from "@/features/alert-dialog/DialogProvider";
+import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
 import { toast } from "sonner";
 import { accountAskDeletionAction } from "./delete-account.action";
 
