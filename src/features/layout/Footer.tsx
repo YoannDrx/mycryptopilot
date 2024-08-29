@@ -11,8 +11,10 @@ export const Footer = () => {
           <div className="flex flex-col gap-4">
             <div className="space-y-1">
               <Typography variant="h3">{SiteConfig.title}</Typography>
-              <Typography>{SiteConfig.company.name}</Typography>
-              <Typography>{SiteConfig.company.address}</Typography>
+              <Typography variant="muted">{SiteConfig.company.name}</Typography>
+              <Typography variant="muted">
+                {SiteConfig.company.address}
+              </Typography>
             </div>
             <Typography variant="muted" className="italic">
               © {new Date().getFullYear()} {SiteConfig.company.name} - All
@@ -36,6 +38,33 @@ export const Footer = () => {
               href="/legal/privacy"
             >
               Privacy
+            </Typography>
+          </div>
+          <div className="flex flex-col items-end gap-4">
+            <Typography variant="large">Resources</Typography>
+            <Typography
+              as={Link}
+              variant="muted"
+              className="hover:underline"
+              href="/posts"
+            >
+              Blog
+            </Typography>
+            <Typography
+              as={Link}
+              variant="muted"
+              className="hover:underline"
+              href="/org"
+            >
+              Dashboard
+            </Typography>
+            <Typography
+              as={Link}
+              variant="muted"
+              className="hover:underline"
+              href="/account"
+            >
+              Account
             </Typography>
           </div>
         </LayoutContent>
