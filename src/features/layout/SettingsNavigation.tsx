@@ -22,7 +22,7 @@ export const SettingsNavigation = (props: SettingsNavigationProps) => {
 
   return (
     <div
-      className="top-4 flex gap-2 lg:sticky lg:flex-col"
+      className="top-4 flex items-start justify-start gap-2 max-md:w-full lg:sticky lg:flex-col lg:items-stretch"
       style={{ minWidth: 150 }}
     >
       {props.links.map((link) => {
@@ -33,7 +33,7 @@ export const SettingsNavigation = (props: SettingsNavigationProps) => {
         }
 
         return (
-          <div key={link.href} className="relative w-full">
+          <div key={link.href} className="relative h-10">
             {isMatching && (
               <motion.div
                 className="absolute inset-0 rounded-md bg-accent/50"
@@ -41,7 +41,7 @@ export const SettingsNavigation = (props: SettingsNavigationProps) => {
               />
             )}
             <Link
-              className="relative inline-block w-full rounded-md border border-transparent p-2.5 text-sm text-foreground transition-all duration-75 hover:border-accent/50"
+              className="relative line-clamp-1 inline-flex h-10 w-full items-center justify-center rounded-md border border-transparent px-2.5 text-sm text-foreground transition-all duration-75 hover:border-accent/50 lg:text-left"
               href={link.href}
             >
               {link.label}

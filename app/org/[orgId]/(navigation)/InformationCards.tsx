@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function InformationCards() {
   return (
-    <div className="flex w-full items-center gap-4 max-lg:flex-col lg:gap-8">
+    <div className="flex w-full items-start gap-4 max-lg:flex-col lg:gap-8">
       <Card className="w-full flex-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total likes</CardTitle>

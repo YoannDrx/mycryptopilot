@@ -143,7 +143,7 @@ const MultiSelector = ({
       <Command
         onKeyDown={handleKeyDown}
         className={cn(
-          "overflow-visible bg-transparent flex flex-col space-y-2",
+          "overflow-visible bg-transparent flex flex-col",
           className,
         )}
         dir={dir}
@@ -233,10 +233,20 @@ MultiSelectorInput.displayName = "MultiSelectorInput";
 const MultiSelectorContent = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ children }, ref) => {
+>(({ children, className, ...props }, ref) => {
   const { open } = useMultiSelect();
   return (
-    <div ref={ref} className="relative">
+    <div
+      ref={ref}
+      className={cn(
+        "relative",
+        {
+          hidden: !open,
+        },
+        className,
+      )}
+      {...props}
+    >
       {open && children}
     </div>
   );

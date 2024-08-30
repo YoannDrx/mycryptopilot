@@ -86,7 +86,7 @@ export const OrgMembersForm = ({
             People who have access to your organization.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col divide-y divide-border">
           {form.getValues("members")?.map((baseMember, index) => {
             const member = members.find((m) => m.id === baseMember.id);
             if (!member) {
@@ -94,7 +94,7 @@ export const OrgMembersForm = ({
             }
             return (
               <div key={member.id}>
-                <div className="flex items-center gap-2">
+                <div className="my-2 flex flex-wrap items-center gap-2">
                   <Avatar>
                     <AvatarFallback>{member.email.slice(0, 2)}</AvatarFallback>
                     {member.image ? <AvatarImage src={member.image} /> : null}
@@ -121,7 +121,7 @@ export const OrgMembersForm = ({
                           loop
                           className="w-fit"
                         >
-                          <MultiSelectorTrigger className="w-[250px]">
+                          <MultiSelectorTrigger className="w-[200px] lg:w-[250px]">
                             <MultiSelectorInput
                               className="w-[50px]"
                               placeholder="roles"

@@ -1,7 +1,6 @@
 import {
   Layout,
   LayoutContent,
-  LayoutDescription,
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
@@ -16,9 +15,6 @@ export default async function RouteLayout(props: LayoutParams) {
         <LayoutTitle>
           {user.name ? `${user.name}'s` : "Your"} Settings
         </LayoutTitle>
-        <LayoutDescription>
-          Edit your personal information and account details.
-        </LayoutDescription>
       </LayoutHeader>
       <LayoutContent>{props.children}</LayoutContent>
     </Layout>
