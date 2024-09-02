@@ -28,7 +28,7 @@ export const contactSupportAction = action
       to: SiteConfig.email.contact,
       subject: `New feedback from ${email}`,
       text: `Review: ${feedback.review}\n\nMessage: ${feedback.message}`,
-      reply_to: email,
+      replyTo: email,
     });
 
     return { message: "Your feedback has been sent to support." };

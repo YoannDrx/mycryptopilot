@@ -13,7 +13,7 @@ export const contactSupportAction = action
       to: SiteConfig.email.contact,
       subject: `Support needed from ${email} - ${subject}`,
       text: message,
-      reply_to: email,
+      replyTo: email,
     });
     return { message: "Your message has been sent to support." };
   });
