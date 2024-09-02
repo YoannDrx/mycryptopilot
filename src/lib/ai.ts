@@ -15,4 +15,11 @@ import { openai } from "@ai-sdk/openai";
  * Prompt : https://sdk.vercel.ai/docs/foundations/prompts
  * Tools : https://sdk.vercel.ai/docs/foundations/tools
  */
+
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error(
+    "If you want use openai model you must define OPENAI_API_KEY (https://platform.openai.com/docs/quickstart)",
+  );
+}
+
 export const openaiModel = openai("gpt-4o");
