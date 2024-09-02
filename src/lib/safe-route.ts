@@ -1,7 +1,7 @@
 // app/api/hello/route.ts
 import { createZodRoute } from "next-zod-route";
 import { NextResponse } from "next/server";
-import { auth } from "./auth/helper";
+import { auth, AuthError } from "./auth/helper";
 import { getRequiredCurrentOrg } from "./organizations/getOrg";
 
 export class RouteError extends Error {
@@ -19,6 +19,17 @@ export const route = createZodRoute({
         { message: e.message, status: e.status },
         {
           status: e.status,
+        },
+      );
+    }
+
+    if (e instanceof AuthError) {
+      return NextResponse.json(
+        {
+          message: e.message,
+        },
+        {
+          status: 401,
         },
       );
     }

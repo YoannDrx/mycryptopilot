@@ -2,7 +2,7 @@
  * Find all errors here : https://authjs.dev/reference/core/errors
  * It's UX friendly message for each error.
  */
-export const AUTH_ERRORS: Record<string, string> = {
+const AUTH_ERRORS: Record<string, string> = {
   AccountNotLinked:
     "Your email is already used with another account. Please sign in with the account originally linked to this email.",
   AdapterError:

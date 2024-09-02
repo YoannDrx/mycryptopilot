@@ -9,6 +9,24 @@ type CurrentOrgStore = {
   plan: OrganizationPlan;
 };
 
+/**
+ * Get the current org id in **client component**
+ *
+ * Usage :
+ *
+ * ```tsx
+ * "use client";
+ *
+ * export const ClientComponent = () => {
+ *   const currentOrg = useCurrentOrg();
+ *
+ *   return (
+ *     <div>
+ *       <p>Current org id : {currentOrg.id}</p>
+ *     </div>
+ *   )
+ * }
+ */
 export const useCurrentOrg = create<CurrentOrgStore | null>(() => null);
 
 export const InjectCurrentOrgStore = (

@@ -1,7 +1,7 @@
 import { OrganizationMembershipRole, type User } from "@prisma/client";
 import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
-import { auth } from "../auth/helper";
+import { auth, AuthError } from "../auth/helper";
 import { logger } from "../logger";
 import { getRequiredCurrentOrg } from "../organizations/getOrg";
 
@@ -16,6 +16,11 @@ type HandleReturnedServerError = (e: Error) => string;
 const handleReturnedServerError: HandleReturnedServerError = (e) => {
   if (e instanceof ActionError) {
     logger.debug("[DEV] - Action Error", e.message);
+    return e.message;
+  }
+
+  if (e instanceof AuthError) {
+    logger.debug("[DEV] - Auth Error", e.message);
     return e.message;
   }
 

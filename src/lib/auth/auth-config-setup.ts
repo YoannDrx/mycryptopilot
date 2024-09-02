@@ -5,20 +5,6 @@ import { env } from "../env";
 import { getIdFromUser, getNameFromEmail } from "../format/id";
 import { resend } from "../mail/resend";
 import { prisma } from "../prisma";
-import { stripe } from "../stripe";
-
-export const setupStripeCustomer = async (user: User) => {
-  if (!user.email) {
-    return;
-  }
-
-  const customer = await stripe.customers.create({
-    email: user.email,
-    name: user.name ?? undefined,
-  });
-
-  return customer.id;
-};
 
 export const setupResendCustomer = async (user: User) => {
   if (!user.email) {

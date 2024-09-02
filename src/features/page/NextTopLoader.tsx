@@ -194,6 +194,9 @@ export const NextTopLoader = ({
   return styles;
 };
 
+/**
+ * Stop loading of the current top loader bar
+ */
 export const stopLoading = () => {
   setTimeout(() => {
     NProgress.start();

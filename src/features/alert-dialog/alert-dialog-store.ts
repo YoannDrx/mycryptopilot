@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { create } from "zustand";
 import type { AlertDialogRenderedDialogProps } from "./AlertDialogRenderedDialog";
 
-export type AlertDialogType = AlertDialogRenderedDialogProps & {
+ type AlertDialogType = AlertDialogRenderedDialogProps & {
   id: string;
 };
 
