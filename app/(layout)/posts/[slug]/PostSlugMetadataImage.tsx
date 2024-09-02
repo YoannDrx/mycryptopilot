@@ -2,7 +2,7 @@ import type { Post } from "@/features/posts/post-manager";
 import { SiteConfig } from "@/site-config";
 import { alt } from "./opengraph-image";
 
-export type MetadataImageProps = {
+type MetadataImageProps = {
   post: Post;
 };
 

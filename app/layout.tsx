@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
   modal,
-}: LayoutParams<{}> & { modal?: ReactNode }) {
+}: LayoutParams & { modal?: ReactNode }) {
   return (
     <>
       <html lang="en" className="h-full" suppressHydrationWarning>

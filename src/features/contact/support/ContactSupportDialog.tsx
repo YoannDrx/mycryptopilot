@@ -30,7 +30,7 @@ import { contactSupportAction } from "./contact-support.action";
 import type { ContactSupportSchemaType } from "./contact-support.schema";
 import { ContactSupportSchema } from "./contact-support.schema";
 
-export type ContactSupportDialogProps = PropsWithChildren<{}>;
+type ContactSupportDialogProps = PropsWithChildren;
 
 export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
   const [open, setOpen] = useState(false);

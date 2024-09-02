@@ -2,7 +2,7 @@ import { Layout } from "@/features/page/layout";
 import type { ReviewItemProps } from "./ReviewItem";
 import { ReviewItem } from "./ReviewItem";
 
-export type ReviewTripleProps = {
+type ReviewTripleProps = {
   /**
    * An array of reviews.
    */

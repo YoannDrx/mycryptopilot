@@ -1,21 +1,48 @@
 "use server";
 
+import { ActionError, action } from "@/lib/actions/safe-actions";
 import { auth } from "@/lib/auth/helper";
-import { ActionError, action } from "@/lib/backend/safe-actions";
+import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 import { z } from "zod";
+import { createSearchParamsMessageUrl } from "../searchparams-message/createSearchParamsMessageUrl";
 
 const BuyButtonSchema = z.object({
   priceId: z.string(),
+  orgId: z.string(),
 });
 
 export const buyButtonAction = action
   .schema(BuyButtonSchema)
-  .action(async ({ parsedInput: { priceId } }) => {
+  .action(async ({ parsedInput: { priceId, orgId } }) => {
     const user = await auth();
 
-    const stripeCustomerId = user?.stripeCustomerId ?? undefined;
+    if (!user) {
+      throw new ActionError("You must be authenticated to buy a plan");
+    }
+
+    const org = await prisma.organization.findFirst({
+      where: {
+        id: orgId,
+        members: {
+          some: {
+            userId: user.id,
+            roles: {
+              hasSome: ["OWNER"],
+            },
+          },
+        },
+      },
+    });
+
+    const stripeCustomerId = org?.stripeCustomerId ?? undefined;
+
+    if (!stripeCustomerId) {
+      throw new ActionError(
+        "You must be part of an organization to buy a plan",
+      );
+    }
 
     const price = await stripe.prices.retrieve(priceId);
 
@@ -25,15 +52,26 @@ export const buyButtonAction = action
       customer: stripeCustomerId,
       mode: priceType === "one_time" ? "payment" : "subscription",
       payment_method_types: ["card", "link"],
-      customer_creation: "if_required",
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      success_url: `${getServerUrl()}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${getServerUrl()}/payment/cancel`,
+      success_url: createSearchParamsMessageUrl(
+        `${getServerUrl()}/org/${orgId}/settings/billing?session_id={CHECKOUT_SESSION_ID}`,
+        {
+          type: "success",
+          message: "Your payment has been successful",
+        },
+      ),
+      cancel_url: createSearchParamsMessageUrl(
+        `${getServerUrl()}/org/${orgId}/settings/billing`,
+        {
+          type: "error",
+          message: "Your payment has been cancelled",
+        },
+      ),
     });
 
     if (!session.url) {

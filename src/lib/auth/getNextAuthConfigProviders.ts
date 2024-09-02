@@ -1,5 +1,5 @@
 import { SiteConfig } from "@/site-config";
-import MagicLinkMail from "@email/MagicLinkEmail";
+import MagicLinkMail from "@email/MagicLinkEmail.email";
 import type { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -52,7 +52,7 @@ export const getNextAuthConfigProviders = (): Providers => {
     );
   }
 
-  if (SiteConfig.auth.password) {
+  if (SiteConfig.features.enablePasswordAuth) {
     providers.push(getCredentialsProvider());
   }
 

@@ -16,7 +16,7 @@ export default async function AuthSignInPage() {
     redirect("/");
   }
 
-  if (!SiteConfig.auth.password) {
+  if (!SiteConfig.features.enablePasswordAuth) {
     redirect("/auth/signin");
   }
 

@@ -5,7 +5,10 @@ import type { Session } from "next-auth";
 import NextAuth from "next-auth";
 import { env } from "../env";
 import { prisma } from "../prisma";
-import { setupResendCustomer, setupStripeCustomer } from "./auth-config-setup";
+import {
+  setupDefaultOrganizationsOrInviteUser,
+  setupResendCustomer,
+} from "./auth-config-setup";
 import { getNextAuthConfigProviders } from "./getNextAuthConfigProviders";
 
 export const { handlers, auth: baseAuth } = NextAuth((req) => ({
@@ -14,8 +17,7 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
     signOut: "/auth/signout",
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
-    // ℹ️ Add this line if you want to add an onboarding page
-    // newUser: "/auth/new-user",
+    newUser: "/org",
   },
   adapter: PrismaAdapter(prisma),
   providers: getNextAuthConfigProviders(),
@@ -49,15 +51,15 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
         return;
       }
 
-      const stripeCustomerId = await setupStripeCustomer(user);
       const resendContactId = await setupResendCustomer(user);
+
+      await setupDefaultOrganizationsOrInviteUser(user);
 
       await prisma.user.update({
         where: {
           id: user.id,
         },
         data: {
-          stripeCustomerId,
           resendContactId,
         },
       });

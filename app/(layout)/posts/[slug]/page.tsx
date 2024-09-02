@@ -10,6 +10,12 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { calculateReadingTime } from "@/features/posts/calculate-reading-time";
+import {
+  PostParams,
+  getCurrentPost,
+  getPosts,
+} from "@/features/posts/post-manager";
 import { formatDate } from "@/lib/format/date";
 import { logger } from "@/lib/logger";
 import { SiteConfig } from "@/site-config";
@@ -17,12 +23,8 @@ import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { calculateReadingTime } from "../../../../src/features/posts/calculate-reading-time";
-import type { PostParams } from "../../../../src/features/posts/post-manager";
-import {
-  getCurrentPost,
-  getPosts,
-} from "../../../../src/features/posts/post-manager";
+
+export const dynamic = "force-static";
 
 export async function generateMetadata({
   params,
@@ -38,8 +40,14 @@ export async function generateMetadata({
     description: post.attributes.description,
     keywords: post.attributes.keywords,
     authors: {
-      name: "Melvynx",
-      url: "https://melvynx.com",
+      name: SiteConfig.maker.name,
+      url: SiteConfig.maker.website,
+    },
+    openGraph: {
+      title: post.attributes.title,
+      description: post.attributes.description,
+      url: `https://codeline.app/posts/${params.slug}`,
+      type: "article",
     },
   };
 }

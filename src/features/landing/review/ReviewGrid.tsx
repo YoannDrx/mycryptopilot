@@ -2,7 +2,7 @@ import { SectionLayout } from "../SectionLayout";
 import type { ReviewItemProps } from "./ReviewItem";
 import { ReviewItem } from "./ReviewItem";
 
-export type ReviewGridProps = {
+type ReviewGridProps = {
   reviews: ReviewItemProps[];
 };
 

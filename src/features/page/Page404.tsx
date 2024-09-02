@@ -5,7 +5,7 @@ import { Typography } from "../../components/ui/typography";
 
 export function Page404() {
   return (
-    <main className="flex flex-col items-center gap-8">
+    <main className="flex h-full flex-col items-center justify-center gap-8">
       <div className="space-y-3 text-center">
         <Typography variant="code">404</Typography>
         <Typography variant="h1">Page not found</Typography>

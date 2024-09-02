@@ -18,7 +18,7 @@ import type { PageParams } from "@/types/next";
 import Link from "next/link";
 import { getError } from "./auth-error-mapping";
 
-export default async function AuthErrorPage(props: PageParams<{}>) {
+export default async function AuthErrorPage(props: PageParams) {
   const { errorMessage, error } = getError(props.searchParams.error);
 
   return (

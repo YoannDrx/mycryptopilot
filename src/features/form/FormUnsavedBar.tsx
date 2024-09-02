@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/keyboard-shortcut";
 import { Typography } from "@/components/ui/typography";
 import { useWarnIfUnsavedChanges } from "@/hooks/useWarnIfUnsavedChanges";
+import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef } from "react";
 import { createPortal } from "react-dom";
@@ -38,7 +39,7 @@ export const FormUnsavedBar = <T extends FieldValues>(props: FormProps<T>) => {
 
   return (
     <>
-      <Form {...props}>
+      <Form {...props} className={cn(props.className)}>
         {props.children}
         <button type="submit" className="hidden" ref={buttonRef} />
       </Form>
@@ -77,9 +78,10 @@ export const FormUnsavedBar = <T extends FieldValues>(props: FormProps<T>) => {
                   }}
                 >
                   Save{" "}
-                  <KeyboardShortcut>
-                    <CmdOrOption /> S
+                  <KeyboardShortcut eventKey="cmd">
+                    <CmdOrOption />
                   </KeyboardShortcut>
+                  <KeyboardShortcut eventKey="s">S</KeyboardShortcut>
                 </LoadingButton>
               </motion.div>
             ) : null}

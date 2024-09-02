@@ -7,7 +7,7 @@ import { ThemeToggle } from "../theme/ThemeToggle";
 
 export function HeaderBase({ children }: PropsWithChildren) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
+    <header className="sticky top-0 flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Layout className="my-2">
         <div className="flex items-center gap-2">
           <Image

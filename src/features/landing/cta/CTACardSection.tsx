@@ -20,7 +20,9 @@ export function CTASectionCard() {
         <div className="mt-10 flex items-center justify-center gap-6">
           <Link
             onClick={() => {
-              plausible("CTASectionCard+ClickJoin");
+              plausible("CTASectionCard+ClickJoin", {
+                props: {},
+              });
             }}
             href="#pricing"
             className={buttonVariants({ size: "lg" })}

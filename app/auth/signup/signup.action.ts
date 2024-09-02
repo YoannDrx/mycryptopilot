@@ -1,14 +1,14 @@
 "use server";
 
+import { ActionError, action } from "@/lib/actions/safe-actions";
 import {
+  setupDefaultOrganizationsOrInviteUser,
   setupResendCustomer,
-  setupStripeCustomer,
 } from "@/lib/auth/auth-config-setup";
 import {
   hashStringWithSalt,
   validatePassword,
 } from "@/lib/auth/credentials-provider";
-import { ActionError, action } from "@/lib/backend/safe-actions";
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { LoginCredentialsFormScheme } from "./signup.schema";
@@ -29,16 +29,16 @@ export const signUpAction = action
         name,
       };
 
-      const stripeCustomerId = await setupStripeCustomer(userData);
       const resendContactId = await setupResendCustomer(userData);
 
       const user = await prisma.user.create({
         data: {
           ...userData,
-          stripeCustomerId,
           resendContactId,
         },
       });
+
+      setupDefaultOrganizationsOrInviteUser(user);
 
       return user;
     } catch {

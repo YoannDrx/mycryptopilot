@@ -1,7 +1,7 @@
 "use server";
 
+import { action } from "@/lib/actions/safe-actions";
 import { auth } from "@/lib/auth/helper";
-import { action } from "@/lib/backend/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
@@ -28,7 +28,7 @@ export const contactSupportAction = action
       to: SiteConfig.email.contact,
       subject: `New feedback from ${email}`,
       text: `Review: ${feedback.review}\n\nMessage: ${feedback.message}`,
-      reply_to: email,
+      replyTo: email,
     });
 
     return { message: "Your feedback has been sent to support." };

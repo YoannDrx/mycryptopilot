@@ -4,64 +4,47 @@ import { Typography } from "@/components/ui/typography";
 import {
   Layout,
   LayoutContent,
-  LayoutDescription,
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { getPosts, getPostsTags } from "@/features/posts/post-manager";
+import { PostCard } from "@/features/posts/PostCard";
+import { SiteConfig } from "@/site-config";
 import type { PageParams } from "@/types/next";
 import { FileQuestion } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
-import { PostCard } from "../../../src/features/posts/PostCard";
-import {
-  getPosts,
-  getPostsTags,
-} from "../../../src/features/posts/post-manager";
 
-const getTags = (
-  params: string | string[] | undefined,
-): string[] | undefined => {
-  if (Array.isArray(params)) {
-    return params;
-  }
-  if (typeof params === "string") {
-    return [params];
-  }
-  return undefined;
+export const metadata: Metadata = {
+  title: `${SiteConfig.title}'s Blog`,
+  description: SiteConfig.description,
+  keywords: ["posts"],
+  openGraph: {
+    title: `${SiteConfig.title}'s Blog`,
+    description: SiteConfig.description,
+    url: SiteConfig.prodUrl,
+    type: "website",
+  },
 };
 
-export default async function RoutePage(props: PageParams<{}>) {
-  const activeTags = getTags(props.searchParams.tag);
+export default async function RoutePage(props: PageParams) {
   const tags = await getPostsTags();
-  const posts = await getPosts(activeTags);
+  const posts = await getPosts();
 
   return (
     <Layout>
       <LayoutHeader>
         <LayoutTitle>Blog</LayoutTitle>
-        {activeTags ? (
-          <LayoutDescription>
-            Posts tagged with: {activeTags.join(", ")}
-          </LayoutDescription>
-        ) : null}
       </LayoutHeader>
       <LayoutContent className="flex flex-wrap gap-2">
         {tags.map((tag) => (
           <Link
             key={tag}
             href={{
-              pathname: "/posts",
-              query: {
-                tag: tag,
-              },
+              pathname: `/posts/categories/${tag}`,
             }}
           >
-            <Badge
-              variant={
-                activeTags?.includes(tag) ? "default" : "outline"
-              }
-            >
-              {tag}
-            </Badge>
+            <Badge variant="outline">{tag}</Badge>
           </Link>
         ))}
       </LayoutContent>
