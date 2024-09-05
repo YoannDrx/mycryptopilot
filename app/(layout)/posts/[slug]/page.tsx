@@ -85,9 +85,7 @@ export default async function RoutePage(props: PostParams) {
       <LayoutHeader
         style={{
           backgroundImage: `url(${post.attributes.coverUrl})`,
-          // center the image
           backgroundPosition: "center",
-          // set the image to cover all the space
           backgroundSize: "cover",
         }}
         className="overflow-hidden rounded-lg"

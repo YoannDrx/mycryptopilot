@@ -102,7 +102,6 @@ export default async function RoutePage(
     return "Invalid token";
   }
 
-  // check if user is already a member
   const membership = await prisma.organizationMembership.findFirst({
     where: {
       organizationId: organization.id,

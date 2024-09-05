@@ -64,7 +64,7 @@ export function NavigationLinks({
   const baseLinks = NavigationLinkMapping[linksKey];
 
   const currentPath = useCurrentPath(baseLinks, organizationId);
-  // filter links by roles
+
   const links = userRoles
     ? baseLinks.filter((link) =>
         link.roles ? isInRoles(userRoles, link.roles) : true,

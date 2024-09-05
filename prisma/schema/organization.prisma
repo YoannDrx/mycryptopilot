@@ -13,8 +13,6 @@ model Organization {
   email            String
   stripeCustomerId String?
 
-  // Every settings related to the organization
-
   members OrganizationMembership[]
 
   createdAt DateTime @default(now())

@@ -40,9 +40,6 @@ const getUser = async () => {
     throw new ActionError("Session not found!");
   }
 
-  // In the real world, you would check if the session is valid by querying a database.
-  // We'll keep it very simple here.
-
   if (!user.id || !user.email) {
     throw new ActionError("Session is not valid!");
   }

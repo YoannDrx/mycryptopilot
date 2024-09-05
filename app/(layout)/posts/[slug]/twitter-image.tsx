@@ -21,8 +21,6 @@ export default async function OpenGraphImage(
   }
 
   return new ImageResponse(<PostSlugMetadataImage post={post} />, {
-    // For convenience, we can re-use the exported opengraph-image
-    // size config to also set the ImageResponse's width and height.
     ...size,
     fonts: await getOgImageFont(),
   });

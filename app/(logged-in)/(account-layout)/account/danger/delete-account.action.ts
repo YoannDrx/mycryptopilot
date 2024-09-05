@@ -109,7 +109,7 @@ export const orgConfirmDeletionAction = authAction
   .action(async ({ parsedInput: { token }, ctx }) => {
     await verifyDeleteAccountToken(token, ctx.user.email);
 
-    // first delete all organizations linked to the user
+    // First delete all organizations linked to the user
     const organizationsToDelete = await prisma.organization.findMany({
       where: {
         members: {

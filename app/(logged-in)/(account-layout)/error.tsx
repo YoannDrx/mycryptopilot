@@ -12,7 +12,6 @@ export default function RouteError({ error }: ErrorParams) {
   const session = useSession();
 
   useEffect(() => {
-    // Log the error to an error reporting service
     logger.error(error);
   }, [error]);
 

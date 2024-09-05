@@ -42,7 +42,6 @@ export function middleware(req: NextRequest) {
 
   return NextResponse.next({
     request: {
-      // Apply new request headers
       headers: requestHeaders,
     },
   });

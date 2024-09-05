@@ -14,7 +14,6 @@ import { useEffect } from "react";
 
 export default function RouteError({ error }: ErrorParams) {
   useEffect(() => {
-    // Log the error to an error reporting service
     logger.error(error);
   }, [error]);
 
