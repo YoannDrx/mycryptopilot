@@ -15,6 +15,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
 import { FormUnsavedBar } from "@/features/form/FormUnsavedBar";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { formatId } from "@/lib/format/id";
@@ -23,7 +24,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateOrganizationDetailsAction } from "../org.action";
 import { OrgDangerFormSchema, OrgDangerFormSchemaType } from "../org.schema";
-import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
 
 type ProductFormProps = {
   defaultValues: OrgDangerFormSchemaType;
@@ -41,8 +41,8 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
       const result = await updateOrganizationDetailsAction(values);
 
       if (!isActionSuccessful(result)) {
-        toast.error("Failed to update settings");
-        throw new Error("Failed to update settings");
+        toast.error(result?.serverError ?? "Failed to invite user");
+        return;
       }
 
       const newUrl = window.location.href.replace(

@@ -64,8 +64,8 @@ export const OrgMembersForm = ({
       const result = await updateOrganizationMemberAction(values);
 
       if (!result || result.serverError) {
-        toast.error("Failed to update settings");
-        throw new Error("Failed to update settings");
+        toast.error(result?.serverError ?? "Failed to invite user");
+        return;
       }
 
       router.refresh();
@@ -86,7 +86,7 @@ export const OrgMembersForm = ({
             People who have access to your organization.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col divide-y divide-border">
+        <CardContent className="flex flex-col">
           {form.getValues("members")?.map((baseMember, index) => {
             const member = members.find((m) => m.id === baseMember.id);
             if (!member) {
@@ -168,14 +168,14 @@ export const OrgMembersForm = ({
             );
           })}
           {invitedEmail.length > 0 && (
-            <>
-              <Typography variant="h3">Invited</Typography>
+            <div className="my-4 flex flex-col gap-4">
+              <Typography variant="h3">Pending invitations</Typography>
               <ul className="list-inside list-disc text-sm text-muted-foreground">
                 {invitedEmail.map((email) => (
                   <li key={email}>{email}</li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
           {form.watch("members").length < maxMembers ? (
             <OrganizationInviteMemberForm />

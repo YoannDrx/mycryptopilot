@@ -31,8 +31,8 @@ export const NewOrganizationForm = () => {
       const result = await createOrganizationAction(values);
 
       if (!isActionSuccessful(result)) {
-        toast.error("Failed to update settings");
-        throw new Error("Failed to update settings");
+        toast.error(result?.serverError ?? "Failed to invite user");
+        return;
       }
 
       router.refresh();

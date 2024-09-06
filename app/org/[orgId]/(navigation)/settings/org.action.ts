@@ -1,6 +1,6 @@
 "use server";
 
-import { orgAction } from "@/lib/actions/safe-actions";
+import { ActionError, orgAction } from "@/lib/actions/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { getOrgsMembers } from "@/query/org/get-orgs-members";
@@ -127,6 +127,19 @@ export const inviteUserInOrganizationAction = orgAction
     }),
   )
   .action(async ({ parsedInput: { email }, ctx }) => {
+    if (
+      await prisma.verificationToken.findFirst({
+        where: {
+          identifier: `${email}-invite-${ctx.org.id}`,
+          expires: {
+            gt: new Date(),
+          },
+        },
+      })
+    ) {
+      throw new ActionError("User already invited");
+    }
+
     const verificationToken = await prisma.verificationToken.create({
       data: {
         identifier: `${email}-invite-${ctx.org.id}`,

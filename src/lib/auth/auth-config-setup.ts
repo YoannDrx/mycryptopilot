@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createOrganizationQuery } from "../../query/org/org-create.query";
 import { env } from "../env";
 import { getIdFromUser, getNameFromEmail } from "../format/id";
+import { logger } from "../logger";
 import { resend } from "../mail/resend";
 import { prisma } from "../prisma";
 
@@ -43,6 +44,8 @@ export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
       },
     },
   });
+
+  logger.debug({ tokens });
 
   // If there is no token, there is no invitation
   // We create a default organization for the user

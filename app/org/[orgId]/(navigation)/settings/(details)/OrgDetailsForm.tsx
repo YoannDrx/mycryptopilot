@@ -42,8 +42,8 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
       const result = await updateOrganizationDetailsAction(values);
 
       if (!result || result.serverError) {
-        toast.error("Failed to update settings");
-        throw new Error("Failed to update settings");
+        toast.error(result?.serverError ?? "Failed to invite user");
+        return;
       }
 
       router.refresh();

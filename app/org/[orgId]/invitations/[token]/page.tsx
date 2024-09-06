@@ -15,7 +15,9 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { Page400 } from "@/features/page/Page400";
 import { auth } from "@/lib/auth/helper";
+import { logger } from "@/lib/logger";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
@@ -44,7 +46,7 @@ export default async function RoutePage(
   });
 
   if (!organization) {
-    return "Organization not found";
+    return <Page400 title="Invalid token 1" />;
   }
 
   const verificationToken = await prisma.verificationToken.findUnique({
@@ -54,7 +56,7 @@ export default async function RoutePage(
   });
 
   if (!verificationToken) {
-    return "Verification token not found";
+    return <Page400 title="Invalid token 2" />;
   }
 
   const user = await auth();
@@ -62,7 +64,7 @@ export default async function RoutePage(
   const tokenData = TokenSchema.parse(verificationToken.data);
 
   if (tokenData.orgId !== organization.id) {
-    return "Invalid token. (orgId doesn't match)";
+    return <Page400 title="Invalid token 3" />;
   }
 
   if (!user) {
@@ -96,12 +98,6 @@ export default async function RoutePage(
     );
   }
 
-  if (
-    verificationToken.identifier !== `${user.email}-invite-${organization.id}`
-  ) {
-    return "Invalid token";
-  }
-
   const membership = await prisma.organizationMembership.findFirst({
     where: {
       organizationId: organization.id,
@@ -110,7 +106,14 @@ export default async function RoutePage(
   });
 
   if (membership) {
-    redirect(`/${organization.id}`);
+    redirect(`/org/${organization.id}`);
+  }
+
+  logger.debug({ verificationToken });
+  if (
+    verificationToken.identifier !== `${user.email}-invite-${organization.id}`
+  ) {
+    return <Page400 title="Invalid email" />;
   }
 
   return (

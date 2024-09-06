@@ -45,8 +45,8 @@ export const OrganizationInviteMemberForm = () => {
       const result = await inviteUserInOrganizationAction(values);
 
       if (!result || result.serverError) {
-        toast.error("Failed to update settings");
-        throw new Error("Failed to update settings");
+        toast.error(result?.serverError ?? "Failed to invite user");
+        return;
       }
 
       toast.success("Invitation sent");
