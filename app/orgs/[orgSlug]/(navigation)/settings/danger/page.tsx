@@ -12,7 +12,7 @@ import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
 import { OrganizationDangerForm } from "./OrgDangerForm";
-import { OrganizationDelete } from "./OrgDelete";
+import { OrganizationDeleteDialog } from "./OrganizationDeleteDialog";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Danger",
@@ -53,7 +53,19 @@ export default async function RoutePage(props: PageParams) {
           </CardFooter>
         </Card>
       ) : (
-        <OrganizationDelete />
+        <Card>
+          <CardHeader>
+            <CardTitle>Delete the organization</CardTitle>
+            <CardDescription>
+              By deleting your organization, you will lose all your data and
+              your subscription will be cancelled.
+            </CardDescription>
+            <CardDescription>No refund will be provided.</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <OrganizationDeleteDialog organization={org} />
+          </CardFooter>
+        </Card>
       )}
     </div>
   );
