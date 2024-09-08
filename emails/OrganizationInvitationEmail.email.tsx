@@ -6,14 +6,14 @@ import { EmailLink, EmailSection, EmailText } from "./utils/components.utils";
 
 export default function OrganizationInvitationEmail({
   token,
-  orgId,
+  orgSlug,
   organizationName,
 }: {
   token: string;
-  orgId: string;
+  orgSlug: string;
   organizationName: string;
 }) {
-  const url = `${getServerUrl()}/org/${orgId}/invitations/${token}`;
+  const url = `${getServerUrl()}/org/${orgSlug}/invitations/${token}`;
   return (
     <EmailLayout>
       <Preview>You are invited to join {organizationName}</Preview>

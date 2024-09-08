@@ -37,11 +37,11 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RoutePage(
-  props: PageParams<{ orgId: string; token: string }>,
+  props: PageParams<{ orgSlug: string; token: string }>,
 ) {
-  const organization = await prisma.organization.findUnique({
+  const organization = await prisma.organization.findFirst({
     where: {
-      id: props.params.orgId,
+      slug: props.params.orgSlug,
     },
   });
 
@@ -86,7 +86,7 @@ export default async function RoutePage(
               <CardContent>
                 <Link
                   className={buttonVariants({ size: "lg" })}
-                  href={`/auth/signin?callbackUrl=${getServerUrl()}/org/${organization.id}/invitations/${props.params.token}&email=${tokenData.email}`}
+                  href={`/auth/signin?callbackUrl=${getServerUrl()}/org/${organization.slug}/invitations/${props.params.token}&email=${tokenData.email}`}
                 >
                   Sign in
                 </Link>
@@ -106,7 +106,7 @@ export default async function RoutePage(
   });
 
   if (membership) {
-    redirect(`/org/${organization.id}`);
+    redirect(`/org/${organization.slug}`);
   }
 
   logger.debug({ verificationToken });
@@ -150,7 +150,7 @@ export default async function RoutePage(
                         token: props.params.token,
                       },
                     });
-                    redirect(`/org/${organization.id}`);
+                    redirect(`/org/${organization.slug}`);
                   }}
                 >
                   Join {organization.name}

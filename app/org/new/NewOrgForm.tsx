@@ -8,6 +8,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -37,7 +38,7 @@ export const NewOrganizationForm = () => {
 
       router.refresh();
       form.reset(result.data as NewOrganizationSchemaType);
-      router.push(result.data.id);
+      router.push(result.data.slug);
     },
   });
 
@@ -63,16 +64,17 @@ export const NewOrganizationForm = () => {
                     placeholder="Enter organization name"
                     onChange={(e) => {
                       field.onChange(e);
-                      form.setValue("id", formatId(e.target.value));
+                      form.setValue("slug", formatId(e.target.value));
                     }}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="id"
+            name="slug"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Organization ID</FormLabel>
@@ -84,7 +86,7 @@ export const NewOrganizationForm = () => {
                     placeholder="Enter organization ID"
                     onChange={(e) => {
                       field.onChange(e);
-                      form.setValue("id", formatId(e.target.value));
+                      form.setValue("slug", formatId(e.target.value));
                     }}
                   />
                 </FormControl>
@@ -92,6 +94,7 @@ export const NewOrganizationForm = () => {
                   The organization ID is used to identify the organization, it
                   will be used in all the URLs.
                 </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -113,6 +116,7 @@ export const NewOrganizationForm = () => {
                   The billing email, will be used to send invoices, plan
                   reminders.
                 </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth/helper";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";
-import { OrgsSelect } from "../../../app/org/[orgId]/(navigation)/_navigation/OrgsSelect";
+import { OrgsSelect } from "../../../app/org/[orgSlug]/(navigation)/_navigation/OrgsSelect";
 import { UserDropdown } from "../auth/UserDropdown";
 import { NavigationWrapper } from "./NavigationWrapper";
 
@@ -19,7 +19,7 @@ export default async function AuthNavigationWrapper(props: PropsWithChildren) {
   return (
     <NavigationWrapper
       logoChildren={
-        <OrgsSelect orgs={userOrgs} currentOrgId="new">
+        <OrgsSelect orgs={userOrgs} currentOrgSlug="new">
           <span>Organization...</span>
         </OrgsSelect>
       }

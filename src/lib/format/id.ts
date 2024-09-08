@@ -23,6 +23,8 @@ export const getIdFromUser = (user: {
   return nanoid(6);
 };
 
+export const getSlugFromUser = getIdFromUser;
+
 export const getNameFromEmail = (email: string) => {
   return email.split("@")[0].split("+")[0];
 };

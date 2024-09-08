@@ -1,3 +1,4 @@
+import { RESERVED_SLUGS } from "@/lib/organizations/reservedSlugs";
 import { OrganizationMembershipRole } from "@prisma/client";
 import { z } from "zod";
 
@@ -10,6 +11,10 @@ import { z } from "zod";
  * and the second schema will never be used
  */
 export const OrgDetailsFormSchema = z.object({
+  // This field need to be here not in DangerFormSchema
+  // slug: z.string().refine((v) => !RESERVED_SLUGS.includes(v), {
+  //   message: "This organization slug is reserved",
+  // }),
   name: z.string(),
   email: z.string().email(),
   image: z.string().nullable(),
@@ -25,7 +30,10 @@ export const OrgMemberFormSchema = z.object({
 });
 
 export const OrgDangerFormSchema = z.object({
-  id: z.string(),
+  // We can add live check for slug availability
+  slug: z.string().refine((v) => !RESERVED_SLUGS.includes(v), {
+    message: "This organization slug is reserved",
+  }),
 });
 
 export type OrgDetailsFormSchemaType = z.infer<typeof OrgDetailsFormSchema>;

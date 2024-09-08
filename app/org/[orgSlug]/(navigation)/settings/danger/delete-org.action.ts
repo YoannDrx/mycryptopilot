@@ -33,7 +33,7 @@ export const orgAskDeletionAction = orgAction
       to: ctx.user.email,
       react: OrgAskDeletionEmail({
         org: ctx.org.name,
-        confirmUrl: `${getServerUrl()}/org/${ctx.org.id}/settings/danger/confirm?token=${token.token}`,
+        confirmUrl: `${getServerUrl()}/org/${ctx.org.slug}/settings/danger/confirm?token=${token.token}`,
       }),
     });
   });
@@ -83,7 +83,7 @@ export const orgConfirmDeletionAction = orgAction
 
     await sendEmail({
       from: SiteConfig.email.from,
-      subject: `Your organization has been deleted (${ctx.org.id})`,
+      subject: `Your organization has been deleted (${ctx.org.slug})`,
       to: ctx.user.email,
       react: OrgConfirmDeletionEmail({
         org: ctx.org.name,
