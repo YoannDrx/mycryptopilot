@@ -17,7 +17,6 @@ export const getNextAuthConfigProviders = (): Providers => {
       apiKey: env.RESEND_API_KEY,
       sendVerificationRequest: async ({ identifier: email, url }) => {
         const result = await sendEmail({
-          from: SiteConfig.email.from,
           to: email,
           subject: `Sign in to ${SiteConfig.domain}`,
           react: MagicLinkMail({
