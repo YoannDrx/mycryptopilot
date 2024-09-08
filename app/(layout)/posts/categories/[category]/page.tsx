@@ -24,7 +24,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${SiteConfig.title}'s Blog about ${params.category}`,
       description: SiteConfig.description,
-      url: `https://codeline.app/posts/categoriees/${params.category}`,
+      url: `https://codeline.app/posts/categories/${params.category}`,
       type: "article",
     },
   };
