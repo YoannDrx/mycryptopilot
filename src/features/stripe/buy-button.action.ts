@@ -10,12 +10,12 @@ import { createSearchParamsMessageUrl } from "../searchparams-message/createSear
 
 const BuyButtonSchema = z.object({
   priceId: z.string(),
-  orgId: z.string(),
+  orgSlug: z.string(),
 });
 
 export const buyButtonAction = action
   .schema(BuyButtonSchema)
-  .action(async ({ parsedInput: { priceId, orgId } }) => {
+  .action(async ({ parsedInput: { priceId, orgSlug } }) => {
     const user = await auth();
 
     if (!user) {
@@ -24,7 +24,7 @@ export const buyButtonAction = action
 
     const org = await prisma.organization.findFirst({
       where: {
-        id: orgId,
+        slug: orgSlug,
         members: {
           some: {
             userId: user.id,
@@ -59,14 +59,14 @@ export const buyButtonAction = action
         },
       ],
       success_url: createSearchParamsMessageUrl(
-        `${getServerUrl()}/org/${orgId}/settings/billing?session_id={CHECKOUT_SESSION_ID}`,
+        `${getServerUrl()}/org/${orgSlug}/settings/billing?session_id={CHECKOUT_SESSION_ID}`,
         {
           type: "success",
           message: "Your payment has been successful",
         },
       ),
       cancel_url: createSearchParamsMessageUrl(
-        `${getServerUrl()}/org/${orgId}/settings/billing`,
+        `${getServerUrl()}/org/${orgSlug}/settings/billing`,
         {
           type: "error",
           message: "Your payment has been cancelled",

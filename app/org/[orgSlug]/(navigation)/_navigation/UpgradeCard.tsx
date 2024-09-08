@@ -24,7 +24,7 @@ export const UpgradeCard = async () => {
       </CardHeader>
       <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
         <Link
-          href={`/org/${organization.id}/settings/billing`}
+          href={`/org/${organization.slug}/settings/billing`}
           className={buttonVariants({ className: "w-full" })}
         >
           Upgrade

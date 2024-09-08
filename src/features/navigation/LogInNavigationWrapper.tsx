@@ -19,7 +19,7 @@ export default async function AuthNavigationWrapper(props: PropsWithChildren) {
   return (
     <NavigationWrapper
       logoChildren={
-        <OrgsSelect orgs={userOrgs} currentOrgId="new">
+        <OrgsSelect orgs={userOrgs} currentOrgSlug="new">
           <span>Organization...</span>
         </OrgsSelect>
       }

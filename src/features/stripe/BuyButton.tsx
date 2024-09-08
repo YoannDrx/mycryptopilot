@@ -11,7 +11,7 @@ import { buyButtonAction } from "./buy-button.action";
 
 type BuyButtonProps = {
   priceId: string;
-  orgId: string;
+  orgSlug: string;
 } & ButtonProps;
 
 /**
@@ -26,7 +26,7 @@ type BuyButtonProps = {
  * @param props.priceId This is the Stripe price ID to use for the checkout session
  * @returns
  */
-export const BuyButton = ({ priceId, orgId, ...props }: BuyButtonProps) => {
+export const BuyButton = ({ priceId, orgSlug, ...props }: BuyButtonProps) => {
   const router = useRouter();
   const session = useSession();
 
@@ -40,7 +40,7 @@ export const BuyButton = ({ priceId, orgId, ...props }: BuyButtonProps) => {
 
       const result = await buyButtonAction({
         priceId: priceId,
-        orgId: orgId,
+        orgSlug: orgSlug,
       });
 
       if (!isActionSuccessful(result)) {

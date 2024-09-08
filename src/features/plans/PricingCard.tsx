@@ -13,7 +13,7 @@ import { Plan } from "./plans";
 export const PricingCard = (props: Plan) => {
   const params = useParams();
 
-  const organizationId = params.orgId ? params.orgId : "";
+  const organizationSlug = params.orgSlug ? params.orgSlug : "";
 
   return (
     <Card
@@ -62,7 +62,7 @@ export const PricingCard = (props: Plan) => {
       </CardHeader>
       <CardFooter className="flex flex-col items-stretch gap-2">
         <BuyButton
-          orgId={String(organizationId)}
+          orgSlug={String(organizationSlug)}
           variant={props.isPopular ? "default" : "outline"}
           priceId={props.priceId}
         >

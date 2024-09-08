@@ -4,19 +4,19 @@ import { NavigationLink } from "./OrgLinks";
 
 export const ORGANIZATION_LINKS = [
   {
-    href: "/org/:organizationId/",
+    href: "/org/:organizationSlug/",
     icon: Home,
     label: "Dashboard",
   },
   {
-    href: "/org/:organizationId/users",
+    href: "/org/:organizationSlug/users",
     icon: User,
     label: "Users",
   },
   {
     href: SiteConfig.features.enableSingleMemberOrg
       ? "/account"
-      : "/org/:organizationId/settings",
+      : "/org/:organizationSlug/settings",
     icon: Settings,
     label: "Settings",
     roles: ["ADMIN"],

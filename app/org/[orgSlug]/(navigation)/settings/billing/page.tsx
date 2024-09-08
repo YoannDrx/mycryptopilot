@@ -73,7 +73,7 @@ const PremiumCard = async () => {
 
   const customerPortal = await stripe.billingPortal.sessions.create({
     customer: stripeCustomer.id,
-    return_url: `${getServerUrl()}/org/${organization.id}/settings/billing`,
+    return_url: `${getServerUrl()}/org/${organization.slug}/settings/billing`,
   });
 
   return (

@@ -15,7 +15,7 @@ import { SubscribersChart } from "./SubscribersChart";
 
 export default async function RoutePage(
   props: PageParams<{
-    orgId: string;
+    orgSlug: string;
   }>,
 ) {
   const org = await getRequiredCurrentOrgCache();
@@ -27,7 +27,7 @@ export default async function RoutePage(
       <LayoutActions>
         {isInRoles(org.roles, ["ADMIN"]) ? (
           <Link
-            href={`/org/${props.params.orgId}/settings/members`}
+            href={`/org/${props.params.orgSlug}/settings/members`}
             className={buttonVariants({ variant: "outline" })}
           >
             Invite member

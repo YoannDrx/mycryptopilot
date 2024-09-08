@@ -13,10 +13,11 @@ import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 type OrganizationsSelectProps = {
-  currentOrgId?: string;
+  currentOrgSlug?: string;
   children?: ReactNode;
   orgs: {
     id: string;
+    slug: string;
     name: string;
     image: string | null;
   }[];
@@ -26,7 +27,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
   const router = useRouter();
   return (
     <Select
-      value={props.currentOrgId}
+      value={props.currentOrgSlug}
       onValueChange={(value) => {
         if (value === "new") {
           router.push("/org/new");
@@ -43,7 +44,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
       </SelectTrigger>
       <SelectContent>
         {props.orgs.map((org) => (
-          <SelectItem key={org.id} value={org.id} className="h-fit">
+          <SelectItem key={org.slug} value={org.slug} className="h-fit">
             <span className="inline-flex h-full items-center gap-1">
               <Avatar className="size-6">
                 <AvatarFallback>

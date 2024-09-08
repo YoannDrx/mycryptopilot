@@ -11,7 +11,7 @@ import Link from "next/link";
 import { OrgNavigation } from "./_navigation/OrgNavigation";
 
 export default async function RouteLayout(
-  props: LayoutParams<{ orgId: string }>,
+  props: LayoutParams<{ orgSlug: string }>,
 ) {
   const org = await getCurrentOrgCache();
 
@@ -25,8 +25,8 @@ export default async function RouteLayout(
             <div>
               <Typography variant="large">
                 Oh! You are not logged in or the organization with the ID{" "}
-                <Typography variant="code">{props.params.orgId}</Typography> was
-                not found.
+                <Typography variant="code">{props.params.orgSlug}</Typography>{" "}
+                was not found.
               </Typography>
               {user ? (
                 <Link

@@ -20,12 +20,12 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RouteLayout(
-  props: LayoutParams<{ productId: string; orgId: string }>,
+  props: LayoutParams<{ productId: string; orgSlug: string }>,
 ) {
   if (SiteConfig.features.enableSingleMemberOrg) {
     redirect(
       createSearchParamsMessageUrl(
-        `${getServerUrl()}org/${props.params.orgId}`,
+        `${getServerUrl()}org/${props.params.orgSlug}`,
         {
           type: "message",
           message: "You need to update your account settings.",
@@ -35,6 +35,9 @@ export default async function RouteLayout(
   }
 
   const { roles } = await getRequiredCurrentOrgCache();
+
+  const orgPath = `/org/${props.params.orgSlug}`;
+
   return (
     <Layout>
       <LayoutHeader>
@@ -48,22 +51,22 @@ export default async function RouteLayout(
           roles={roles}
           links={[
             {
-              href: `/org/${props.params.orgId}/settings`,
+              href: `${orgPath}/settings`,
               label: "General",
               roles: ["ADMIN"],
             },
             {
-              href: `/org/${props.params.orgId}/settings/members`,
+              href: `${orgPath}/settings/members`,
               label: "Members",
               roles: ["ADMIN"],
             },
             {
-              href: `/org/${props.params.orgId}/settings/billing`,
+              href: `${orgPath}/settings/billing`,
               label: "Billing",
               roles: ["ADMIN"],
             },
             {
-              href: `/org/${props.params.orgId}/settings/danger`,
+              href: `${orgPath}/settings/danger`,
               label: "Danger Zone",
               roles: ["OWNER"],
             },

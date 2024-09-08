@@ -8,8 +8,8 @@ export const createOrganizationAction = authAction
   .schema(NewOrgsSchema)
   .action(async ({ parsedInput, ctx }) => {
     const org = await createOrganizationQuery({
+      slug: parsedInput.slug,
       name: parsedInput.name,
-      id: parsedInput.id,
       email: parsedInput.email,
       members: {
         create: {

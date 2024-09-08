@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { auth } from "../auth/helper";
 import { prisma } from "../prisma";
 
-const getOrgIdFromUrl = () => {
+const getOrgSlugFromUrl = () => {
   const headerList = headers();
   const xURL = headerList.get("x-url");
 
@@ -19,13 +19,13 @@ const getOrgIdFromUrl = () => {
     return null;
   }
 
-  const organizationId = match[1];
+  const organizationSlug = match[1];
 
-  if (!organizationId) {
+  if (!organizationSlug) {
     return null;
   }
 
-  return organizationId;
+  return organizationSlug;
 };
 
 export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
@@ -35,15 +35,15 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
     return null;
   }
 
-  const organizationId = getOrgIdFromUrl();
+  const organizationSlug = getOrgSlugFromUrl();
 
-  if (!organizationId) {
+  if (!organizationSlug) {
     return null;
   }
 
   const org = await prisma.organization.findFirst({
     where: {
-      id: organizationId,
+      slug: organizationSlug,
       members: {
         some: {
           userId: user.id,
@@ -57,6 +57,7 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
     },
     select: {
       id: true,
+      slug: true,
       name: true,
       plan: true,
       email: true,

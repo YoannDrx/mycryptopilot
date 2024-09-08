@@ -16,9 +16,12 @@ export type NavigationLink = {
   roles?: OrganizationMembershipRole[];
 };
 
-const useCurrentPath = (links: { href: string }[], organizationId?: string) => {
+const useCurrentPath = (
+  links: { href: string }[],
+  organizationSlug?: string,
+) => {
   const currentPath = usePathname()
-    .replace(`:organizationId`, organizationId ?? "")
+    .replace(`:organizationSlug`, organizationSlug ?? "")
     .split("/")
     .filter(Boolean);
 
@@ -52,18 +55,18 @@ type NavigationLinkMappingKey = keyof typeof NavigationLinkMapping;
 
 export function NavigationLinks({
   variant,
-  organizationId,
+  organizationSlug,
   roles: userRoles,
   links: linksKey,
 }: {
   variant?: "default" | "mobile";
-  organizationId?: string;
+  organizationSlug?: string;
   roles?: OrganizationMembershipRole[];
   links: NavigationLinkMappingKey;
 }) {
   const baseLinks = NavigationLinkMapping[linksKey];
 
-  const currentPath = useCurrentPath(baseLinks, organizationId);
+  const currentPath = useCurrentPath(baseLinks, organizationSlug);
 
   const links = userRoles
     ? baseLinks.filter((link) =>
@@ -77,7 +80,10 @@ export function NavigationLinks({
         {links.map((link, index) => (
           <Link
             key={index}
-            href={link.href.replaceAll(":organizationId", organizationId ?? "")}
+            href={link.href.replaceAll(
+              ":organizationSlug",
+              organizationSlug ?? "",
+            )}
             className={cn(
               `mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2`,
               {
@@ -99,7 +105,10 @@ export function NavigationLinks({
       {links.map((link, index) => (
         <Link
           key={index}
-          href={link.href.replaceAll(":organizationId", organizationId ?? "")}
+          href={link.href.replaceAll(
+            ":organizationSlug",
+            organizationSlug ?? "",
+          )}
           className={cn(`flex items-center gap-3 rounded-lg px-3 py-2`, {
             "text-primary hover:text-primary": currentPath === link.href,
             "text-muted-foreground hover:text-foreground":

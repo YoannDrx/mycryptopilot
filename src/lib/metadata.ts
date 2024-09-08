@@ -27,10 +27,10 @@ export const combineWithParentMetadata =
  * The cache is revalidate every 100 seconds.
  */
 export const orgMetadata = cache(
-  async (orgId: string): Promise<Metadata> => {
-    const org = await prisma.organization.findUnique({
+  async (orgSlug: string): Promise<Metadata> => {
+    const org = await prisma.organization.findFirst({
       where: {
-        id: orgId,
+        slug: orgSlug,
       },
     });
 

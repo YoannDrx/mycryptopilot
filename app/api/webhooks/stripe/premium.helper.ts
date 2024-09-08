@@ -43,7 +43,7 @@ export const notifyUserOfPremiumDowngrade = async (org: Organization) => {
     to: org.email,
     subject: `Important Update: Changes to Your Account Status`,
     react: SubscriptionDowngradeEmail({
-      url: `${getServerUrl()}/${org.id}/settings/billing`,
+      url: `${getServerUrl()}/${org.slug}/settings/billing`,
     }),
   });
 };
@@ -53,7 +53,7 @@ export const notifyUserOfPaymentFailure = async (org: Organization) => {
     to: org.email,
     subject: `Action Needed: Update Your Payment to Continue Enjoying Our Services`,
     react: SubscriptionFailedEmail({
-      url: `${getServerUrl()}/${org.id}/settings/billing`,
+      url: `${getServerUrl()}/${org.slug}/settings/billing`,
     }),
   });
 };

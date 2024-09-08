@@ -4,6 +4,7 @@ import { create } from "zustand";
 
 type CurrentOrgStore = {
   id: string;
+  slug: string;
   name: string;
   image: string | null;
   plan: OrganizationPlan;
@@ -38,6 +39,7 @@ export const InjectCurrentOrgStore = (
 
   useCurrentOrg.setState({
     id: props.org.id,
+    slug: props.org.slug,
     name: props.org.name,
     image: props.org.image,
     plan: props.org.plan,

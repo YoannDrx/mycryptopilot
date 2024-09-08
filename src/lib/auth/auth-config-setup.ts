@@ -2,7 +2,7 @@ import type { User } from "next-auth";
 import { z } from "zod";
 import { createOrganizationQuery } from "../../query/org/org-create.query";
 import { env } from "../env";
-import { getIdFromUser, getNameFromEmail } from "../format/id";
+import { getNameFromEmail, getSlugFromUser } from "../format/id";
 import { logger } from "../logger";
 import { resend } from "../mail/resend";
 import { prisma } from "../prisma";
@@ -50,9 +50,9 @@ export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
   // If there is no token, there is no invitation
   // We create a default organization for the user
   if (tokens.length === 0) {
-    const id = getIdFromUser(user);
+    const orgSlug = getSlugFromUser(user);
     await createOrganizationQuery({
-      id: id,
+      slug: orgSlug,
       name: `${user.name || getNameFromEmail(user.email)}'s organization`,
       email: user.email,
       members: {

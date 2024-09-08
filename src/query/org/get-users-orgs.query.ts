@@ -13,8 +13,9 @@ export async function getUsersOrgs() {
     },
     select: {
       id: true,
-      image: true,
+      slug: true,
       name: true,
+      image: true,
     },
   });
 

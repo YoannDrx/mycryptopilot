@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
  * If a user arrive to `/org` we redirect them to the first organization they are part of.
  *
  * 💡 If you want to redirect user to organization page, redirect them to `/org`
- * 💡 If you want them to redirect to a specific organization, redirect them to `/org/orgId`
+ * 💡 If you want them to redirect to a specific organization, redirect them to `/org/orgSlug`
  */
 export const GET = async () => {
   const user = await auth();
@@ -26,6 +26,7 @@ export const GET = async () => {
     },
     select: {
       id: true,
+      slug: true,
     },
   });
 
@@ -33,5 +34,5 @@ export const GET = async () => {
     return NextResponse.redirect(`${getServerUrl()}/org/new`);
   }
 
-  return NextResponse.redirect(`${getServerUrl()}/org/${organization.id}`);
+  return NextResponse.redirect(`${getServerUrl()}/org/${organization.slug}`);
 };

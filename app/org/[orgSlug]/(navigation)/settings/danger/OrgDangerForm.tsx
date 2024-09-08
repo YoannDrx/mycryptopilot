@@ -46,8 +46,8 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
       }
 
       const newUrl = window.location.href.replace(
-        `/org/${defaultValues.id}/`,
-        `/org/${result.data.id}/`,
+        `/org/${defaultValues.slug}/`,
+        `/org/${result.data.slug}/`,
       );
       router.push(newUrl);
       form.reset(result.data as OrgDangerFormSchemaType);
@@ -63,7 +63,7 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
           description:
             "You are about to change the unique identifier of your organization. All the previous URLs will be changed.",
           action: {
-            label: "Yes, change the id",
+            label: "Yes, change the slug",
             onClick: () => {
               mutation.mutate(v);
             },
@@ -74,9 +74,9 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
     >
       <Card>
         <CardHeader>
-          <CardTitle>Organization's id</CardTitle>
+          <CardTitle>Organization's slug</CardTitle>
           <CardDescription>
-            id is the unique identifier of your organization.
+            Slug is the unique identifier of your organization.
           </CardDescription>
           <CardDescription>
             It's used in all the URLs, if you change it, all your URLs will be
@@ -86,7 +86,7 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
         <CardContent>
           <FormField
             control={form.control}
-            name="id"
+            name="slug"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -94,8 +94,8 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
                     placeholder=""
                     {...field}
                     onChange={(e) => {
-                      const id = formatId(e.target.value);
-                      field.onChange(id);
+                      const slug = formatId(e.target.value);
+                      field.onChange(slug);
                     }}
                   />
                 </FormControl>

@@ -157,7 +157,7 @@ export const inviteUserInOrganizationAction = orgAction
       subject: `Invitation to join ${ctx.org.name}`,
       react: OrganizationInvitationEmail({
         token: verificationToken.token,
-        orgId: ctx.org.id,
+        orgSlug: ctx.org.slug,
         organizationName: ctx.org.name,
       }),
     });

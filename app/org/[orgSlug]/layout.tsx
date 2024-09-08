@@ -6,12 +6,12 @@ import { InjectCurrentOrgStore } from "./useCurrentOrg";
 
 export async function generateMetadata({
   params,
-}: PageParams<{ orgId: string }>): Promise<Metadata> {
-  return orgMetadata(params.orgId);
+}: PageParams<{ orgSlug: string }>): Promise<Metadata> {
+  return orgMetadata(params.orgSlug);
 }
 
 export default async function RouteLayout(
-  props: LayoutParams<{ orgId: string }>,
+  props: LayoutParams<{ orgSlug: string }>,
 ) {
   const org = await getCurrentOrgCache();
   return (
@@ -20,6 +20,7 @@ export default async function RouteLayout(
         org?.org
           ? {
               id: org.org.id,
+              slug: org.org.slug,
               name: org.org.name,
               image: org.org.image,
               plan: org.org.plan,
