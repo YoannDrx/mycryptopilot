@@ -27,7 +27,7 @@ export default async function RoutePage(
       <LayoutActions>
         {isInRoles(org.roles, ["ADMIN"]) ? (
           <Link
-            href={`/org/${props.params.orgSlug}/settings/members`}
+            href={`/orgs/${props.params.orgSlug}/settings/members`}
             className={buttonVariants({ variant: "outline" })}
           >
             Invite member

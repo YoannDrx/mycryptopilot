@@ -46,8 +46,8 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
       }
 
       const newUrl = window.location.href.replace(
-        `/org/${defaultValues.slug}/`,
-        `/org/${result.data.slug}/`,
+        `/orgs/${defaultValues.slug}/`,
+        `/orgs/${result.data.slug}/`,
       );
       router.push(newUrl);
       form.reset(result.data as OrgDangerFormSchemaType);

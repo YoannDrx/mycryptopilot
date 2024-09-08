@@ -17,7 +17,7 @@ export default async function RoutePage() {
 
   if (SiteConfig.features.enableSingleMemberOrg) {
     redirect(
-      createSearchParamsMessageUrl(`/org`, {
+      createSearchParamsMessageUrl(`/orgs`, {
         type: "message",
         message: "You can't create an organization.",
       }),

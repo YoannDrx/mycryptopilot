@@ -12,8 +12,8 @@ const getOrgSlugFromUrl = () => {
     return null;
   }
 
-  // get the parameters after /org/ or /organizations/ and before a / or ? (if there are params)
-  const match = xURL.match(/\/(?:org|organizations)\/([^/?]+)(?:[/?]|$)/);
+  // get the parameters after /orgs/ or /organizations/ and before a / or ? (if there are params)
+  const match = xURL.match(/\/(?:orgs|organizations)\/([^/?]+)(?:[/?]|$)/);
 
   if (!match) {
     return null;

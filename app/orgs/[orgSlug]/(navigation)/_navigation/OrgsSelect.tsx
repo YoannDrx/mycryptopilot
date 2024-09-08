@@ -30,11 +30,11 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
       value={props.currentOrgSlug}
       onValueChange={(value) => {
         if (value === "new") {
-          router.push("/org/new");
+          router.push("/orgs/new");
           return;
         }
 
-        const newUrl = `/org/${value}`;
+        const newUrl = `/orgs/${value}`;
 
         router.push(newUrl);
       }}

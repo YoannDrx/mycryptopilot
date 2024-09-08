@@ -41,13 +41,13 @@ export const SiteConfig = {
      */
     enablePasswordAuth: false as boolean,
     /**
-     * If enable, the user will be redirected to `/org` when he visits the landing page at `/`
+     * If enable, the user will be redirected to `/orgs` when he visits the landing page at `/`
      * The logic is located in middleware.ts
      */
     enableLandingRedirection: false as boolean,
     /**
      * If enable, the user will be able to create only ONE organization and all his settings will be synced with it.
-     * It's disable the `/settings` page from the organization and the `/org/new` page.
+     * It's disable the `/settings` page from the organization and the `/orgs/new` page.
      */
     enableSingleMemberOrg: false as boolean,
   },

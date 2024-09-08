@@ -13,7 +13,7 @@ export default function OrganizationInvitationEmail({
   orgSlug: string;
   organizationName: string;
 }) {
-  const url = `${getServerUrl()}/org/${orgSlug}/invitations/${token}`;
+  const url = `${getServerUrl()}/orgs/${orgSlug}/invitations/${token}`;
   return (
     <EmailLayout>
       <Preview>You are invited to join {organizationName}</Preview>
