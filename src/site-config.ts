@@ -1,13 +1,3 @@
-if (!process.env.NEXT_PUBLIC_RESEND_EMAIL_FROM) {
-  throw new Error("Please set the NEXT_PUBLIC_RESEND_EMAIL_FROM env variable");
-}
-
-if (!process.env.NEXT_PUBLIC_RESEND_EMAIL_CONTACT) {
-  throw new Error(
-    "Please set the NEXT_PUBLIC_RESEND_EMAIL_CONTACT env variable",
-  );
-}
-
 export const SiteConfig = {
   title: "Now.ts",
   description: "A template description for Now.ts",
@@ -20,15 +10,6 @@ export const SiteConfig = {
   },
   brand: {
     primary: "#007291",
-  },
-  email: {
-    /**
-     * Replace this with your domaine email.
-     * If you don't have one, you can use `test@resend.com`
-     * If you use Resend domain, you can ONLY send email to your account email.
-     */
-    from: process.env.NEXT_PUBLIC_RESEND_EMAIL_FROM,
-    contact: process.env.NEXT_PUBLIC_RESEND_EMAIL_CONTACT,
   },
   maker: {
     image: "https://melvynx.com/images/me/twitter-en.jpg",
