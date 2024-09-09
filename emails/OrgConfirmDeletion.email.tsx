@@ -7,15 +7,15 @@ export default function OrgConfirmDeletionEmail({ org }: { org: string }) {
   return (
     <EmailLayout>
       <Preview>
-        Your organization has been deleted. All your data, including any
-        organizations you owned, have been removed from our system.
+        Your organization has been deleted. All your data, related to your
+        organization, have been removed from our system.
       </Preview>
       <EmailSection>
         <EmailText>Hi,</EmailText>
         <EmailText>
           We just wanted to let you know that the organization {org} has been
-          permanently deleted. All your data, including any organizations you
-          owned, have been removed from our system.
+          permanently deleted. All your data, related to your organization, have
+          been removed from our system.
         </EmailText>
       </EmailSection>
       <Text className="text-lg leading-6">
