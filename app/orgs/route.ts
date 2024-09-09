@@ -4,10 +4,10 @@ import { getServerUrl } from "@/lib/server-url";
 import { NextResponse } from "next/server";
 
 /**
- * If a user arrive to `/org` we redirect them to the first organization they are part of.
+ * If a user arrive to `/orgs` we redirect them to the first organization they are part of.
  *
- * 💡 If you want to redirect user to organization page, redirect them to `/org`
- * 💡 If you want them to redirect to a specific organization, redirect them to `/org/orgSlug`
+ * 💡 If you want to redirect user to organization page, redirect them to `/orgs`
+ * 💡 If you want them to redirect to a specific organization, redirect them to `/orgs/orgSlug`
  */
 export const GET = async () => {
   const user = await auth();
@@ -31,8 +31,8 @@ export const GET = async () => {
   });
 
   if (!organization) {
-    return NextResponse.redirect(`${getServerUrl()}/org/new`);
+    return NextResponse.redirect(`${getServerUrl()}/orgs/new`);
   }
 
-  return NextResponse.redirect(`${getServerUrl()}/org/${organization.slug}`);
+  return NextResponse.redirect(`${getServerUrl()}/orgs/${organization.slug}`);
 };

@@ -30,7 +30,7 @@ export default async function RouteLayout(
               </Typography>
               {user ? (
                 <Link
-                  href="/org"
+                  href="/orgs"
                   className={buttonVariants({
                     className: "mt-2",
                   })}

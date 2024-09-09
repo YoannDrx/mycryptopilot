@@ -58,7 +58,7 @@ export default async function RoutePage(props: PageParams) {
                     token: String(token),
                   });
 
-                  redirect("/org");
+                  redirect("/orgs");
                 }}
               >
                 Delete organization

@@ -33,7 +33,7 @@ export const orgAskDeletionAction = orgAction
       to: ctx.user.email,
       react: OrgAskDeletionEmail({
         org: ctx.org.name,
-        confirmUrl: `${getServerUrl()}/org/${ctx.org.slug}/settings/danger/confirm?token=${token.token}`,
+        confirmUrl: `${getServerUrl()}/orgs/${ctx.org.slug}/settings/danger/confirm?token=${token.token}`,
       }),
     });
   });

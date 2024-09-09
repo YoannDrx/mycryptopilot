@@ -36,7 +36,7 @@ export default async function RouteLayout(
 
   const { roles } = await getRequiredCurrentOrgCache();
 
-  const orgPath = `/org/${props.params.orgSlug}`;
+  const orgPath = `/orgs/${props.params.orgSlug}`;
 
   return (
     <Layout>

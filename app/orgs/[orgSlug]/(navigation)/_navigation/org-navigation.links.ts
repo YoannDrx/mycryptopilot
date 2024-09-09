@@ -2,21 +2,23 @@ import { SiteConfig } from "@/site-config";
 import { Home, Settings, User } from "lucide-react";
 import { NavigationLink } from "./OrgLinks";
 
+const orgPath = `/orgs/:organizationSlug`;
+
 export const ORGANIZATION_LINKS = [
   {
-    href: "/org/:organizationSlug/",
+    href: orgPath,
     icon: Home,
     label: "Dashboard",
   },
   {
-    href: "/org/:organizationSlug/users",
+    href: `${orgPath}/users`,
     icon: User,
     label: "Users",
   },
   {
     href: SiteConfig.features.enableSingleMemberOrg
       ? "/account"
-      : "/org/:organizationSlug/settings",
+      : `${orgPath}/settings`,
     icon: Settings,
     label: "Settings",
     roles: ["ADMIN"],

@@ -86,7 +86,7 @@ export default async function RoutePage(
               <CardContent>
                 <Link
                   className={buttonVariants({ size: "lg" })}
-                  href={`/auth/signin?callbackUrl=${getServerUrl()}/org/${organization.slug}/invitations/${props.params.token}&email=${tokenData.email}`}
+                  href={`/auth/signin?callbackUrl=${getServerUrl()}/orgs/${organization.slug}/invitations/${props.params.token}&email=${tokenData.email}`}
                 >
                   Sign in
                 </Link>
@@ -106,7 +106,7 @@ export default async function RoutePage(
   });
 
   if (membership) {
-    redirect(`/org/${organization.slug}`);
+    redirect(`/orgs/${organization.slug}`);
   }
 
   logger.debug({ verificationToken });
@@ -150,7 +150,7 @@ export default async function RoutePage(
                         token: props.params.token,
                       },
                     });
-                    redirect(`/org/${organization.slug}`);
+                    redirect(`/orgs/${organization.slug}`);
                   }}
                 >
                   Join {organization.name}

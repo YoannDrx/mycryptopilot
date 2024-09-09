@@ -59,14 +59,14 @@ export const buyButtonAction = action
         },
       ],
       success_url: createSearchParamsMessageUrl(
-        `${getServerUrl()}/org/${orgSlug}/settings/billing?session_id={CHECKOUT_SESSION_ID}`,
+        `${getServerUrl()}/orgs/${orgSlug}/settings/billing?session_id={CHECKOUT_SESSION_ID}`,
         {
           type: "success",
           message: "Your payment has been successful",
         },
       ),
       cancel_url: createSearchParamsMessageUrl(
-        `${getServerUrl()}/org/${orgSlug}/settings/billing`,
+        `${getServerUrl()}/orgs/${orgSlug}/settings/billing`,
         {
           type: "error",
           message: "Your payment has been cancelled",

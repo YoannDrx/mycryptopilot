@@ -1,5 +1,5 @@
 import { AlertCircle, Mail, User2 } from "lucide-react";
-import { NavigationLink } from "../../org/[orgSlug]/(navigation)/_navigation/OrgLinks";
+import { NavigationLink } from "../../orgs/[orgSlug]/(navigation)/_navigation/OrgLinks";
 
 export const ACCOUNT_LINKS: NavigationLink[] = [
   {

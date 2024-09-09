@@ -35,7 +35,7 @@ export function middleware(req: NextRequest) {
 
     if (authCookie) {
       const url = new URL(req.url);
-      url.pathname = "/org";
+      url.pathname = "/orgs";
       return NextResponse.redirect(url.toString());
     }
   }
