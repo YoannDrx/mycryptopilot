@@ -23,6 +23,8 @@ export const OrganizationDeleteDialog = ({
         return;
       }
 
+      toast.success("Organization deleted");
+      router.push("/orgs");
       router.refresh();
     },
   });
@@ -40,8 +42,6 @@ export const OrganizationDeleteDialog = ({
             label: "Delete",
             onClick: async () => {
               await mutation.mutateAsync();
-              toast.success("Organization deleted");
-              router.push("/orgs");
             },
           },
         });
