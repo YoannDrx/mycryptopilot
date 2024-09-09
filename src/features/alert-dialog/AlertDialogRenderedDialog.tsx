@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactElement, ReactNode } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +9,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../../components/ui/alert-dialog";
-import { Loader } from "../../components/ui/loader";
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
+import { Typography } from "@/components/ui/typography";
+import { useState, type ReactElement, type ReactNode } from "react";
+type DialogBaseProps = {
+  loading?: boolean;
+};
 
-export type AlertDialogRenderedDialogProps = {
+type StandardDialogProps = {
   title?: string;
   description?: ReactNode;
+  // The user needs to type this text to confirm the action
+  confirmText?: string;
   action?:
     | {
         label: string;
@@ -26,49 +33,82 @@ export type AlertDialogRenderedDialogProps = {
     label: string;
     onClick: () => void | Promise<void>;
   };
+};
 
-  loading?: boolean;
+type CustomDialogProps = {
   children?: ReactNode;
 };
 
-export const AlertDialogRenderedDialog = ({
-  title,
-  description,
-  loading,
-  action,
-  cancel,
-  children,
-}: AlertDialogRenderedDialogProps) => {
+export type AlertDialogRenderedDialogProps = DialogBaseProps &
+  (StandardDialogProps | CustomDialogProps);
+
+const isStandardDialog = (
+  props: AlertDialogRenderedDialogProps,
+): props is DialogBaseProps & StandardDialogProps => {
+  if ("children" in props) {
+    return false;
+  }
+
+  return true;
+};
+
+export const AlertDialogRenderedDialog = (
+  props: AlertDialogRenderedDialogProps,
+) => {
+  const [text, setText] = useState("");
+
+  if (!isStandardDialog(props)) {
+    return (
+      <AlertDialog open={true}>
+        <AlertDialogContent>{props.children}</AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
+  const isConfirmDisabled = props.confirmText
+    ? text !== props.confirmText
+    : false;
+
   return (
     <AlertDialog open={true}>
       <AlertDialogContent>
-        {children ? (
-          children
-        ) : (
-          <>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{title ?? ""}</AlertDialogTitle>
-              {typeof description === "string" ? (
-                <AlertDialogDescription>{description}</AlertDialogDescription>
-              ) : (
-                description
-              )}
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={loading} onClick={cancel?.onClick}>
-                {cancel?.label ?? "Cancel"}
-              </AlertDialogCancel>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{props.title ?? ""}</AlertDialogTitle>
+          {typeof props.description === "string" ? (
+            <AlertDialogDescription>{props.description}</AlertDialogDescription>
+          ) : (
+            props.description
+          )}
+        </AlertDialogHeader>
+        {props.confirmText ? (
+          <div>
+            <Typography>
+              Please type{" "}
+              <Typography variant="code">{props.confirmText}</Typography> to
+              confirm the action.
+            </Typography>
+            <Input value={text} onChange={(e) => setText(e.target.value)} />
+          </div>
+        ) : null}
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            disabled={props.loading}
+            onClick={props.cancel?.onClick}
+          >
+            {props.cancel?.label ?? "Cancel"}
+          </AlertDialogCancel>
 
-              {action && "label" in action ? (
-                <AlertDialogAction disabled={loading} onClick={action.onClick}>
-                  {loading ? <Loader /> : action.label}
-                </AlertDialogAction>
-              ) : (
-                action
-              )}
-            </AlertDialogFooter>
-          </>
-        )}
+          {props.action && "label" in props.action ? (
+            <AlertDialogAction
+              disabled={props.loading || isConfirmDisabled}
+              onClick={props.action.onClick}
+            >
+              {props.loading ? <Loader /> : props.action.label}
+            </AlertDialogAction>
+          ) : (
+            props.action
+          )}
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

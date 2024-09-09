@@ -63,7 +63,7 @@ export default async function RoutePage(props: PageParams) {
             <CardDescription>No refund will be provided.</CardDescription>
           </CardHeader>
           <CardFooter>
-            <OrganizationDeleteDialog organization={org} />
+            <OrganizationDeleteDialog org={org} />
           </CardFooter>
         </Card>
       )}
