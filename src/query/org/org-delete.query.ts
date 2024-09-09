@@ -1,3 +1,4 @@
+import { ActionError } from "@/lib/actions/safe-actions";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 
@@ -8,7 +9,13 @@ export const deleteOrganizationQuery = async (id: string) => {
     },
   });
 
-  if (!org?.stripeCustomerId) return;
+  if (!org) {
+    throw new ActionError("Invalid organization");
+  }
+
+  if (!org.stripeCustomerId) {
+    throw new ActionError("Invalid subscription");
+  }
 
   const subscriptions = await stripe.subscriptions.list({
     customer: org.stripeCustomerId,
