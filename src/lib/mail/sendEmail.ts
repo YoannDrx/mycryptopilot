@@ -25,7 +25,7 @@ export const sendEmail = async (
   }
   const resendParams = [
     {
-      from: env.RESEND_EMAIL_FROM,
+      from: params[0].from ?? env.RESEND_EMAIL_FROM,
       ...params[0],
     } as ResendParamsType[0],
     params[1],
