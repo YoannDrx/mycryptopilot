@@ -1,3 +1,8 @@
+# 2024-09-12
+
+- Add `NEXT_PUBLIC_EMAIL_CONTACT` env variable
+- Add `RESEND_EMAIL_FROM` env variable
+
 # 2024-09-08
 
 - Add `slug` to organizations
