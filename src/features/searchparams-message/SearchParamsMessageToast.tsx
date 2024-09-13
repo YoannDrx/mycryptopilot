@@ -1,4 +1,3 @@
-import { logger } from "@/lib/logger";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import { toast } from "sonner";
@@ -32,7 +31,6 @@ const SearchParamsMessageToast = () => {
     deleteSearchParamsMessageUrl();
     return () => {
       if (toastId) {
-        logger.debug("Clear toast", toastId);
         toast.dismiss(toastId);
       }
     };

@@ -1,4 +1,3 @@
-import { logger } from "@/lib/logger";
 import { orgMetadata } from "@/lib/metadata";
 import { getCurrentOrgCache } from "@/lib/react/cache";
 import type { LayoutParams, PageParams } from "@/types/next";
@@ -15,7 +14,7 @@ export default async function RouteLayout(
   props: LayoutParams<{ orgSlug: string }>,
 ) {
   const org = await getCurrentOrgCache();
-  logger.debug({ org });
+
   return (
     <InjectCurrentOrgStore
       org={

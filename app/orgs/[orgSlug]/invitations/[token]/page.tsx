@@ -17,7 +17,6 @@ import {
 } from "@/features/page/layout";
 import { Page400 } from "@/features/page/Page400";
 import { auth } from "@/lib/auth/helper";
-import { logger } from "@/lib/logger";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
@@ -109,7 +108,6 @@ export default async function RoutePage(
     redirect(`/orgs/${organization.slug}`);
   }
 
-  logger.debug({ verificationToken });
   if (
     verificationToken.identifier !== `${user.email}-invite-${organization.id}`
   ) {

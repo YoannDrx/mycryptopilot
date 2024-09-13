@@ -15,16 +15,16 @@ type handleServerError = (e: Error) => string;
 
 const handleServerError: handleServerError = (e) => {
   if (e instanceof ActionError) {
-    logger.debug("[DEV] - Action Error", e.message);
+    logger.info("[DEV] - Action Error", e.message);
     return e.message;
   }
 
   if (e instanceof AuthError) {
-    logger.debug("[DEV] - Auth Error", e.message);
+    logger.info("[DEV] - Auth Error", e.message);
     return e.message;
   }
 
-  logger.debug("[DEV] - Unknown Error", e);
+  logger.info("[DEV] - Unknown Error", e);
 
   return "An unexpected error occurred.";
 };

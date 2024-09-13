@@ -1,6 +1,5 @@
 "use client";
 
-import { logger } from "@/lib/logger";
 import { OrganizationPlan } from "@prisma/client";
 import { PropsWithChildren } from "react";
 import { create } from "zustand";
@@ -38,7 +37,6 @@ export const InjectCurrentOrgStore = (
     org?: CurrentOrgStore;
   }>,
 ) => {
-  logger.debug("Client set state", props.org);
   if (!props.org) return props.children;
 
   useCurrentOrg.setState({

@@ -1,4 +1,3 @@
-import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { Prisma } from "@prisma/client";
@@ -18,8 +17,6 @@ export const createOrganizationQuery = async (
       stripeCustomerId: customer.id,
     },
   });
-
-  logger.debug("Create org fin");
 
   return organization;
 };
