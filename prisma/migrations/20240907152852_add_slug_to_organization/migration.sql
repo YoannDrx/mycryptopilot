@@ -6,7 +6,13 @@
 
 */
 -- AlterTable
-ALTER TABLE "Organization" ADD COLUMN     "slug" TEXT NOT NULL;
+ALTER TABLE "Organization" ADD COLUMN "slug" TEXT;
+
+-- Update existing records with default slug using the id
+UPDATE "Organization" SET "slug" = "id"::TEXT WHERE "slug" IS NULL;
+
+-- AlterTable to make slug not null
+ALTER TABLE "Organization" ALTER COLUMN "slug" SET NOT NULL;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Organization_slug_key" ON "Organization"("slug");
