@@ -11,15 +11,6 @@ export const SiteConfig = {
   brand: {
     primary: "#007291",
   },
-  email: {
-    /**
-     * Replace this with your domaine email.
-     * If you don't have one, you can use `test@resend.com`
-     * If you use Resend domain, you can ONLY send email to your account email.
-     */
-    from: "NowTS <contact@nowts.app>",
-    contact: "contact@nowts.app",
-  },
   maker: {
     image: "https://melvynx.com/images/me/twitter-en.jpg",
     website: "https://melvynx.com",

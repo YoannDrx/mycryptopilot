@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { SiteConfig } from "@/site-config";
+import { env } from "@/lib/env";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
@@ -72,9 +72,9 @@ export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
             Fill the form bellow or send an email to{" "}
             <Link
               className="text-primary"
-              href={`mailto:${SiteConfig.email.contact}`}
+              href={`mailto:${env.NEXT_PUBLIC_EMAIL_CONTACT}`}
             >
-              {SiteConfig.email.contact}
+              {env.NEXT_PUBLIC_EMAIL_CONTACT}
             </Link>
             .
           </DialogDescription>

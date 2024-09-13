@@ -1,6 +1,5 @@
-import { SiteConfig } from "@/site-config";
-import { env } from "../env";
-import { logger } from "../logger";
+import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 import { resend } from "./resend";
 
 type ResendSendType = typeof resend.emails.send;
@@ -26,8 +25,8 @@ export const sendEmail = async (
   }
   const resendParams = [
     {
+      from: params[0].from ?? env.RESEND_EMAIL_FROM,
       ...params[0],
-      from: params[0].from ?? SiteConfig.email.from,
     } as ResendParamsType[0],
     params[1],
   ] satisfies ResendParamsType;

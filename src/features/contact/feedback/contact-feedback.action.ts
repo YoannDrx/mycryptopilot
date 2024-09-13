@@ -2,9 +2,9 @@
 
 import { action } from "@/lib/actions/safe-actions";
 import { auth } from "@/lib/auth/helper";
+import { env } from "@/lib/env";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
-import { SiteConfig } from "@/site-config";
 import { ContactFeedbackSchema } from "./contact-feedback.schema";
 
 export const contactSupportAction = action
@@ -24,8 +24,7 @@ export const contactSupportAction = action
     });
 
     await sendEmail({
-      from: SiteConfig.email.from,
-      to: SiteConfig.email.contact,
+      to: env.NEXT_PUBLIC_EMAIL_CONTACT,
       subject: `New feedback from ${email}`,
       text: `Review: ${feedback.review}\n\nMessage: ${feedback.message}`,
       replyTo: email,

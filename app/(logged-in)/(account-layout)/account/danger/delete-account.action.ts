@@ -5,7 +5,6 @@ import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { deleteOrganizationQuery } from "@/query/org/org-delete.query";
-import { SiteConfig } from "@/site-config";
 import AccountAskDeletionEmail from "@email/AccountAskDeletion.email";
 import AccountConfirmDeletionEmail from "@email/AccountConfirmDeletion.email";
 import { addHours } from "date-fns";
@@ -53,7 +52,6 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
   });
 
   await sendEmail({
-    from: SiteConfig.email.from,
     subject: "[Action required] Confirm your account deletion",
     to: user.email,
     react: AccountAskDeletionEmail({
@@ -140,7 +138,6 @@ export const orgConfirmDeletionAction = authAction
     });
 
     await sendEmail({
-      from: SiteConfig.email.from,
       subject: "Your account has been deleted",
       to: ctx.user.email,
       react: AccountConfirmDeletionEmail(),
