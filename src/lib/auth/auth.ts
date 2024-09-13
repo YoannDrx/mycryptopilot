@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { User } from "@prisma/client";
 import type { Session } from "next-auth";
@@ -9,6 +8,10 @@ import {
   setupDefaultOrganizationsOrInviteUser,
   setupResendCustomer,
 } from "./auth-config-setup";
+import {
+  credentialsOverrideJwt,
+  credentialsSignInCallback,
+} from "./credentials-provider";
 import { getNextAuthConfigProviders } from "./getNextAuthConfigProviders";
 
 export const { handlers, auth: baseAuth } = NextAuth((req) => ({
@@ -43,7 +46,7 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
   },
   events: {
     // 🔑 Add this line and the import to add credentials provider
-    // signIn: credentialsSignInCallback(req),
+    signIn: credentialsSignInCallback(req),
     createUser: async (message) => {
       const user = message.user;
 
@@ -66,5 +69,5 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
     },
   },
   // 🔑 Add this line and the import to add credentials provider
-  // jwt: credentialsOverrideJwt,
+  jwt: credentialsOverrideJwt,
 }));
