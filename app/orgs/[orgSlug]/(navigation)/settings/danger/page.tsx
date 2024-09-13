@@ -20,7 +20,7 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RoutePage(props: PageParams) {
-  const { org, user } = await getRequiredCurrentOrgCache(["ADMIN"]);
+  const { org, user } = await getRequiredCurrentOrgCache(["OWNER"]);
 
   const usersOrganizationsCount = await prisma.organizationMembership.count({
     where: {

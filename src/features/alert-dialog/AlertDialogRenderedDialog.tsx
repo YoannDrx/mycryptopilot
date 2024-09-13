@@ -11,9 +11,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Loader } from "@/components/ui/loader";
 import { Typography } from "@/components/ui/typography";
 import { useState, type ReactElement, type ReactNode } from "react";
+import { LoadingButton } from "../form/SubmitButton";
 type DialogBaseProps = {
   loading?: boolean;
 };
@@ -42,7 +42,7 @@ type CustomDialogProps = {
 export type AlertDialogRenderedDialogProps = DialogBaseProps &
   (StandardDialogProps | CustomDialogProps);
 
-const isStandardDialog = (
+export const isStandardDialog = (
   props: AlertDialogRenderedDialogProps,
 ): props is DialogBaseProps & StandardDialogProps => {
   if ("children" in props) {
@@ -99,11 +99,14 @@ export const AlertDialogRenderedDialog = (
           </AlertDialogCancel>
 
           {props.action && "label" in props.action ? (
-            <AlertDialogAction
-              disabled={props.loading || isConfirmDisabled}
-              onClick={props.action.onClick}
-            >
-              {props.loading ? <Loader /> : props.action.label}
+            <AlertDialogAction asChild>
+              <LoadingButton
+                loading={props.loading}
+                disabled={props.loading || isConfirmDisabled}
+                onClick={props.action.onClick}
+              >
+                {props.action.label}
+              </LoadingButton>
             </AlertDialogAction>
           ) : (
             props.action

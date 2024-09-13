@@ -3,9 +3,12 @@
 import { logger } from "@/lib/logger";
 import { toast } from "sonner";
 import { create } from "zustand";
-import type { AlertDialogRenderedDialogProps } from "./AlertDialogRenderedDialog";
+import {
+  isStandardDialog,
+  type AlertDialogRenderedDialogProps,
+} from "./AlertDialogRenderedDialog";
 
- type AlertDialogType = AlertDialogRenderedDialogProps & {
+type AlertDialogType = AlertDialogRenderedDialogProps & {
   id: string;
 };
 
@@ -21,63 +24,68 @@ export const useAlertDialogStore = create<AlertDialogStore>((set, get) => ({
     const id = Math.random().toString(36).slice(2, 9);
     const { removeDialog } = get();
 
-    const newDialog: AlertDialogType = {
-      ...dialog,
-      cancel: {
-        label: dialog.cancel?.label ?? "Cancel",
-        onClick: () => {
-          if (dialog.cancel && "onClick" in dialog.cancel) {
-            dialog.cancel?.onClick();
-            return;
-          }
-          removeDialog(id);
-        },
-      },
-      action:
-        dialog.action && "onClick" in dialog.action
-          ? {
-              label: dialog.action?.label ?? "",
-              onClick: () => {
-                if (dialog.action && "onClick" in dialog.action === false) {
-                  logger.error("Invalid dialog action");
-                  removeDialog(id);
-                  return;
-                }
-
-                // check if it's a promise
-                const onClickReturn = dialog.action?.onClick();
-
-                if (onClickReturn instanceof Promise) {
-                  set((state) => {
-                    const dialog = state.dialogs.find(
-                      (dialog) => dialog.id === id,
-                    );
-
-                    if (dialog) {
-                      dialog.loading = true;
+    const newDialog: AlertDialogType = isStandardDialog(dialog)
+      ? {
+          ...dialog,
+          cancel: {
+            label: dialog.cancel?.label ?? "Cancel",
+            onClick: () => {
+              if (dialog.cancel && "onClick" in dialog.cancel) {
+                dialog.cancel?.onClick();
+                return;
+              }
+              removeDialog(id);
+            },
+          },
+          action:
+            dialog.action && "onClick" in dialog.action
+              ? {
+                  label: dialog.action?.label ?? "",
+                  onClick: () => {
+                    if (dialog.action && "onClick" in dialog.action === false) {
+                      logger.error("Invalid dialog action");
+                      removeDialog(id);
+                      return;
                     }
 
-                    return { dialogs: [...state.dialogs] };
-                  });
+                    // check if it's a promise
+                    const onClickReturn = dialog.action?.onClick();
 
-                  onClickReturn
-                    .then(() => {
-                      removeDialog(id);
-                    })
-                    .catch((e) => {
-                      toast.error("Some error occurred", {
-                        description: e.message,
+                    if (onClickReturn instanceof Promise) {
+                      set((state) => {
+                        console.log("Add loading");
+                        const dialogIndex = state.dialogs.findIndex(
+                          (dialog) => dialog.id === id,
+                        );
+
+                        if (dialogIndex !== -1) {
+                          const dialogCopy = { ...state.dialogs[dialogIndex] };
+                          dialogCopy.loading = true;
+                          state.dialogs[dialogIndex] = dialogCopy;
+                        }
+
+                        return { dialogs: [...state.dialogs] };
                       });
-                    });
-                } else {
-                  removeDialog(id);
+
+                      onClickReturn
+                        .then(() => {
+                          removeDialog(id);
+                        })
+                        .catch((e) => {
+                          toast.error("Some error occurred", {
+                            description: e.message,
+                          });
+                        });
+                    } else {
+                      removeDialog(id);
+                    }
+                  },
                 }
-              },
-            }
-          : dialog.action,
-      loading: false,
-      id,
-    };
+              : dialog.action,
+          loading: false,
+          id,
+        }
+      : { ...dialog, id: id };
 
     set((state) => ({ dialogs: [...state.dialogs, newDialog] }));
 
