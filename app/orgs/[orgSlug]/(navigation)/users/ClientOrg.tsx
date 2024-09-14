@@ -31,12 +31,12 @@ export const ClientOrg = () => {
         onClick={() => {
           alertDialog.add({
             title: "Are you sure ?",
-            description: "You will delete your orghanization ?",
+            description: "You will delete your organization ?",
             action: {
               label: "Yes, I confirm",
               onClick: async () => {
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                alert("Je confirm");
+                alert("I confirm");
               },
             },
           });
