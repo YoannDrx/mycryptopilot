@@ -1,6 +1,6 @@
 Licence Agreement for Now.ts, Version 1.1
 
-This Licence Agreement ("Agreement") is made between [Your Name or Company Name], the copyright holder ("Licensor") and the user ("Licensee") of the Now.ts software ("Software"), version 1.1.
+This Licence Agreement ("Agreement") is made between Codelynx, LLC, the copyright holder ("Licensor") and the user ("Licensee") of the Now.ts software ("Software"), version 1.1.
 
 Grant of Licence: Licensor hereby grants Licensee a non-exclusive, non-transferable, perpetual licence to use the Software for the purpose of developing commercial applications. Licensee is permitted to use the Software in the creation of applications that the Licensee may commercialize.
 
