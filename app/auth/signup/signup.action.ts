@@ -38,7 +38,7 @@ export const signUpAction = action
         },
       });
 
-      setupDefaultOrganizationsOrInviteUser(user);
+      await setupDefaultOrganizationsOrInviteUser(user);
 
       return user;
     } catch {
