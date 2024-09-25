@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { ReactNode } from "react";
 import { resend } from "./resend";
 
 type ResendSendType = typeof resend.emails.send;
@@ -25,8 +26,12 @@ export const sendEmail = async (
   }
   const resendParams = [
     {
-      from: params[0].from ?? env.RESEND_EMAIL_FROM,
       ...params[0],
+      from: params[0].from ?? env.RESEND_EMAIL_FROM,
+      text:
+        (params[0].text ?? params[0].react)
+          ? extractTextFromReactNode(params[0].react)
+          : "Please check your email to see the content.",
     } as ResendParamsType[0],
     params[1],
   ] satisfies ResendParamsType;
@@ -39,3 +44,21 @@ export const sendEmail = async (
 
   return result;
 };
+
+function extractTextFromReactNode(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return node.toString();
+  }
+
+  if (Array.isArray(node)) {
+    const nodes = node as ReactNode[];
+    return nodes.map(extractTextFromReactNode).join("");
+  }
+
+  if (node && typeof node === "object" && "props" in node) {
+    const { children } = node.props;
+    return extractTextFromReactNode(children);
+  }
+
+  return "";
+}
