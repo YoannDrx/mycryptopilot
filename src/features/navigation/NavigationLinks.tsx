@@ -1,5 +1,6 @@
 "use client";
 
+import { Typography } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import { LayoutGroup, motion } from "framer-motion";
 import Link from "next/link";
@@ -30,16 +31,16 @@ const useCurrentPath = (links: NavigationLink[]) => {
   return mostMatchingLink.url || links[0].href;
 };
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 export const NavigationLinks = ({
   navigation,
 }: {
   navigation: NavigationGroup[];
 }) => {
-  const links: NavigationLink[] = navigation.flatMap(
-    (group: NavigationGroup) => group.links,
-  );
+  const links: NavigationLink[] = navigation
+    .flatMap((group: NavigationGroup) => group.links)
+    .filter((l) => !l.hidden);
 
   const currentPath = useCurrentPath(links);
 
@@ -50,13 +51,11 @@ export const NavigationLinks = ({
           (group: NavigationGroup, groupIndex: number) =>
             group.links.length > 0 && (
               <div
-                className="mb-6 flex flex-col gap-1 px-1"
-                key={"group-" + groupIndex}
+                className="mb-6 flex flex-col gap-2 px-1"
+                key={group.title + groupIndex}
               >
-                <div className="group flex items-center justify-between pl-1.5">
-                  <p className="cursor-default truncate font-sans text-xs font-normal uppercase tracking-wider text-muted-foreground">
-                    {group.title}
-                  </p>
+                <div className="group flex items-center justify-between">
+                  <Typography variant="small">{group.title}</Typography>
                 </div>
                 {group.links.map((link: NavigationLink, index: number) => (
                   <MotionLink

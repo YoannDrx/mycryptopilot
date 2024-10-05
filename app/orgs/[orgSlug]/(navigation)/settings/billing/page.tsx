@@ -12,10 +12,10 @@ import { Typography } from "@/components/ui/typography";
 import { Pricing } from "@/features/plans/PricingSection";
 import { formatDate } from "@/lib/format/date";
 import { combineWithParentMetadata } from "@/lib/metadata";
+import { CurrentOrgPayload } from "@/lib/organizations/getOrg";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
-import type { PageParams } from "@/types/next";
 import Link from "next/link";
 
 export const generateMetadata = combineWithParentMetadata({
@@ -23,14 +23,18 @@ export const generateMetadata = combineWithParentMetadata({
   description: "Manage your organization billing.",
 });
 
-export default async function RoutePage(props: PageParams) {
-  const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
+export default async function OrgBillingPage() {
+  const { org } = await getRequiredCurrentOrgCache(["ADMIN"]);
 
-  if (!organization.stripeCustomerId) {
+  return <OrganizationBilling org={org} />;
+}
+
+export const OrganizationBilling = ({ org }: { org: CurrentOrgPayload }) => {
+  if (!org.stripeCustomerId) {
     throw new Error("Organization has no Stripe customer");
   }
 
-  if (organization.plan.id === "FREE") {
+  if (org.plan.id === "FREE") {
     return (
       <div className="flex flex-col gap-4">
         <Card>
@@ -48,21 +52,17 @@ export default async function RoutePage(props: PageParams) {
 
   return (
     <div className="flex flex-col gap-4">
-      <PremiumCard />
+      <PremiumCard org={org} />
     </div>
   );
-}
+};
 
-const PremiumCard = async () => {
-  const { org: organization } = await getRequiredCurrentOrgCache(["ADMIN"]);
-
-  if (!organization.stripeCustomerId) {
+export const PremiumCard = async ({ org }: { org: CurrentOrgPayload }) => {
+  if (!org.stripeCustomerId) {
     throw new Error("Organization has no Stripe customer");
   }
 
-  const stripeCustomer = await stripe.customers.retrieve(
-    organization.stripeCustomerId,
-  );
+  const stripeCustomer = await stripe.customers.retrieve(org.stripeCustomerId);
   const subscriptions = await stripe.subscriptions.list({
     customer: stripeCustomer.id,
   });
@@ -73,7 +73,7 @@ const PremiumCard = async () => {
 
   const customerPortal = await stripe.billingPortal.sessions.create({
     customer: stripeCustomer.id,
-    return_url: `${getServerUrl()}/orgs/${organization.slug}/settings/billing`,
+    return_url: `${getServerUrl()}/orgs/${org.slug}/settings/billing`,
   });
 
   return (
@@ -81,8 +81,7 @@ const PremiumCard = async () => {
       <CardHeader>
         <CardDescription>Plan</CardDescription>
         <CardTitle>
-          {organization.plan.name}{" "}
-          {firstSubscription?.cancel_at ? "(Canceled)" : ""}
+          {org.plan.name} {firstSubscription?.cancel_at ? "(Canceled)" : ""}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 md:flex-row">

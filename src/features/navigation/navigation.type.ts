@@ -12,4 +12,5 @@ export type NavigationLink = {
   Icon: LucideIcon;
   label: string;
   roles?: OrganizationMembershipRole[];
+  hidden?: boolean;
 };

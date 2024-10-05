@@ -1,4 +1,4 @@
-import { OrganizationMembershipRole } from "@prisma/client";
+import { OrganizationMembershipRole, Prisma } from "@prisma/client";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { auth } from "../auth/helper";
@@ -28,6 +28,29 @@ const getOrgSlugFromUrl = () => {
   return organizationSlug;
 };
 
+export const OrgSelectQuery = (userId: string) =>
+  ({
+    id: true,
+    slug: true,
+    name: true,
+    plan: true,
+    email: true,
+    image: true,
+    stripeCustomerId: true,
+    members: {
+      where: {
+        userId: userId,
+      },
+      select: {
+        roles: true,
+      },
+    },
+  }) satisfies Prisma.OrganizationSelect;
+
+export type CurrentOrgPayload = Prisma.OrganizationGetPayload<{
+  select: ReturnType<typeof OrgSelectQuery>;
+}>;
+
 export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
   const user = await auth();
 
@@ -55,23 +78,7 @@ export const getCurrentOrg = async (roles?: OrganizationMembershipRole[]) => {
         },
       },
     },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      plan: true,
-      email: true,
-      image: true,
-      stripeCustomerId: true,
-      members: {
-        where: {
-          userId: user.id,
-        },
-        select: {
-          roles: true,
-        },
-      },
-    },
+    select: OrgSelectQuery(user.id),
   });
 
   if (!org) {

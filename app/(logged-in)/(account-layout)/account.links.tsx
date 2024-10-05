@@ -1,5 +1,6 @@
 import { NavigationGroup } from "@/features/navigation/navigation.type";
-import { AlertCircle, Mail, User2 } from "lucide-react";
+import { SiteConfig } from "@/site-config";
+import { AlertCircle, CreditCard, Mail, User2 } from "lucide-react";
 
 export const getAccountNavigation = (): NavigationGroup[] => {
   return ACCOUNT_LINKS;
@@ -23,6 +24,12 @@ const ACCOUNT_LINKS: NavigationGroup[] = [
         href: "/account/danger",
         Icon: AlertCircle,
         label: "Danger",
+      },
+      {
+        href: "/account/billing",
+        Icon: CreditCard,
+        label: "Billing",
+        hidden: !SiteConfig.features.enableSingleMemberOrg,
       },
     ],
   },
