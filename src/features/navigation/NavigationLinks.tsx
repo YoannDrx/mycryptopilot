@@ -54,15 +54,18 @@ export const NavigationLinks = ({
                 className="mb-6 flex flex-col gap-2 px-1"
                 key={group.title + groupIndex}
               >
-                <div className="group flex items-center justify-between">
-                  <Typography variant="small">{group.title}</Typography>
+                <div className="group ml-2 flex items-center justify-between">
+                  <Typography className="text-muted-foreground" variant="small">
+                    {group.title}
+                  </Typography>
                 </div>
                 {group.links.map((link: NavigationLink, index: number) => (
                   <MotionLink
                     key={index}
                     href={link.href}
                     className={cn(
-                      `flex items-center gap-3 rounded-lg px-3 py-2 relative transition`,
+                      `flex items-center transition gap-3 rounded-lg px-3 py-2 relative`,
+                      "hover:bg-accent/20",
                       {
                         "text-muted-foreground hover:text-foreground":
                           currentPath !== link.href,
