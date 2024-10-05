@@ -1,7 +1,7 @@
 export const SiteConfig = {
   title: "Now.ts",
   description: "A template description for Now.ts",
-  prodUrl: "https://demo.nowts.app/",
+  prodUrl: "https://demo.nowts.app",
   domain: "nowts.app",
   appIcon: "/images/icon.png",
   company: {
@@ -30,7 +30,7 @@ export const SiteConfig = {
      * This feature will authorize users to login with a password.
      * Customize the signup form here : app/auth/signup/page.tsx
      */
-    enablePasswordAuth: true as boolean,
+    enablePasswordAuth: false as boolean,
     /**
      * If enable, the user will be redirected to `/orgs` when he visits the landing page at `/`
      * The logic is located in middleware.ts

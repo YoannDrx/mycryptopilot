@@ -21,7 +21,7 @@ export const createSearchParamsMessageUrl = (
   // Convert relative URL to absolute URL if necessary
   const absoluteBaseUrl = baseUrl.startsWith("/")
     ? isServer
-      ? `${getServerUrl()}${baseUrl}`
+      ? `${getServerUrl()}/${baseUrl}`
       : `${window.location.origin}${baseUrl}`
     : baseUrl;
 

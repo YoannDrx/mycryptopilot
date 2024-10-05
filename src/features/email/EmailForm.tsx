@@ -14,7 +14,6 @@ import { LoadingButton } from "@/features/form/SubmitButton";
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, CheckCircle } from "lucide-react";
-import { usePlausible } from "next-plausible";
 import { addEmailAction } from "./email.action";
 import type { EmailActionSchemaType } from "./email.schema";
 import { EmailActionSchema } from "./email.schema";
@@ -31,14 +30,11 @@ export const EmailForm = ({
   const form = useZodForm({
     schema: EmailActionSchema,
   });
-  const plausible = usePlausible();
 
   const submit = useMutation({
     mutationFn: async ({ email }: EmailActionSchemaType) => {
       const result = await addEmailAction({ email });
-      plausible("Email+Submit", {
-        props: {},
-      });
+   
 
       if (result?.data) {
         return result.data;

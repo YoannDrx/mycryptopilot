@@ -1,10 +1,15 @@
-import { nanoid } from "nanoid";
+import { customAlphabet, nanoid } from "nanoid";
 
 export const formatId = (id: string) => {
   return id
-    .replace(/\s/g, "_")
-    .replace(/[^a-zA-Z0-9_]/g, "")
+    .replace(/\s/g, "-")
+    .replace(/[^a-zA-Z0-9_-]/g, "")
     .toLowerCase();
+};
+
+export const generateSlug = (value: string) => {
+  const id = customAlphabet("1234567890abcdef", 10);
+  return [formatId(value), id(4)].join("-");
 };
 
 export const getIdFromUser = (user: {

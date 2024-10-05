@@ -14,12 +14,16 @@ import {
   KeyboardShortcut,
 } from "@/components/ui/keyboard-shortcut";
 import { Search } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useKey } from "react-use";
 import { ORGANIZATION_LINKS } from "./org-navigation.links";
 
 export function OrganizationCommand() {
   const [open, setOpen] = useState(false);
+  const params = useParams();
+  const router = useRouter();
+  const orgSlug = typeof params.orgSlug === "string" ? params.orgSlug : "";
 
   const down = () => {
     setOpen((open) => !open);
@@ -60,14 +64,23 @@ export function OrganizationCommand() {
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            {ORGANIZATION_LINKS.map((link, index) => (
-              <CommandItem key={index}>
-                <link.icon className="mr-2 size-4" />
-                <span>{link.label}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {ORGANIZATION_LINKS.map((link, index) => (
+            <CommandGroup heading={link.title} key={index}>
+              {link.links.map((link) => (
+                <CommandItem
+                  key={link.href}
+                  onSelect={() => {
+                    router.push(
+                      link.href.replace(":organizationSlug", orgSlug),
+                    );
+                  }}
+                >
+                  <link.Icon className="mr-2 size-4" />
+                  <span>{link.label}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          ))}
         </CommandList>
       </CommandDialog>
     </>

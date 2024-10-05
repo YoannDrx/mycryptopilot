@@ -1,13 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { UserDropdown } from "@/features/auth/UserDropdown";
 import { ContactFeedbackPopover } from "@/features/contact/feedback/ContactFeedbackPopover";
 import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
+import { Building } from "lucide-react";
+import Link from "next/link";
 import { PropsWithChildren } from "react";
 import { OrganizationCommand } from "./OrgCommand";
-import { NavigationLinks } from "./OrgLinks";
+import { OrganizationNavigationLinks } from "./OrgLinks";
 import { OrgsSelect } from "./OrgsSelect";
 import { UpgradeCard } from "./UpgradeCard";
 
@@ -22,14 +24,20 @@ export async function OrgNavigation({ children }: PropsWithChildren) {
         <OrgsSelect currentOrgSlug={org.slug} orgs={userOrganizations} />
       }
       navigationChildren={
-        <NavigationLinks
-          links="organization"
-          variant="default"
-          organizationSlug={org.slug}
-          roles={roles}
-        />
+        <OrganizationNavigationLinks roles={roles} slug={org.slug} />
       }
-      bottomNavigationChildren={<UpgradeCard />}
+      bottomNavigationChildren={
+        <div className="flex flex-col gap-2">
+          <UpgradeCard />
+          <Link
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+            href={`/orgs/${org.slug}/settings`}
+          >
+            <Building size={16} className="mr-2" />
+            Settings
+          </Link>
+        </div>
+      }
       topBarCornerLeftChildren={
         <>
           <ContactFeedbackPopover>

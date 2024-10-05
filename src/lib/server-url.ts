@@ -15,9 +15,9 @@ export const getServerUrl = () => {
 
   // If we are in "stage" environment, we return the staging URL.
   if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}/`;
+    return `https://${process.env.VERCEL_URL}`;
   }
 
   // If we are in development, we return the localhost URL.
-  return "http://localhost:3000/";
+  return "http://localhost:3000";
 };

@@ -5,8 +5,8 @@ import { requiredAuth } from "@/lib/auth/helper";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";
 import { NavigationWrapper } from "../../../src/features/navigation/NavigationWrapper";
-import { NavigationLinks } from "../../orgs/[orgSlug]/(navigation)/_navigation/OrgLinks";
 import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/OrgsSelect";
+import { AccountNavigationLinks } from "./account-navigation-links";
 
 export async function AccountNavigation({ children }: PropsWithChildren) {
   const user = await requiredAuth();
@@ -24,7 +24,7 @@ export async function AccountNavigation({ children }: PropsWithChildren) {
           <span>{user.name}</span>
         </OrgsSelect>
       }
-      navigationChildren={<NavigationLinks links="account" variant="default" />}
+      navigationChildren={<AccountNavigationLinks />}
       topBarCornerLeftChildren={
         <UserDropdown>
           <Button variant="ghost" className="size-10 rounded-full" size="sm">

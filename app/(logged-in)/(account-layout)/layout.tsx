@@ -8,7 +8,7 @@ import type { LayoutParams } from "@/types/next";
 import { CircleAlert, Rabbit } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { AccountNavigation } from "./AccountNavigation";
+import { AccountNavigation } from "./account-navigation";
 import { VerifyEmailButton } from "./account/verify-email/VerifyEmailButton";
 
 export const metadata: Metadata = {
