@@ -25,7 +25,10 @@ export const FormUnsavedBar = <T extends FieldValues>(props: FormProps<T>) => {
 
   useKey(
     (event) => (event.ctrlKey || event.metaKey) && event.key === "s" && isDirty,
-    submit,
+    (event) => {
+      event.preventDefault();
+      submit();
+    },
     { event: "keydown" },
     [isDirty],
   );
