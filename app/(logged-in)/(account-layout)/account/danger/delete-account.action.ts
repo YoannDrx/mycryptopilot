@@ -58,7 +58,7 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
       organizationsToDelete: user.organizations?.map(
         (o) => o.organization.name,
       ),
-      confirmUrl: `${getServerUrl()}/account/delete/confirm?token=${token.token}`,
+      confirmUrl: `${getServerUrl()}/account/danger/confirm?token=${token.token}`,
     }),
   });
 });
