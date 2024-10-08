@@ -81,7 +81,7 @@ export async function verifyDeleteAccountToken(
     throw new ActionError("Invalid token");
   }
 
-  const tokenData = TokenSchema.parse(String(verificationToken.data));
+  const tokenData = TokenSchema.parse(verificationToken.data);
 
   if (!tokenData.deleteAccount) {
     throw new ActionError("Invalid token");
