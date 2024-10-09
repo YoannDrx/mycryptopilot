@@ -58,7 +58,7 @@ export const accountAskDeletionAction = authAction.action(async ({ ctx }) => {
       organizationsToDelete: user.organizations?.map(
         (o) => o.organization.name,
       ),
-      confirmUrl: `${getServerUrl()}/account/delete/confirm?token=${token.token}`,
+      confirmUrl: `${getServerUrl()}/account/danger/confirm?token=${token.token}`,
     }),
   });
 });
@@ -81,7 +81,7 @@ export async function verifyDeleteAccountToken(
     throw new ActionError("Invalid token");
   }
 
-  const tokenData = TokenSchema.parse(String(verificationToken.data));
+  const tokenData = TokenSchema.parse(verificationToken.data);
 
   if (!tokenData.deleteAccount) {
     throw new ActionError("Invalid token");
