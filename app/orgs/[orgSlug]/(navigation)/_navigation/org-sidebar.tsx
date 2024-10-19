@@ -104,6 +104,7 @@ const UserButton = () => {
           <AvatarFallback>{data?.name?.[0] ?? "-"}</AvatarFallback>
           {data?.image && <AvatarImage src={data.image} />}
         </Avatar>
+        <span>{data?.name}</span>
       </Button>
     </UserDropdown>
   );
