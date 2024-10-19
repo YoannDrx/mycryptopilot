@@ -2,14 +2,18 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import { SiteConfig } from "@/site-config";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ReactNode } from "react";
 
 type OrganizationsSelectProps = {
@@ -24,42 +28,53 @@ type OrganizationsSelectProps = {
 };
 
 export const OrgsSelect = (props: OrganizationsSelectProps) => {
-  const router = useRouter();
+  const org = props.orgs.find((org) => org.slug === props.currentOrgSlug);
+
   return (
-    <Select
-      value={props.currentOrgSlug}
-      onValueChange={(value) => {
-        if (value === "new") {
-          router.push("/orgs/new");
-          return;
-        }
-
-        const newUrl = `/orgs/${value}`;
-
-        router.push(newUrl);
-      }}
-    >
-      <SelectTrigger className="h-8 justify-start gap-2 border-none bg-transparent px-4 hover:bg-accent [&>span]:flex [&>svg]:hidden hover:[&>svg]:block">
-        {props.children ? props.children : <SelectValue />}
-      </SelectTrigger>
-      <SelectContent>
-        {props.orgs.map((org) => (
-          <SelectItem key={org.slug} value={org.slug} className="h-fit">
-            <span className="inline-flex h-full items-center gap-1">
-              <Avatar className="size-6">
-                <AvatarFallback>
-                  {org.name.slice(0, 1).toUpperCase()}
-                </AvatarFallback>
-                {org.image ? <AvatarImage src={org.image} /> : null}
-              </Avatar>
-              <span className="line-clamp-1 text-left">{org.name}</span>
-            </span>
-          </SelectItem>
-        ))}
-        {!SiteConfig.features.enableSingleMemberOrg ? (
-          <SelectItem value="new">Add a new organization</SelectItem>
-        ) : null}
-      </SelectContent>
-    </Select>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton variant="outline">
+              {org ? (
+                <span className="inline-flex w-full items-center gap-2">
+                  <Avatar className="size-6 object-contain">
+                    <AvatarFallback>
+                      {org.name.slice(0, 1).toUpperCase()}
+                    </AvatarFallback>
+                    {org.image ? <AvatarImage src={org.image} /> : null}
+                  </Avatar>
+                  <span className="line-clamp-1 text-left">{org.name}</span>
+                </span>
+              ) : null}
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
+            {props.orgs.map((org) => (
+              <DropdownMenuItem key={org.slug} asChild>
+                <Link
+                  href={window.location.href.replace(
+                    `/orgs/${props.currentOrgSlug}`,
+                    `/orgs/${org.slug}`,
+                  )}
+                  className="inline-flex w-full items-center gap-2"
+                >
+                  <Avatar className="size-6">
+                    <AvatarFallback>
+                      {org.name.slice(0, 1).toUpperCase()}
+                    </AvatarFallback>
+                    {org.image ? <AvatarImage src={org.image} /> : null}
+                  </Avatar>
+                  <span className="line-clamp-1 text-left">{org.name}</span>
+                </Link>
+              </DropdownMenuItem>
+            ))}
+            {!SiteConfig.features.enableSingleMemberOrg ? (
+              <DropdownMenuItem>Add a new organization</DropdownMenuItem>
+            ) : null}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 };

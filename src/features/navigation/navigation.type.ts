@@ -5,6 +5,7 @@ export type NavigationGroup = {
   title: string;
   roles?: OrganizationMembershipRole[];
   links: NavigationLink[];
+  defaultOpenStartPath?: string;
 };
 
 export type NavigationLink = {

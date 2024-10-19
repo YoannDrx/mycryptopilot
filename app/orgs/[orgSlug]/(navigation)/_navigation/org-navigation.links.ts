@@ -4,7 +4,14 @@ import {
 } from "@/features/navigation/navigation.type";
 import { isInRoles } from "@/lib/organizations/isInRoles";
 import { OrganizationMembershipRole } from "@prisma/client";
-import { Home, User } from "lucide-react";
+import {
+  CreditCard,
+  Home,
+  Settings,
+  TriangleAlert,
+  User,
+  User2,
+} from "lucide-react";
 
 const replaceSlug = (href: string, slug: string) => {
   return href.replace(":organizationSlug", slug);
@@ -17,6 +24,9 @@ export const getOrganizationNavigation = (
   return ORGANIZATION_LINKS.map((group: NavigationGroup) => {
     return {
       ...group,
+      defaultOpenStartPath: group.defaultOpenStartPath
+        ? replaceSlug(group.defaultOpenStartPath, slug)
+        : undefined,
       links: group.links
         .filter((link: NavigationLink) =>
           link.roles ? isInRoles(userRoles, link.roles) : true,
@@ -47,6 +57,35 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         Icon: User,
         label: "Users",
       },
-    ] satisfies NavigationLink[],
+    ],
+  },
+  {
+    title: "Organization",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
+    links: [
+      {
+        href: `${ORGANIZATION_PATH}/settings`,
+        Icon: Settings,
+        label: "Settings",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/settings/members`,
+        Icon: User2,
+        label: "Members",
+        roles: ["ADMIN"],
+      },
+      {
+        href: `${ORGANIZATION_PATH}/settings/billing`,
+        label: "Billing",
+        roles: ["ADMIN"],
+        Icon: CreditCard,
+      },
+      {
+        href: `${ORGANIZATION_PATH}/settings/danger`,
+        label: "Danger Zone",
+        roles: ["OWNER"],
+        Icon: TriangleAlert,
+      },
+    ],
   },
 ] satisfies NavigationGroup[];

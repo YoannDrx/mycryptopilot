@@ -59,7 +59,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
     >
       <Card>
         <CardHeader>
-          <CardTitle>Organization's image</CardTitle>
+          <CardTitle>Image</CardTitle>
           <CardDescription>
             Add a custom image to your organization.
           </CardDescription>
@@ -85,7 +85,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Organization's name</CardTitle>
+          <CardTitle>Name</CardTitle>
           <CardDescription>
             Use your organization's name or your name if you don't have an
             organization.
@@ -108,7 +108,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Organization's email</CardTitle>
+          <CardTitle>Email</CardTitle>
           <CardDescription>
             Use a valid email address to receive billing and invoices.
           </CardDescription>
