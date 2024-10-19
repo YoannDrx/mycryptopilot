@@ -46,29 +46,37 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
                   </Avatar>
                   <span className="line-clamp-1 text-left">{org.name}</span>
                 </span>
-              ) : null}
+              ) : (
+                <span>Open organization</span>
+              )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-            {props.orgs.map((org) => (
-              <DropdownMenuItem key={org.slug} asChild>
-                <Link
-                  href={window.location.href.replace(
-                    `/orgs/${props.currentOrgSlug}`,
-                    `/orgs/${org.slug}`,
-                  )}
-                  className="inline-flex w-full items-center gap-2"
-                >
-                  <Avatar className="size-6">
-                    <AvatarFallback>
-                      {org.name.slice(0, 1).toUpperCase()}
-                    </AvatarFallback>
-                    {org.image ? <AvatarImage src={org.image} /> : null}
-                  </Avatar>
-                  <span className="line-clamp-1 text-left">{org.name}</span>
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            {props.orgs.map((org) => {
+              return (
+                <DropdownMenuItem key={org.slug} asChild>
+                  <Link
+                    href={
+                      props.currentOrgSlug
+                        ? window.location.href.replace(
+                            `/orgs/${props.currentOrgSlug}`,
+                            `/orgs/${org.slug}`,
+                          )
+                        : `/orgs/${org.slug}`
+                    }
+                    className="inline-flex w-full items-center gap-2"
+                  >
+                    <Avatar className="size-6">
+                      <AvatarFallback>
+                        {org.name.slice(0, 1).toUpperCase()}
+                      </AvatarFallback>
+                      {org.image ? <AvatarImage src={org.image} /> : null}
+                    </Avatar>
+                    <span className="line-clamp-1 text-left">{org.name}</span>
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
             {!SiteConfig.features.enableSingleMemberOrg ? (
               <DropdownMenuItem>Add a new organization</DropdownMenuItem>
             ) : null}

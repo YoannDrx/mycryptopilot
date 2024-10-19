@@ -6,14 +6,27 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Loader } from "@/components/ui/loader";
 import { Typography } from "@/components/ui/typography";
 import { useMutation } from "@tanstack/react-query";
-import { LayoutDashboard, LogOut, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  Monitor,
+  Moon,
+  Settings,
+  SunMedium,
+  SunMoon,
+} from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
 
@@ -22,6 +35,7 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
     mutationFn: () => signOut(),
   });
   const session = useSession();
+  const theme = useTheme();
 
   return (
     <DropdownMenu>
@@ -44,6 +58,30 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
             Account Settings
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <SunMoon className="mr-2 size-4" />
+            <span>Theme</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem onClick={() => theme.setTheme("dark")}>
+                <SunMedium className="mr-2 size-4" />
+                <span>Dark</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => theme.setTheme("light")}>
+                <Moon className="mr-2 size-4" />
+                <span>Light</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => theme.setTheme("system")}>
+                <Monitor className="mr-2 size-4" />
+                <span>System</span>
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
 
         <DropdownMenuSeparator />
 

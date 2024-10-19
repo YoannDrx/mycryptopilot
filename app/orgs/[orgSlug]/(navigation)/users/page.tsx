@@ -25,12 +25,14 @@ export default async function RoutePage(props: PageParams) {
       </LayoutHeader>
       <LayoutActions className="flex gap-2">
         <Button variant="outline">Delete</Button>
-        <Button variant="invert">Create</Button>
+        <Button variant="default">Create</Button>
       </LayoutActions>
-      <LayoutContent className="flex  gap-6">
-        <UsersChart />
+      <LayoutContent className="flex flex-col gap-4 lg:gap-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
+          <UsersChart />
+          <ClientOrg />
+        </div>
         <DonutChart />
-        <ClientOrg />
       </LayoutContent>
     </Layout>
   );

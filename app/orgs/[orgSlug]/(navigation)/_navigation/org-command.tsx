@@ -19,7 +19,7 @@ import { useState } from "react";
 import { useKey } from "react-use";
 import { ORGANIZATION_LINKS } from "./org-navigation.links";
 
-export function OrganizationCommand() {
+export function OrgCommand() {
   const [open, setOpen] = useState(false);
   const params = useParams();
   const router = useRouter();
@@ -42,7 +42,7 @@ export function OrganizationCommand() {
 
   return (
     <>
-      <div className="relative w-full max-w-[200px] md:w-2/3 lg:w-1/3">
+      <div className="relative w-full">
         <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
         <Input
           type="search"

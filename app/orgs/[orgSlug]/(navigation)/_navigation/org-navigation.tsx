@@ -7,21 +7,16 @@ import { Layout } from "@/features/page/layout";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";
-import { OrgSidebar } from "./OrgSidebar";
+import { OrgSidebar } from "./org-sidebar";
 
 export async function OrgNavigation({ children }: PropsWithChildren) {
-  const { org, user, roles } = await getRequiredCurrentOrgCache();
+  const { org, roles } = await getRequiredCurrentOrgCache();
 
   const userOrganizations = await getUsersOrgs();
 
   return (
     <SidebarProvider>
-      <OrgSidebar
-        user={user}
-        slug={org.slug}
-        roles={roles}
-        userOrgs={userOrganizations}
-      />
+      <OrgSidebar slug={org.slug} roles={roles} userOrgs={userOrganizations} />
       <SidebarInset className="border border-accent">
         <header className="flex h-16 shrink-0 items-center gap-2">
           <Layout>

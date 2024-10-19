@@ -1,6 +1,7 @@
 "use client";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -19,14 +20,18 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { UserDropdown } from "@/features/auth/UserDropdown";
 import { NavigationGroup } from "@/features/navigation/navigation.type";
-import { OrganizationMembershipRole, User } from "@prisma/client";
-import { ChevronDown, Settings } from "lucide-react";
+import { OrganizationMembershipRole } from "@prisma/client";
+import { ChevronDown } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PropsWithChildren, useEffect, useState } from "react";
+import { OrgCommand } from "./org-command";
 import { getOrganizationNavigation } from "./org-navigation.links";
-import { OrgsSelect } from "./OrgsSelect";
+import { OrgsSelect } from "./orgs-select";
+import { UpgradeCard } from "./upgrade-org-card";
 
 export function OrgSidebar({
   slug,
@@ -34,7 +39,6 @@ export function OrgSidebar({
   roles,
 }: {
   slug: string;
-  user: User;
   roles: OrganizationMembershipRole[] | undefined;
   userOrgs: {
     id: string;
@@ -43,18 +47,16 @@ export function OrgSidebar({
     image: string | null;
   }[];
 }) {
-  const organizationNavigation: NavigationGroup[] = getOrganizationNavigation(
-    slug,
-    roles,
-  );
+  const links: NavigationGroup[] = getOrganizationNavigation(slug, roles);
 
   return (
     <Sidebar variant="inset">
-      <SidebarHeader>
+      <SidebarHeader className="flex flex-col gap-2">
         <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
+        <OrgCommand />
       </SidebarHeader>
       <SidebarContent>
-        {organizationNavigation.map((link) => (
+        {links.map((link) => (
           <ItemCollapsing
             defaultOpenStartPath={link.defaultOpenStartPath}
             key={link.title}
@@ -86,19 +88,29 @@ export function OrgSidebar({
           </ItemCollapsing>
         ))}
       </SidebarContent>
-      <SidebarFooter>
-        <Link
-          className={buttonVariants({ variant: "outline" })}
-          href={`/orgs/${slug}/settings`}
-        >
-          <Settings className="mr-2 size-4" />
-          Settings
-        </Link>
+      <SidebarFooter className="flex flex-col gap-2">
+        <UpgradeCard />
+        <UserButton />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
 }
+
+const UserButton = () => {
+  const session = useSession();
+  const data = session.data?.user;
+  return (
+    <UserDropdown>
+      <Button variant="outline">
+        <Avatar className="size-6">
+          <AvatarFallback>{data?.name?.[0] ?? "-"}</AvatarFallback>
+          {data?.image && <AvatarImage src={data.image} />}
+        </Avatar>
+      </Button>
+    </UserDropdown>
+  );
+};
 
 const ItemCollapsing = (
   props: PropsWithChildren<{ defaultOpenStartPath?: string }>,

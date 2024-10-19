@@ -8,7 +8,7 @@ import { getCurrentOrgCache } from "@/lib/react/cache";
 import type { LayoutParams } from "@/types/next";
 import { Rabbit } from "lucide-react";
 import Link from "next/link";
-import { OrgNavigation } from "./_navigation/OrgNavigation";
+import { OrgNavigation } from "./_navigation/org-navigation";
 
 export default async function RouteLayout(
   props: LayoutParams<{ orgSlug: string }>,

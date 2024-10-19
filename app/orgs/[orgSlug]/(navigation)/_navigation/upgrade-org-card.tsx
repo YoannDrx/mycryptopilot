@@ -6,13 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import Link from "next/link";
+import { useCurrentOrg } from "../../useCurrentOrg";
 
-export const UpgradeCard = async () => {
-  const { org: organization } = await getRequiredCurrentOrgCache();
+export const UpgradeCard = () => {
+  const org = useCurrentOrg();
 
-  if (organization.plan.id !== "FREE") return null;
+  if (!org) return null;
+
+  if (org.plan.id !== "FREE") return null;
 
   return (
     <Card x-chunk="dashboard-02-chunk-0">
@@ -24,7 +26,7 @@ export const UpgradeCard = async () => {
       </CardHeader>
       <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
         <Link
-          href={`/orgs/${organization.slug}/settings/billing`}
+          href={`/orgs/${org.slug}/settings/billing`}
           className={buttonVariants({ className: "w-full" })}
         >
           Upgrade
