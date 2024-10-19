@@ -11,15 +11,14 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
 import { UserDropdown } from "@/features/auth/UserDropdown";
 import { NavigationGroup } from "@/features/navigation/navigation.type";
 import { ChevronDown } from "lucide-react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/orgs-select";
 import { getAccountNavigation } from "./account.links";
 
@@ -51,12 +50,10 @@ export function AccountSidebar({
               <SidebarMenu>
                 {link.links.map((item) => (
                   <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton asChild>
-                      <Link href={item.href}>
-                        <item.Icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                    <SidebarMenuButtonLink href={item.href}>
+                      <item.Icon />
+                      <span>{item.label}</span>
+                    </SidebarMenuButtonLink>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
