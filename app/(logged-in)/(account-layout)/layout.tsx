@@ -46,7 +46,7 @@ export default async function RouteLayout(props: LayoutParams) {
 
   return (
     <div>
-      <AccountNavigation emailVerified={user?.emailVerified}>
+      <AccountNavigation emailVerified={Boolean(user?.emailVerified)}>
         {props.children}
       </AccountNavigation>
     </div>
