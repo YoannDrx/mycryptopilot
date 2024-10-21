@@ -40,7 +40,7 @@ const chartConfig = {
 
 export function UsersChart() {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Area Chart - Stacked</CardTitle>
         <CardDescription>

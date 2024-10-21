@@ -20,7 +20,7 @@ export const ClientOrg = () => {
   }
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>{org.name}</CardTitle>
         <CardDescription>{org.slug}</CardDescription>

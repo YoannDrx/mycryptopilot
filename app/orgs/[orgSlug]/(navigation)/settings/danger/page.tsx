@@ -32,7 +32,7 @@ export default async function RoutePage(props: PageParams) {
     <div className="flex flex-col gap-4 lg:gap-8">
       <OrganizationDangerForm defaultValues={org} />
       {usersOrganizationsCount <= 1 ? (
-        <Card>
+        <Card className="border-destructive">
           <CardHeader>
             <CardTitle>Delete the organization</CardTitle>
             <CardDescription>

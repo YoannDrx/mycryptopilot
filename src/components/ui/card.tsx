@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 
-const cardVariants = cva("rounded-lg shadow-sm", {
+const cardVariants = cva("rounded-xl border shadow", {
   variants: {
     variant: {
       default: "border bg-card text-card-foreground",
@@ -47,10 +47,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className,
-    )}
+    className={cn("font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ));

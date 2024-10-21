@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth/helper";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { PropsWithChildren } from "react";
-import { OrgsSelect } from "../../../app/orgs/[orgSlug]/(navigation)/_navigation/OrgsSelect";
+import { OrgsSelect } from "../../../app/orgs/[orgSlug]/(navigation)/_navigation/orgs-select";
 import { UserDropdown } from "../auth/UserDropdown";
 import { NavigationWrapper } from "./NavigationWrapper";
 

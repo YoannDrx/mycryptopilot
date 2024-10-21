@@ -74,13 +74,10 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
     >
       <Card>
         <CardHeader>
-          <CardTitle>Organization's slug</CardTitle>
+          <CardTitle>Slug</CardTitle>
           <CardDescription>
-            Slug is the unique identifier of your organization.
-          </CardDescription>
-          <CardDescription>
-            It's used in all the URLs, if you change it, all your URLs will be
-            broken.
+            Slug is the unique identifier of your organization. It's used in all
+            the URLs, if you change it, all your URLs will be broken.
           </CardDescription>
         </CardHeader>
         <CardContent>

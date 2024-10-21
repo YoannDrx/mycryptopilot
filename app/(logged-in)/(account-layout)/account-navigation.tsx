@@ -1,44 +1,49 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { UserDropdown } from "@/features/auth/UserDropdown";
-import { requiredAuth } from "@/lib/auth/helper";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Layout } from "@/features/page/layout";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
+import { CircleAlert } from "lucide-react";
 import { PropsWithChildren } from "react";
-import { NavigationWrapper } from "../../../src/features/navigation/NavigationWrapper";
-import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/OrgsSelect";
-import { AccountNavigationLinks } from "./account-navigation-links";
+import { AccountSidebar } from "./account-sidebar";
+import { VerifyEmailButton } from "./account/verify-email/VerifyEmailButton";
 
-export async function AccountNavigation({ children }: PropsWithChildren) {
-  const user = await requiredAuth();
-  const userOrgs = await getUsersOrgs();
+export async function AccountNavigation({
+  children,
+  emailVerified,
+}: PropsWithChildren<{ emailVerified?: boolean | null }>) {
+  const userOrganizations = await getUsersOrgs();
+
   return (
-    <NavigationWrapper
-      logoChildren={
-        <OrgsSelect orgs={userOrgs}>
-          <Avatar className="size-8">
-            <AvatarFallback>
-              {user.email ? user.email.slice(0, 2) : "??"}
-            </AvatarFallback>
-            {user.image && <AvatarImage src={user.image} />}
-          </Avatar>
-          <span>{user.name}</span>
-        </OrgsSelect>
-      }
-      navigationChildren={<AccountNavigationLinks />}
-      topBarCornerLeftChildren={
-        <UserDropdown>
-          <Button variant="ghost" className="size-10 rounded-full" size="sm">
-            <Avatar className="size-8">
-              <AvatarFallback>
-                {user.email ? user.email.slice(0, 2) : "??"}
-              </AvatarFallback>
-              {user.image && <AvatarImage src={user.image} />}
-            </Avatar>
-          </Button>
-        </UserDropdown>
-      }
-    >
-      {children}
-    </NavigationWrapper>
+    <SidebarProvider>
+      <AccountSidebar userOrgs={userOrganizations} />
+      <SidebarInset className="border border-accent">
+        <header className="flex h-16 shrink-0 items-center gap-2">
+          <Layout>
+            <SidebarTrigger className="-ml-1" />
+          </Layout>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          {!emailVerified ? (
+            <Layout className="my-0 h-fit">
+              <Alert>
+                <CircleAlert size={16} />
+                <AlertTitle>
+                  Email not verified. Please verify your email.
+                </AlertTitle>
+                <VerifyEmailButton
+                  variant="invert"
+                  className="ml-auto flex h-6 w-fit items-center gap-1 rounded-md px-3 text-sm"
+                />
+              </Alert>
+            </Layout>
+          ) : null}
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
