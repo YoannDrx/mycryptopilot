@@ -1,5 +1,5 @@
-import { Header } from "@/features/layout/Header";
-import { Page404 } from "@/features/page/Page404";
+import { Header } from "@/features/layout/header";
+import { Page404 } from "@/features/page/page-404";
 
 export default function NotFoundPage() {
   return (

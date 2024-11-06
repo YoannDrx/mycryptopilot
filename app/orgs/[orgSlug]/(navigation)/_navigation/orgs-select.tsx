@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { SiteConfig } from "@/site-config";
 import Link from "next/link";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type OrganizationsSelectProps = {
   currentOrgSlug?: string;
@@ -53,6 +53,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
             {props.orgs.map((org) => {
+              if (typeof window === "undefined") return null;
               return (
                 <DropdownMenuItem key={org.slug} asChild>
                   <Link

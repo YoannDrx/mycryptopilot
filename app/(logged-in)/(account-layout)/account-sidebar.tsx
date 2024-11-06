@@ -15,8 +15,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
-import { UserDropdown } from "@/features/auth/UserDropdown";
-import { NavigationGroup } from "@/features/navigation/navigation.type";
+import { UserDropdown } from "@/features/auth/user-dropdown";
+import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import { ChevronDown } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/orgs-select";

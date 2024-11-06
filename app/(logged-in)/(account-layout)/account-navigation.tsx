@@ -7,9 +7,9 @@ import {
 import { Layout } from "@/features/page/layout";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import { CircleAlert } from "lucide-react";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { AccountSidebar } from "./account-sidebar";
-import { VerifyEmailButton } from "./account/verify-email/VerifyEmailButton";
+import { VerifyEmailButton } from "./account/verify-email/verify-email-button";
 
 export async function AccountNavigation({
   children,

@@ -6,16 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SubmitButton } from "@/features/form/SubmitButton";
-import AuthNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
-import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
+import { SubmitButton } from "@/features/form/submit-button";
+import AuthNavigationWrapper from "@/features/navigation/log-in-navigation-wrapper";
+import { NavigationWrapper } from "@/features/navigation/navigation-wrapper";
 import {
   Layout,
   LayoutContent,
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { Page400 } from "@/features/page/Page400";
+import { Page400 } from "@/features/page/page-400";
 import { auth } from "@/lib/auth/helper";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
@@ -38,9 +38,10 @@ export const generateMetadata = combineWithParentMetadata({
 export default async function RoutePage(
   props: PageParams<{ orgSlug: string; token: string }>,
 ) {
+  const params = await props.params;
   const organization = await prisma.organization.findFirst({
     where: {
-      slug: props.params.orgSlug,
+      slug: params.orgSlug,
     },
   });
 
@@ -50,7 +51,7 @@ export default async function RoutePage(
 
   const verificationToken = await prisma.verificationToken.findUnique({
     where: {
-      token: props.params.token,
+      token: params.token,
     },
   });
 
@@ -85,7 +86,7 @@ export default async function RoutePage(
               <CardContent>
                 <Link
                   className={buttonVariants({ size: "lg" })}
-                  href={`/auth/signin?callbackUrl=${getServerUrl()}/orgs/${organization.slug}/invitations/${props.params.token}&email=${tokenData.email}`}
+                  href={`/auth/signin?callbackUrl=${getServerUrl()}/orgs/${organization.slug}/invitations/${(await props.params).token}&email=${tokenData.email}`}
                 >
                   Sign in
                 </Link>
@@ -145,7 +146,7 @@ export default async function RoutePage(
                     });
                     await prisma.verificationToken.delete({
                       where: {
-                        token: props.params.token,
+                        token: params.token,
                       },
                     });
                     redirect(`/orgs/${organization.slug}`);

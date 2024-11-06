@@ -44,7 +44,7 @@ const Form = <T extends FieldValues>({
       className={className}
     >
       <fieldset
-        disabled={disabled || form.formState.isSubmitting}
+        disabled={disabled ?? form.formState.isSubmitting}
         className={className}
       >
         {children}

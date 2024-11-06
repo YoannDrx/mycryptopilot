@@ -2,7 +2,7 @@
 import { createZodRoute } from "next-zod-route";
 import { NextResponse } from "next/server";
 import { auth, AuthError } from "./auth/helper";
-import { getRequiredCurrentOrg } from "./organizations/getOrg";
+import { getRequiredCurrentOrg } from "./organizations/get-org";
 
 export class RouteError extends Error {
   status?: number;
@@ -54,10 +54,6 @@ export const authRoute = route.use(async () => {
 export const orgRoute = authRoute.use(async () => {
   try {
     const organization = await getRequiredCurrentOrg();
-
-    if (!organization) {
-      throw new Error("Organization not found!");
-    }
 
     return {
       organization,

@@ -1,6 +1,6 @@
 "use client";
 
-import { NavigationLinks } from "@/features/navigation/NavigationLinks";
+import { NavigationLinks } from "@/features/navigation/navigation-links";
 import { getAccountNavigation } from "./account.links";
 
 export const AccountNavigationLinks = () => {

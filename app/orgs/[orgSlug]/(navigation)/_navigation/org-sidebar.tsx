@@ -20,13 +20,14 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
-import { UserDropdown } from "@/features/auth/UserDropdown";
-import { NavigationGroup } from "@/features/navigation/navigation.type";
-import { OrganizationMembershipRole } from "@prisma/client";
+import { UserDropdown } from "@/features/auth/user-dropdown";
+import type { NavigationGroup } from "@/features/navigation/navigation.type";
+import type { OrganizationMembershipRole } from "@prisma/client";
 import { ChevronDown } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { PropsWithChildren, useEffect, useState } from "react";
+import type { PropsWithChildren} from "react";
+import { useEffect, useState } from "react";
 import { OrgCommand } from "./org-command";
 import { getOrganizationNavigation } from "./org-navigation.links";
 import { OrgsSelect } from "./orgs-select";

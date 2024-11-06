@@ -1,6 +1,6 @@
-import { TailwindIndicator } from "@/components/utils/TailwindIndicator";
-import { FloatingLegalFooter } from "@/features/legal/FloatingLegalFooter";
-import { NextTopLoader } from "@/features/page/NextTopLoader";
+import { TailwindIndicator } from "@/components/utils/tailwind-indicator";
+import { FloatingLegalFooter } from "@/features/legal/floating-legal-footer";
+import { NextTopLoader } from "@/features/page/next-top-loader";
 import { getServerUrl } from "@/lib/server-url";
 import { cn } from "@/lib/utils";
 import { SiteConfig } from "@/site-config";
@@ -8,9 +8,9 @@ import type { LayoutParams } from "@/types/next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
+import { Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
-import "./code-theme.scss";
-import "./globals.scss";
+import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   description: SiteConfig.description,
   metadataBase: new URL(getServerUrl()),
 };
+
+const CaptionFont = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-caption",
+});
 
 export default function RootLayout({
   children,
@@ -32,6 +37,7 @@ export default function RootLayout({
             "h-full bg-background font-sans antialiased",
             GeistMono.variable,
             GeistSans.variable,
+            CaptionFont.variable,
           )}
         >
           <Providers>

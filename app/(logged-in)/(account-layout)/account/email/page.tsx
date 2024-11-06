@@ -6,12 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ContactSupportDialog } from "@/features/contact/support/ContactSupportDialog";
+import { ContactSupportDialog } from "@/features/contact/support/contact-support-dialog";
 import { requiredAuth } from "@/lib/auth/helper";
 import { env } from "@/lib/env";
 import { resend } from "@/lib/mail/resend";
 import { combineWithParentMetadata } from "@/lib/metadata";
-import { ToggleEmailCheckbox } from "./ToggleEmailCheckbox";
+import { ToggleEmailCheckbox } from "./toggle-email-checkbox";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Email",

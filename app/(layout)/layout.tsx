@@ -1,4 +1,4 @@
-import { BaseLayout } from "@/features/layout/BaseLayout";
+import { BaseLayout } from "@/features/layout/base-layout";
 import type { PropsWithChildren } from "react";
 
 export default function RouteLayout(props: PropsWithChildren) {

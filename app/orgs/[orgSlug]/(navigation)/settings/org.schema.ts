@@ -1,4 +1,4 @@
-import { RESERVED_SLUGS } from "@/lib/organizations/reservedSlugs";
+import { RESERVED_SLUGS } from "@/lib/organizations/reserved-slugs";
 import { OrganizationMembershipRole } from "@prisma/client";
 import { z } from "zod";
 

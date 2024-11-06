@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Typography } from "@/components/ui/typography";
-import { ServerMdx } from "@/features/markdown/ServerMdx";
+import { ServerMdx } from "@/features/markdown/server-mdx";
 import {
   Layout,
   LayoutContent,
@@ -11,8 +11,9 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { calculateReadingTime } from "@/features/posts/calculate-reading-time";
+import type {
+  PostParams} from "@/features/posts/post-manager";
 import {
-  PostParams,
   getCurrentPost,
   getPosts,
 } from "@/features/posts/post-manager";
@@ -26,9 +27,8 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-static";
 
-export async function generateMetadata({
-  params,
-}: PostParams): Promise<Metadata> {
+export async function generateMetadata(props: PostParams): Promise<Metadata> {
+  const params = await props.params;
   const post = await getCurrentPost(params.slug);
 
   if (!post) {
@@ -61,7 +61,8 @@ export async function generateStaticParams() {
 }
 
 export default async function RoutePage(props: PostParams) {
-  const post = await getCurrentPost(props.params.slug);
+  const params = await props.params;
+  const post = await getCurrentPost(params.slug);
 
   if (!post) {
     notFound();

@@ -3,13 +3,9 @@ import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
 import { auth, AuthError } from "../auth/helper";
 import { logger } from "../logger";
-import { getRequiredCurrentOrg } from "../organizations/getOrg";
+import { getRequiredCurrentOrg } from "../organizations/get-org";
 
-export class ActionError extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class ActionError extends Error {}
 
 type handleServerError = (e: Error) => string;
 

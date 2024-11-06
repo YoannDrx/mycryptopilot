@@ -1,20 +1,20 @@
-import { EmailFormSection } from "@/features/email/EmailFormSection";
-import { BentoGridSection } from "@/features/landing/BentoSection";
-import { FAQSection } from "@/features/landing/FAQSection";
-import { FeaturesSection } from "@/features/landing/FeatureSection";
-import { Hero } from "@/features/landing/Hero";
-import { LandingHeader } from "@/features/landing/LandingHeader";
-import { PainSection } from "@/features/landing/Pain";
-import { SectionDivider } from "@/features/landing/SectionDivider";
-import { StatsSection } from "@/features/landing/StatsSection";
-import { CTASectionCard } from "@/features/landing/cta/CTACardSection";
-import { CTAImageSection } from "@/features/landing/cta/CTAImageSection";
-import { CtaSection } from "@/features/landing/cta/CTASection";
-import { ReviewGrid } from "@/features/landing/review/ReviewGrid";
-import { ReviewSingle } from "@/features/landing/review/ReviewSingle";
-import { ReviewTriple } from "@/features/landing/review/ReviewTriple";
-import { Footer } from "@/features/layout/Footer";
-import { Pricing } from "@/features/plans/PricingSection";
+import { EmailFormSection } from "@/features/email/email-form-section";
+import { BentoGridSection } from "@/features/landing/bento-section";
+import { CTASectionCard } from "@/features/landing/cta/cta-card-section";
+import { CTAImageSection } from "@/features/landing/cta/cta-image-section";
+import { CtaSection } from "@/features/landing/cta/cta-section";
+import { FAQSection } from "@/features/landing/faq-section";
+import { FeaturesSection } from "@/features/landing/feature-section";
+import { Hero } from "@/features/landing/hero";
+import { LandingHeader } from "@/features/landing/landing-header";
+import { PainSection } from "@/features/landing/pain";
+import { ReviewGrid } from "@/features/landing/review/review-grid";
+import { ReviewSingle } from "@/features/landing/review/review-single";
+import { ReviewTriple } from "@/features/landing/review/review-triple";
+import { SectionDivider } from "@/features/landing/section-divider";
+import { StatsSection } from "@/features/landing/stats-section";
+import { Footer } from "@/features/layout/footer";
+import { Pricing } from "@/features/plans/pricing-section";
 import Image from "next/image";
 
 export default function HomePage() {
@@ -81,6 +81,7 @@ export default function HomePage() {
                 width={200}
                 height={100}
                 className="h-auto w-full object-cover"
+                unoptimized
               />
             ),
           },
@@ -111,6 +112,7 @@ export default function HomePage() {
                 width={200}
                 height={100}
                 className="h-auto w-full object-cover"
+                unoptimized
               />
             ),
           },
@@ -126,6 +128,7 @@ export default function HomePage() {
                 width={200}
                 height={100}
                 className="h-auto w-full object-cover"
+                unoptimized
               />
             ),
           },

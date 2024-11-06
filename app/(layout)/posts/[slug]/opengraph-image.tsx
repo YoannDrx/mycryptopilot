@@ -2,7 +2,7 @@ import { getCurrentPost } from "@/features/posts/post-manager";
 import { getOgImageFont } from "@/lib/og-image-font";
 import type { PageParams } from "@/types/next";
 import { ImageResponse } from "next/og";
-import { PostSlugMetadataImage } from "./PostSlugMetadataImage";
+import { PostSlugMetadataImage } from "./post-slug-metadata-image";
 
 export const alt = "Codeline information images";
 export const size = {
@@ -14,7 +14,8 @@ export const contentType = "image/png";
 export default async function OpenGraphImage(
   props: PageParams<{ slug: string }>,
 ) {
-  const post = await getCurrentPost(props.params.slug);
+  const params = await props.params;
+  const post = await getCurrentPost(params.slug);
 
   if (!post) {
     return null;

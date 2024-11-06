@@ -3,7 +3,8 @@
 import { logger } from "@/lib/logger";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SidebarMenuButton, SidebarMenuButtonProps } from "./sidebar";
+import type { SidebarMenuButtonProps } from "./sidebar";
+import { SidebarMenuButton } from "./sidebar";
 
 export const SidebarMenuButtonLink = ({
   href,

@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requiredAuth } from "@/lib/auth/helper";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
-import { EditPasswordForm } from "./EditPasswordForm";
-import { EditProfileCardForm } from "./EditProfileForm";
+import { EditPasswordForm } from "./edit-password-form";
+import { EditProfileCardForm } from "./edit-profile-form";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Settings",

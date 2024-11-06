@@ -13,10 +13,9 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RoutePage(props: PageParams) {
+  const searchParams = await props.searchParams;
   const token =
-    typeof props.searchParams.token === "string"
-      ? props.searchParams.token
-      : null;
+    typeof searchParams.token === "string" ? searchParams.token : null;
 
   if (!token) {
     return (

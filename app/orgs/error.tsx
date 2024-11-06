@@ -1,13 +1,13 @@
 "use client";
 
-import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
+import { NavigationWrapper } from "@/features/navigation/navigation-wrapper";
 import {
   Layout,
   LayoutContent,
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { Page400 } from "@/features/page/Page400";
+import { Page400 } from "@/features/page/page-400";
 import { logger } from "@/lib/logger";
 import type { ErrorParams } from "@/types/next";
 import { useEffect } from "react";

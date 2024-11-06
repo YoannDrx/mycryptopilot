@@ -6,12 +6,12 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { isInRoles } from "@/lib/organizations/isInRoles";
+import { isInRoles } from "@/lib/organizations/is-in-roles";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
-import InformationCards from "./InformationCards";
-import { SubscribersChart } from "./SubscribersChart";
+import InformationCards from "./information-cards";
+import { SubscribersChart } from "./subscribers-charts";
 
 export default async function RoutePage(
   props: PageParams<{
@@ -19,6 +19,7 @@ export default async function RoutePage(
   }>,
 ) {
   const org = await getRequiredCurrentOrgCache();
+  const params = await props.params;
   return (
     <Layout>
       <LayoutHeader>
@@ -27,7 +28,7 @@ export default async function RoutePage(
       <LayoutActions>
         {isInRoles(org.roles, ["ADMIN"]) ? (
           <Link
-            href={`/orgs/${props.params.orgSlug}/settings/members`}
+            href={`/orgs/${params.orgSlug}/settings/members`}
             className={buttonVariants({ variant: "outline" })}
           >
             Invite member

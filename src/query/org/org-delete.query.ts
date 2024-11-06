@@ -21,7 +21,7 @@ export const deleteOrganizationQuery = async (id: string) => {
     customer: org.stripeCustomerId,
   });
 
-  for (const subscription of subscriptions.data) {
+  for await (const subscription of subscriptions.data) {
     await stripe.subscriptions.cancel(subscription.id);
   }
 

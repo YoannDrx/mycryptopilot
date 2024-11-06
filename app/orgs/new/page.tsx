@@ -1,4 +1,4 @@
-import AuthNavigationWrapper from "@/features/navigation/LogInNavigationWrapper";
+import AuthNavigationWrapper from "@/features/navigation/log-in-navigation-wrapper";
 import {
   Layout,
   LayoutContent,
@@ -10,7 +10,7 @@ import { createSearchParamsMessageUrl } from "@/features/searchparams-message/cr
 import { requiredAuth } from "@/lib/auth/helper";
 import { SiteConfig } from "@/site-config";
 import { redirect } from "next/navigation";
-import { NewOrganizationForm } from "./NewOrgForm";
+import { NewOrganizationForm } from "./new-org-form";
 
 export default async function RoutePage() {
   await requiredAuth();

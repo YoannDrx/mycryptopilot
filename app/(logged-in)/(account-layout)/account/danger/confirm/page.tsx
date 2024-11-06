@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SubmitButton } from "@/features/form/SubmitButton";
+import { SubmitButton } from "@/features/form/submit-button";
 import { requiredAuth } from "@/lib/auth/helper";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import type { PageParams } from "@/types/next";
@@ -22,7 +22,8 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RoutePage(props: PageParams) {
-  const token = props.searchParams.token;
+  const searchParams = await props.searchParams;
+  const token = searchParams.token;
   const user = await requiredAuth();
 
   const invalidTokenCard = (

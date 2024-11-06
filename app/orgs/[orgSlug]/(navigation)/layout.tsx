@@ -1,7 +1,7 @@
 import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { NavigationWrapper } from "@/features/navigation/NavigationWrapper";
+import { NavigationWrapper } from "@/features/navigation/navigation-wrapper";
 import { Layout } from "@/features/page/layout";
 import { auth } from "@/lib/auth/helper";
 import { getCurrentOrgCache } from "@/lib/react/cache";
@@ -14,6 +14,7 @@ export default async function RouteLayout(
   props: LayoutParams<{ orgSlug: string }>,
 ) {
   const org = await getCurrentOrgCache();
+  const params = await props.params;
 
   if (!org) {
     const user = await auth();
@@ -25,8 +26,8 @@ export default async function RouteLayout(
             <div>
               <Typography variant="large">
                 Oh! You are not logged in or the organization with the ID{" "}
-                <Typography variant="code">{props.params.orgSlug}</Typography>{" "}
-                was not found.
+                <Typography variant="code">{params.orgSlug}</Typography> was not
+                found.
               </Typography>
               {user ? (
                 <Link

@@ -19,15 +19,13 @@ export const generateMetadata = combineWithParentMetadata({
 export default async function RouteLayout(
   props: LayoutParams<{ productId: string; orgSlug: string }>,
 ) {
+  const params = await props.params;
   if (SiteConfig.features.enableSingleMemberOrg) {
     redirect(
-      createSearchParamsMessageUrl(
-        `${getServerUrl()}org/${props.params.orgSlug}`,
-        {
-          type: "message",
-          message: "You need to update your account settings.",
-        },
-      ),
+      createSearchParamsMessageUrl(`${getServerUrl()}org/${params.orgSlug}`, {
+        type: "message",
+        message: "You need to update your account settings.",
+      }),
     );
   }
 

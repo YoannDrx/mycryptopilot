@@ -1,7 +1,7 @@
 "use client";
 
-import { HeaderBase } from "@/features/layout/HeaderBase";
-import { Page400 } from "@/features/page/Page400";
+import { HeaderBase } from "@/features/layout/header-base";
+import { Page400 } from "@/features/page/page-400";
 
 export default function ErrorPage() {
   return (

@@ -3,7 +3,7 @@
 import { orgAction } from "@/lib/actions/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { deleteOrganizationQuery } from "@/query/org/org-delete.query";
-import OrgConfirmDeletionEmail from "@email/OrgConfirmDeletion.email";
+import OrgConfirmDeletionEmail from "@email/org-confirm-deletion.email";
 
 export const organizationDeleteAction = orgAction
   .metadata({ roles: ["OWNER"] })

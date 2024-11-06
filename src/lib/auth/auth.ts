@@ -1,6 +1,4 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import type { User } from "@prisma/client";
-import type { Session } from "next-auth";
 import NextAuth from "next-auth";
 import { env } from "../env";
 import { prisma } from "../prisma";
@@ -29,19 +27,10 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
   },
   secret: env.NEXTAUTH_SECRET,
   callbacks: {
-    session(params) {
-      if (params.newSession) return params.session;
-
-      const typedParams = params as unknown as {
-        session: Session;
-        user?: User;
-      };
-
-      if (!typedParams.user) return typedParams.session;
-
-      typedParams.user.passwordHash = null;
-
-      return typedParams.session;
+    session: (params) => {
+      // @ts-expect-error - NextAuth doesn't know about this property
+      params.session.user.passwordHash = null;
+      return params.session;
     },
   },
   events: {

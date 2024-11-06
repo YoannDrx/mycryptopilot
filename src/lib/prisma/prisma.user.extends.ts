@@ -1,6 +1,6 @@
 import { SiteConfig } from "@/site-config";
-import { Prisma } from "@prisma/client";
-import {
+import type { Prisma } from "@prisma/client";
+import type {
   DefaultArgs,
   DynamicQueryExtensionCb,
   InternalArgs,
@@ -17,9 +17,9 @@ export const onUserUpdate: DynamicQueryExtensionCb<
   "update"
 > = async (...params) => {
   if (SiteConfig.features.enableSingleMemberOrg) {
-    syncWithOrganizations(...params);
+    await syncWithOrganizations(...params);
   }
-  syncWithResendContact(...params);
+  await syncWithResendContact(...params);
 
   const [{ args, query }] = params;
   return query(args);

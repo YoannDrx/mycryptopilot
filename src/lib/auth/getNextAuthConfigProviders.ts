@@ -1,5 +1,5 @@
 import { SiteConfig } from "@/site-config";
-import MagicLinkMail from "@email/MagicLinkEmail.email";
+import MagicLinkMail from "@email/magic-link-email.email";
 import type { NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";

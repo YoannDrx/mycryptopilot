@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export const createOrganizationQuery = async (
   params: Prisma.OrganizationUncheckedCreateInput,

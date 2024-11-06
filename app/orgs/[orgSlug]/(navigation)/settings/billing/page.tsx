@@ -9,14 +9,15 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Typography } from "@/components/ui/typography";
-import { Pricing } from "@/features/plans/PricingSection";
+import { Pricing } from "@/features/plans/pricing-section";
 import { formatDate } from "@/lib/format/date";
 import { combineWithParentMetadata } from "@/lib/metadata";
-import { CurrentOrgPayload } from "@/lib/organizations/getOrg";
+import type { CurrentOrgPayload } from "@/lib/organizations/get-org";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 import Link from "next/link";
+import type Stripe from "stripe";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Billing",
@@ -67,7 +68,7 @@ export const PremiumCard = async ({ org }: { org: CurrentOrgPayload }) => {
     customer: stripeCustomer.id,
   });
 
-  const firstSubscription = subscriptions.data[0];
+  const firstSubscription = subscriptions.data[0] as Stripe.Subscription | null;
   const nextRenewDate = firstSubscription?.current_period_end;
   const price = firstSubscription?.items.data[0].price;
 
@@ -90,7 +91,7 @@ export const PremiumCard = async ({ org }: { org: CurrentOrgPayload }) => {
             <div>
               <Typography variant="muted">Price</Typography>
               <Typography variant="large">
-                ${(price.unit_amount ?? 0) / 100}
+                ${(price?.unit_amount ?? 0) / 100}
               </Typography>
             </div>
             <Separator
@@ -102,7 +103,7 @@ export const PremiumCard = async ({ org }: { org: CurrentOrgPayload }) => {
                 {firstSubscription.cancel_at ? "Cancel at" : "Renew at"}
               </Typography>
               <Typography variant="large">
-                {formatDate(new Date(nextRenewDate * 1000))}
+                {formatDate(new Date(nextRenewDate ?? 0 * 1000))}
               </Typography>
             </div>
           </>

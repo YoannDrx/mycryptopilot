@@ -8,7 +8,7 @@ import {
 } from "@/features/page/layout";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import type { PageParams } from "@/types/next";
-import { ClientOrg } from "./ClientOrg";
+import { ClientOrg } from "./client-org";
 import { DonutChart } from "./donuts-chart";
 import { UsersChart } from "./users-chart";
 

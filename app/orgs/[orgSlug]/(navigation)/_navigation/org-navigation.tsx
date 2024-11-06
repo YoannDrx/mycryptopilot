@@ -6,7 +6,7 @@ import {
 import { Layout } from "@/features/page/layout";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 import { OrgSidebar } from "./org-sidebar";
 
 export async function OrgNavigation({ children }: PropsWithChildren) {

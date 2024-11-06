@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
+import type {
+  LinkProps,
+  SectionProps,
+  TextProps} from "@react-email/components";
 import {
   Link,
-  LinkProps,
   Section,
-  SectionProps,
-  Text,
-  TextProps,
+  Text
 } from "@react-email/components";
 
 export const EmailLink = (props: LinkProps) => {

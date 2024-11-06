@@ -18,7 +18,7 @@ export const config = {
   ],
 };
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   // Inject the current URL inside the request headers
   // Useful to get the parameters of the current request
   const requestHeaders = new Headers(req.headers);
@@ -30,7 +30,7 @@ export function middleware(req: NextRequest) {
     req.nextUrl.pathname === "/" &&
     SiteConfig.features.enableLandingRedirection
   ) {
-    const cookieList = cookies();
+    const cookieList = await cookies();
     const authCookie = cookieList.get(AUTH_COOKIE_NAME);
 
     if (authCookie) {

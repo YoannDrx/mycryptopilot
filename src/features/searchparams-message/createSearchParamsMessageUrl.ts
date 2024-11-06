@@ -19,11 +19,14 @@ export const createSearchParamsMessageUrl = (
   const isServer = typeof window === "undefined";
 
   // Convert relative URL to absolute URL if necessary
-  const absoluteBaseUrl = baseUrl.startsWith("/")
-    ? isServer
+  let absoluteBaseUrl: string;
+  if (baseUrl.startsWith("/")) {
+    absoluteBaseUrl = isServer
       ? `${getServerUrl()}/${baseUrl}`
-      : `${window.location.origin}${baseUrl}`
-    : baseUrl;
+      : `${window.location.origin}${baseUrl}`;
+  } else {
+    absoluteBaseUrl = baseUrl;
+  }
 
   const searchParamsKey = SearchParamsMessageKeys[message.type];
   const url = new URL(absoluteBaseUrl);

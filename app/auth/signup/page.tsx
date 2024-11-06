@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { SignUpCredentialsForm } from "./SignUpCredentialsForm";
+import { SignUpCredentialsForm } from "./sign-up-credentials-form";
 
 export default async function AuthSignInPage() {
   const user = await auth();

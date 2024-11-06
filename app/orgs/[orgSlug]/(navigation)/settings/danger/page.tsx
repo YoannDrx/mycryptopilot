@@ -11,8 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
-import { OrganizationDangerForm } from "./OrgDangerForm";
-import { OrganizationDeleteDialog } from "./OrganizationDeleteDialog";
+import { OrganizationDangerForm } from "./org-danger-form";
+import { OrganizationDeleteDialog } from "./organization-delete-dialog";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Danger",

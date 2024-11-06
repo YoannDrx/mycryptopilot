@@ -4,7 +4,7 @@ import { ActionError, authAction } from "@/lib/actions/safe-actions";
 import { sendEmail } from "@/lib/mail/sendEmail";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
-import VerifyEmail from "@email/VerifyEmail.email";
+import VerifyEmail from "@email/verify-email.email";
 import { addHours } from "date-fns";
 import { nanoid } from "nanoid";
 

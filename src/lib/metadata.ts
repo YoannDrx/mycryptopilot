@@ -1,5 +1,5 @@
-import { PageParams } from "@/types/next";
-import { Metadata, ResolvingMetadata } from "next";
+import type { PageParams } from "@/types/next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { unstable_cache as cache } from "next/cache";
 import { prisma } from "./prisma";
 

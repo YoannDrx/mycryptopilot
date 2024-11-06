@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getOrgsMembers } from "@/query/org/get-orgs-members";
 import type { PageParams } from "@/types/next";
-import { OrgMembersForm } from "./OrgMembersForm";
+import { OrgMembersForm } from "./org-members-form";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Members",
@@ -30,7 +30,7 @@ export default async function RoutePage(props: PageParams) {
   });
 
   const invitedEmail = invitations
-    .map((i) => (i?.data as { email?: string })?.email)
+    .map((i) => (i.data as { email?: string }).email)
     .filter(Boolean) as string[];
 
   return (

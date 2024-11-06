@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ContactSupportDialog } from "@/features/contact/support/ContactSupportDialog";
-import { HeaderBase } from "@/features/layout/HeaderBase";
+import { ContactSupportDialog } from "@/features/contact/support/contact-support-dialog";
+import { HeaderBase } from "@/features/layout/header-base";
 import {
   Layout,
   LayoutContent,
@@ -19,7 +19,8 @@ import Link from "next/link";
 import { getError } from "./auth-error-mapping";
 
 export default async function AuthErrorPage(props: PageParams) {
-  const { errorMessage, error } = getError(props.searchParams.error);
+  const searchParams = await props.searchParams;
+  const { errorMessage, error } = getError(searchParams.error);
 
   return (
     <div className="flex h-full flex-col">

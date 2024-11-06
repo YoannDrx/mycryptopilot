@@ -1,9 +1,9 @@
-import {
+import type {
   NavigationGroup,
   NavigationLink,
 } from "@/features/navigation/navigation.type";
-import { isInRoles } from "@/lib/organizations/isInRoles";
-import { OrganizationMembershipRole } from "@prisma/client";
+import { isInRoles } from "@/lib/organizations/is-in-roles";
+import type { OrganizationMembershipRole } from "@prisma/client";
 import {
   CreditCard,
   Home,

@@ -1,4 +1,4 @@
-import { NavigationGroup } from "@/features/navigation/navigation.type";
+import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import { SiteConfig } from "@/site-config";
 import { AlertCircle, CreditCard, Mail, User2 } from "lucide-react";
 

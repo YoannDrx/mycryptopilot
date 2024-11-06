@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import {
+import type { Prisma } from "@prisma/client";
+import type {
   DefaultArgs,
   DynamicQueryExtensionCb,
   InternalArgs,
@@ -13,7 +13,7 @@ export const onOrganizationUpdate: DynamicQueryExtensionCb<
   "Organization",
   "update"
 > = async (...params) => {
-  syncOrganizationEmailWithStripe(...params);
+  await syncOrganizationEmailWithStripe(...params);
 
   const [{ args, query }] = params;
 

@@ -1,3 +1,4 @@
+ 
 "use client";
 
 // From : https://shadcn-extension.vercel.app/docs/multi-select
@@ -12,8 +13,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check, X as RemoveIcon } from "lucide-react";
+import type { KeyboardEvent } from "react";
 import React, {
-  KeyboardEvent,
   createContext,
   forwardRef,
   useCallback,
@@ -27,7 +28,7 @@ type MultiSelectorProps = {
   loop?: boolean;
 } & React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
 
-interface MultiSelectContextProps {
+type MultiSelectContextProps = {
   value: string[];
   onValueChange: (value: string) => void;
   open: boolean;
@@ -36,7 +37,7 @@ interface MultiSelectContextProps {
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
   activeIndex: number;
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
-}
+};
 
 const MultiSelectContext = createContext<MultiSelectContextProps | null>(null);
 

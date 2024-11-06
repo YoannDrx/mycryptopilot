@@ -7,17 +7,18 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { PostCard } from "@/features/posts/post-card";
 import { getPosts, getPostsTags } from "@/features/posts/post-manager";
-import { PostCard } from "@/features/posts/PostCard";
 import { SiteConfig } from "@/site-config";
 import type { PageParams } from "@/types/next";
 import { FileQuestion } from "lucide-react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export async function generateMetadata({
-  params,
-}: CategoryParams): Promise<Metadata> {
+export async function generateMetadata(
+  props: CategoryParams,
+): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: `${SiteConfig.title}'s Blog about ${params.category}`,
     description: SiteConfig.description,
@@ -36,12 +37,13 @@ type CategoryParams = PageParams<{
 
 export default async function RoutePage(props: CategoryParams) {
   const tags = await getPostsTags();
-  const posts = await getPosts([props.params.category]);
+  const params = await props.params;
+  const posts = await getPosts([params.category]);
 
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>Blog post about {props.params.category}</LayoutTitle>
+        <LayoutTitle>Blog post about {params.category}</LayoutTitle>
       </LayoutHeader>
       <LayoutContent className="flex flex-wrap gap-2">
         {tags.map((tag) => (
@@ -51,9 +53,7 @@ export default async function RoutePage(props: CategoryParams) {
               pathname: `/posts/categories/${tag}`,
             }}
           >
-            <Badge
-              variant={props.params.category === tag ? "default" : "outline"}
-            >
+            <Badge variant={params.category === tag ? "default" : "outline"}>
               {tag}
             </Badge>
           </Link>

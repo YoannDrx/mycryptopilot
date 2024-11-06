@@ -99,7 +99,7 @@ export const credentialsSignInCallback =
       },
     });
 
-    const cookieList = cookies();
+    const cookieList = await cookies();
 
     cookieList.set(AUTH_COOKIE_NAME, uuid, {
       expires: expireAt,

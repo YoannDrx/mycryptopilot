@@ -1,6 +1,6 @@
-import { OrganizationMembershipRole } from "@prisma/client";
-import { IconProps } from "@radix-ui/react-icons/dist/types";
-import { LucideIcon } from "lucide-react";
+import type { OrganizationMembershipRole } from "@prisma/client";
+import type { IconProps } from "@radix-ui/react-icons/dist/types";
+import type { LucideIcon } from "lucide-react";
 
 export type NavigationGroup = {
   title: string;

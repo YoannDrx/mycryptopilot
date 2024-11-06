@@ -1,12 +1,12 @@
 import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { BaseLayout } from "@/features/layout/BaseLayout";
+import { BaseLayout } from "@/features/layout/base-layout";
 import { Layout } from "@/features/page/layout";
 import { auth } from "@/lib/auth/helper";
 import type { LayoutParams } from "@/types/next";
 import { Rabbit } from "lucide-react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AccountNavigation } from "./account-navigation";
 
@@ -46,7 +46,7 @@ export default async function RouteLayout(props: LayoutParams) {
 
   return (
     <div>
-      <AccountNavigation emailVerified={Boolean(user?.emailVerified)}>
+      <AccountNavigation emailVerified={Boolean(user.emailVerified)}>
         {props.children}
       </AccountNavigation>
     </div>

@@ -8,11 +8,11 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { getPosts, getPostsTags } from "@/features/posts/post-manager";
-import { PostCard } from "@/features/posts/PostCard";
+import { PostCard } from "@/features/posts/post-card";
 import { SiteConfig } from "@/site-config";
 import type { PageParams } from "@/types/next";
 import { FileQuestion } from "lucide-react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {

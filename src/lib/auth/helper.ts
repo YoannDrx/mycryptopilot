@@ -1,11 +1,7 @@
 import type { User } from "@prisma/client";
 import { baseAuth } from "./auth";
 
-export class AuthError extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class AuthError extends Error {}
 
 export const auth = async () => {
   const session = await baseAuth();
