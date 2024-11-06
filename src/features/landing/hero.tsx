@@ -1,6 +1,8 @@
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { CircleSvg } from "@/components/svg/circle-svg";
+import { buttonVariants } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { Typography } from "../../components/ui/typography";
 
 export const Hero = () => {
@@ -13,7 +15,7 @@ export const Hero = () => {
           <div className="mx-auto max-w-2xl text-center">
             <Typography
               variant="h1"
-              className="text-balance text-5xl font-semibold tracking-tight text-white sm:text-7xl lg:text-7xl"
+              className="text-balance text-5xl font-semibold tracking-tight sm:text-7xl lg:text-7xl"
             >
               Write the best content and Grow your{" "}
               <span className="relative inline-block">
@@ -23,7 +25,7 @@ export const Hero = () => {
             </Typography>
             <Typography
               variant="large"
-              className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8"
+              className="mt-8 text-pretty text-lg font-medium text-muted-foreground sm:text-xl/8"
             >
               Build for Thread, create, schedule and publish your content to
               your account with AI.
@@ -36,9 +38,12 @@ export const Hero = () => {
               >
                 Get started
               </ShimmerButton>
-              <a href="#" className="text-sm/6 font-semibold text-white">
+              <Link
+                href="#pricing"
+                className={buttonVariants({ variant: "link" })}
+              >
                 Learn more <span aria-hidden="true">→</span>
-              </a>
+              </Link>
             </div>
           </div>
           <Image
