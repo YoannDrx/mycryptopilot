@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/promise-function-async */
 "use client";
 
 import type { OrganizationPlan } from "@prisma/client";
@@ -32,12 +33,14 @@ type CurrentOrgStore = {
  */
 export const useCurrentOrg = create<CurrentOrgStore | null>(() => null);
 
-export const InjectCurrentOrgStore = async (
+export const InjectCurrentOrgStore = (
   props: PropsWithChildren<{
     org?: CurrentOrgStore;
   }>,
 ) => {
   if (!props.org) return props.children;
+
+  if (useCurrentOrg.getState()) return props.children;
 
   useCurrentOrg.setState({
     id: props.org.id,

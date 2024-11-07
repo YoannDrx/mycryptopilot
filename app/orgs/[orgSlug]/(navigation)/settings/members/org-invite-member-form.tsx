@@ -37,6 +37,9 @@ export const OrganizationInviteMemberForm = () => {
   const [open, setOpen] = useState(false);
   const form = useZodForm({
     schema: Schema,
+    defaultValues: {
+      email: "",
+    },
   });
   const router = useRouter();
 
