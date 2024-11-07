@@ -36,6 +36,7 @@ export const PLANS = [
     features: ["5 users"],
     isPopular: true,
     type: "monthly",
+    // TODO : Change this to the actual price id
     priceId: "price_id_demo",
     cta: "Start now",
     ctaSubtitle: "Then $49/month",
