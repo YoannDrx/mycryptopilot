@@ -32,21 +32,21 @@ export const getNextAuthConfigProviders = (): Providers => {
     }),
   ];
 
-  if (env.GITHUB_ID && env.GITHUB_SECRET) {
+  if (env.AUTH_GITHUB_ID && env.AUTH_GITHUB_SECRET) {
     providers.push(
       GitHub({
-        clientId: env.GITHUB_ID,
-        clientSecret: env.GITHUB_SECRET,
+        clientId: env.AUTH_GITHUB_ID,
+        clientSecret: env.AUTH_GITHUB_SECRET,
         allowDangerousEmailAccountLinking: true,
       }),
     );
   }
 
-  if (env.GOOGLE_ID && env.GOOGLE_SECRET) {
+  if (env.AUTH_GOOGLE_ID && env.AUTH_GOOGLE_SECRET) {
     providers.push(
       Google({
-        clientId: env.GOOGLE_ID,
-        clientSecret: env.GOOGLE_SECRET,
+        clientId: env.AUTH_GOOGLE_ID,
+        clientSecret: env.AUTH_GOOGLE_SECRET,
       }),
     );
   }
