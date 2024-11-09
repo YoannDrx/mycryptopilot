@@ -128,7 +128,7 @@ const syncWithOrganizations: DynamicQueryExtensionCb<
 
   const emailUpdate = args.data.email ? String(args.data.email) : undefined;
   const nameUpdate = args.data.name
-    ? `${String(args.data.name)}'s app`
+    ? `${String(args.data.name)}'s org`
     : undefined;
   const imageUpdate = args.data.image ? String(args.data.image) : undefined;
 

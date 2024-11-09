@@ -40,6 +40,6 @@ export const SiteConfig = {
      * If enable, the user will be able to create only ONE organization and all his settings will be synced with it.
      * It's disable the `/settings` page from the organization and the `/orgs/new` page.
      */
-    enableSingleMemberOrg: false as boolean,
+    enableSingleMemberOrg: true as boolean,
   },
 };
