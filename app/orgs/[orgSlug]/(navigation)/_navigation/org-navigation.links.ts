@@ -3,6 +3,7 @@ import type {
   NavigationLink,
 } from "@/features/navigation/navigation.type";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
+import { SiteConfig } from "@/site-config";
 import type { OrganizationMembershipRole } from "@prisma/client";
 import {
   CreditCard,
@@ -59,33 +60,44 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       },
     ],
   },
-  {
-    title: "Organization",
-    defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
-    links: [
-      {
-        href: `${ORGANIZATION_PATH}/settings`,
-        Icon: Settings,
-        label: "Settings",
+  SiteConfig.features.enableSingleMemberOrg
+    ? {
+        title: "Settings",
+        links: [
+          {
+            href: `/account`,
+            Icon: Settings,
+            label: "Account",
+          },
+        ],
+      }
+    : {
+        title: "Organization",
+        defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
+        links: [
+          {
+            href: `${ORGANIZATION_PATH}/settings`,
+            Icon: Settings,
+            label: "Settings",
+          },
+          {
+            href: `${ORGANIZATION_PATH}/settings/members`,
+            Icon: User2,
+            label: "Members",
+            roles: ["ADMIN"],
+          },
+          {
+            href: `${ORGANIZATION_PATH}/settings/billing`,
+            label: "Billing",
+            roles: ["ADMIN"],
+            Icon: CreditCard,
+          },
+          {
+            href: `${ORGANIZATION_PATH}/settings/danger`,
+            label: "Danger Zone",
+            roles: ["OWNER"],
+            Icon: TriangleAlert,
+          },
+        ],
       },
-      {
-        href: `${ORGANIZATION_PATH}/settings/members`,
-        Icon: User2,
-        label: "Members",
-        roles: ["ADMIN"],
-      },
-      {
-        href: `${ORGANIZATION_PATH}/settings/billing`,
-        label: "Billing",
-        roles: ["ADMIN"],
-        Icon: CreditCard,
-      },
-      {
-        href: `${ORGANIZATION_PATH}/settings/danger`,
-        label: "Danger Zone",
-        roles: ["OWNER"],
-        Icon: TriangleAlert,
-      },
-    ],
-  },
 ] satisfies NavigationGroup[];
