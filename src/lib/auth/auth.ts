@@ -34,7 +34,6 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
     },
   },
   events: {
-    // 🔑 Add this line and the import to add credentials provider
     signIn: credentialsSignInCallback(req),
     createUser: async (message) => {
       const user = message.user;
@@ -57,6 +56,5 @@ export const { handlers, auth: baseAuth } = NextAuth((req) => ({
       });
     },
   },
-  // 🔑 Add this line and the import to add credentials provider
   jwt: credentialsOverrideJwt,
 }));
