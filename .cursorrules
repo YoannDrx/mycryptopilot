@@ -1,4 +1,11 @@
-Develop TypeScript, Node.js, and Next.js applications following provided conventions and guidelines.
+<context>
+You are an AI embed in a project that use :
+
+- TypeScript
+- Node.js with Next.js
+- React
+- TailwindCSS and Shadcn UI
+  </context>
 
 <style-and-structure>
 - Write concise, technical TypeScript code using functional and declarative programming patterns.
@@ -70,8 +77,7 @@ export default async function Page() {
 ```
 
 - Avoid using React hooks within server components.
-
-</next-15-and-react-19>
+  </next-15-and-react-19>
 
 <creating-a-component>
 - You always use `export function` without "default" or named export.
@@ -153,3 +159,104 @@ export const Form = () => {
 ```
 
 </form-example>
+
+<server-action-usage>
+Server Action is a way to execute server-side code like to mutate database etc... but without API endpoint. It's a React abstraction to handle the server-code.
+
+To create and use server-action, you muse follow the following process.
+
+1. Create a server action files
+
+We use `server-action-name.action.ts` converntion to easily reconize server-action.
+
+```ts
+// All server action must start with "use server" to inform NextJS that this method must be executed on the server
+"use server";
+
+// orgAction is a utility from the library "next-safe-action" that handle middleware to verify the permission of the user.
+// use `authAction` for not-org-related actions.
+import { orgAction } from "@/lib/actions/safe-actions";
+
+export const demoAction = orgAction
+  // We can limit the action to a specific role
+  .metadata({
+    roles: ["OWNER", "ADMIN"],
+  })
+  // The schema is used to validate the input of the action
+  .schema(DatabaseFormSchema)
+  .action(async ({ parsedInput: input, ctx }) => {
+    // we can do async code here
+    const database = await prisma.database.create({
+      data: {
+        name: input.name,
+        schema: input.schema,
+        organizationId: ctx.org.id,
+      },
+    });
+
+    return database;
+  });
+```
+
+2. Use the server action in a client component
+
+In any client component we can use Server Action like the following example :
+
+```tsx
+import { demoAction } from "./server-action-name.action";
+import { useMutation } from "@tanstack/react-query";
+import { resolveActionResult } from "@/lib/actions/actions-utils";
+
+export const Form = () => {
+  // ...
+
+  const mutation = useMutation({
+    mutationFn: async (data: FormData) =>
+      resolveActionResult(demoAction(data)),
+    onError: (error) => toast.error(error.message),
+    onSuccess: (result) => {
+      toast.success("Demo Action executed!");
+    },
+  });
+```
+
+</server-action-usage>
+
+<safe-route>
+You need to use next-zod-route to create a safe route.
+
+```ts
+// app/api/org/[orgId]/route.ts
+import { prisma } from "@/lib/prisma";
+import { orgRoute } from "@/lib/safe-route";
+import { z } from "zod";
+
+export const POST = orgRoute
+  // Path params = /orgs/:orgId
+  .params(
+    z.object({
+      orgId: z.string(),
+    }),
+  )
+  // Body params = { name: "John" }
+  .body(z.object({ name: z.string() }))
+  // Query params = ?a=1&b=2
+  .query(z.object({ query: z.string() }))
+  .handler(async (req, { params, body, query, context }) => {
+    // Safe check orgId
+    const orgId = params.orgId;
+    await prisma.organization.update({
+      where: {
+        id: params.orgId,
+      },
+      data: {
+        name: body.name,
+      },
+    });
+  });
+```
+
+- Always create org related routes insides `/api/org/[orgId]/*`
+- Always use `orgRoute` to create safe routes inside `/api/org/[orgId]/*`
+- In general, you can use `authRoute` to create safe routes that is NOT related to orgs.
+  </safe-route>
