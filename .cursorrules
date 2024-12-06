@@ -259,4 +259,5 @@ export const POST = orgRoute
 - Always create org related routes insides `/api/org/[orgId]/*`
 - Always use `orgRoute` to create safe routes inside `/api/org/[orgId]/*`
 - In general, you can use `authRoute` to create safe routes that is NOT related to orgs.
-  </safe-route>
+
+</safe-route>
