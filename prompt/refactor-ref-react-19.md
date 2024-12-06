@@ -1,5 +1,4 @@
-## Context
-
+<context>
 React 19 is out and `forwardRef` is now longer needed to use `ref` in any React components. We can now just pass `ref` props :
 
 ```tsx
@@ -8,12 +7,13 @@ const MyButton = ({ ref, ...props }: ComponentProps<"button">) => {
 };
 ```
 
-## Goal
+</context>
 
+<goal>
 You need to refactor a component **that was using `forwardRef`** to use the new `ref` props.
+</goal>
 
-## Example
-
+<example>
 BEFORE :
 
 ```tsx
@@ -43,3 +43,5 @@ export const MyCustomComponent = ({
   return <div ref={ref} {...props} />;
 };
 ```
+
+</example>
