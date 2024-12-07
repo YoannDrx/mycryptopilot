@@ -142,7 +142,7 @@ export const Form = () => {
        <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
+          render={({ wfield }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
