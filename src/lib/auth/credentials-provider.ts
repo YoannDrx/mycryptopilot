@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { addDays } from "date-fns";
 import { nanoid } from "nanoid";
 import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -7,7 +8,6 @@ import type { NextRequest } from "next/server";
 import { env } from "../env";
 import { prisma } from "../prisma";
 import { AUTH_COOKIE_NAME } from "./auth.const";
-import { addDays } from "date-fns";
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
@@ -40,7 +40,7 @@ export const getCredentialsProvider = () => {
       // Add logic here to look up the user from the credentials supplied
       const passwordHash = hashStringWithSalt(
         String(credentials.password),
-        env.NEXTAUTH_SECRET,
+        env.AUTH_SECRET,
       );
 
       const user = await prisma.user.findFirst({

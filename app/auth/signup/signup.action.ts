@@ -25,7 +25,7 @@ export const signUpAction = action
     try {
       const userData = {
         email,
-        passwordHash: hashStringWithSalt(password, env.NEXTAUTH_SECRET),
+        passwordHash: hashStringWithSalt(password, env.AUTH_SECRET),
         name,
       };
 
