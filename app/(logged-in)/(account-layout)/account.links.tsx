@@ -1,6 +1,13 @@
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import { SiteConfig } from "@/site-config";
-import { AlertCircle, CreditCard, Mail, User2 } from "lucide-react";
+import {
+  AlertCircle,
+  CreditCard,
+  Mail,
+  Package,
+  Settings,
+  User2,
+} from "lucide-react";
 
 export const getAccountNavigation = (): NavigationGroup[] => {
   return ACCOUNT_LINKS;

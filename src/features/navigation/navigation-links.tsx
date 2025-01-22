@@ -75,7 +75,6 @@ export const NavigationLinks = ({
                     {currentPath === link.href && (
                       <motion.div
                         layoutId={"motion-link"}
-                        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
                         className="absolute inset-0 rounded-lg bg-accent"
                       ></motion.div>
                     )}

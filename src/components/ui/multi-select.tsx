@@ -1,4 +1,3 @@
- 
 "use client";
 
 // From : https://shadcn-extension.vercel.app/docs/multi-select
@@ -14,19 +13,13 @@ import { cn } from "@/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check, X as RemoveIcon } from "lucide-react";
 import type { KeyboardEvent } from "react";
-import React, {
-  createContext,
-  forwardRef,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 type MultiSelectorProps = {
   values: string[];
   onValuesChange: (value: string[]) => void;
   loop?: boolean;
-} & React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
+} & React.ComponentProps<typeof CommandPrimitive>;
 
 type MultiSelectContextProps = {
   value: string[];
@@ -156,10 +149,12 @@ const MultiSelector = ({
   );
 };
 
-const MultiSelectorTrigger = forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => {
+const MultiSelectorTrigger = ({
+  ref,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) => {
   const { value, onValueChange, activeIndex } = useMultiSelect();
 
   const mousePreventDefault = useCallback((e: React.MouseEvent) => {
@@ -201,14 +196,13 @@ const MultiSelectorTrigger = forwardRef<
       {children}
     </div>
   );
-});
+};
 
-MultiSelectorTrigger.displayName = "MultiSelectorTrigger";
-
-const MultiSelectorInput = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => {
+const MultiSelectorInput = ({
+  ref,
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input>) => {
   const { setOpen, inputValue, setInputValue, activeIndex, setActiveIndex } =
     useMultiSelect();
   return (
@@ -227,14 +221,14 @@ const MultiSelectorInput = forwardRef<
       )}
     />
   );
-});
+};
 
-MultiSelectorInput.displayName = "MultiSelectorInput";
-
-const MultiSelectorContent = forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ children, className, ...props }, ref) => {
+const MultiSelectorContent = ({
+  ref,
+  children,
+  className,
+  ...props
+}: React.ComponentProps<"div">) => {
   const { open } = useMultiSelect();
   return (
     <div
@@ -251,14 +245,13 @@ const MultiSelectorContent = forwardRef<
       {open && children}
     </div>
   );
-});
+};
 
-MultiSelectorContent.displayName = "MultiSelectorContent";
-
-const MultiSelectorList = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
->(({ className, children }, ref) => {
+const MultiSelectorList = ({
+  ref,
+  className,
+  children,
+}: React.ComponentProps<typeof CommandPrimitive.List>) => {
   return (
     <CommandList
       ref={ref}
@@ -273,16 +266,15 @@ const MultiSelectorList = forwardRef<
       </CommandEmpty>
     </CommandList>
   );
-});
+};
 
-MultiSelectorList.displayName = "MultiSelectorList";
-
-const MultiSelectorItem = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  { value: string } & React.ComponentPropsWithoutRef<
-    typeof CommandPrimitive.Item
-  >
->(({ className, value, children, ...props }, ref) => {
+const MultiSelectorItem = ({
+  ref,
+  className,
+  value,
+  children,
+  ...props
+}: { value: string } & React.ComponentProps<typeof CommandPrimitive.Item>) => {
   const { value: Options, onValueChange, setInputValue } = useMultiSelect();
 
   const mousePreventDefault = useCallback((e: React.MouseEvent) => {
@@ -311,9 +303,7 @@ const MultiSelectorItem = forwardRef<
       {isIncluded && <Check className="size-4" />}
     </CommandItem>
   );
-});
-
-MultiSelectorItem.displayName = "MultiSelectorItem";
+};
 
 export {
   MultiSelector,

@@ -11,12 +11,8 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { calculateReadingTime } from "@/features/posts/calculate-reading-time";
-import type {
-  PostParams} from "@/features/posts/post-manager";
-import {
-  getCurrentPost,
-  getPosts,
-} from "@/features/posts/post-manager";
+import type { PostParams } from "@/features/posts/post-manager";
+import { getCurrentPost, getPosts } from "@/features/posts/post-manager";
 import { formatDate } from "@/lib/format/date";
 import { logger } from "@/lib/logger";
 import { SiteConfig } from "@/site-config";

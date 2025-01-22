@@ -47,6 +47,7 @@ export const setupDefaultOrganizationsOrInviteUser = async (user: User) => {
   // If there is no token, there is no invitation
   // We create a default organization for the user
   if (tokens.length === 0) {
+    console.log("Create default organization for user", user.id);
     const orgSlug = generateSlug(user.name ?? getNameFromEmail(user.email));
     await createOrganizationQuery({
       slug: orgSlug,

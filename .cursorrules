@@ -261,3 +261,31 @@ export const POST = orgRoute
 - In general, you can use `authRoute` to create safe routes that is NOT related to orgs.
 
 </safe-route>
+
+<auth>
+To get the current user, you must use `auth` function.
+
+```ts
+import { auth, requiredAuth } from "@/lib/auth/helper";
+
+const user = await auth();
+// Or required user
+const user = await requiredAuth();
+```
+
+</auth>
+
+<org>
+
+- You muse always use organisation for ressources. Everything must be linked to an organisation, not a user.
+
+- To get an organisation, you can use `getCurrentOrgCache` or `getRequiredCurrentOrgCache` function.
+
+```ts
+import { getCurrentOrgCache } from "@/lib/react/cache";
+
+const org = await getCurrentOrgCache();
+```
+
+</org>
+```

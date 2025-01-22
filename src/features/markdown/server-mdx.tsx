@@ -1,9 +1,6 @@
-import { Loader } from "@/components/ui/loader";
 import { cn } from "@/lib/utils";
 import { MDXRemote } from "next-mdx-remote-client/rsc";
-import { Suspense } from "react";
 import { rehypePlugins, remarkPlugins } from "./markdown.config";
-import { ErrorBoundary } from "@/components/utils/error-boundaries";
 
 type ServerMdxProps = {
   source: string;
@@ -15,13 +12,9 @@ const MdxComponent = {} satisfies Record<string, React.ComponentType>;
 
 export const ServerMdx = (props: ServerMdxProps) => {
   return (
-    <ErrorBoundary>
-      <div className={cn("prose dark:prose-invert", props.className)}>
-        <Suspense fallback={<Loader />}>
-          <RenderMdx {...props} />
-        </Suspense>
-      </div>
-    </ErrorBoundary>
+    <div className={cn("prose dark:prose-invert", props.className)}>
+      <RenderMdx {...props} />
+    </div>
   );
 };
 

@@ -46,13 +46,9 @@ const Skeleton1 = () => {
     <motion.div
       initial="initial"
       whileHover="animate"
-      // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
       className="flex h-full flex-col gap-2"
     >
-      <motion.div
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
-        className="flex flex-row items-start gap-2 rounded-2xl border border-border bg-background p-3"
-      >
+      <motion.div className="flex flex-row items-start gap-2 rounded-2xl border border-border bg-background p-3">
         <img
           alt="avatar"
           src="https://melvynx.com/_next/image?url=%2Fimages%2Fmy-face.png&w=828&q=75"
@@ -66,7 +62,6 @@ const Skeleton1 = () => {
       </motion.div>
       <motion.div
         variants={variants}
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
         className="flex flex-row items-start justify-end gap-2 rounded-2xl border border-border bg-background p-3"
       >
         <p className="text-xs text-neutral-500">
@@ -88,7 +83,6 @@ const Skeleton2 = () => {
     <motion.div
       initial="initial"
       whileHover="animate"
-      // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
       className="flex h-full flex-col gap-2"
     >
       <motion.div>
@@ -125,7 +119,6 @@ const Skeleton3 = () => {
         repeat: Infinity,
         repeatType: "reverse",
       }}
-      // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
       className="dark:bg-dot-white/[0.2] bg-dot-black/[0.2] flex size-full min-h-24 flex-1 flex-col space-y-2 rounded-lg"
       style={{
         background:
@@ -133,10 +126,7 @@ const Skeleton3 = () => {
         backgroundSize: "400% 400%",
       }}
     >
-      <motion.div
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
-        className="size-full rounded-lg"
-      ></motion.div>
+      <motion.div className="size-full rounded-lg"></motion.div>
     </motion.div>
   );
 };
@@ -166,12 +156,10 @@ const Skeleton4 = () => {
       initial="initial"
       animate="animate"
       whileHover="hover"
-      // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
       className="flex flex-1 flex-row gap-4"
     >
       <motion.div
         variants={first}
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
         className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4"
       >
         <Typography variant="large">+123 followers</Typography>
@@ -180,10 +168,7 @@ const Skeleton4 = () => {
           +12%
         </Typography>
       </motion.div>
-      <motion.div
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
-        className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4"
-      >
+      <motion.div className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4">
         <Typography variant="large">+1.4 M Views</Typography>
         <Typography variant={"muted"}>In the last 30 days</Typography>
         <Typography variant={"muted"} className="text-green-500">
@@ -192,7 +177,6 @@ const Skeleton4 = () => {
       </motion.div>
       <motion.div
         variants={second}
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
         className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4"
       >
         <Typography variant="large">1244 likes</Typography>
@@ -236,12 +220,10 @@ const Skeleton5 = () => {
     <motion.div
       initial="initial"
       whileHover="animate"
-      // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
       className="flex flex-col gap-2"
     >
       <motion.div
         variants={variants}
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
         className="flex flex-row items-start gap-2 rounded-2xl border border-border bg-background p-3"
       >
         <img
@@ -257,13 +239,11 @@ const Skeleton5 = () => {
       </motion.div>
       <motion.div
         variants={variantsSecond}
-        // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
         className="flex flex-row items-start justify-end gap-2 rounded-2xl border border-border bg-background p-3"
       >
         <div>
           <p className="text-xs text-neutral-500">Searching...</p>
           <motion.p
-            // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
             className="text-xs text-neutral-500"
             variants={{
               initial: {

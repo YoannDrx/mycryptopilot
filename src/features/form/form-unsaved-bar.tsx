@@ -68,7 +68,6 @@ export const FormUnsavedBar = <T extends FieldValues>(props: FormProps<T>) => {
                         duration: 0.5,
                       },
                     }}
-                    // @ts-expect-error - TODO : Remove this when framer-motion fully supports react 19 (https://mlv.sh/fm-r19)
                     className="pointer-events-auto flex items-center gap-4 rounded-md border bg-card p-1 lg:p-2"
                   >
                     <Typography variant="small">

@@ -13,10 +13,11 @@ const AttributeSchema = z.object({
   status: z.enum(["draft", "published"]),
   coverUrl: z.string(),
   tags: z.array(z.string()).optional(),
+  date: z.date(),
 });
 
 type PostAttributes = z.infer<typeof AttributeSchema> & {
-  date: string;
+  date: Date;
 };
 
 export type Post = {
@@ -53,13 +54,10 @@ export const getPosts = async (tags?: string[]) => {
       }
     }
 
-    const date = fileName.split("_")[0];
-
     posts.push({
       slug: fileName.replace(".mdx", ""),
       content: matter.body,
       attributes: {
-        date,
         ...result.data,
       },
     });

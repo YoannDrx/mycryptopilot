@@ -60,6 +60,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       },
     ],
   },
+
   SiteConfig.features.enableSingleMemberOrg
     ? {
         title: "Settings",
