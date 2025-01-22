@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { SiteConfig } from "@/site-config";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 type OrganizationsSelectProps = {
@@ -28,6 +29,7 @@ type OrganizationsSelectProps = {
 };
 
 export const OrgsSelect = (props: OrganizationsSelectProps) => {
+  const router = useRouter();
   const org = props.orgs.find((org) => org.slug === props.currentOrgSlug);
 
   return (
@@ -79,7 +81,14 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
               );
             })}
             {!SiteConfig.features.enableSingleMemberOrg ? (
-              <DropdownMenuItem>Add a new organization</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  console.log("Go new");
+                  router.push("/orgs/new");
+                }}
+              >
+                Add a new organization
+              </DropdownMenuItem>
             ) : null}
           </DropdownMenuContent>
         </DropdownMenu>

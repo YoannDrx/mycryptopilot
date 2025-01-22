@@ -1,7 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -15,10 +13,9 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
-import { UserDropdown } from "@/features/auth/user-dropdown";
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
+import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
 import { ChevronDown } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/orgs-select";
 import { getAccountNavigation } from "./account.links";
 
@@ -62,24 +59,9 @@ export function AccountSidebar({
         ))}
       </SidebarContent>
       <SidebarFooter className="flex flex-col gap-2">
-        <UserButton />
+        <SidebarUserButton />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
 }
-
-const UserButton = () => {
-  const session = useSession();
-  const data = session.data?.user;
-  return (
-    <UserDropdown>
-      <Button variant="outline">
-        <Avatar className="size-6">
-          <AvatarFallback>{data?.name?.[0] ?? "-"}</AvatarFallback>
-          {data?.image && <AvatarImage src={data.image} />}
-        </Avatar>
-      </Button>
-    </UserDropdown>
-  );
-};

@@ -1,7 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,13 +18,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
-import { UserDropdown } from "@/features/auth/user-dropdown";
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
+import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
 import type { OrganizationMembershipRole } from "@prisma/client";
 import { ChevronDown } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import type { PropsWithChildren} from "react";
+import type { PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
 import { OrgCommand } from "./org-command";
 import { getOrganizationNavigation } from "./org-navigation.links";
@@ -88,28 +85,12 @@ export function OrgSidebar({
       </SidebarContent>
       <SidebarFooter className="flex flex-col gap-2">
         <UpgradeCard />
-        <UserButton />
+        <SidebarUserButton />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
 }
-
-const UserButton = () => {
-  const session = useSession();
-  const data = session.data?.user;
-  return (
-    <UserDropdown>
-      <Button variant="outline">
-        <Avatar className="size-6">
-          <AvatarFallback>{data?.name?.[0] ?? "-"}</AvatarFallback>
-          {data?.image && <AvatarImage src={data.image} />}
-        </Avatar>
-        <span>{data?.name}</span>
-      </Button>
-    </UserDropdown>
-  );
-};
 
 const ItemCollapsing = (
   props: PropsWithChildren<{ defaultOpenStartPath?: string }>,
