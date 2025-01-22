@@ -294,7 +294,7 @@ const org = await getCurrentOrgCache();
 
 You're commit must always follow commitizen convention.
 
-Example :
+<example>
 
 - feat(sidebar): add sidebar user button
 - fix(sidebar): fix sidebar user button
@@ -303,5 +303,16 @@ Example :
 - style(sidebar): style sidebar user button
 - test(sidebar): add test for sidebar user button
 - chore(sidebar): add chore for sidebar user button
+
+</example>
+
+<rules>
+
+- Keep it short, ideally under 50 characters.
+- Explain what and why, not how.
+- Separate subject and body with a blank line.
+- Use body only in case of a big commit.
+
+</rules>
 
 </commit>
