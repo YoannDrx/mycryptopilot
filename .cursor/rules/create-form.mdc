@@ -1,0 +1,76 @@
+---
+description: Create a form using NextJS / React Hook Form / Server Actions.
+globs: *.tsx
+---
+To create a form, we use Shadcn/UI form element mixing with schema. 
+
+Example :
+
+```tsx
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  useZodForm,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { action } from "./action.ts"
+import { resolveActionResult } from "@/lib/actions/actions-utils";
+import { useMutation } from "@tanstack/react-query";
+
+const Schema = z.object({
+  name: z.string(),
+});
+
+export const Form = () => {
+  const form = useZodForm({
+    schema: Schema,
+    defaultValues: {
+      name: "",
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async ({ someParams }: { someParams: string }) => {
+      return resolveActionResult(action({ someParams }));
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      toast.success("Invoice marked as paid");
+    },
+  });
+
+  return (
+    <Form form={form} onSubmit={async (data) => onSubmit(data)}>
+       <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
+    </Form>
+  );
+};
+```
+
+Then you can create an server-action follow @server-actions.mdc.
+
+Please use the following files :
+
+* [form.tsx](mdc:src/components/ui/form.tsx)
+* [actions-utils.ts](mdc:src/lib/actions/actions-utils.ts)
+
+

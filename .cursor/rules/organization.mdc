@@ -1,0 +1,34 @@
+---
+description: How get and retreive organization
+globs: 
+---
+Organization define a multi-tenant model. Every table is linked to an organization instead of a user. Every table about organization is defined in [organization.prisma](mdc:prisma/schema/organization.prisma).
+
+## Methods
+
+- You muse always use organization for resources. Everything must be linked to an organization, not a user.
+
+- To get an organization, you can use `getCurrentOrgCache` or `getRequiredCurrentOrgCache` function.
+
+```ts
+import { getCurrentOrgCache } from "@/lib/react/cache";
+
+const org = await getCurrentOrgCache();
+```
+
+The `cache` version avoid to make the request multiple time.
+
+## Rules
+
+You must always include the organization inside Prisma query to avoid getting data from other organization :
+
+```ts
+const { org } = await getRequiredCurrentOrgCache();
+
+const tags = await prisma.tag.findMany({
+  where: {
+    // Verify the organization
+    organizationId: org.id,
+  }
+});
+```
