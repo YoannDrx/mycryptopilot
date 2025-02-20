@@ -11,9 +11,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Typography } from "@/components/ui/typography";
 import { useState, type ReactElement, type ReactNode } from "react";
 import { LoadingButton } from "../form/submit-button";
+
 type DialogBaseProps = {
   loading?: boolean;
 };
@@ -23,10 +25,16 @@ type StandardDialogProps = {
   description?: ReactNode;
   // The user needs to type this text to confirm the action
   confirmText?: string;
+  // Input field for getting user input
+  input?: {
+    label: string;
+    defaultValue?: string;
+    placeholder?: string;
+  };
   action?:
     | {
         label: string;
-        onClick: () => void | Promise<void>;
+        onClick: (value?: string) => void | Promise<void>;
       }
     | ReactElement;
   cancel?: {
@@ -55,7 +63,10 @@ export const isStandardDialog = (
 export const AlertDialogRenderedDialog = (
   props: AlertDialogRenderedDialogProps,
 ) => {
-  const [text, setText] = useState("");
+  const [confirmText, setConfirmText] = useState("");
+  const [inputValue, setInputValue] = useState(
+    isStandardDialog(props) ? (props.input?.defaultValue ?? "") : "",
+  );
 
   if (!isStandardDialog(props)) {
     return (
@@ -66,7 +77,7 @@ export const AlertDialogRenderedDialog = (
   }
 
   const isConfirmDisabled = props.confirmText
-    ? text !== props.confirmText
+    ? confirmText !== props.confirmText
     : false;
 
   return (
@@ -80,16 +91,29 @@ export const AlertDialogRenderedDialog = (
             props.description
           )}
         </AlertDialogHeader>
-        {props.confirmText ? (
+        {props.confirmText && (
           <div>
             <Typography>
               Please type{" "}
               <Typography variant="code">{props.confirmText}</Typography> to
               confirm the action.
             </Typography>
-            <Input value={text} onChange={(e) => setText(e.target.value)} />
+            <Input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+            />
           </div>
-        ) : null}
+        )}
+        {props.input && (
+          <div className="mt-2">
+            <Label>{props.input.label}</Label>
+            <Input
+              value={inputValue}
+              placeholder={props.input.placeholder}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+          </div>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel
             disabled={props.loading}
@@ -103,7 +127,11 @@ export const AlertDialogRenderedDialog = (
               <LoadingButton
                 loading={props.loading}
                 disabled={props.loading ?? isConfirmDisabled}
-                onClick={props.action.onClick}
+                onClick={() => {
+                  if (props.action && "onClick" in props.action) {
+                    void props.action.onClick(inputValue);
+                  }
+                }}
               >
                 {props.action.label}
               </LoadingButton>

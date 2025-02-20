@@ -39,7 +39,7 @@ export const useAlertDialogStore = create<AlertDialogStore>((set, get) => ({
             dialog.action && "onClick" in dialog.action
               ? {
                   label: dialog.action.label || "",
-                  onClick: () => {
+                  onClick: (value?: string) => {
                     if (dialog.action && "onClick" in dialog.action === false) {
                       logger.error("Invalid dialog action");
                       removeDialog(id);
@@ -47,7 +47,7 @@ export const useAlertDialogStore = create<AlertDialogStore>((set, get) => ({
                     }
 
                     // check if it's a promise
-                    const onClickReturn = dialog.action?.onClick();
+                    const onClickReturn = dialog.action?.onClick(value);
 
                     if (onClickReturn instanceof Promise) {
                       set((state) => {
