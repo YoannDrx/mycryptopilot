@@ -1,6 +1,6 @@
 ---
 description: Create and understand Client Components in NextJS 15 and React 19
-globs: 
+globs: *.tsx, *.ts
 ---
 React 19: Separate Client and [server-components.mdc](mdc:.cursor/rules/server-components.mdc) 
 

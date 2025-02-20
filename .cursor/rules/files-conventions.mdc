@@ -1,6 +1,6 @@
 ---
 description: How to name files
-globs: 
+globs: *.ts, *.tsx
 ---
 Rules to name files :
 

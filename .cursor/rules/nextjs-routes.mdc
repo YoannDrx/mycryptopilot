@@ -12,6 +12,28 @@ The template for page is located in [npag.code-snippets](mdc:.vscode/npag.code-s
 
 * `/app/users/page.tsx` will route in `/users`
 
+The params is ASYNC and you must use [next.ts](mdc:src/types/next.ts) to use the params with PageParams.
+
+Exemple :
+
+```tsx
+import type { PageParams } from "@/types/next";
+
+// You always need to use PageParams
+export default async function RoutePage(props: PageParams<{ userId: string }>) {
+  // You need to await searchParams
+  const searchParams = await props.searchParams;
+  const page = searchParams.page;
+
+  // You need to await params
+  const params = await props.params;
+  const userId = params.userId;
+
+  return // ...
+}
+
+```
+
 ## `layout.tsx`
 
 The template for the layout is located in [nlay.code-snippets](mdc:.vscode/nlay.code-snippets) and define the layout that will be applied to every child of a route.
@@ -21,6 +43,8 @@ The template for the layout is located in [nlay.code-snippets](mdc:.vscode/nlay.
 * `/users/1`
 * `/users`
 * `/users/dashboard/test`
+
+The params is ASYNC and you must use [next.ts](mdc:src/types/next.ts) to use the params with LayoutParams.
 
 ## `error.tsx`
 

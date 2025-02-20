@@ -18,6 +18,11 @@ We use `server-action-name.action.ts` converntion to easily reconize server-acti
 // use `authAction` for not-org-related actions.
 import { orgAction } from "@/lib/actions/safe-actions";
 
+const Schema = z.object({
+  name: z.string(),
+  schema: z.string(),
+})
+
 // Server action must ALWAYS be suffix by "Action" like "deleteUserAction"
 export const demoAction = orgAction
   // We can limit the action to a specific role
@@ -25,7 +30,7 @@ export const demoAction = orgAction
     roles: ["OWNER", "ADMIN"],
   })
   // The schema is used to validate the input of the action
-  .schema(DatabaseFormSchema)
+  .schema(Schema)
   .action(async ({ parsedInput: input, ctx }) => {
     // we can do async code here
     const database = await prisma.database.create({

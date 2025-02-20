@@ -1,0 +1,69 @@
+---
+description: Open and handle alert-dialog
+globs: *.ts, *.tsx
+---
+AlertDialog enable you to show global popup with many features. The basic one is just a validation dialog :
+
+## Example
+
+```tsx
+import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
+
+alertDialog.add({
+  title: "Delete step",
+  description: "Are you sure you want to delete this step?",
+  action: {
+    label: "Delete",
+    onClick: async () => {
+      // todo 
+    }
+  },
+});
+```
+
+## Options
+
+### Input
+
+You can define an input to retreive a value from the alert dialog.
+
+```tsx
+alertDialog.add({
+  title: "Rename campaign",
+  description: "Enter a new name for this campaign",
+  input: {
+    label: "Name",
+    defaultValue: campaign.name,
+  },
+  action: {
+    label: "Rename",
+    onClick: async (value) => {
+      if (!value) return;
+      await renameMutation.mutateAsync({ name: value });
+    },
+  },
+});
+```
+
+### Confirm Text
+
+For important action, you can ask a `confirmText` so the user need to type it before going forward.
+
+```tsx
+alertDialog.add({
+  title: "Delete Segment",
+  description:
+    "Are you sure you want to delete this segment? This action cannot be undone.",
+  confirmText: "DELETE",
+  action: {
+    label: "Delete",
+    onClick: () => {
+      deleteMutation.mutate(segment.id);
+    },
+  },
+});
+```
+
+## Files
+
+Files : [alert-dialog-store.ts](mdc:src/features/alert-dialog/alert-dialog-store.ts)

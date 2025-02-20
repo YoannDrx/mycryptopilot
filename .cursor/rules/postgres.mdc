@@ -13,3 +13,5 @@ VALUES
   ('PRO', 'Pro Plan', 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT ("id") DO NOTHING;
 ```
+
+- Use valid PostgresQL syntax with guillemet for table and column names.

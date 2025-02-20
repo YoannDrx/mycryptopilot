@@ -13,4 +13,4 @@ const user = await auth();
 const user = await requiredAuth();
 ```
 
-You can also get the user using 
+`requiredAuth` will throw an `unauthorized` method that will be catch by `unauthorized.tsx`. You can check [nextjs-routes.mdc](mdc:.cursor/rules/nextjs-routes.mdc).

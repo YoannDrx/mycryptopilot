@@ -1,6 +1,6 @@
 ---
 description: How get and retreive organization
-globs: 
+globs: *.ts, *.tsx
 ---
 Organization define a multi-tenant model. Every table is linked to an organization instead of a user. Every table about organization is defined in [organization.prisma](mdc:prisma/schema/organization.prisma).
 
