@@ -5,314 +5,97 @@ You are an AI embed in a project that use :
 - Node.js with Next.js
 - React
 - TailwindCSS and Shadcn UI
-  </context>
-
-<style-and-structure>
-- Write concise, technical TypeScript code using functional and declarative programming patterns.
-- Avoid classes; prefer iteration and modularization over code duplication.
-- Use descriptive variable names with auxiliary verbs (e.g., `isLoading`, `hasError`).
-- Structure files into: exported component, subcomponents, helpers, static content, and types.
-</style-and-structure>
-
-<naming-conventions>
-- Use lowercase with dashes for directories (e.g., `components/auth-wizard`).
-- Favor named exports for components.
-</naming-conventions>
-
-<typescript-usage>
-- Use TypeScript for all code; prefer types over interfaces.
-- Avoid enums; use maps instead.
-- Use functional components with TypeScript types.
-</typescript-usage>
-
-<syntax-and-formatting>
-- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
-- Write declarative JSX.
-</syntax-and-formatting>
-
-<ui-and-styling>
-- Use Shadcn UI, Radix, and Tailwind for components and styling.
-- Implement responsive design with Tailwind CSS using a mobile-first approach.
-</ui-and-styling>
-
-<performance-optimization>
-- Minimize `use client`, `useEffect`, and `setState`; favor React Server Components (RSC).
-- Wrap client components in `Suspense` with fallback.
-- Use dynamic loading for non-critical components.
-- Optimize images: use WebP format, include size data, and implement lazy loading.
-</performance-optimization>
-
-<database-querying-and-data-model-creation>
-- Use Prisma SDK to query the database.
-- For data models, read the `.prisma` files.
-</database-querying-and-data-model-creation>
-
-<key-conventions>
-- Use 'nuqs' for URL search parameter state management.
-- Optimize Web Vitals (LCP, CLS, FID).
-- Limit 'use client': Favor server components and Next.js SSR for data fetching or state management.
-- Use 'use client' only for Web API access in small components.
-</key-conventions>
-
-<postgresql>
-- Use valid PostgresQL syntax with guillemet for table and column names.
-</postgresql>
-
-<next-15-and-react-19>
-- Utilize React 19 with Server Components. Implement Prisma queries and backend logic inside `page` or `layout` files like this:
-
-```tsx
-// Use "async" for server components
-export default async function Page() {
-  // Use "await" for async operations
-  const result = await prisma.user.findMany();
-  return (
-    <div>
-      {result.map((user) => (
-        <p>{user.name}</p>
-      ))}
-    </div>
-  );
-}
-```
-
-- Avoid using React hooks within server components.
-  </next-15-and-react-19>
-
-<creating-a-component>
-- You always use `export function` without "default" or named export.
-- You always use an object "props" as the first argument of your component, and add type directly in the object.
-
-Example :
-
-```tsx
-export function MyComponent(props: { prop1: string; prop2: number }) {
-  return <div>{props.prop1}</div>;
-}
-```
-
-</creating-a-component>
-
-<toast-example>
-If you need to use "toast", use the following example :
-
-```ts
-import { toast } from "sonner";
-
-toast.success("Success message");
-
-toast.error("Error message");
-```
-
-</toast-example>
-
-<form-example>
-If you need to create form, you need to follow the following example :
-
-```tsx
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  useZodForm,
-} from "@/components/ui/form";
-import { z } from "zod";
-
-const Schema = z.object({
-  name: z.string(),
-});
-
-export const Form = () => {
-  const form = useZodForm({
-    schema: Schema,
-    defaultValues: {
-      name: "",
-    },
-  });
-
-  const onSubmit = async (data: z.infer<typeof Schema>) => {
-    console.log(data);
-  };
-
-  return (
-    <Form form={form} onSubmit={async (data) => onSubmit(data)}>
-       <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      )}
-    </Form>
-  );
-};
-```
-
-</form-example>
-
-<server-action-usage>
-Server Action is a way to execute server-side code like to mutate database etc... but without API endpoint. It's a React abstraction to handle the server-code.
-
-To create and use server-action, you muse follow the following process.
-
-1. Create a server action files
-
-We use `server-action-name.action.ts` converntion to easily reconize server-action.
-
-```ts
-// All server action must start with "use server" to inform NextJS that this method must be executed on the server
-"use server";
-
-// orgAction is a utility from the library "next-safe-action" that handle middleware to verify the permission of the user.
-// use `authAction` for not-org-related actions.
-import { orgAction } from "@/lib/actions/safe-actions";
-
-export const demoAction = orgAction
-  // We can limit the action to a specific role
-  .metadata({
-    roles: ["OWNER", "ADMIN"],
-  })
-  // The schema is used to validate the input of the action
-  .schema(DatabaseFormSchema)
-  .action(async ({ parsedInput: input, ctx }) => {
-    // we can do async code here
-    const database = await prisma.database.create({
-      data: {
-        name: input.name,
-        schema: input.schema,
-        organizationId: ctx.org.id,
-      },
-    });
-
-    return database;
-  });
-```
-
-2. Use the server action in a client component
-
-In any client component we can use Server Action like the following example :
-
-```tsx
-import { demoAction } from "./server-action-name.action";
-import { useMutation } from "@tanstack/react-query";
-import { resolveActionResult } from "@/lib/actions/actions-utils";
-
-export const Form = () => {
-  // ...
-
-  const mutation = useMutation({
-    mutationFn: async (data: FormData) =>
-      resolveActionResult(demoAction(data)),
-    onError: (error) => toast.error(error.message),
-    onSuccess: (result) => {
-      toast.success("Demo Action executed!");
-    },
-  });
-```
-
-</server-action-usage>
-
-<safe-route>
-You need to use next-zod-route to create a safe route.
-
-```ts
-// app/api/org/[orgId]/route.ts
-import { prisma } from "@/lib/prisma";
-import { orgRoute } from "@/lib/safe-route";
-import { z } from "zod";
-
-export const POST = orgRoute
-  // Path params = /orgs/:orgId
-  .params(
-    z.object({
-      orgId: z.string(),
-    }),
-  )
-  // Body params = { name: "John" }
-  .body(z.object({ name: z.string() }))
-  // Query params = ?a=1&b=2
-  .query(z.object({ query: z.string() }))
-  .handler(async (req, { params, body, query, context }) => {
-    // Safe check orgId
-    const orgId = params.orgId;
-    await prisma.organization.update({
-      where: {
-        id: params.orgId,
-      },
-      data: {
-        name: body.name,
-      },
-    });
-  });
-```
-
-- Always create org related routes insides `/api/org/[orgId]/*`
-- Always use `orgRoute` to create safe routes inside `/api/org/[orgId]/*`
-- In general, you can use `authRoute` to create safe routes that is NOT related to orgs.
-
-</safe-route>
-
-<auth>
-To get the current user, you must use `auth` function.
-
-```ts
-import { auth, requiredAuth } from "@/lib/auth/helper";
-
-const user = await auth();
-// Or required user
-const user = await requiredAuth();
-```
-
-</auth>
-
-<org>
-
-- You muse always use organisation for ressources. Everything must be linked to an organisation, not a user.
-
-- To get an organisation, you can use `getCurrentOrgCache` or `getRequiredCurrentOrgCache` function.
-
-```ts
-import { getCurrentOrgCache } from "@/lib/react/cache";
-
-const org = await getCurrentOrgCache();
-```
-
-</org>
-```
-
-<commit>
-
-You're commit must always follow commitizen convention.
-
-<example>
-
-- feat(sidebar): add sidebar user button
-- fix(sidebar): fix sidebar user button
-- refactor(sidebar): refactor sidebar user button
-- docs(sidebar): add docs for sidebar user button
-- style(sidebar): style sidebar user button
-- test(sidebar): add test for sidebar user button
-- chore(sidebar): add chore for sidebar user button
-
-</example>
-
-<rules>
-
-- Keep it short, ideally under 50 characters.
-- Explain what and why, not how.
-- Separate subject and body with a blank line.
-- Use body only in case of a big commit.
-
-</rules>
-
-</commit>
+
+</context>
+
+<project>
+
+## Critiqo.io
+
+### Core Features
+
+1. **Review Capture Pages**  
+   - Ability to create multiple pages dedicated to gathering reviews from users.  
+   - **Pages Flow**:  
+     1. **Welcome Page** – Introduces the product/service and explains the review process.  
+     2. **Choice of Review Type** – User selects text-based review or video review (if enabled).  
+     3. **Review Submission** – User writes the review text or records a short (max 90 seconds) video.  
+     4. **User Info Collection** – Basic details (Name, Email, Role (optional), Profile Image).  
+     5. **Thank You Page** – A final message confirming submission.  
+   - **Customization**:  
+     - Text content (headers, descriptions)  
+     - Primary color (theme-based)  
+     - Background color (theme-based)  
+   - **Live Preview**:  
+     - An admin/editor interface with fields on the left, live preview on the right.  
+     - All customizations saved in a JSON config (type-safe with Prisma schemas).
+
+2. **Review Moderation & Listing**  
+   - **Review List**:  
+     - Displays all reviews in a paginated table (20 reviews per page).  
+     - Shows basic info (user name, image, partial text or video thumbnail).  
+   - **Moderation**:  
+     - Admin can open a review to see the full content, edit details if necessary, then approve or reject it.  
+     - By default, reviews must be **approved** before becoming publicly visible.   
+
+3. **Tagging System**  
+   - Multiple tags can be assigned to a review (e.g., “Positive”, “Tutorial”, etc.).  
+   - Tags can be inherited automatically from the review page configuration.  
+   - Admin can add or remove tags during moderation.  
+   - Dedicated UI for managing tags (create, rename, delete).
+
+4. **Video Handling with Mux**  
+   - Users can upload video reviews up to **1 minute 30 seconds**.  
+   - Mux handles compression, conversion, and automated thumbnail generation.  
+   - We store references to Mux assets for playback within the app.
+
+5. **Public Sharing of Review Pages**  
+   - A publicly accessible URL for each review page (e.g., `critiqo.io/:orgSlug/reviewPageId`).  
+   - Uses smooth animations (via `framer-motion` or similar) across the steps:
+     1. Welcome  
+     2. Capture (text or video)  
+     3. Basic info  
+     4. Thank you  
+   - Once a review is submitted, an email notification is sent to the **organization’s email**.
+
+6. **Widgets for Displaying Reviews**  
+   - Embed code to display a masonry grid of reviews on any external site.  
+   - **Styling**:  
+     - Primary color, background color, and text are customizable (within reason).  
+     - Masonry layout (multiple columns, responsive).  
+     - “Load More” button to fetch additional reviews.  
+   - **Tag-based Filtering**:  
+     - Widget can show only reviews with certain tags, or all reviews.  
+
+7. **Widget to Encourage Reviews**  
+   - A small widget (popup) that appears (e.g., bottom-left corner) after a configurable time interval.  
+   - Clicking it redirects the user to the dedicated review page.
+
+8. **Notifications**  
+   - When a review is submitted, only the **organization’s email** is notified.  
+   - No separate notifications on approval or rejection for the reviewer.
+
+---
+
+### Monetization
+- **Free Plan**:  
+  - Up to **10 reviews** total.  
+- **Premium Plan**:  
+  - **€39/month**.  
+  - Unlimited reviews.
+
+---
+
+### Future Integrations (Not in First Release)
+- **CRM Integrations**: e.g., Salesforce, HubSpot.  
+- **Webhooks**: so external services can react to new reviews or updates.
+
+---
+
+### Analytics & Stats
+- Basic analytics on capture pages:
+  - **Number of Visits**  
+  - **Number of Submissions**  
+  - **Conversion Rate** (submissions ÷ visits)  
+
+</project>

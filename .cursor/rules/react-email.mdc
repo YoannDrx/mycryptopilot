@@ -1,0 +1,33 @@
+---
+description: Create email template and use it.
+globs: 
+---
+We use React-Email and Resend to send email. Here is how to use it.
+
+## Create email
+
+Go in the folder `/emails` to create an email, you can follow the example of [magic-link-email.email.tsx](mdc:emails/magic-link-email.email.tsx) `<EmailLayout />` will define the default beautiful layout for an email.
+
+## Use email
+
+Use the utility `sendEmail` when you need to send an email.
+
+Exemple: 
+
+```ts
+import { sendEmail } from "@/lib/mail/sendEmail";
+
+const result = await sendEmail({
+  to: email,
+  subject: `Sign in to ${SiteConfig.domain}`,
+  react: MagicLinkMail({
+    url,
+  }),
+  text: `Here is your magic link : ${url}`
+});
+```
+
+* to : email adresse of the recipient
+* subject : subject of the email
+* react : React component, you must never instanciate it with `<MagicLinkMail>` but always with object props
+* text : the plain text of the email to improve delivrability

@@ -7,6 +7,7 @@ import { SiteConfig } from "@/site-config";
 import type { OrganizationMembershipRole } from "@prisma/client";
 import {
   CreditCard,
+  File,
   Home,
   Settings,
   TriangleAlert,
@@ -57,6 +58,11 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         href: `${ORGANIZATION_PATH}/users`,
         Icon: User,
         label: "Users",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/pages`,
+        Icon: File,
+        label: "Pages",
       },
     ],
   },

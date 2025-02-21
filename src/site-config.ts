@@ -1,15 +1,15 @@
 export const SiteConfig = {
-  title: "Now.ts",
-  description: "A template description for Now.ts",
-  prodUrl: "https://demo.nowts.app",
-  domain: "nowts.app",
+  title: "Critiqo.io",
+  description: "Collect and showcase powerful video and text testimonials",
+  prodUrl: "https://critiqo.io",
+  domain: "critiqo.io",
   appIcon: "/images/icon.png",
   company: {
-    name: "NowTS Inc.",
-    address: "1234 Main St, New York, NY 10001",
+    name: "Critiqo",
+    address: "", // Remove if not needed
   },
   brand: {
-    primary: "#007291",
+    primary: "#007291", // You can adjust this to your brand color
   },
   maker: {
     image: "https://melvynx.com/images/me/twitter-en.jpg",
