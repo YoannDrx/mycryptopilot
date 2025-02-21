@@ -216,4 +216,15 @@ export function useCoordinates() {
 }
 ```
 
+## Rules
 
+* When you want use a query-state in a server component, you must add shallow and throttleMs
+
+Exemple :
+
+```tsx
+const [status, setStatus] = useQueryState("status", {
+  shallow: false,
+  throttleMs: 1000,
+});
+```

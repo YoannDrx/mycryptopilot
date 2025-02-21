@@ -7,6 +7,7 @@ import { SearchParamsMessageToastSuspended } from "@/features/searchparams-messa
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
+
 import type { PropsWithChildren } from "react";
 
 const queryClient = new QueryClient();

@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-const StepConfigsSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  videoUrl: z.string().nullable(),
-  ctaLabel: z.string(),
-});
-
 export const PageConfigSchema = z.object({
   intro: z.object({
     title: z.string(),

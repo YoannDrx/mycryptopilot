@@ -9,6 +9,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -40,17 +41,19 @@ export default function RootLayout({
             CaptionFont.variable,
           )}
         >
-          <Providers>
-            <NextTopLoader
-              delay={100}
-              showSpinner={false}
-              color="hsl(var(--primary))"
-            />
-            {children}
-            {modal}
-            <TailwindIndicator />
-            <FloatingLegalFooter />
-          </Providers>
+          <NuqsAdapter>
+            <Providers>
+              <NextTopLoader
+                delay={100}
+                showSpinner={false}
+                color="hsl(var(--primary))"
+              />
+              {children}
+              {modal}
+              <TailwindIndicator />
+              <FloatingLegalFooter />
+            </Providers>
+          </NuqsAdapter>
         </body>
       </html>
     </>

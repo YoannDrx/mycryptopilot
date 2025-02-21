@@ -64,6 +64,11 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         Icon: File,
         label: "Pages",
       },
+      {
+        href: `${ORGANIZATION_PATH}/reviews`,
+        Icon: File,
+        label: "Reviews",
+      },
     ],
   },
 
