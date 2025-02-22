@@ -22,7 +22,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { InlineTooltip } from "@/components/ui/tooltip";
 import { Typography } from "@/components/ui/typography";
-import { alertDialog } from "@/features/alert-dialog/dialog-manager-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
 import { FormUnsavedBar } from "@/features/form/form-unsaved-bar";
 import { openGlobalDialog } from "@/features/global-dialog/global-dialog.store";
 import { OrganizationMembershipRole } from "@prisma/client";
@@ -187,7 +187,7 @@ export const OrgMembersForm = ({
                 e.preventDefault();
                 e.stopPropagation();
 
-                const dialogId = alertDialog.add({
+                const dialogId = dialogManager.add({
                   title: "Oh no ! You've reached the maximum number of members",
                   description: (
                     <>
@@ -213,7 +213,7 @@ export const OrgMembersForm = ({
                     <Button
                       onClick={() => {
                         openGlobalDialog("org-plan");
-                        alertDialog.remove(dialogId);
+                        dialogManager.remove(dialogId);
                       }}
                     >
                       <Zap className="mr-2" size={16} />

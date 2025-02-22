@@ -94,7 +94,7 @@ export const useDialogManager = create<DialogManagerStore>((set, get) => ({
     })),
 }));
 
-export const alertDialog = {
+export const dialogManager = {
   add: (dialog: DialogManagerRendererDialogProps) =>
     useDialogManager.getState().addDialog(dialog),
   remove: (dialogId: string) =>

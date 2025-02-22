@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { alertDialog } from "@/features/alert-dialog/dialog-manager-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
 import { toast } from "sonner";
 import { accountAskDeletionAction } from "./delete-account.action";
 
@@ -33,7 +33,7 @@ export default function DeleteProfilePage() {
           variant="destructive"
           size="lg"
           onClick={() => {
-            alertDialog.add({
+            dialogManager.add({
               title: "Delete your account ?",
               description: "Are you sure you want to delete your profile?",
               action: {

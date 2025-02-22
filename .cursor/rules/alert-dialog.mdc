@@ -7,9 +7,9 @@ AlertDialog enable you to show global popup with many features. The basic one is
 ## Example
 
 ```tsx
-import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
 
-alertDialog.add({
+dialogManager.add({
   title: "Delete step",
   description: "Are you sure you want to delete this step?",
   action: {
@@ -28,7 +28,7 @@ alertDialog.add({
 You can define an input to retreive a value from the alert dialog.
 
 ```tsx
-alertDialog.add({
+dialogManager.add({
   title: "Rename campaign",
   description: "Enter a new name for this campaign",
   input: {
@@ -50,7 +50,7 @@ alertDialog.add({
 For important action, you can ask a `confirmText` so the user need to type it before going forward.
 
 ```tsx
-alertDialog.add({
+dialogManager.add({
   title: "Delete Segment",
   description:
     "Are you sure you want to delete this segment? This action cannot be undone.",
@@ -66,4 +66,6 @@ alertDialog.add({
 
 ## Files
 
-Files : [alert-dialog-store.ts](mdc:src/features/alert-dialog/alert-dialog-store.ts)
+Files : [dialog-manager-dialog.tsx](mdc:src/features/dialog-manager/dialog-manager-dialog.tsx) [dialog-manager-store.ts](mdc:src/features/dialog-manager/dialog-manager-store.ts)
+
+

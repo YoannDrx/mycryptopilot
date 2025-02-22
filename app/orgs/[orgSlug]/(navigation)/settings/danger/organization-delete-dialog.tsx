@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { alertDialog } from "@/features/alert-dialog/dialog-manager-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
 import { useMutation } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -34,7 +34,7 @@ export const OrganizationDeleteDialog = ({
       type="button"
       variant="destructive"
       onClick={() => {
-        alertDialog.add({
+        dialogManager.add({
           title: "Delete Organization",
           description: "Are you sure you want to delete your organization?",
           confirmText: org.slug,
