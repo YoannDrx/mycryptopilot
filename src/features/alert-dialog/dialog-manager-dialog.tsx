@@ -47,11 +47,11 @@ type CustomDialogProps = {
   children?: ReactNode;
 };
 
-export type AlertDialogRenderedDialogProps = DialogBaseProps &
+export type DialogManagerRendererDialogProps = DialogBaseProps &
   (StandardDialogProps | CustomDialogProps);
 
 export const isStandardDialog = (
-  props: AlertDialogRenderedDialogProps,
+  props: DialogManagerRendererDialogProps,
 ): props is DialogBaseProps & StandardDialogProps => {
   if ("children" in props) {
     return false;
@@ -60,8 +60,8 @@ export const isStandardDialog = (
   return true;
 };
 
-export const AlertDialogRenderedDialog = (
-  props: AlertDialogRenderedDialogProps,
+export const DialogManagerRendererDialog = (
+  props: DialogManagerRendererDialogProps,
 ) => {
   const [confirmText, setConfirmText] = useState("");
   const [inputValue, setInputValue] = useState(

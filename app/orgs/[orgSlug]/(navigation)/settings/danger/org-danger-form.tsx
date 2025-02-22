@@ -15,7 +15,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { alertDialog } from "@/features/alert-dialog/alert-dialog-store";
+import { alertDialog } from "@/features/alert-dialog/dialog-manager-store";
 import { FormUnsavedBar } from "@/features/form/form-unsaved-bar";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { formatId } from "@/lib/format/id";

@@ -3,26 +3,26 @@
 import { logger } from "@/lib/logger";
 import { toast } from "sonner";
 import { create } from "zustand";
-import type { AlertDialogRenderedDialogProps } from "./alert-dialog-rendered-dialog";
-import { isStandardDialog } from "./alert-dialog-rendered-dialog";
+import type { DialogManagerRendererDialogProps } from "./dialog-manager-dialog";
+import { isStandardDialog } from "./dialog-manager-dialog";
 
-export type AlertDialogType = AlertDialogRenderedDialogProps & {
+export type DialogManagerType = DialogManagerRendererDialogProps & {
   id: string;
 };
 
-type AlertDialogStore = {
-  dialogs: AlertDialogType[];
-  addDialog: (dialog: AlertDialogRenderedDialogProps) => string;
+type DialogManagerStore = {
+  dialogs: DialogManagerType[];
+  addDialog: (dialog: DialogManagerRendererDialogProps) => string;
   removeDialog: (dialogId: string) => void;
 };
 
-export const useAlertDialogStore = create<AlertDialogStore>((set, get) => ({
+export const useDialogManager = create<DialogManagerStore>((set, get) => ({
   dialogs: [],
   addDialog: (dialog) => {
     const id = Math.random().toString(36).slice(2, 9);
     const { removeDialog } = get();
 
-    const newDialog: AlertDialogType = isStandardDialog(dialog)
+    const newDialog: DialogManagerType = isStandardDialog(dialog)
       ? {
           ...dialog,
           cancel: {
@@ -95,8 +95,8 @@ export const useAlertDialogStore = create<AlertDialogStore>((set, get) => ({
 }));
 
 export const alertDialog = {
-  add: (dialog: AlertDialogRenderedDialogProps) =>
-    useAlertDialogStore.getState().addDialog(dialog),
+  add: (dialog: DialogManagerRendererDialogProps) =>
+    useDialogManager.getState().addDialog(dialog),
   remove: (dialogId: string) =>
-    useAlertDialogStore.getState().removeDialog(dialogId),
+    useDialogManager.getState().removeDialog(dialogId),
 };
