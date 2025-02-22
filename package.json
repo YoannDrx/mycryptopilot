@@ -12,7 +12,7 @@
     "ts": "tsc --noEmit",
     "email": "email dev",
     "stripe-webhooks": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && next build && prisma migrate deploy",
     "postinstall": "prisma generate",
     "clean": "next lint --fix && tsc --noEmit && prettier --write .",
     "knip": "knip"
