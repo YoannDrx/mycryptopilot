@@ -1,0 +1,23 @@
+---
+description: EXPLAIN how authentification work and HOW to use it
+globs: *.tsx, *.ts
+---
+## Context
+
+* We use NextAuth to handle authentification in our application.
+* Our application create helper to simplify the usage of retreiving the user.
+
+## Example
+
+To get the current user, you must use `auth` function :
+
+```ts
+import { auth, requiredAuth } from "@/lib/auth/helper";
+
+// user is optional
+const user = await auth();
+// throw an error if user is not defined
+const user = await requiredAuth();
+```
+
+`requiredAuth` will throw an `unauthorized` method that will be catch by `unauthorized.tsx`. You can check [nextjs-routes.mdc](mdc:.cursor/rules/nextjs-routes.mdc).

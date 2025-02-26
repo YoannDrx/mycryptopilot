@@ -1,12 +1,16 @@
 ---
-description: Create and use React Query State to sync URL Query of the application with our Query State with NUQS
+description: EXPLAIN how to use NUQS to create Query State that sync React useState with the URL Query
 globs: *.tsx, *.ts
 ---
+## Context
+
 NUQS is a libriarie that enable you to store value in the QUERY of the URL :
 
-* /users?page=12&q=hello&name=Melvyn
+* `/users?page=12&q=hello&name=Melvyn`
 
-The Query can be stored in a [client-components.mdc](mdc:.cursor/rules/client-components.mdc) with useQuery hooks : 
+## Usage
+
+The Query can be stored in a [11-client-components.mdc](mdc:.cursor/rules/11-client-components.mdc) with useQuery hooks : 
 
 ```tsx
 'use client'

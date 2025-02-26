@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { auth, AuthError } from "./auth/helper";
 import { getRequiredCurrentOrg } from "./organizations/get-org";
 
-export class RouteError extends Error {
+export class SafeRouteError extends Error {
   status?: number;
   constructor(message: string, status?: number) {
     super(message);
@@ -14,7 +14,7 @@ export class RouteError extends Error {
 
 export const route = createZodRoute({
   handleServerError: (e: Error) => {
-    if (e instanceof RouteError) {
+    if (e instanceof SafeRouteError) {
       return NextResponse.json(
         { message: e.message, status: e.status },
         {
@@ -42,7 +42,7 @@ export const authRoute = route.use(async () => {
   const user = await auth();
 
   if (!user) {
-    throw new RouteError("Session not found!");
+    throw new SafeRouteError("Session not found!");
   }
 
   return {
@@ -59,7 +59,7 @@ export const orgRoute = authRoute.use(async () => {
       organization,
     };
   } catch {
-    throw new RouteError(
+    throw new SafeRouteError(
       "You need to be part of an organization to access this resource.",
     );
   }

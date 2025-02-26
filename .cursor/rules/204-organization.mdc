@@ -1,8 +1,14 @@
 ---
-description: How get and retreive organization
+description: EXPLAIN how work multi-tenant model with organization
 globs: *.ts, *.tsx
 ---
-Organization define a multi-tenant model. Every table is linked to an organization instead of a user. Every table about organization is defined in [organization.prisma](mdc:prisma/schema/organization.prisma).
+## Context
+
+* The application define a multi-tenant model
+* The multi-tenant model name is `Organization`
+* Every table must be linked to `Organization` and the user can be a member of it.
+* The plan and payment is always link to the `Organization`
+* The orgainzation is defined in [organization.prisma](mdc:prisma/schema/organization.prisma)
 
 ## Methods
 

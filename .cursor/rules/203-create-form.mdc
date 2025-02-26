@@ -2,9 +2,12 @@
 description: Create a form using NextJS / React Hook Form / Server Actions.
 globs: *.tsx
 ---
-To create a form, we use Shadcn/UI form element mixing with schema. 
+## Context
 
-Example :
+* Creating a form should always use Shadcn/UI [input.tsx](mdc:src/components/ui/input.tsx) and [label.tsx](mdc:src/components/ui/label.tsx) and [form.tsx](mdc:src/components/ui/form.tsx)
+* We must always use [server-actions.mdc](mdc:.cursor/rules/server-actions.mdc) or [21-api-route.mdc](mdc:.cursor/rules/21-api-route.mdc) to handle the action and [use-mutation.mdc](mdc:.cursor/rules/use-mutation.mdc)
+
+## Example
 
 ```tsx
 import {
@@ -66,7 +69,7 @@ export const Form = () => {
 };
 ```
 
-Then you can create an server-action follow @server-actions.mdc.
+Then you can create an server-action follow [server-actions.mdc](mdc:.cursor/rules/server-actions.mdc)
 
 Please use the following files :
 

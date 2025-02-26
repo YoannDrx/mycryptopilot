@@ -1,10 +1,13 @@
 ---
-description: Create a new server actions in NextJS 15
+description: EXPLAIN how to create and USE server action with next-safe-action library
 globs: *.ts, *.tsx
 ---
-Server Action is a way to execute server-side code like to mutate database etc... but without API endpoint. It's a React abstraction to handle the server-code.
+## Context
 
-To create and use server-action, you muse follow the following process.
+* Server Action is a way to execute server-side code like to mutate database etc... but without API endpoint. It's a React abstraction to handle the server-code.
+* We use `next-safe-action` to handle authentification, security and to verify the data we received
+
+## Usage
 
 1. Create a server action files
 

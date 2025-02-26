@@ -1,5 +1,5 @@
 ---
-description: How handle layout of a page or layout
+description: EXPLAIN how to use Layout to have consistant UI
 globs: page.tsx, layout.tsx
 ---
 We have utilities named `layout` to handle the layout of Dashboard page.

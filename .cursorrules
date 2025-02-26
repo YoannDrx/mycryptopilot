@@ -1,4 +1,5 @@
 <context>
+
 You are an AI embed in a project that use :
 
 - TypeScript
@@ -10,92 +11,6 @@ You are an AI embed in a project that use :
 
 <project>
 
-## Critiqo.io
-
-### Core Features
-
-1. **Review Capture Pages**  
-   - Ability to create multiple pages dedicated to gathering reviews from users.  
-   - **Pages Flow**:  
-     1. **Welcome Page** – Introduces the product/service and explains the review process.  
-     2. **Choice of Review Type** – User selects text-based review or video review (if enabled).  
-     3. **Review Submission** – User writes the review text or records a short (max 90 seconds) video.  
-     4. **User Info Collection** – Basic details (Name, Email, Role (optional), Profile Image).  
-     5. **Thank You Page** – A final message confirming submission.  
-   - **Customization**:  
-     - Text content (headers, descriptions)  
-     - Primary color (theme-based)  
-     - Background color (theme-based)  
-   - **Live Preview**:  
-     - An admin/editor interface with fields on the left, live preview on the right.  
-     - All customizations saved in a JSON config (type-safe with Prisma schemas).
-
-2. **Review Moderation & Listing**  
-   - **Review List**:  
-     - Displays all reviews in a paginated table (20 reviews per page).  
-     - Shows basic info (user name, image, partial text or video thumbnail).  
-   - **Moderation**:  
-     - Admin can open a review to see the full content, edit details if necessary, then approve or reject it.  
-     - By default, reviews must be **approved** before becoming publicly visible.   
-
-3. **Tagging System**  
-   - Multiple tags can be assigned to a review (e.g., “Positive”, “Tutorial”, etc.).  
-   - Tags can be inherited automatically from the review page configuration.  
-   - Admin can add or remove tags during moderation.  
-   - Dedicated UI for managing tags (create, rename, delete).
-
-4. **Video Handling with Mux**  
-   - Users can upload video reviews up to **1 minute 30 seconds**.  
-   - Mux handles compression, conversion, and automated thumbnail generation.  
-   - We store references to Mux assets for playback within the app.
-
-5. **Public Sharing of Review Pages**  
-   - A publicly accessible URL for each review page (e.g., `critiqo.io/:orgSlug/reviewPageId`).  
-   - Uses smooth animations (via `framer-motion` or similar) across the steps:
-     1. Welcome  
-     2. Capture (text or video)  
-     3. Basic info  
-     4. Thank you  
-   - Once a review is submitted, an email notification is sent to the **organization’s email**.
-
-6. **Widgets for Displaying Reviews**  
-   - Embed code to display a masonry grid of reviews on any external site.  
-   - **Styling**:  
-     - Primary color, background color, and text are customizable (within reason).  
-     - Masonry layout (multiple columns, responsive).  
-     - “Load More” button to fetch additional reviews.  
-   - **Tag-based Filtering**:  
-     - Widget can show only reviews with certain tags, or all reviews.  
-
-7. **Widget to Encourage Reviews**  
-   - A small widget (popup) that appears (e.g., bottom-left corner) after a configurable time interval.  
-   - Clicking it redirects the user to the dedicated review page.
-
-8. **Notifications**  
-   - When a review is submitted, only the **organization’s email** is notified.  
-   - No separate notifications on approval or rejection for the reviewer.
-
----
-
-### Monetization
-- **Free Plan**:  
-  - Up to **10 reviews** total.  
-- **Premium Plan**:  
-  - **€39/month**.  
-  - Unlimited reviews.
-
----
-
-### Future Integrations (Not in First Release)
-- **CRM Integrations**: e.g., Salesforce, HubSpot.  
-- **Webhooks**: so external services can react to new reviews or updates.
-
----
-
-### Analytics & Stats
-- Basic analytics on capture pages:
-  - **Number of Visits**  
-  - **Number of Submissions**  
-  - **Conversion Rate** (submissions ÷ visits)  
+EXPLANATION OF THE PROJECT
 
 </project>

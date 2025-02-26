@@ -1,8 +1,10 @@
 ---
-description: How create and name Zod Schema
+description: ENFORE rules 
 globs: *.store.ts, *.ts
 ---
-Zod Schema is used to parse data for Form, API Endpoint and other stuff. You must always follow the rules.
+## Context
+
+* Zod Schema is used to parse data for Form, API Endpoint and other stuff. You must always follow the rules.
 
 ## Naming rules
 

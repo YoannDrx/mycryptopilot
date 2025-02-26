@@ -1,8 +1,11 @@
 ---
-description: Create email template and use it.
+description: EXPLAIN how to create email template and how to use them
 globs: 
 ---
-We use React-Email and Resend to send email. Here is how to use it.
+## Context
+
+* We use React-Email and Resend to send email.
+* We use Resend to send this email
 
 ## Create email
 

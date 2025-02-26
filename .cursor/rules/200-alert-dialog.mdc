@@ -1,8 +1,10 @@
 ---
-description: Open and handle alert-dialog
+description: EXPLAIN how to use Dialog Manager to easily create Dialog without boilerplate code.
 globs: *.ts, *.tsx
 ---
-AlertDialog enable you to show global popup with many features. The basic one is just a validation dialog :
+## Context
+
+* DialogManager enables you to show a global popup with many features. The basic one is just a validation dialog:
 
 ## Example
 
@@ -66,6 +68,9 @@ dialogManager.add({
 
 ## Files
 
-Files : [dialog-manager-dialog.tsx](mdc:src/features/dialog-manager/dialog-manager-dialog.tsx) [dialog-manager-store.ts](mdc:src/features/dialog-manager/dialog-manager-store.ts)
+Files : 
+
+* [dialog-manager-dialog.tsx](mdc:src/features/dialog-manager/dialog-manager-dialog.tsx) 
+* [dialog-manager-store.ts](mdc:src/features/dialog-manager/dialog-manager-store.ts)
 
 
