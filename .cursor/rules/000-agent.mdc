@@ -1,6 +1,7 @@
 ---
 description: Styles used in our application
 globs: 
+alwaysApply: false
 ---
 - Write concise, technical TypeScript code using functional and declarative programming patterns.
 - Avoid classes; prefer iteration and modularization over code duplication.
@@ -42,3 +43,8 @@ globs:
 - Limit 'use client': Favor server components and Next.js SSR for data fetching or state management.
 - Use 'use client' only for Web API access in small components.
 
+## Output
+
+- Always write code in English
+- Always write UI in English
+- Do not add comments

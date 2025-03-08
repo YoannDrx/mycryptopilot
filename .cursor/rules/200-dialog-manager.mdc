@@ -1,6 +1,7 @@
 ---
 description: EXPLAIN how to use Dialog Manager to easily create Dialog without boilerplate code.
 globs: *.ts, *.tsx
+alwaysApply: false
 ---
 ## Context
 
@@ -35,13 +36,14 @@ dialogManager.add({
   description: "Enter a new name for this campaign",
   input: {
     label: "Name",
-    defaultValue: campaign.name,
+    defaultValue: "Some value",
+    placeholder: "Enter a new name",
   },
   action: {
     label: "Rename",
     onClick: async (value) => {
       if (!value) return;
-      await renameMutation.mutateAsync({ name: value });
+      // TODO
     },
   },
 });
