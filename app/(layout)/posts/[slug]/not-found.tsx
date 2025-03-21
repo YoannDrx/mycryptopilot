@@ -13,7 +13,7 @@ export default function NotFoundPage() {
         <LayoutTitle>404 - Not Found</LayoutTitle>
       </LayoutHeader>
       <LayoutContent>
-        <Card variant="error">
+        <Card>
           <CardHeader>
             <CardTitle>The post you are looking for doesn't exist.</CardTitle>
           </CardHeader>

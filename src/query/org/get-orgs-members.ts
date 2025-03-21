@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 
 export const getOrgsMembers = async (orgId: string) => {
-  return prisma.organizationMembership.findMany({
+  return prisma.member.findMany({
     where: {
       organizationId: orgId,
     },
@@ -15,8 +16,10 @@ export const getOrgsMembers = async (orgId: string) => {
         },
       },
       id: true,
-      roles: true,
+      role: true,
       userId: true,
     },
   });
 };
+
+export type OrgMembers = Prisma.PromiseReturnType<typeof getOrgsMembers>;

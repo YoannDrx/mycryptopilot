@@ -6,6 +6,7 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { hasPermission } from "@/lib/auth/auth-org";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import type { PageParams } from "@/types/next";
 import { ClientOrg } from "./client-org";
@@ -19,13 +20,17 @@ export const generateMetadata = combineWithParentMetadata({
 
 export default async function RoutePage(props: PageParams) {
   return (
-    <Layout>
+    <Layout size="lg">
       <LayoutHeader>
-        <LayoutTitle>Demo Page</LayoutTitle>
+        <LayoutTitle>Videos</LayoutTitle>
       </LayoutHeader>
       <LayoutActions className="flex gap-2">
-        <Button variant="outline">Delete</Button>
-        <Button variant="default">Create</Button>
+        {(await hasPermission({ videos: ["delete"] })) && (
+          <Button variant="outline">Delete</Button>
+        )}
+        {(await hasPermission({ videos: ["create"] })) && (
+          <Button variant="default">Create</Button>
+        )}
       </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">

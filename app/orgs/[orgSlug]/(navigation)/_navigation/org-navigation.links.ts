@@ -2,12 +2,10 @@ import type {
   NavigationGroup,
   NavigationLink,
 } from "@/features/navigation/navigation.type";
+import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
-import { SiteConfig } from "@/site-config";
-import type { OrganizationMembershipRole } from "@prisma/client";
 import {
   CreditCard,
-  File,
   Home,
   Settings,
   TriangleAlert,
@@ -21,7 +19,7 @@ const replaceSlug = (href: string, slug: string) => {
 
 export const getOrganizationNavigation = (
   slug: string,
-  userRoles: OrganizationMembershipRole[] | undefined,
+  userRoles: AuthRole[] | undefined,
 ): NavigationGroup[] => {
   return ORGANIZATION_LINKS.map((group: NavigationGroup) => {
     return {
@@ -59,57 +57,35 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         Icon: User,
         label: "Users",
       },
+    ],
+  },
+  {
+    title: "Organization",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
+    links: [
       {
-        href: `${ORGANIZATION_PATH}/pages`,
-        Icon: File,
-        label: "Pages",
+        href: `${ORGANIZATION_PATH}/settings`,
+        Icon: Settings,
+        label: "Settings",
       },
       {
-        href: `${ORGANIZATION_PATH}/reviews`,
-        Icon: File,
-        label: "Reviews",
+        href: `${ORGANIZATION_PATH}/settings/members`,
+        Icon: User2,
+        label: "Members",
+        roles: ["admin"],
+      },
+      {
+        href: `${ORGANIZATION_PATH}/settings/billing`,
+        label: "Billing",
+        roles: ["admin"],
+        Icon: CreditCard,
+      },
+      {
+        href: `${ORGANIZATION_PATH}/settings/danger`,
+        label: "Danger Zone",
+        roles: ["owner"],
+        Icon: TriangleAlert,
       },
     ],
   },
-
-  SiteConfig.features.enableSingleMemberOrg
-    ? {
-        title: "Settings",
-        links: [
-          {
-            href: `/account`,
-            Icon: Settings,
-            label: "Account",
-          },
-        ],
-      }
-    : {
-        title: "Organization",
-        defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
-        links: [
-          {
-            href: `${ORGANIZATION_PATH}/settings`,
-            Icon: Settings,
-            label: "Settings",
-          },
-          {
-            href: `${ORGANIZATION_PATH}/settings/members`,
-            Icon: User2,
-            label: "Members",
-            roles: ["ADMIN"],
-          },
-          {
-            href: `${ORGANIZATION_PATH}/settings/billing`,
-            label: "Billing",
-            roles: ["ADMIN"],
-            Icon: CreditCard,
-          },
-          {
-            href: `${ORGANIZATION_PATH}/settings/danger`,
-            label: "Danger Zone",
-            roles: ["OWNER"],
-            Icon: TriangleAlert,
-          },
-        ],
-      },
 ] satisfies NavigationGroup[];

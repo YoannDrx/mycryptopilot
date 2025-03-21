@@ -1,4 +1,4 @@
-import { Loader } from "@/components/ui/loader";
+import { Loader } from "@/components/nowts/loader";
 
 /**
  * This page should never be seen by the user because everything is pre-rendered.

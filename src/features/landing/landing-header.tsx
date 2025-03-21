@@ -104,7 +104,7 @@ export function LandingHeader() {
               [1, 0],
             ),
           }}
-          className="flex items-center gap-4 text-sm font-medium text-muted-foreground"
+          className="text-muted-foreground flex items-center gap-4 text-sm font-medium"
         >
           <Link href="#features">Features</Link>
           <Link href="#pricing">Pricing</Link>

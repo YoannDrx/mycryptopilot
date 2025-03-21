@@ -1,4 +1,4 @@
-import { Typography } from "@/components/ui/typography";
+import { Typography } from "@/components/nowts/typography";
 import { Layout, LayoutContent } from "@/features/page/layout";
 import { MDXRemote } from "next-mdx-remote-client/rsc";
 
@@ -7,11 +7,11 @@ const markdown = `Privacy demo`;
 export default function page() {
   return (
     <div>
-      <div className="flex w-full items-center justify-center bg-card p-8 lg:p-12">
+      <div className="bg-card flex w-full items-center justify-center p-8 lg:p-12">
         <Typography variant="h1">Privacy</Typography>
       </div>
       <Layout>
-        <LayoutContent className="prose m-auto mb-8 dark:prose-invert">
+        <LayoutContent className="prose dark:prose-invert m-auto mb-8">
           <MDXRemote source={markdown} />
         </LayoutContent>
       </Layout>

@@ -14,17 +14,17 @@ export const UpgradeCard = () => {
 
   if (!org) return null;
 
-  if (org.plan.id !== "FREE") return null;
+  if (org.subscription) return null;
 
   return (
-    <Card x-chunk="dashboard-02-chunk-0">
-      <CardHeader className="p-2 pt-0 md:p-4">
+    <Card className="">
+      <CardHeader className="">
         <CardTitle>Upgrade to PRO</CardTitle>
         <CardDescription>
           Unlock all features and get unlimited access to our app.
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
+      <CardContent className="">
         <Link
           href={`/orgs/${org.slug}/settings/billing`}
           className={buttonVariants({ className: "w-full" })}

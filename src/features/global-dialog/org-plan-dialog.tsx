@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PLANS } from "../plans/plans";
+import { AUTH_PLANS } from "@/lib/auth/auth-plans";
 import { PricingCard } from "../plans/pricing-card";
 import { closeGlobalDialog } from "./global-dialog.store";
 
@@ -23,8 +23,8 @@ export const OrgPlanDialog = () => {
           </DialogDescription>
         </DialogHeader>
         <div className="mt-8 flex w-full justify-center gap-4 max-md:flex-col lg:mt-12 lg:gap-8 xl:gap-12">
-          {PLANS.map((card, i) => (
-            <PricingCard key={i} {...card} />
+          {AUTH_PLANS.map((card, i) => (
+            <PricingCard key={i} plan={card} />
           ))}
         </div>
       </DialogContent>

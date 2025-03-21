@@ -1,9 +1,9 @@
 "use client";
 
+import { BentoGrid, BentoGridItem } from "@/components/nowts/bentoo";
+import { Loader } from "@/components/nowts/loader";
+import { Typography } from "@/components/nowts/typography";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { BentoGrid, BentoGridItem } from "@/components/ui/bentoo";
-import { Loader } from "@/components/ui/loader";
-import { Typography } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import type { Variants } from "framer-motion";
 import { motion } from "framer-motion";
@@ -48,7 +48,7 @@ const Skeleton1 = () => {
       whileHover="animate"
       className="flex h-full flex-col gap-2"
     >
-      <motion.div className="flex flex-row items-start gap-2 rounded-2xl border border-border bg-background p-3">
+      <motion.div className="border-border bg-background flex flex-row items-start gap-2 rounded-2xl border p-3">
         <img
           alt="avatar"
           src="https://melvynx.com/_next/image?url=%2Fimages%2Fmy-face.png&w=828&q=75"
@@ -62,7 +62,7 @@ const Skeleton1 = () => {
       </motion.div>
       <motion.div
         variants={variants}
-        className="flex flex-row items-start justify-end gap-2 rounded-2xl border border-border bg-background p-3"
+        className="border-border bg-background flex flex-row items-start justify-end gap-2 rounded-2xl border p-3"
       >
         <p className="text-xs text-neutral-500">
           Today I announced my new project, Now.TS, the perfect way to create
@@ -160,7 +160,7 @@ const Skeleton4 = () => {
     >
       <motion.div
         variants={first}
-        className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4"
+        className="border-border bg-background flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border p-4"
       >
         <Typography variant="large">+123 followers</Typography>
         <Typography variant={"muted"}>In the last 30 days</Typography>
@@ -168,7 +168,7 @@ const Skeleton4 = () => {
           +12%
         </Typography>
       </motion.div>
-      <motion.div className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4">
+      <motion.div className="border-border bg-background flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border p-4">
         <Typography variant="large">+1.4 M Views</Typography>
         <Typography variant={"muted"}>In the last 30 days</Typography>
         <Typography variant={"muted"} className="text-green-500">
@@ -177,7 +177,7 @@ const Skeleton4 = () => {
       </motion.div>
       <motion.div
         variants={second}
-        className="flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border border-border bg-background p-4"
+        className="border-border bg-background flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border p-4"
       >
         <Typography variant="large">1244 likes</Typography>
         <Typography variant="large">766 replis</Typography>
@@ -224,7 +224,7 @@ const Skeleton5 = () => {
     >
       <motion.div
         variants={variants}
-        className="flex flex-row items-start gap-2 rounded-2xl border border-border bg-background p-3"
+        className="border-border bg-background flex flex-row items-start gap-2 rounded-2xl border p-3"
       >
         <img
           src="https://melvynx.com/_next/image?url=%2Fimages%2Fmy-face.png&w=828&q=75"
@@ -239,7 +239,7 @@ const Skeleton5 = () => {
       </motion.div>
       <motion.div
         variants={variantsSecond}
-        className="flex flex-row items-start justify-end gap-2 rounded-2xl border border-border bg-background p-3"
+        className="border-border bg-background flex flex-row items-start justify-end gap-2 rounded-2xl border p-3"
       >
         <div>
           <p className="text-xs text-neutral-500">Searching...</p>

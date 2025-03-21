@@ -1,10 +1,10 @@
-import type { OrganizationMembershipRole } from "@prisma/client";
+import type { AuthRole } from "@/lib/auth/auth-permissions";
 import type { IconProps } from "@radix-ui/react-icons/dist/types";
 import type { LucideIcon } from "lucide-react";
 
 export type NavigationGroup = {
   title: string;
-  roles?: OrganizationMembershipRole[];
+  roles?: AuthRole[];
   links: NavigationLink[];
   defaultOpenStartPath?: string;
 };
@@ -17,6 +17,7 @@ export type NavigationLink = {
       >
     | LucideIcon;
   label: string;
-  roles?: OrganizationMembershipRole[];
+  roles?: AuthRole[];
   hidden?: boolean;
+  links?: NavigationLink[];
 };

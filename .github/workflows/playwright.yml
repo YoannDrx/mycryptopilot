@@ -1,0 +1,76 @@
+name: E2E Playwright Tests
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  deployment_status:
+
+jobs:
+  test:
+    # Only run this job when a deployment to preview or production is successful
+    if: github.event.deployment_status.state == 'success' && (github.event.deployment_status.environment == 'Preview')
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Get SHA from Deployment API
+        run: |
+          DEPLOYMENT_URL="${{ github.event.deployment_status.deployment_url }}"
+          SHA=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "$DEPLOYMENT_URL" | jq -r '.sha')
+          echo "sha=$SHA" >> $GITHUB_ENV
+
+      - name: Get branch name from SHA
+        run: |
+          BRANCH_NAME=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/branches" \
+            | jq -r --arg SHA "${{ env.sha }}" '.[] | select(.commit.sha == $SHA) | .name')
+          echo "branch=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Verify open PR for SHA
+        run: |
+          PR_COUNT=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/commits/${{ env.sha }}/pulls" \
+            | jq '[.[] | select(.state == "open")] | length')
+
+          if [ "$PR_COUNT" -lt 1 ]; then
+            echo "❌ No open PRs found for this commit!"
+            exit 1
+          fi
+
+      - name: Pull Vercel Environment Information
+        run: vercel env pull --environment=preview --git-branch=${{ env.branch }} .env --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Run Playwright tests against deployed URL
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm exec playwright test --project=chromium
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

@@ -1,5 +1,4 @@
-import { prisma } from "@/lib/prisma";
-import { orgRoute, SafeRouteError } from "@/lib/safe-route";
+import { orgRoute } from "@/lib/zod-route";
 import { z } from "zod";
 
 export const POST = orgRoute
@@ -9,14 +8,8 @@ export const POST = orgRoute
     }),
   )
   .body(z.object({ name: z.string() }))
-  .handler(async (req, { params, body }) => {
-    throw SafeRouteError;
-    await prisma.organization.update({
-      where: {
-        id: params.orgId,
-      },
-      data: {
-        name: body.name,
-      },
-    });
+  .handler(async () => {
+    return {
+      hello: "world",
+    };
   });

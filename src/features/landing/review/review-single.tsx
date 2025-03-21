@@ -1,5 +1,5 @@
+import { Typography } from "@/components/nowts/typography";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Typography } from "@/components/ui/typography";
 import { ClientMarkdown } from "@/features/markdown/client-markdown";
 import { Layout } from "@/features/page/layout";
 

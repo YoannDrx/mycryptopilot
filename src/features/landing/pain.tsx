@@ -1,6 +1,6 @@
 "use client";
 
-import { Typography } from "@/components/ui/typography";
+import { Typography } from "@/components/nowts/typography";
 import { SectionLayout } from "./section-layout";
 
 export const PainSection = () => {
@@ -20,7 +20,7 @@ export const PainSection = () => {
             <Typography variant="h3" className="text-red-500">
               😞 Posting without Threader
             </Typography>
-            <ul className="ml-4 mt-4 flex list-disc flex-col gap-2 text-lg text-foreground/80">
+            <ul className="text-foreground/80 mt-4 ml-4 flex list-disc flex-col gap-2 text-lg">
               <li>Going on Thread every day to post</li>
               <li>Be distracted when I go on the app</li>
               <li>Losing track of my post</li>
@@ -31,7 +31,7 @@ export const PainSection = () => {
             <Typography variant="h3" className="text-green-500">
               😎 Posting WITH Threader
             </Typography>
-            <ul className="ml-4 mt-4 flex list-disc flex-col gap-2 text-lg text-foreground/80">
+            <ul className="text-foreground/80 mt-4 ml-4 flex list-disc flex-col gap-2 text-lg">
               <li>Schedule your post on the Threader UI</li>
               <li>Avoiding opening the app every day</li>
               <li>See excatly what you have scheduled</li>

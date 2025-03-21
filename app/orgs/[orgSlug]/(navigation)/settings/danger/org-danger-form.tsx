@@ -4,10 +4,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -16,13 +18,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
-import { FormUnsavedBar } from "@/features/form/form-unsaved-bar";
-import { isActionSuccessful } from "@/lib/actions/actions-utils";
+import { LoadingButton } from "@/features/form/submit-button";
+import { authClient } from "@/lib/auth-client";
 import { formatId } from "@/lib/format/id";
+import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updateOrganizationDetailsAction } from "../org.action";
 import type { OrgDangerFormSchemaType } from "../org.schema";
 import { OrgDangerFormSchema } from "../org.schema";
 
@@ -39,24 +41,29 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
 
   const mutation = useMutation({
     mutationFn: async (values: OrgDangerFormSchemaType) => {
-      const result = await updateOrganizationDetailsAction(values);
-
-      if (!isActionSuccessful(result)) {
-        toast.error(result?.serverError ?? "Failed to invite user");
-        return;
-      }
-
+      return unwrapSafePromise(
+        authClient.organization.update({
+          data: {
+            slug: values.slug,
+          },
+        }),
+      );
+    },
+    onSuccess: (data) => {
       const newUrl = window.location.href.replace(
         `/orgs/${defaultValues.slug}/`,
-        `/orgs/${result.data.slug}/`,
+        `/orgs/${data.slug}/`,
       );
       router.push(newUrl);
-      form.reset(result.data as OrgDangerFormSchemaType);
+      form.reset(data as OrgDangerFormSchemaType);
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   return (
-    <FormUnsavedBar
+    <Form
       form={form}
       onSubmit={(v) => {
         dialogManager.add({
@@ -102,7 +109,12 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
             )}
           />
         </CardContent>
+        <CardFooter className="border-tu flex justify-end">
+          <LoadingButton loading={mutation.isPending} type="submit">
+            Save
+          </LoadingButton>
+        </CardFooter>
       </Card>
-    </FormUnsavedBar>
+    </Form>
   );
 };

@@ -1,5 +1,4 @@
 import { RESERVED_SLUGS } from "@/lib/organizations/reserved-slugs";
-import { OrganizationMembershipRole } from "@prisma/client";
 import { z } from "zod";
 
 /**
@@ -16,17 +15,7 @@ export const OrgDetailsFormSchema = z.object({
   //   message: "This organization slug is reserved",
   // }),
   name: z.string(),
-  email: z.string().email(),
-  image: z.string().nullable(),
-});
-
-export const OrgMemberFormSchema = z.object({
-  members: z.array(
-    z.object({
-      id: z.string(),
-      roles: z.array(z.nativeEnum(OrganizationMembershipRole)),
-    }),
-  ),
+  logo: z.string().nullable().optional(),
 });
 
 export const OrgDangerFormSchema = z.object({
@@ -37,5 +26,4 @@ export const OrgDangerFormSchema = z.object({
 });
 
 export type OrgDetailsFormSchemaType = z.infer<typeof OrgDetailsFormSchema>;
-export type OrgMemberFormSchemaType = z.infer<typeof OrgMemberFormSchema>;
 export type OrgDangerFormSchemaType = z.infer<typeof OrgDangerFormSchema>;

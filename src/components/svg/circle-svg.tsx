@@ -8,7 +8,7 @@ export const CircleSvg = ({
   return (
     <svg
       className={cn(
-        "absolute -z-10 w-[calc(100%+1rem)] top-0 left-0 fill-foreground",
+        "fill-foreground absolute top-0 left-0 -z-10 w-[calc(100%+1rem)]",
         className,
       )}
       xmlns="http://www.w3.org/2000/svg"

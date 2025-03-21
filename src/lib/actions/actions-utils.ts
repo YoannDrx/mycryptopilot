@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { SafeActionResult } from "next-safe-action";
+import {
+  flattenValidationErrors,
+  type SafeActionResult,
+  type ValidationErrors,
+} from "next-safe-action";
 import type { z } from "zod";
 
 /**
@@ -9,8 +13,12 @@ import type { z } from "zod";
  * @param action Return value of a server action
  * @returns A boolean indicating if the action is successful
  */
-export const isActionSuccessful = <T extends z.ZodType, Data>(
-  action?: SafeActionResult<string, T, readonly [], any, any, Data>,
+export const isActionSuccessful = <
+  T extends z.ZodType,
+  Data,
+  CVE = ValidationErrors<T>,
+>(
+  action?: SafeActionResult<string, T, readonly [], any, CVE, Data>,
 ): action is {
   data: Data;
   serverError: undefined;
@@ -37,9 +45,13 @@ export const isActionSuccessful = <T extends z.ZodType, Data>(
  * @param action Return value of a server action
  * @returns A promise that resolves to false
  */
-export const resolveActionResult = async <T extends z.ZodType, Data>(
+export const resolveActionResult = async <
+  T extends z.ZodType,
+  Data,
+  CVE = ValidationErrors<T>,
+>(
   action: Promise<
-    SafeActionResult<string, T, readonly [], any, any, Data> | undefined
+    SafeActionResult<string, T, readonly [], any, CVE, Data> | undefined
   >,
 ): Promise<Data> => {
   return new Promise((resolve, reject) => {
@@ -48,11 +60,33 @@ export const resolveActionResult = async <T extends z.ZodType, Data>(
         if (isActionSuccessful(result)) {
           resolve(result.data);
         } else {
-          reject(result?.serverError ?? "Something went wrong");
+          if (result?.validationErrors) {
+            const str = validationErrorToString(result.validationErrors);
+            return reject(new Error(str));
+          }
+          if (result?.serverError) {
+            return reject(new Error(result.serverError));
+          }
+          reject(new Error(result?.serverError ?? "Something went wrong"));
         }
       })
       .catch((error) => {
-        reject(error);
+        reject(new Error(error));
       });
   });
+};
+
+/**
+ * Converts validation errors to a string
+ *
+ * @param validationError Validation errors from a server action
+ * @returns A string representation of the validation errors
+ */
+export const validationErrorToString = (
+  validationError: ValidationErrors<any>,
+) => {
+  const flatten = flattenValidationErrors(validationError);
+  return Object.entries(flatten.fieldErrors)
+    .map(([key, value]) => `${key}: ${value?.join(", ")}`)
+    .join("\n");
 };

@@ -18,9 +18,9 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineTooltip } from "@/components/ui/tooltip";
+import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Angry, Frown, Meh, SmilePlus } from "lucide-react";
-import { useSession } from "next-auth/react";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +33,7 @@ type ContactFeedbackPopoverProps = PropsWithChildren;
 export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
   const [open, setOpen] = useState(false);
   const session = useSession();
-  const email = session.data?.user ? (session.data.user.email ?? "") : "";
+  const email = session.data?.user ? session.data.user.email : "";
   const form = useZodForm({
     schema: ContactFeedbackSchema,
     defaultValues: {
@@ -49,7 +49,7 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
       return;
     }
 
-    toast.success("Your feedback has been sent. Thanks you.");
+    toast.success("Your feedback has been sent! Thanks you.");
     form.reset();
     setOpen(false);
   };
@@ -57,11 +57,7 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
   return (
     <Popover open={open} onOpenChange={(v) => setOpen(v)}>
       <PopoverTrigger asChild>
-        {props.children ? (
-          props.children
-        ) : (
-          <Button variant="outline">Feedback</Button>
-        )}
+        {props.children ?? <Button variant="outline">Feedback</Button>}
       </PopoverTrigger>
       <PopoverContent className="p-0">
         <Form
@@ -100,7 +96,7 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
               )}
             />
           </div>
-          <div className="flex w-full items-center justify-between  border-t border-accent bg-accent/50 p-2">
+          <div className="border-accent bg-accent/50 flex w-full items-center justify-between border-t p-2">
             <FormField
               control={form.control}
               name="review"
@@ -164,7 +160,7 @@ const ReviewInput = ({
             onClick={() => {
               onChange(item.value);
             }}
-            className={cn("hover:rotate-12 hover:scale-110 transition", {
+            className={cn("transition hover:scale-110 hover:rotate-12", {
               "text-primary scale-110": value === item.value,
             })}
           >

@@ -1,5 +1,6 @@
 "use client";
 
+import { Typography } from "@/components/nowts/typography";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,7 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Typography } from "@/components/ui/typography";
+import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 import { useState, type ReactElement, type ReactNode } from "react";
 import { LoadingButton } from "../form/submit-button";
 
@@ -23,6 +25,8 @@ type DialogBaseProps = {
 type StandardDialogProps = {
   title?: string;
   description?: ReactNode;
+  icon?: LucideIcon;
+  style?: "default" | "centered";
   // The user needs to type this text to confirm the action
   confirmText?: string;
   // Input field for getting user input
@@ -83,7 +87,16 @@ export const DialogManagerRendererDialog = (
   return (
     <AlertDialog open={true}>
       <AlertDialogContent>
-        <AlertDialogHeader>
+        <AlertDialogHeader
+          className={cn({
+            "flex flex-col items-center gap-2": props.style === "centered",
+          })}
+        >
+          {props.icon && (
+            <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+              <props.icon className="size-6" />
+            </div>
+          )}
           <AlertDialogTitle>{props.title ?? ""}</AlertDialogTitle>
           {typeof props.description === "string" ? (
             <AlertDialogDescription>{props.description}</AlertDialogDescription>
@@ -126,7 +139,8 @@ export const DialogManagerRendererDialog = (
             <AlertDialogAction asChild>
               <LoadingButton
                 loading={props.loading}
-                disabled={props.loading ?? isConfirmDisabled}
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                disabled={props.loading || isConfirmDisabled}
                 onClick={() => {
                   if (props.action && "onClick" in props.action) {
                     void props.action.onClick(inputValue);

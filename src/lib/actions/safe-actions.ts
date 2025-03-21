@@ -1,7 +1,7 @@
-import { OrganizationMembershipRole, type User } from "@prisma/client";
 import { createSafeActionClient } from "next-safe-action";
 import { z } from "zod";
-import { auth, AuthError } from "../auth/helper";
+import { AuthPermissionSchema, RolesKeys } from "../auth/auth-permissions";
+import { getRequiredUser } from "../auth/auth-user";
 import { logger } from "../logger";
 import { getRequiredCurrentOrg } from "../organizations/get-org";
 
@@ -11,16 +11,15 @@ type handleServerError = (e: Error) => string;
 
 const handleServerError: handleServerError = (e) => {
   if (e instanceof ActionError) {
-    logger.info("[DEV] - Action Error", e.message);
+    logger.debug("[DEV] - Action Error", e.message);
     return e.message;
   }
 
-  if (e instanceof AuthError) {
-    logger.info("[DEV] - Auth Error", e.message);
+  logger.info("Unknown Error", e);
+
+  if (process.env.NODE_ENV === "development") {
     return e.message;
   }
-
-  logger.info("[DEV] - Unknown Error", e);
 
   return "An unexpected error occurred.";
 };
@@ -29,28 +28,14 @@ export const action = createSafeActionClient({
   handleServerError,
 });
 
-const getUser = async () => {
-  const user = await auth();
-
-  if (!user) {
-    throw new ActionError("Session not found!");
-  }
-
-  if (!user.id || !user.email) {
-    throw new ActionError("Session is not valid!");
-  }
-
-  return user as User;
-};
-
 export const authAction = createSafeActionClient({
   handleServerError,
 }).use(async ({ next }) => {
-  const user = await getUser();
+  const user = await getRequiredUser();
 
   return next({
     ctx: {
-      user: user as User,
+      user: user,
     },
   });
 });
@@ -60,13 +45,14 @@ export const orgAction = createSafeActionClient({
   defineMetadataSchema() {
     return z
       .object({
-        roles: z.array(z.nativeEnum(OrganizationMembershipRole)),
+        roles: z.array(z.enum(RolesKeys)).optional(),
+        permissions: AuthPermissionSchema.optional(),
       })
       .optional();
   },
-}).use(async ({ next, metadata = { roles: [] } }) => {
+}).use(async ({ next, metadata = {} }) => {
   try {
-    const org = await getRequiredCurrentOrg(metadata.roles);
+    const org = await getRequiredCurrentOrg(metadata);
     return next({
       ctx: org,
     });

@@ -8,27 +8,17 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
+import { SidebarNavigationMenu } from "@/components/ui/sidebar-utils";
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
+import type { AuthOrganization } from "@/lib/auth/auth-type";
 import { ChevronDown } from "lucide-react";
 import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/orgs-select";
 import { getAccountNavigation } from "./account.links";
 
-export function AccountSidebar({
-  userOrgs,
-}: {
-  userOrgs: {
-    id: string;
-    slug: string;
-    name: string;
-    image: string | null;
-  }[];
-}) {
+export function AccountSidebar({ userOrgs }: { userOrgs: AuthOrganization[] }) {
   const links: NavigationGroup[] = getAccountNavigation();
 
   return (
@@ -44,16 +34,7 @@ export function AccountSidebar({
               <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {link.links.map((item) => (
-                  <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButtonLink href={item.href}>
-                      <item.Icon />
-                      <span>{item.label}</span>
-                    </SidebarMenuButtonLink>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
+              <SidebarNavigationMenu link={link} />
             </SidebarGroupContent>
           </SidebarGroup>
         ))}

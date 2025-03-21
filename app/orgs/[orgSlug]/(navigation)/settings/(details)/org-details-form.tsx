@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,12 +16,14 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { FormUnsavedBar } from "@/features/form/form-unsaved-bar";
+import { FormAutoSave } from "@/features/form/form-auto-save";
+import { FormAutoSaveStickyBar } from "@/features/form/form-auto-save-sticky-bar";
 import { ImageFormItem } from "@/features/images/image-form-item";
+import { authClient } from "@/lib/auth-client";
+import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updateOrganizationDetailsAction } from "../org.action";
 import {
   OrgDetailsFormSchema,
   type OrgDetailsFormSchemaType,
@@ -39,24 +42,33 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
 
   const mutation = useMutation({
     mutationFn: async (values: OrgDetailsFormSchemaType) => {
-      const result = await updateOrganizationDetailsAction(values);
-
-      if (!result || result.serverError) {
-        toast.error(result?.serverError ?? "Failed to invite user");
-        return;
-      }
-
+      return unwrapSafePromise(
+        authClient.organization.update({
+          data: {
+            logo: values.logo ?? undefined,
+            name: values.name,
+          },
+        }),
+      );
+    },
+    onSuccess: (data) => {
       router.refresh();
-      form.reset(result.data as OrgDetailsFormSchemaType);
+      form.reset(data);
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   return (
-    <FormUnsavedBar
+    <FormAutoSave
       form={form}
-      onSubmit={async (v) => mutation.mutateAsync(v)}
+      onSubmit={async (v) => {
+        return mutation.mutateAsync(v);
+      }}
       className="flex w-full flex-col gap-6 lg:gap-8"
     >
+      <FormAutoSaveStickyBar />
       <Card>
         <CardHeader>
           <CardTitle>Image</CardTitle>
@@ -67,7 +79,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
         <CardContent>
           <FormField
             control={form.control}
-            name="image"
+            name="logo"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -106,28 +118,11 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
           />
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Email</CardTitle>
-          <CardDescription>
-            Use a valid email address to receive billing and invoices.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </CardContent>
+      <Card className="flex items-end p-6">
+        <Button type="submit" className="w-fit">
+          Save
+        </Button>
       </Card>
-    </FormUnsavedBar>
+    </FormAutoSave>
   );
 };

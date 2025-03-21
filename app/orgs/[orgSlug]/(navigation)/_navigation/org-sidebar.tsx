@@ -13,14 +13,13 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
+import { SidebarNavigationMenu } from "@/components/ui/sidebar-utils";
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
-import type { OrganizationMembershipRole } from "@prisma/client";
+import type { AuthRole } from "@/lib/auth/auth-permissions";
+import type { AuthOrganization } from "@/lib/auth/auth-type";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { PropsWithChildren } from "react";
@@ -36,13 +35,8 @@ export function OrgSidebar({
   roles,
 }: {
   slug: string;
-  roles: OrganizationMembershipRole[] | undefined;
-  userOrgs: {
-    id: string;
-    slug: string;
-    name: string;
-    image: string | null;
-  }[];
+  roles: AuthRole[] | undefined;
+  userOrgs: AuthOrganization[];
 }) {
   const links: NavigationGroup[] = getOrganizationNavigation(slug, roles);
 
@@ -67,16 +61,7 @@ export function OrgSidebar({
               </SidebarGroupLabel>
               <CollapsibleContent>
                 <SidebarGroupContent>
-                  <SidebarMenu>
-                    {link.links.map((item) => (
-                      <SidebarMenuItem key={item.label}>
-                        <SidebarMenuButtonLink href={item.href}>
-                          <item.Icon />
-                          <span>{item.label}</span>
-                        </SidebarMenuButtonLink>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
+                  <SidebarNavigationMenu link={link} />
                 </SidebarGroupContent>
               </CollapsibleContent>
             </SidebarGroup>

@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/helper";
+import { getUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { NextResponse } from "next/server";
@@ -10,7 +10,7 @@ import { NextResponse } from "next/server";
  * 💡 If you want them to redirect to a specific organization, redirect them to `/orgs/orgSlug`
  */
 export const GET = async () => {
-  const user = await auth();
+  const user = await getUser();
 
   if (!user) {
     return NextResponse.redirect(`${getServerUrl()}/auth/signin`);

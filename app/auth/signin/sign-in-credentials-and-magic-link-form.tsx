@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Typography } from "@/components/nowts/typography";
 import {
   Form,
   FormControl,
@@ -11,10 +11,14 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Typography } from "@/components/ui/typography";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { LoadingButton } from "@/features/form/submit-button";
+import { authClient } from "@/lib/auth-client";
+import { getCallbackUrl } from "@/lib/auth/auth-utils";
+import { unwrapSafePromise } from "@/lib/promises";
+import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import { useLocalStorage } from "react-use";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const LoginCredentialsFormScheme = z.object({
@@ -24,29 +28,49 @@ const LoginCredentialsFormScheme = z.object({
 
 type LoginCredentialsFormType = z.infer<typeof LoginCredentialsFormScheme>;
 
-export const SignInCredentialsAndMagicLinkForm = () => {
+export const SignInCredentialsAndMagicLinkForm = (props: {
+  callbackUrl?: string;
+}) => {
   const form = useZodForm({
     schema: LoginCredentialsFormScheme,
   });
-  const searchParams = useSearchParams();
   const [isUsingCredentials, setIsUsingCredentials] = useLocalStorage(
     "sign-in-with-credentials",
-    false,
+    true,
   );
 
-  async function onSubmit(values: LoginCredentialsFormType) {
-    if (isUsingCredentials) {
-      await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        callbackUrl: searchParams.get("callbackUrl") ?? undefined,
-      });
-    } else {
-      await signIn("resend", {
-        email: values.email,
-        callbackUrl: searchParams.get("callbackUrl") ?? undefined,
-      });
-    }
+  const signInMutation = useMutation({
+    mutationFn: async (values: LoginCredentialsFormType) => {
+      if (isUsingCredentials) {
+        return unwrapSafePromise(
+          authClient.signIn.email({
+            email: values.email,
+            password: values.password ?? "",
+            rememberMe: true,
+          }),
+        );
+      } else {
+        return unwrapSafePromise(
+          authClient.signIn.magicLink({
+            email: values.email,
+          }),
+        );
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: () => {
+      const callbackUrl = getCallbackUrl(props.callbackUrl, "/orgs");
+      const newUrl =
+        window.location.origin +
+        (isUsingCredentials ? callbackUrl : "/auth/verify");
+      window.location.href = newUrl;
+    },
+  });
+
+  function onSubmit(values: LoginCredentialsFormType) {
+    signInMutation.mutate(values);
   }
 
   return (
@@ -56,7 +80,7 @@ export const SignInCredentialsAndMagicLinkForm = () => {
         name="email"
         render={({ field }) => (
           <FormItem>
-            {isUsingCredentials ? <FormLabel>Email</FormLabel> : null}
+            <FormLabel>Email</FormLabel>
             <FormControl>
               <Input placeholder="john@doe.com" {...field} />
             </FormControl>
@@ -71,7 +95,16 @@ export const SignInCredentialsAndMagicLinkForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Password</FormLabel>
+                <div className="flex items-center justify-between">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href="/auth/forget-password"
+                    className="text-sm underline"
+                    tabIndex={2}
+                  >
+                    Forgot password ?
+                  </Link>
+                </div>
                 <FormControl>
                   <Input type="password" {...field} />
                 </FormControl>
@@ -80,26 +113,18 @@ export const SignInCredentialsAndMagicLinkForm = () => {
             )}
           />
         </>
-      ) : (
-        <Typography
-          variant="link"
-          as="button"
-          type="button"
-          className="text-sm"
-          onClick={() => {
-            setIsUsingCredentials(true);
-          }}
-        >
-          Use password
-        </Typography>
-      )}
+      ) : null}
 
-      <Button type="submit" className="w-full">
-        {isUsingCredentials ? "Login with Password" : "Login with MagicLink"}
-      </Button>
+      <LoadingButton
+        loading={signInMutation.isPending}
+        type="submit"
+        className="ring-offset-card w-full ring-offset-2"
+      >
+        {isUsingCredentials ? "Sign in" : "Sign in with magic link"}
+      </LoadingButton>
 
-      {isUsingCredentials && (
-        <Typography variant="small">
+      {isUsingCredentials ? (
+        <Typography variant="muted" className="text-xs">
           Forgot password ?{" "}
           <Typography
             variant="link"
@@ -111,6 +136,18 @@ export const SignInCredentialsAndMagicLinkForm = () => {
           >
             Login with magic link
           </Typography>
+        </Typography>
+      ) : (
+        <Typography
+          variant="link"
+          as="button"
+          type="button"
+          className="text-xs"
+          onClick={() => {
+            setIsUsingCredentials(true);
+          }}
+        >
+          Use password
         </Typography>
       )}
     </Form>

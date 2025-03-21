@@ -1,7 +1,10 @@
+import { RefreshPage } from "@/components/utils/refresh-page";
+import { auth } from "@/lib/auth";
 import { orgMetadata } from "@/lib/metadata";
-import { getCurrentOrgCache } from "@/lib/react/cache";
+import { getCurrentOrg } from "@/lib/organizations/get-org";
 import type { LayoutParams, PageParams } from "@/types/next";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { InjectCurrentOrgStore } from "./use-current-org";
 
 export async function generateMetadata(
@@ -14,21 +17,31 @@ export async function generateMetadata(
 export default async function RouteLayout(
   props: LayoutParams<{ orgSlug: string }>,
 ) {
-  const org = await getCurrentOrgCache();
+  const params = await props.params;
+
+  const org = await getCurrentOrg();
+
+  // The user try to go to another organization, we must sync with the URL
+  if (org?.slug !== params.orgSlug) {
+    await auth.api.setActiveOrganization({
+      headers: await headers(),
+      body: {
+        organizationSlug: params.orgSlug,
+      },
+    });
+    // Make a full refresh of the page
+    return <RefreshPage />;
+  }
 
   return (
     <InjectCurrentOrgStore
-      org={
-        org?.org
-          ? {
-              id: org.org.id,
-              slug: org.org.slug,
-              name: org.org.name,
-              image: org.org.image,
-              plan: org.org.plan,
-            }
-          : undefined
-      }
+      org={{
+        id: org.id,
+        slug: org.slug,
+        name: org.name,
+        image: org.logo ?? null,
+        subscription: org.subscription,
+      }}
     >
       {props.children}
     </InjectCurrentOrgStore>

@@ -1,7 +1,7 @@
 import { SiteConfig } from "@/site-config";
-import { Preview, Text } from "@react-email/components";
-import { EmailLayout } from "./utils/email-layout";
+import { Preview } from "@react-email/components";
 import { EmailLink, EmailSection, EmailText } from "./utils/components.utils";
+import { EmailLayout } from "./utils/email-layout";
 
 export default function MagicLinkMail({ url }: { url: string }) {
   return (
@@ -10,17 +10,19 @@ export default function MagicLinkMail({ url }: { url: string }) {
         You have requested a magic link to sign in to your account.
       </Preview>
       <EmailSection>
+        <EmailText>Hello,</EmailText>
+        <EmailText>You request a magic link :</EmailText>
         <EmailText>
-          <EmailLink href={url}>👉 Click here to sign in 👈</EmailLink>
+          <EmailLink href={url}>Click here to sign in</EmailLink>
         </EmailText>
         <EmailText>
           If you didn't request this, please ignore this email.
         </EmailText>
       </EmailSection>
-      <Text className="text-lg leading-6">
+      <EmailText>
         Best,
-        <br />- {SiteConfig.maker.name} from {SiteConfig.title}
-      </Text>
+        <br />- {SiteConfig.team.name} from {SiteConfig.title}
+      </EmailText>
     </EmailLayout>
   );
 }

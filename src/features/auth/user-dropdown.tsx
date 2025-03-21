@@ -1,5 +1,7 @@
 "use client";
 
+import { Loader } from "@/components/nowts/loader";
+import { Typography } from "@/components/nowts/typography";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +15,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Loader } from "@/components/ui/loader";
-import { Typography } from "@/components/ui/typography";
+import { signOut, useSession } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import {
   LayoutDashboard,
@@ -25,14 +26,19 @@ import {
   SunMedium,
   SunMoon,
 } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { PropsWithChildren } from "react";
 
 export const UserDropdown = ({ children }: PropsWithChildren) => {
+  const router = useRouter();
   const logout = useMutation({
     mutationFn: async () => signOut(),
+    onSuccess: () => {
+      void router.push("/auth/signin");
+    },
   });
   const session = useSession();
   const theme = useTheme();
@@ -46,10 +52,16 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>
-          <Typography variant="small">
-            {session.data.user.name ?? session.data.user.email}
-          </Typography>
-          <Typography variant="muted">{session.data.user.email}</Typography>
+          {session.data.user.name ? (
+            <>
+              <Typography variant="small">
+                {session.data.user.name || session.data.user.email}
+              </Typography>
+              <Typography variant="muted">{session.data.user.email}</Typography>
+            </>
+          ) : (
+            <Typography variant="small">{session.data.user.email}</Typography>
+          )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

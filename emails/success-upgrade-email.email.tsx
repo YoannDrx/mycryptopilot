@@ -1,7 +1,7 @@
 import { SiteConfig } from "@/site-config";
 import { Preview, Text } from "@react-email/components";
-import { EmailLayout } from "./utils/email-layout";
 import { EmailSection, EmailText } from "./utils/components.utils";
+import { EmailLayout } from "./utils/email-layout";
 
 export default function SuccessUpgradeEmail() {
   return (
@@ -25,7 +25,7 @@ export default function SuccessUpgradeEmail() {
       </EmailSection>
       <Text className="text-lg leading-6">
         Best,
-        <br />- {SiteConfig.maker.name} from {SiteConfig.title}
+        <br />- {SiteConfig.team.name} from {SiteConfig.title}
       </Text>
     </EmailLayout>
   );

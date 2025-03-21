@@ -1,6 +1,5 @@
-import { AUTH_COOKIE_NAME } from "@/lib/auth/auth.const";
+import { auth } from "@/lib/auth";
 import { SiteConfig } from "@/site-config";
-import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -16,33 +15,21 @@ export const config = {
      */
     "/((?!api|_next/static|_next/image|favicon.ico|admin).*)",
   ],
+  runtime: "nodejs",
 };
 
-export async function middleware(req: NextRequest) {
-  // Inject the current URL inside the request headers
-  // Useful to get the parameters of the current request
-  const requestHeaders = new Headers(req.headers);
-  requestHeaders.set("x-url", req.url);
+export async function middleware(request: NextRequest) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
 
-  // This settings is used to redirect the user to the organization page if he is logged in
-  // The landing page is still accessible with the /home route
   if (
-    req.nextUrl.pathname === "/" &&
-    SiteConfig.features.enableLandingRedirection
+    SiteConfig.features.enableLandingRedirection &&
+    session &&
+    request.nextUrl.pathname === "/"
   ) {
-    const cookieList = await cookies();
-    const authCookie = cookieList.get(AUTH_COOKIE_NAME);
-
-    if (authCookie) {
-      const url = new URL(req.url);
-      url.pathname = "/orgs";
-      return NextResponse.redirect(url.toString());
-    }
+    return NextResponse.redirect(new URL("/orgs", request.url));
   }
 
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  return NextResponse.next();
 }

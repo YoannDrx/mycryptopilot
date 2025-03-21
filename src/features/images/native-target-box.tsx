@@ -1,4 +1,4 @@
-import { Typography } from "@/components/ui/typography";
+import { Typography } from "@/components/nowts/typography";
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
 import React, { useRef, useState } from "react";
@@ -83,7 +83,6 @@ export const NativeTargetBox = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       style={{
-        border: isDrop ? "2px dashed green" : "2px dashed gray",
         background: isDrop ? "hsl(var(--background) / 0.5)" : undefined,
         padding: "20px",
         borderRadius: "5px",
@@ -100,7 +99,11 @@ export const NativeTargetBox = ({
         <div className="absolute inset-0 flex items-center justify-center">
           <Typography variant="muted">Drop here</Typography>
         </div>
-      ) : null}
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Typography variant="muted">Upload</Typography>
+        </div>
+      )}
       <input
         type="file"
         ref={inputRef}

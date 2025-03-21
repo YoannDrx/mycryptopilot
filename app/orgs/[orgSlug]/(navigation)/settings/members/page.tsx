@@ -1,3 +1,4 @@
+import { getPlanLimits } from "@/lib/auth/auth-plans";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
@@ -11,40 +12,27 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RoutePage(props: PageParams) {
-  const { org } = await getRequiredCurrentOrgCache(["ADMIN"]);
-
-  const members = await getOrgsMembers(org.id);
-
-  const invitations = await prisma.verificationToken.findMany({
-    where: {
-      identifier: {
-        endsWith: `-invite-${org.id}`,
-      },
-      expires: {
-        gt: new Date(),
-      },
-    },
-    select: {
-      data: true,
+  const org = await getRequiredCurrentOrgCache({
+    permissions: {
+      member: ["create", "update", "delete"],
     },
   });
 
-  const invitedEmail = invitations
-    .map((i) => (i.data as { email?: string }).email)
-    .filter(Boolean) as string[];
+  const members = await getOrgsMembers(org.id);
+
+  const maxMembers = getPlanLimits(org.subscription?.plan).members;
+
+  const invitations = await prisma.invitation.findMany({
+    where: {
+      organizationId: org.id,
+    },
+  });
 
   return (
     <OrgMembersForm
-      defaultValues={{
-        members: members.map((m) => ({
-          roles: m.roles,
-          id: m.id,
-          userId: m.userId,
-        })),
-      }}
-      maxMembers={org.plan.maximumMembers}
-      members={members.map((m) => ({ role: m.roles, ...m.user, id: m.id }))}
-      invitedEmail={invitedEmail}
+      invitations={invitations}
+      members={members}
+      maxMembers={maxMembers}
     />
   );
 }

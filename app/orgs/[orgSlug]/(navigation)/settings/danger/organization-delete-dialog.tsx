@@ -2,11 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
+import { authClient } from "@/lib/auth-client";
+import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { organizationDeleteAction } from "./delete-org.action";
 
 export const OrganizationDeleteDialog = ({
   org,
@@ -16,16 +17,22 @@ export const OrganizationDeleteDialog = ({
   const router = useRouter();
   const mutation = useMutation({
     mutationFn: async () => {
-      const result = await organizationDeleteAction();
-
-      if (!result || result.serverError) {
-        toast.error(result?.serverError ?? "Failed to delete organization");
-        return;
-      }
-
-      toast.success("Organization deleted");
+      return unwrapSafePromise(
+        authClient.organization.delete({
+          organizationId: org.id,
+        }),
+      );
+    },
+    onError: (error) => {
+      toast.error("Error deleting organization", {
+        description: error.message,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Organization deleted", {
+        description: "Your organization has been deleted",
+      });
       router.push("/orgs");
-      router.refresh();
     },
   });
 
@@ -35,6 +42,8 @@ export const OrganizationDeleteDialog = ({
       variant="destructive"
       onClick={() => {
         dialogManager.add({
+          style: "centered",
+          icon: X,
           title: "Delete Organization",
           description: "Are you sure you want to delete your organization?",
           confirmText: org.slug,

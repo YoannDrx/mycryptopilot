@@ -2,6 +2,7 @@
 const nextConfig = {
   experimental: {
     authInterrupts: true,
+    nodeMiddleware: true,
   },
 };
 

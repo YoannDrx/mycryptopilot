@@ -1,7 +1,7 @@
 "use client";
 
+import { Typography } from "@/components/nowts/typography";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Typography } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";

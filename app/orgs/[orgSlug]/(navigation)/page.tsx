@@ -6,8 +6,7 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { isInRoles } from "@/lib/organizations/is-in-roles";
-import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import { hasPermission } from "@/lib/auth/auth-org";
 import type { PageParams } from "@/types/next";
 import Link from "next/link";
 import InformationCards from "./information-cards";
@@ -18,15 +17,17 @@ export default async function RoutePage(
     orgSlug: string;
   }>,
 ) {
-  const org = await getRequiredCurrentOrgCache();
   const params = await props.params;
+
   return (
-    <Layout>
+    <Layout size="lg">
       <LayoutHeader>
         <LayoutTitle>Dashboard</LayoutTitle>
       </LayoutHeader>
       <LayoutActions>
-        {isInRoles(org.roles, ["ADMIN"]) ? (
+        {(await hasPermission({
+          member: ["create"],
+        })) ? (
           <Link
             href={`/orgs/${params.orgSlug}/settings/members`}
             className={buttonVariants({ variant: "outline" })}

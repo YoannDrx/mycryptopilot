@@ -1,8 +1,8 @@
 "use client";
 
+import { Typography } from "@/components/nowts/typography";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Typography } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -33,7 +33,7 @@ export const ToggleEmailCheckbox = ({
   return (
     <div
       className={cn(
-        "flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4",
+        "flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4",
         {
           "bg-muted": mutation.isPending,
         },

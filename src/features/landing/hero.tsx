@@ -3,7 +3,7 @@ import { CircleSvg } from "@/components/svg/circle-svg";
 import { buttonVariants } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { Typography } from "../../components/ui/typography";
+import { Typography } from "../../components/nowts/typography";
 
 export const Hero = () => {
   return (
@@ -15,17 +15,17 @@ export const Hero = () => {
           <div className="mx-auto max-w-2xl text-center">
             <Typography
               variant="h1"
-              className="text-balance text-5xl font-semibold tracking-tight sm:text-7xl lg:text-7xl"
+              className="text-5xl font-semibold tracking-tight text-balance sm:text-7xl lg:text-7xl"
             >
               Write the best content and Grow your{" "}
               <span className="relative inline-block">
                 <span>business</span>
-                <CircleSvg className="absolute inset-0 fill-primary" />
+                <CircleSvg className="fill-primary absolute inset-0" />
               </span>
             </Typography>
             <Typography
               variant="large"
-              className="mt-8 text-pretty text-lg font-medium text-muted-foreground sm:text-xl/8"
+              className="text-muted-foreground mt-8 text-lg font-medium text-pretty sm:text-xl/8"
             >
               Build for Thread, create, schedule and publish your content to
               your account with AI.
@@ -61,7 +61,7 @@ export const Hero = () => {
 
 const GridBackground = () => {
   return (
-    <div className="absolute inset-0 bg-grid-white/20 bg-grid-16 [mask-image:linear-gradient(180deg,transparent,black,transparent)]"></div>
+    <div className="bg-grid absolute inset-0 [mask-image:linear-gradient(180deg,transparent,black,transparent)]"></div>
   );
 };
 
@@ -77,7 +77,7 @@ const GradientBackground = () => {
             clipPath:
               "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
           }}
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary to-[#9089fc] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          className="from-primary relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr to-[#9089fc] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
         />
       </div>
       <div

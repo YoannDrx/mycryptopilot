@@ -1,45 +1,48 @@
-import { LogoSvg } from "@/components/svg/logo-svg";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { HeaderBase } from "@/features/layout/header-base";
-import { auth } from "@/lib/auth/helper";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
+import { SocialProviders } from "@/lib/auth";
+import { getUser } from "@/lib/auth/auth-user";
+import { SiteConfig } from "@/site-config";
 import type { PageParams } from "@/types/next";
-import { AlertTriangle } from "lucide-react";
 import { redirect } from "next/navigation";
-import { getError } from "../error/auth-error-mapping";
 import { SignInProviders } from "./sign-in-providers";
 
 export default async function AuthSignInPage(props: PageParams) {
-  const searchParams = await props.searchParams;
-  const { errorMessage, error } = getError(searchParams.error);
-
-  const user = await auth();
+  const user = await getUser();
 
   if (user) {
     redirect("/account");
   }
 
+  const providers = Object.keys(SocialProviders ?? {});
+
   return (
-    <div className="flex h-full flex-col">
-      <HeaderBase />
-      <div className="flex flex-1 items-center justify-center">
-        <Card className="w-full max-w-md lg:max-w-lg lg:p-6">
-          <CardHeader className="flex flex-col items-center justify-center gap-2">
-            <LogoSvg />
-            <CardTitle>Sign in to your account</CardTitle>
-          </CardHeader>
-          <CardContent className="mt-8">
-            <SignInProviders />
-          </CardContent>
-          {error ? (
-            <Alert>
-              <AlertTriangle size={16} />
-              <AlertDescription>{error}</AlertDescription>
-              <AlertTitle>{errorMessage}</AlertTitle>
-            </Alert>
-          ) : null}
-        </Card>
-      </div>
-    </div>
+    <Card className="mx-auto w-full max-w-md lg:max-w-lg lg:p-6">
+      <CardHeader>
+        <div className="flex justify-center">
+          <Avatar className="size-16 rounded-md">
+            <AvatarImage src={SiteConfig.appIcon} alt="app logo" />
+            <AvatarFallback>
+              {SiteConfig.title.substring(0, 1).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+        <CardHeader className="text-center">
+          Sign in to {SiteConfig.title}
+        </CardHeader>
+
+        <CardDescription className="text-center">
+          Please sign in to your account to continue.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="mt-8">
+        <SignInProviders providers={providers} />
+      </CardContent>
+    </Card>
   );
 }

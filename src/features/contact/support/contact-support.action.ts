@@ -2,7 +2,7 @@
 
 import { action } from "@/lib/actions/safe-actions";
 import { env } from "@/lib/env";
-import { sendEmail } from "@/lib/mail/sendEmail";
+import { sendEmail } from "@/lib/mail/send-email";
 import { ContactSupportSchema } from "./contact-support.schema";
 
 export const contactSupportAction = action

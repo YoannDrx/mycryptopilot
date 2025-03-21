@@ -12,7 +12,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { SiteConfig } from "@/site-config";
+import type { AuthOrganization } from "@/lib/auth/auth-type";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -20,12 +21,7 @@ import type { ReactNode } from "react";
 type OrganizationsSelectProps = {
   currentOrgSlug?: string;
   children?: ReactNode;
-  orgs: {
-    id: string;
-    slug: string;
-    name: string;
-    image: string | null;
-  }[];
+  orgs: AuthOrganization[];
 };
 
 export const OrgsSelect = (props: OrganizationsSelectProps) => {
@@ -38,14 +34,18 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton variant="outline">
+            <SidebarMenuButton
+              data-testid="org-selector"
+              variant="default"
+              size="lg"
+            >
               {org ? (
                 <span className="inline-flex w-full items-center gap-2">
                   <Avatar className="size-6 object-contain">
                     <AvatarFallback>
                       {org.name.slice(0, 1).toUpperCase()}
                     </AvatarFallback>
-                    {org.image ? <AvatarImage src={org.image} /> : null}
+                    {org.logo ? <AvatarImage src={org.logo} /> : null}
                   </Avatar>
                   <span className="line-clamp-1 text-left">{org.name}</span>
                 </span>
@@ -85,15 +85,16 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
                   </DropdownMenuItem>
                 );
               })}
-            {!SiteConfig.features.enableSingleMemberOrg ? (
-              <DropdownMenuItem
-                onClick={() => {
-                  router.push("/orgs/new");
-                }}
-              >
+            <DropdownMenuItem
+              onClick={() => {
+                router.push("/orgs/new");
+              }}
+            >
+              <Plus className="mr-2 size-6" />
+              <span className="line-clamp-1 text-left">
                 Add a new organization
-              </DropdownMenuItem>
-            ) : null}
+              </span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

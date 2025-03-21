@@ -64,6 +64,7 @@ export const EmailLayout = (
                 </td>
               </tr>
             </table>
+            <Hr className="mt-3 mb-6 border-gray-300" />
           </Tailwind>
           {props.disableTailwind ? (
             props.children
@@ -71,7 +72,7 @@ export const EmailLayout = (
             <Tailwind>{props.children}</Tailwind>
           )}
           <Tailwind>
-            <Hr className="mb-6 mt-12 border-gray-300" />
+            <Hr className="mt-12 mb-6 border-gray-300" />
 
             <table cellPadding={0} cellSpacing={0}>
               <tr>

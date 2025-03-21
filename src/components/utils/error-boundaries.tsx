@@ -63,7 +63,7 @@ export class ErrorBoundary extends Component<Props, State> {
     } = this.props;
 
     return (
-      <Card variant="error">
+      <Card>
         <CardHeader>
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>

@@ -1,6 +1,6 @@
+import { Typography } from "@/components/nowts/typography";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Typography } from "@/components/ui/typography";
 import { ClientMarkdown } from "@/features/markdown/client-markdown";
 import { cn } from "@/lib/utils";
 import type { ComponentPropsWithoutRef } from "react";
@@ -30,7 +30,7 @@ export const ReviewItem = ({ className, ...props }: ReviewItemProps) => {
       <CardHeader>
         <ClientMarkdown className="citation">{props.review}</ClientMarkdown>
       </CardHeader>
-      <CardContent className="flex items-center gap-2 rounded-lg bg-background pt-6">
+      <CardContent className="bg-background flex items-center gap-2 rounded-lg pt-6">
         <div>
           <Avatar>
             <AvatarFallback>{props.name[0]}</AvatarFallback>

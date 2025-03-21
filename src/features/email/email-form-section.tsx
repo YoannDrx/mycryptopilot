@@ -1,4 +1,4 @@
-import { Typography } from "@/components/ui/typography";
+import { Typography } from "@/components/nowts/typography";
 import { SectionLayout } from "../landing/section-layout";
 import { EmailForm } from "./email-form";
 
@@ -11,13 +11,13 @@ export const EmailFormSection = () => {
       <div className="relative m-auto flex max-w-xl flex-col gap-4 text-center">
         <Typography
           variant="small"
-          className="font-extrabold uppercase text-primary"
+          className="text-primary font-extrabold uppercase"
         >
           Be the first to use Threader
         </Typography>
         <Typography variant="h2" className="text-center text-4xl lg:text-5xl">
           Join the waiting list of{" "}
-          <span className="text-gradient bg-gradient-to-r from-primary to-secondary font-mono font-extrabold uppercase">
+          <span className="text-gradient from-primary to-secondary bg-gradient-to-r font-mono font-extrabold uppercase">
             Threader
           </span>
         </Typography>

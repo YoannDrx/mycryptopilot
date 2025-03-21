@@ -44,7 +44,7 @@ export function StatsSection() {
 
               {stat.suffix}
             </h4>
-            <p className="text-sm text-muted-foreground">{stat.text}</p>
+            <p className="text-muted-foreground text-sm">{stat.text}</p>
           </div>
         ))}
       </div>

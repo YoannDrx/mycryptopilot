@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  CmdOrOption,
+  KeyboardShortcut,
+} from "@/components/nowts/keyboard-shortcut";
+import {
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -9,10 +13,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
-import {
-  CmdOrOption,
-  KeyboardShortcut,
-} from "@/components/ui/keyboard-shortcut";
 import { Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -43,17 +43,17 @@ export function OrgCommand() {
   return (
     <>
       <div className="relative w-full">
-        <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+        <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-4" />
         <Input
           type="search"
           placeholder="Search..."
-          className="w-full appearance-none bg-background pl-8 shadow-none"
+          className="bg-background w-full appearance-none pl-8 shadow-none"
           onClick={() => {
             setOpen(true);
           }}
         />
 
-        <div className="pointer-events-none absolute right-2.5 top-2.5 inline-flex h-5 select-none items-center gap-1">
+        <div className="pointer-events-none absolute top-2.5 right-2.5 inline-flex h-5 items-center gap-1 select-none">
           <KeyboardShortcut eventKey="cmd">
             <CmdOrOption />
           </KeyboardShortcut>

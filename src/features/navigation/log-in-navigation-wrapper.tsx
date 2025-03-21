@@ -1,14 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth/helper";
+import { getUser } from "@/lib/auth/auth-user";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import type { PropsWithChildren } from "react";
 import { OrgsSelect } from "../../../app/orgs/[orgSlug]/(navigation)/_navigation/orgs-select";
 import { UserDropdown } from "../auth/user-dropdown";
 import { NavigationWrapper } from "./navigation-wrapper";
 
+// TODO : Update this
 export default async function AuthNavigationWrapper(props: PropsWithChildren) {
-  const user = await auth();
+  const user = await getUser();
 
   if (!user) {
     return <NavigationWrapper>{props.children}</NavigationWrapper>;

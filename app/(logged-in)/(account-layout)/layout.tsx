@@ -1,4 +1,4 @@
-import { requiredAuth } from "@/lib/auth/helper";
+import { getRequiredUser } from "@/lib/auth/auth-user";
 import type { LayoutParams } from "@/types/next";
 import type { Metadata } from "next";
 import { AccountNavigation } from "./account-navigation";
@@ -9,13 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RouteLayout(props: LayoutParams) {
-  const user = await requiredAuth();
+  await getRequiredUser();
 
-  return (
-    <div>
-      <AccountNavigation emailVerified={Boolean(user.emailVerified)}>
-        {props.children}
-      </AccountNavigation>
-    </div>
-  );
+  return <AccountNavigation>{props.children}</AccountNavigation>;
 }

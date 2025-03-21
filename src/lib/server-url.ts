@@ -8,6 +8,10 @@ export const getServerUrl = () => {
     return window.location.origin;
   }
 
+  if (process.env.PLAYWRIGHT_TEST_BASE_URL) {
+    return process.env.PLAYWRIGHT_TEST_BASE_URL;
+  }
+
   // If we are in production, we return the production URL.
   if (process.env.VERCEL_ENV === "production") {
     return SiteConfig.prodUrl;
@@ -18,6 +22,6 @@ export const getServerUrl = () => {
     return `https://${process.env.VERCEL_URL}`;
   }
 
-  // If we are in development, we return the localhost URL.
+  // If we are in development, we return the localhost URL
   return "http://localhost:3000";
 };

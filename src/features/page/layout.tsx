@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef } from "react";
-import { Typography } from "../../components/ui/typography";
+import { Typography } from "../../components/nowts/typography";
 import { cn } from "../../lib/utils";
 
 export const Layout = (
@@ -11,7 +11,7 @@ export const Layout = (
     <div
       {...props}
       className={cn(
-        "max-w-4xl flex-wrap w-full flex gap-4 m-auto px-4 mt-4",
+        "m-auto mt-4 flex w-full max-w-4xl flex-wrap gap-4 px-4",
         {
           "max-w-7xl": props.size === "lg",
           "max-w-3xl": props.size === "sm",
@@ -27,7 +27,7 @@ export const LayoutHeader = (props: ComponentPropsWithoutRef<"div">) => {
     <div
       {...props}
       className={cn(
-        "flex items-start gap-2 flex-col w-full md:flex-1 min-w-[200px]",
+        "flex w-full min-w-[200px] flex-col items-start gap-2 md:flex-1",
         props.className,
       )}
     />

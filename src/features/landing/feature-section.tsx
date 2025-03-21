@@ -1,8 +1,8 @@
 "use client";
 
+import { Typography } from "@/components/nowts/typography";
 import { DotPattern } from "@/components/svg/dot-pattern";
 import { Badge } from "@/components/ui/badge";
-import { Typography } from "@/components/ui/typography";
 import { ClientMarkdown } from "@/features/markdown/client-markdown";
 import type { ReactNode } from "react";
 import { SectionLayout } from "./section-layout";
@@ -13,7 +13,7 @@ export const FeaturesSection = ({
   features: FeatureLineProps[];
 }) => {
   return (
-    <SectionLayout size="sm" className="relative " id="features">
+    <SectionLayout size="sm" className="relative" id="features">
       <div className="relative flex flex-col gap-16 lg:gap-28">
         <div className="flex flex-col items-center gap-2">
           <Badge>The features you NEED.</Badge>

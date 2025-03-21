@@ -1,6 +1,6 @@
+import { Typography } from "@/components/nowts/typography";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Typography } from "@/components/ui/typography";
 import {
   Layout,
   LayoutContent,

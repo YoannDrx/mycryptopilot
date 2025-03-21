@@ -1,5 +1,5 @@
+import { Typography } from "@/components/nowts/typography";
 import { buttonVariants } from "@/components/ui/button";
-import { Typography } from "@/components/ui/typography";
 import Link from "next/link";
 import { SectionLayout } from "../section-layout";
 

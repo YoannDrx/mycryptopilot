@@ -1,4 +1,4 @@
-import { Loader } from "@/components/ui/loader";
+import { Loader } from "@/components/nowts/loader";
 
 export default async function RouteLoading() {
   return (

@@ -1,11 +1,11 @@
-import { Typography } from "@/components/ui/typography";
+import { Typography } from "@/components/nowts/typography";
 import { Layout, LayoutContent } from "@/features/page/layout";
 import { SiteConfig } from "@/site-config";
 import Link from "next/link";
 
 export const Footer = () => {
   return (
-    <footer className="border border-border bg-card">
+    <footer className="border-border bg-card border">
       <Layout className="py-24">
         <LayoutContent className="flex justify-between max-lg:flex-col">
           <div className="flex flex-col gap-4">

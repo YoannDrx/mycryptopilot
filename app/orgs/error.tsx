@@ -1,13 +1,8 @@
 "use client";
 
-import { NavigationWrapper } from "@/features/navigation/navigation-wrapper";
-import {
-  Layout,
-  LayoutContent,
-  LayoutHeader,
-  LayoutTitle,
-} from "@/features/page/layout";
-import { Page400 } from "@/features/page/page-400";
+import { BaseNavigation } from "@/features/navigation/base-navigation";
+import { Error400 } from "@/features/page/error-400";
+import { Layout } from "@/features/page/layout";
 import { logger } from "@/lib/logger";
 import type { ErrorParams } from "@/types/next";
 import { useEffect } from "react";
@@ -18,15 +13,10 @@ export default function RouteError({ error }: ErrorParams) {
   }, [error]);
 
   return (
-    <NavigationWrapper>
-      <Layout>
-        <LayoutHeader>
-          <LayoutTitle>Organization error</LayoutTitle>
-        </LayoutHeader>
-        <LayoutContent>
-          <Page400 />
-        </LayoutContent>
+    <BaseNavigation>
+      <Layout size="lg">
+        <Error400 />
       </Layout>
-    </NavigationWrapper>
+    </BaseNavigation>
   );
 }

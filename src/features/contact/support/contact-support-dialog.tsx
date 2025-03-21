@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/auth-client";
 import { env } from "@/lib/env";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
@@ -35,7 +35,7 @@ type ContactSupportDialogProps = PropsWithChildren;
 export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
   const [open, setOpen] = useState(false);
   const session = useSession();
-  const email = session.data?.user ? (session.data.user.email ?? "") : "";
+  const email = session.data?.user ? session.data.user.email : "";
   const form = useZodForm({
     schema: ContactSupportSchema,
     defaultValues: {
@@ -59,11 +59,7 @@ export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={(v) => setOpen(v)}>
       <DialogTrigger asChild>
-        {props.children ? (
-          props.children
-        ) : (
-          <Button variant="outline">Contact support</Button>
-        )}
+        {props.children ?? <Button variant="outline">Contact support</Button>}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

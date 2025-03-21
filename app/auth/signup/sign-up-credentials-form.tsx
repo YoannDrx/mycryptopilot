@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,11 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
-import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { signUpAction } from "./signup.action";
 import type { LoginCredentialsFormType } from "./signup.schema";
 import { LoginCredentialsFormScheme } from "./signup.schema";
 
@@ -22,22 +24,27 @@ export const SignUpCredentialsForm = () => {
   const form = useZodForm({
     schema: LoginCredentialsFormScheme,
   });
+  const searchParams = useSearchParams();
+  const callbackURL = searchParams.get("callbackUrl") || "/orgs";
 
   const submitMutation = useMutation({
     mutationFn: async (values: LoginCredentialsFormType) => {
-      const result = await signUpAction(values);
-
-      if (result?.serverError) {
-        toast.error(result.serverError);
-        return;
-      }
-
-      await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-
-        callbackUrl: `${window.location.origin}/`,
-      });
+      return unwrapSafePromise(
+        authClient.signUp.email({
+          email: values.email,
+          password: values.password,
+          name: values.name,
+          image: values.image,
+        }),
+      );
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: () => {
+      // Process full-refresh
+      const newUrl = window.location.origin + callbackURL;
+      window.location.href = newUrl;
     },
   });
 
@@ -114,7 +121,7 @@ export const SignUpCredentialsForm = () => {
       />
 
       <Button type="submit" className="w-full">
-        Submit
+        Sign up
       </Button>
     </Form>
   );

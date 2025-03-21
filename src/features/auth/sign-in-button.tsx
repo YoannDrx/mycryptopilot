@@ -14,9 +14,9 @@ const useHref = () => {
     return "";
   }
 
-  const href = window.location.href;
+  const pathname = window.location.pathname;
 
-  return `${href}`;
+  return pathname;
 };
 
 export const SignInButton = (props: VariantProps<typeof buttonVariants>) => {

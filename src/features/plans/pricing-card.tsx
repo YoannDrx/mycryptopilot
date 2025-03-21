@@ -1,75 +1,205 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Typography } from "@/components/ui/typography";
-import { BuyButton } from "@/features/stripe/buy-button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { authClient } from "@/lib/auth-client";
+import type { AppAuthPlan } from "@/lib/auth/auth-plans";
+import { ADDITIONAL_FEATURES, LIMITS_CONFIG } from "@/lib/auth/auth-plans";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
-import { useParams } from "next/navigation";
-import type { Plan } from "./plans";
+import { useMutation } from "@tanstack/react-query";
+import { Clock } from "lucide-react";
+import { toast } from "sonner";
+import { LoadingButton } from "../form/submit-button";
 
-export const PricingCard = (props: Plan) => {
-  const params = useParams();
+export function PricingCard({
+  plan,
+  isYearly,
+}: {
+  plan: AppAuthPlan;
+  isYearly?: boolean;
+}) {
+  // Get the active organization
+  const { data: activeOrg } = authClient.useActiveOrganization();
 
-  const organizationSlug = params.orgSlug ? params.orgSlug : "";
+  const upgradeMutation = useMutation({
+    mutationFn: async (name: string) => {
+      if (!activeOrg) {
+        throw new Error("No active organization");
+      }
+
+      // Create a subscription for the organization
+      const result = await authClient.subscription.upgrade({
+        plan: name,
+        referenceId: activeOrg.id,
+        annual: false,
+        successUrl: `/orgs/${activeOrg.slug}/settings/billing/success`,
+        cancelUrl: `/orgs/${activeOrg.slug}/settings/billing`,
+      });
+
+      if (result.error) {
+        toast.error(result.error.message);
+      }
+
+      return result.data;
+    },
+  });
+
+  // Calculate pricing details
+  const monthlyPrice = plan.price;
+  const yearlyPrice = plan.yearlyPrice ?? plan.price * 12;
+  const displayPrice = isYearly ? Math.round(yearlyPrice / 12) : monthlyPrice;
+  const originalPrice = isYearly ? monthlyPrice : null;
+
+  // Calculate discount percentage
+  const calculateDiscount = (monthlyPrice: number, yearlyPrice: number) => {
+    if (monthlyPrice === 0) return 0;
+    const annualCost = monthlyPrice * 12;
+    const discount = ((annualCost - yearlyPrice) / annualCost) * 100;
+    return Math.round(discount);
+  };
+
+  const discount = calculateDiscount(plan.price, plan.yearlyPrice ?? 0);
 
   return (
     <Card
       className={cn(
-        "border-[0.5px] h-fit lg:rounded-3xl rounded-3xl flex-1 p-6 ring-1 ring-gray-900/10 sm:p-8",
-        {
-          "relative bg-background shadow-2xl": props.isPopular,
-          "bg-background/60 sm:mx-8 lg:mx-0": !props.isPopular,
-        },
-        props.className,
+        "flex flex-col transition-all duration-200 hover:shadow-lg",
+        plan.isPopular && "border-primary relative overflow-hidden shadow-md",
       )}
     >
-      {props.isPopular ? (
-        <div className="absolute inset-x-0 top-0 flex items-center justify-center">
-          <Badge className="-translate-y-1/2">Popular</Badge>
+      {plan.isPopular && (
+        <div className="absolute top-5 right-0">
+          <div className="bg-primary text-primary-foreground rounded-l-full px-4 py-1 text-xs font-semibold">
+            Most Popular
+          </div>
         </div>
-      ) : null}
-      <CardHeader className="flex flex-col items-start gap-6 lg:gap-8">
-        <p className="gap-4 text-lg font-bold uppercase text-primary">
-          {props.name}
-        </p>
-        <div className="flex items-end justify-center gap-2">
-          <p className="text-5xl font-extrabold">${props.price}</p>
-          <Typography>{props.currency || "USD"}</Typography>
+      )}
 
-          {props.barredPrice ? (
-            <div className="relative self-start">
-              <p className="text-lg font-bold">${props.barredPrice}</p>
-              <div className="absolute top-1/2 h-0.5 w-full rotate-45 bg-red-500" />
-            </div>
-          ) : null}
-        </div>
-        <Typography variant="muted">{props.subtitle}</Typography>
-        <Separator />
-        <ul className="flex w-full flex-col gap-3 lg:gap-4">
-          {props.features.map((feature, i) => (
-            <li key={i} className="flex items-center gap-1">
-              <Check className="text-green-500" size={20} />
-              <Typography variant="muted" className="flex-1">
-                {" "}
-                {feature}
-              </Typography>
-            </li>
-          ))}
-        </ul>
+      <CardHeader className={cn("pb-0")}>
+        <CardTitle className="text-2xl capitalize">{plan.name}</CardTitle>
+        <CardDescription className="mt-1.5">{plan.description}</CardDescription>
       </CardHeader>
-      <CardFooter className="flex flex-col items-stretch gap-2">
-        <BuyButton
-          orgSlug={String(organizationSlug)}
-          variant={props.isPopular ? "default" : "outline"}
-          priceId={props.priceId}
+
+      <CardContent className="flex-1 pt-6">
+        <div className="mb-8">
+          <div className="flex items-baseline">
+            <span className="text-3xl font-bold">
+              {plan.currency === "USD" ? "$" : plan.currency}
+            </span>
+            <span className="text-5xl font-bold tracking-tight">
+              {displayPrice}
+            </span>
+            <span className="text-muted-foreground ml-1.5">/mo</span>
+          </div>
+
+          {isYearly && originalPrice !== null && originalPrice > 0 && (
+            <div className="mt-2 flex items-center">
+              <span className="text-muted-foreground mr-2 line-through">
+                ${originalPrice}/mo
+              </span>
+              <Badge
+                variant="outline"
+                className="border-primary/20 bg-primary/10 text-primary"
+              >
+                Save {discount}%
+              </Badge>
+            </div>
+          )}
+
+          {isYearly && yearlyPrice > 0 && (
+            <p className="text-muted-foreground mt-2 text-sm">
+              Billed as ${yearlyPrice} per year
+            </p>
+          )}
+
+          {plan.freeTrial && (
+            <div className="bg-primary/10 text-primary mt-3 inline-flex items-center rounded-full px-3 py-1 text-sm font-medium">
+              <Clock className="mr-1.5 size-3.5" />
+              {plan.freeTrial.days}-day free trial
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          <h4 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
+            Plan Includes
+          </h4>
+
+          <ul className="space-y-5">
+            {/* Generate features from limits object */}
+            {Object.entries(plan.limits).map(([key, value]) => {
+              const limitConfig =
+                LIMITS_CONFIG[key as keyof typeof LIMITS_CONFIG];
+
+              const Icon = limitConfig.icon;
+
+              return (
+                <li key={key} className="flex items-start">
+                  <div className="text-primary mt-0.5 mr-3 size-5 shrink-0">
+                    <Icon className="size-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      {limitConfig.getLabel(value as number)}
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {limitConfig.description}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+
+            {/* Additional features based on plan */}
+            {ADDITIONAL_FEATURES[
+              plan.name as keyof typeof ADDITIONAL_FEATURES
+            ].map((feature, index) => {
+              const Icon = feature.icon;
+
+              return (
+                <li key={index} className="flex items-start">
+                  <div className="text-primary mt-0.5 mr-3 size-5 shrink-0">
+                    <Icon className="size-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{feature.label}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {feature.description}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </CardContent>
+
+      <CardFooter className="pt-6 pb-8">
+        <LoadingButton
+          loading={upgradeMutation.isPending}
+          size="lg"
+          className={cn(
+            "w-full text-base font-medium",
+            plan.isPopular ? "bg-primary hover:bg-primary/90" : "",
+          )}
+          onClick={() => {
+            upgradeMutation.mutate(plan.name);
+          }}
         >
-          {props.cta}
-        </BuyButton>
-        <Typography variant="muted">{props.ctaSubtitle}</Typography>
+          {plan.price === 0
+            ? "Get Started"
+            : isYearly
+              ? "Subscribe Yearly"
+              : "Subscribe Monthly"}
+        </LoadingButton>
       </CardFooter>
     </Card>
   );
-};
+}

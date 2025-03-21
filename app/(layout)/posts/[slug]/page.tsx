@@ -1,7 +1,7 @@
+import { Typography } from "@/components/nowts/typography";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Typography } from "@/components/ui/typography";
 import { ServerMdx } from "@/features/markdown/server-mdx";
 import {
   Layout,
@@ -36,8 +36,8 @@ export async function generateMetadata(props: PostParams): Promise<Metadata> {
     description: post.attributes.description,
     keywords: post.attributes.keywords,
     authors: {
-      name: SiteConfig.maker.name,
-      url: SiteConfig.maker.website,
+      name: SiteConfig.team.name,
+      url: SiteConfig.team.website,
     },
     openGraph: {
       title: post.attributes.title,
@@ -99,12 +99,8 @@ export default async function RoutePage(props: PostParams) {
           <LayoutDescription className="drop-shadow-sm">
             Published by {formatDate(new Date(post.attributes.date))} · Reading
             time {calculateReadingTime(post.content)} minutes · Created by{" "}
-            <Typography
-              variant="link"
-              as={Link}
-              href={SiteConfig.maker.website}
-            >
-              {SiteConfig.maker.name}
+            <Typography variant="link" as={Link} href={SiteConfig.team.website}>
+              {SiteConfig.team.name}
             </Typography>
           </LayoutDescription>
         </div>
@@ -112,7 +108,7 @@ export default async function RoutePage(props: PostParams) {
       <Separator />
       <LayoutContent>
         <ServerMdx
-          className="prose mb-8 dark:prose-invert lg:prose-lg xl:prose-xl"
+          className="prose dark:prose-invert lg:prose-lg xl:prose-xl mb-8"
           source={post.content}
         />
       </LayoutContent>

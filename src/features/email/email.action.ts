@@ -1,29 +1,16 @@
 "use server";
 
-import { ActionError, action } from "@/lib/actions/safe-actions";
-import { setupResendCustomer } from "@/lib/auth/auth-config-setup";
-import { prisma } from "@/lib/prisma";
+import { action } from "@/lib/actions/safe-actions";
+import { logger } from "@/lib/logger";
 import { EmailActionSchema } from "./email.schema";
 
 export const addEmailAction = action
   .schema(EmailActionSchema)
   .action(async ({ parsedInput: { email } }) => {
-    try {
-      const userData = {
-        email,
-      };
+    logger.info("Add email", { email });
+    // Add the user in your mailing tools
 
-      const resendContactId = await setupResendCustomer(userData);
-
-      await prisma.user.create({
-        data: {
-          ...userData,
-          resendContactId,
-        },
-      });
-
-      return { email };
-    } catch {
-      throw new ActionError("The email is already in use");
-    }
+    return {
+      ok: true,
+    };
   });

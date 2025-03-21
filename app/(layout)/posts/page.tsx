@@ -1,14 +1,14 @@
+import { Typography } from "@/components/nowts/typography";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Typography } from "@/components/ui/typography";
 import {
   Layout,
   LayoutContent,
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { getPosts, getPostsTags } from "@/features/posts/post-manager";
 import { PostCard } from "@/features/posts/post-card";
+import { getPosts, getPostsTags } from "@/features/posts/post-manager";
 import { SiteConfig } from "@/site-config";
 import type { PageParams } from "@/types/next";
 import { FileQuestion } from "lucide-react";

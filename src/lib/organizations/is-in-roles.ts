@@ -1,4 +1,4 @@
-import type { OrganizationMembershipRole } from "@prisma/client";
+import type { AuthRole } from "../auth/auth-permissions";
 
 /**
  *
@@ -6,14 +6,11 @@ import type { OrganizationMembershipRole } from "@prisma/client";
  * @param rolesNeeded Roles to check
  * @returns a boolean indicating if the user has at least one role in rolesB
  */
-export const isInRoles = (
-  userRoles?: OrganizationMembershipRole[],
-  rolesNeeded?: OrganizationMembershipRole[],
-) => {
+export const isInRoles = (userRoles?: AuthRole[], rolesNeeded?: AuthRole[]) => {
   if (!userRoles) return false;
 
   // Owner can access to everything
-  if (userRoles.includes("OWNER")) return true;
+  if (userRoles.includes("owner")) return true;
 
   if (!rolesNeeded) return true;
   return rolesNeeded.every((role) => userRoles.includes(role));

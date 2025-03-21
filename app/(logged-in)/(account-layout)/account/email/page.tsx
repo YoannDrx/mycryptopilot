@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ContactSupportDialog } from "@/features/contact/support/contact-support-dialog";
-import { requiredAuth } from "@/lib/auth/helper";
 import { env } from "@/lib/env";
 import { resend } from "@/lib/mail/resend";
 import { combineWithParentMetadata } from "@/lib/metadata";
@@ -19,9 +18,9 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function MailProfilePage() {
-  const user = await requiredAuth();
+  const resendContactId = "" as null | string;
 
-  if (!user.resendContactId) {
+  if (!resendContactId) {
     return <ErrorComponent />;
   }
 
@@ -31,7 +30,7 @@ export default async function MailProfilePage() {
 
   const { data: resendUser } = await resend.contacts.get({
     audienceId: env.RESEND_AUDIENCE_ID,
-    id: user.resendContactId,
+    id: resendContactId,
   });
 
   if (!resendUser) {
@@ -55,7 +54,7 @@ export default async function MailProfilePage() {
 
 const ErrorComponent = () => {
   return (
-    <Card variant="error">
+    <Card>
       <CardHeader>
         <CardTitle>Resend not found</CardTitle>
         <CardDescription>

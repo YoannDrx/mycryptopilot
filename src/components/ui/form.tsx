@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+"use client";
+
+import { Label } from "@/components/ui/label";
+import { useDebounceFn } from "@/hooks/use-debounce-fn";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import type {
-  ControllerProps,
-  FieldPath,
-  FieldValues,
   SubmitHandler,
   UseFormProps,
   UseFormReturn,
@@ -16,17 +18,21 @@ import {
   FormProvider,
   useForm,
   useFormContext,
+  useFormState,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
 } from "react-hook-form";
 import type { TypeOf, ZodSchema } from "zod";
-import { Label } from "./label";
 
-type FormProps<T extends FieldValues> = Omit<
+export type FormProps<T extends FieldValues> = Omit<
   React.ComponentProps<"form">,
   "onSubmit"
 > & {
   form: UseFormReturn<T>;
   onSubmit: SubmitHandler<T>;
   disabled?: boolean;
+  submitOnBlur?: boolean;
 };
 
 const Form = <T extends FieldValues>({
@@ -35,23 +41,35 @@ const Form = <T extends FieldValues>({
   children,
   className,
   disabled,
+  submitOnBlur = false,
   ...props
-}: FormProps<T>) => (
-  <FormProvider {...form}>
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      {...props}
-      className={className}
-    >
-      <fieldset
-        disabled={disabled ?? form.formState.isSubmitting}
+}: FormProps<T>) => {
+  const debouncedBlurSubmit = useDebounceFn(() => {
+    void form.handleSubmit(onSubmit)();
+  }, 500);
+
+  return (
+    <FormProvider {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        onBlur={async () => {
+          if (submitOnBlur) {
+            debouncedBlurSubmit();
+          }
+        }}
+        {...props}
         className={className}
       >
-        {children}
-      </fieldset>
-    </form>
-  </FormProvider>
-);
+        <fieldset
+          disabled={disabled ?? form.formState.isSubmitting}
+          className={className}
+        >
+          {children}
+        </fieldset>
+      </form>
+    </FormProvider>
+  );
+};
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -80,11 +98,11 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
-  const { getFieldState, formState } = useFormContext();
-
+  const { getFieldState } = useFormContext();
+  const formState = useFormState({ name: fieldContext.name });
   const fieldState = getFieldState(fieldContext.name, formState);
 
-  if (!fieldContext.name) {
+  if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>");
   }
 
@@ -108,79 +126,72 @@ const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
-const FormItem = ({
-  ref,
-  className,
-  ...props
-}: React.ComponentProps<"div">) => {
+function FormItem({ className, ...props }: React.ComponentProps<"div">) {
   const id = React.useId();
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div
+        data-slot="form-item"
+        className={cn("grid gap-2", className)}
+        {...props}
+      />
     </FormItemContext.Provider>
   );
-};
+}
 
-const FormLabel = ({
-  ref,
+function FormLabel({
   className,
   ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) => {
+}: React.ComponentProps<typeof LabelPrimitive.Root>) {
   const { error, formItemId } = useFormField();
 
   return (
     <Label
-      ref={ref}
-      className={cn(error && "text-destructive", className)}
+      data-slot="form-label"
+      data-error={!!error}
+      className={cn("data-[error=true]:text-destructive", className)}
       htmlFor={formItemId}
       {...props}
     />
   );
-};
+}
 
-const FormControl = ({ ref, ...props }: React.ComponentProps<typeof Slot>) => {
+function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
   return (
     <Slot
-      ref={ref}
+      data-slot="form-control"
       id={formItemId}
       aria-describedby={
-        error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
+        !error
+          ? `${formDescriptionId}`
+          : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
       {...props}
     />
   );
-};
+}
 
-const FormDescription = ({
-  ref,
-  className,
-  ...props
-}: React.ComponentProps<"p">) => {
+function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
   const { formDescriptionId } = useFormField();
 
   return (
     <p
-      ref={ref}
+      data-slot="form-description"
       id={formDescriptionId}
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
   );
-};
+}
 
-const FormMessage = ({
-  ref,
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"p">) => {
+function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error.message) : children;
+  const body = error ? String(error.message ?? "") : props.children;
 
   if (!body) {
     return null;
@@ -188,15 +199,15 @@ const FormMessage = ({
 
   return (
     <p
-      ref={ref}
+      data-slot="form-message"
       id={formMessageId}
-      className={cn("text-sm font-medium text-destructive", className)}
+      className={cn("text-destructive text-sm", className)}
       {...props}
     >
       {body}
     </p>
   );
-};
+}
 
 type UseZodFormProps<Z extends ZodSchema> = Exclude<
   UseFormProps<TypeOf<Z>>,
@@ -225,5 +236,3 @@ export {
   useFormField,
   useZodForm,
 };
-
-export type { FormProps };

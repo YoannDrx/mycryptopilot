@@ -17,7 +17,7 @@ export default function RouteError({ error, reset }: ErrorParams) {
       <LayoutHeader>
         <LayoutTitle>Error with post.</LayoutTitle>
       </LayoutHeader>
-      <Card variant="error">
+      <Card>
         <CardHeader>
           <CardTitle>
             Sorry, the post you are looking for doesn't work as expected. Please

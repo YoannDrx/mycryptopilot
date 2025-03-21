@@ -18,12 +18,12 @@ export default function RouteError({ error, reset }: ErrorParams) {
   }, [error]);
 
   return (
-    <Layout>
+    <Layout size="lg">
       <LayoutHeader>
         <LayoutTitle>Error</LayoutTitle>
       </LayoutHeader>
       <LayoutContent>
-        <Card variant="error">
+        <Card>
           <CardHeader>
             <CardTitle>
               Sorry, something went wrong. Please try again later.

@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 "use client";
 
-import type { OrganizationPlan } from "@prisma/client";
+import type { PlanLimit } from "@/lib/auth/auth-plans";
+import { getPlanLimits } from "@/lib/auth/auth-plans";
+import type { Subscription } from "@better-auth/stripe";
 import type { PropsWithChildren } from "react";
 import { create } from "zustand";
 
@@ -10,7 +12,8 @@ type CurrentOrgStore = {
   slug: string;
   name: string;
   image: string | null;
-  plan: OrganizationPlan;
+  subscription: Subscription | null;
+  limits: PlanLimit;
 };
 
 /**
@@ -35,7 +38,7 @@ export const useCurrentOrg = create<CurrentOrgStore | null>(() => null);
 
 export const InjectCurrentOrgStore = (
   props: PropsWithChildren<{
-    org?: CurrentOrgStore;
+    org?: Omit<CurrentOrgStore, "limits">;
   }>,
 ) => {
   if (!props.org) return props.children;
@@ -47,7 +50,13 @@ export const InjectCurrentOrgStore = (
     slug: props.org.slug,
     name: props.org.name,
     image: props.org.image,
-    plan: props.org.plan,
+    subscription: props.org.subscription,
+    limits: getPlanLimits(props.org.subscription?.plan),
   });
   return props.children;
+};
+
+export const getCurrentOrgSlug = () => {
+  const currentOrg = useCurrentOrg.getState();
+  return currentOrg?.slug;
 };

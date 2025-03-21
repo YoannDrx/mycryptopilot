@@ -3,7 +3,9 @@ import { FlatCompat } from "@eslint/eslintrc";
 import pluginJs from "@eslint/js";
 import hooksPlugin from "eslint-plugin-react-hooks";
 import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
-import tailwind from "eslint-plugin-tailwindcss";
+// Plugin doesn't support TailwindV4
+// FYI : https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/325
+// import tailwind from "eslint-plugin-tailwindcss";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -28,7 +30,7 @@ export default [
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
   // Tailwind
-  ...tailwind.configs["flat/recommended"],
+  // ...tailwind.configs["flat/recommended"],
   // React
   ...fixupConfigRules(pluginReactConfig),
   {
@@ -130,6 +132,7 @@ export default [
     ignores: [
       "*/**.js",
       "*.js",
+      "*.mjs",
       "zod",
       "*/**.mjs",
       "vitest.config.ts",

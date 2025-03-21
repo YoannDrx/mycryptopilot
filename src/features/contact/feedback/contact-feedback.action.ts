@@ -1,16 +1,16 @@
 "use server";
 
 import { action } from "@/lib/actions/safe-actions";
-import { auth } from "@/lib/auth/helper";
+import { getUser } from "@/lib/auth/auth-user";
 import { env } from "@/lib/env";
-import { sendEmail } from "@/lib/mail/sendEmail";
+import { sendEmail } from "@/lib/mail/send-email";
 import { prisma } from "@/lib/prisma";
 import { ContactFeedbackSchema } from "./contact-feedback.schema";
 
 export const contactSupportAction = action
   .schema(ContactFeedbackSchema)
   .action(async ({ parsedInput: data }) => {
-    const user = await auth();
+    const user = await getUser();
 
     const email = user?.email ?? data.email;
 

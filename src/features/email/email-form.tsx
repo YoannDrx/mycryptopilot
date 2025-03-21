@@ -88,7 +88,7 @@ export const EmailForm = ({
                   <FormItem className="relative w-full">
                     <FormControl>
                       <Input
-                        className="rounded-lg border-accent-foreground/20 bg-accent px-4 py-6 text-lg focus-visible:ring-foreground"
+                        className="border-accent-foreground/20 bg-accent focus-visible:ring-foreground rounded-lg px-4 py-6 text-lg"
                         placeholder="Ton email"
                         {...field}
                       />
