@@ -1,8 +1,9 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
+import { ChevronsUpDown } from "lucide-react";
 import { UserDropdown } from "../auth/user-dropdown";
 
 export const SidebarUserButton = () => {
@@ -10,13 +11,19 @@ export const SidebarUserButton = () => {
   const data = session.data?.user;
   return (
     <UserDropdown>
-      <Button variant="outline">
-        <Avatar className="size-6">
-          <AvatarFallback>{data?.name[0] ?? "-"}</AvatarFallback>
-          {data?.image && <AvatarImage src={data.image} />}
+      <SidebarMenuButton variant="outline">
+        <Avatar className="size-8 rounded-lg">
+          <AvatarImage src={data?.image ?? ""} alt={data?.name[0]} />
+          <AvatarFallback className="rounded-lg">
+            {data?.name[0] ?? data?.email[0]}
+          </AvatarFallback>
         </Avatar>
-        <span>{data?.name}</span>
-      </Button>
+        <div className="grid flex-1 text-left text-sm leading-tight">
+          <span className="truncate font-semibold">{data?.name}</span>
+          <span className="truncate text-xs">{data?.email}</span>
+        </div>
+        <ChevronsUpDown className="ml-auto size-4" />
+      </SidebarMenuButton>
     </UserDropdown>
   );
 };

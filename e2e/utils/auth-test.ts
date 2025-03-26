@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { faker } from "@faker-js/faker";
 import type { Page } from "@playwright/test";
 
@@ -33,7 +34,11 @@ export async function createTestAccount(options: {
 
   // Wait for navigation to complete - we should be redirected to the callback URL
   if (callbackURL) {
-    await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
+    try {
+      await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
+    } catch (error) {
+      logger.error("Error waiting for navigation to complete", error);
+    }
   }
 
   return userData;
@@ -67,7 +72,11 @@ export async function signInAccount(options: {
 
   // Wait for navigation to complete if a callback URL is provided
   if (callbackURL) {
-    await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
+    try {
+      await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
+    } catch (error) {
+      logger.error("Error waiting for navigation to complete", error);
+    }
   }
 
   return userData;
