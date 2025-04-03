@@ -1,5 +1,3 @@
-// e2e/example.spec.ts
-
 import { prisma } from "@/lib/prisma";
 import { expect, test } from "@playwright/test";
 import { createTestAccount } from "./utils/auth-test";

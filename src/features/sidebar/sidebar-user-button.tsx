@@ -11,7 +11,7 @@ export const SidebarUserButton = () => {
   const data = session.data?.user;
   return (
     <UserDropdown>
-      <SidebarMenuButton variant="outline">
+      <SidebarMenuButton variant="outline" className="h-12">
         <Avatar className="size-8 rounded-lg">
           <AvatarImage src={data?.image ?? ""} alt={data?.name[0]} />
           <AvatarFallback className="rounded-lg">

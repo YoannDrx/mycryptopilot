@@ -8,8 +8,6 @@ import {
   signOutAccount,
 } from "./utils/auth-test";
 
-// Delete account url : http://localhost:3000/api/auth/delete-user/callback?token=90568005193667110474793643622299&callbackURL=/goodbye
-
 test.describe("account", () => {
   test("delete account flow", async ({ page }) => {
     // 1. Create a test account
