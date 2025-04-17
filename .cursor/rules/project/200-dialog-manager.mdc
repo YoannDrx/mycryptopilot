@@ -72,7 +72,7 @@ dialogManager.add({
 
 Files : 
 
-* [dialog-manager-dialog.tsx](mdc:src/features/dialog-manager/dialog-manager-dialog.tsx) 
+* [dialog-manager-dialog.tsx](mdc:src/features/dialog-manager/dialog-manager-dialog.tsx)
 * [dialog-manager-store.ts](mdc:src/features/dialog-manager/dialog-manager-store.ts)
 
 

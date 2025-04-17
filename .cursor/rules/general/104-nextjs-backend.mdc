@@ -35,7 +35,7 @@ export default async function Page() {
 }
 ```
 
-To set a cookie, you must be in an [api-route.mdc](mdc:.cursor/rules/api-route.mdc) or [server-actions.mdc](mdc:.cursor/rules/server-actions.mdc) :
+To set a cookie, you must be in an [201-api-route.mdc](mdc:.cursor/rules/project/201-api-route.mdc) or [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc) :
 
 ```tsx
 'use server'

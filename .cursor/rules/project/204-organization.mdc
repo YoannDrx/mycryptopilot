@@ -57,6 +57,6 @@ const maxMembers = getPlanLimits(org.subscription?.plan ?? "basic").members;
 
 ## Roles
 
-The roles is defined in [auth-permissions.ts](mdc:src/lib/auth-permissions.ts) with the permissions.
+The roles is defined in [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts) with the permissions.
 
 

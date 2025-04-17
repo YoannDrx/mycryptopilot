@@ -10,7 +10,7 @@ NUQS is a libriarie that enable you to store value in the QUERY of the URL :
 
 ## Usage
 
-The Query can be stored in a [11-client-components.mdc](mdc:.cursor/rules/11-client-components.mdc) with useQuery hooks : 
+The Query can be stored in a [101-client-components.mdc](mdc:.cursor/rules/general/101-client-components.mdc) with useQuery hooks : 
 
 ```tsx
 'use client'
@@ -126,7 +126,7 @@ export const loadSearchParams = createLoader(coordinatesSearchParams)
 
 Here, loadSearchParams is a function that parses search params and returns state variables to be consumed server-side (the same state type that useQueryStates returns).
 
-Then on [nextjs-routes.mdc](mdc:.cursor/rules/nextjs-routes.mdc) you can use :
+Then on [105-nextjs-routes.mdc](mdc:.cursor/rules/general/105-nextjs-routes.mdc) you can use :
 
 ```tsx
 // page.tsx
@@ -193,7 +193,7 @@ export default async function Page({ searchParams }: PageProps) {
   )
 }
  
-// anywhere in [server-components.mdc](mdc:.cursor/rules/server-components.mdc)
+// anywhere in [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc)
 function Results() {
   // Access type-safe search params in children server components:
   const maxResults = searchParamsCache.get('maxResults')

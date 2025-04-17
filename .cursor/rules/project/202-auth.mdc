@@ -21,11 +21,11 @@ const user = await getUser();
 const user = await getRequiredUser();
 ```
 
-`requiredAuth` will throw an `unauthorized` method that will be catch by `unauthorized.tsx`. You can check [105-nextjs-routes.mdc](mdc:.cursor/rules/105-nextjs-routes.mdc).
+`requiredAuth` will throw an `unauthorized` method that will be catch by `unauthorized.tsx`. You can check [105-nextjs-routes.mdc](mdc:.cursor/rules/general/105-nextjs-routes.mdc)
 
 ## Exemple Client Side
 
-Use `useSession` from [212-better-auth.mdc](mdc:.cursor/rules/212-better-auth.mdc) and [auth-client.ts](mdc:src/lib/auth-client.ts) !
+Use `useSession` from [212-better-auth.mdc](mdc:.cursor/rules/project/212-better-auth.mdc) and [auth-client.ts](mdc:src/lib/auth-client.ts) !
 
 ```ts
 import { useSession } from "@/lib/auth-client";

@@ -5,7 +5,7 @@ globs: *.tsx
 ## Context
 
 * Creating a form should always use Shadcn/UI [input.tsx](mdc:src/components/ui/input.tsx) and [label.tsx](mdc:src/components/ui/label.tsx) and [form.tsx](mdc:src/components/ui/form.tsx)
-* We must always use [server-actions.mdc](mdc:.cursor/rules/server-actions.mdc) or [21-api-route.mdc](mdc:.cursor/rules/21-api-route.mdc) to handle the action and [use-mutation.mdc](mdc:.cursor/rules/use-mutation.mdc)
+* We must always use [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc) or [201-api-route.mdc](mdc:.cursor/rules/project/201-api-route.mdc) to handle the action and [210-use-mutation.mdc](mdc:.cursor/rules/project/210-use-mutation.mdc)
 
 ## Example
 
@@ -69,7 +69,7 @@ export const Form = () => {
 };
 ```
 
-Then you can create an server-action follow [server-actions.mdc](mdc:.cursor/rules/server-actions.mdc)
+Then you can create an server-action follow [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc)
 
 Please use the following files :
 

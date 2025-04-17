@@ -44,7 +44,7 @@ export const POST = orgRoute
   });
 ```
 
-Our application use [organization.mdc](mdc:.cursor/rules/organization.mdc) to handle persmission
+Our application use [204-organization.mdc](mdc:.cursor/rules/project/204-organization.mdc) to handle persmission
 
 ## Rules
 

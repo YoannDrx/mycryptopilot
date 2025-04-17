@@ -59,7 +59,7 @@ The template can be found in [nerr.code-snippets](mdc:.vscode/nerr.code-snippets
 
 The template can be found in [nloa.code-snippets](mdc:.vscode/nloa.code-snippets) and define the Loading page. 
 
-When a child is a [server-components.mdc](mdc:.cursor/rules/server-components.mdc) and wait, the `loading.tsx` page will be displayed.
+When a child is a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) and wait, the `loading.tsx` page will be displayed.
 
 * `/app/users/loading.tsx` will show a loader for every route that didn't have a nearest loading, children of `/users`
 
