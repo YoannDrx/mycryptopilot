@@ -145,6 +145,7 @@ export default [
       "next.config.js",
       "eslint.config.mjs",
       "**/worker.js",
+      "src/generated",
     ],
   },
 ];

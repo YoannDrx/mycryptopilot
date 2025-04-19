@@ -27,7 +27,7 @@ export const ProviderButton = (props: ProviderButtonProps) => {
     mutationFn: async () => {
       await authClient.signIn.social({
         provider: props.providerId,
-        callbackURL: getCallbackUrl(props.callbackUrl, "/account"),
+        callbackURL: getCallbackUrl(props.callbackUrl ?? "/account"),
       });
     },
   });

@@ -5,8 +5,6 @@ import { Loader } from "@/components/nowts/loader";
 import { Typography } from "@/components/nowts/typography";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import type { Variants } from "framer-motion";
-import { motion } from "framer-motion";
 import {
   BarChart3,
   Calendar,
@@ -15,6 +13,8 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import type { Variants } from "motion/react";
+import { motion } from "motion/react";
 import { SectionLayout } from "./section-layout";
 
 export function BentoGridSection() {

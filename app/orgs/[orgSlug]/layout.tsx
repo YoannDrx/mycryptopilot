@@ -1,10 +1,8 @@
-import { RefreshPage } from "@/components/utils/refresh-page";
-import { auth } from "@/lib/auth";
 import { orgMetadata } from "@/lib/metadata";
 import { getCurrentOrg } from "@/lib/organizations/get-org";
 import type { LayoutParams, PageParams } from "@/types/next";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { unauthorized } from "next/navigation";
 import { InjectCurrentOrgStore } from "./use-current-org";
 
 export async function generateMetadata(
@@ -19,19 +17,9 @@ export default async function RouteLayout(
 ) {
   const params = await props.params;
 
-  const org = await getCurrentOrg();
+  const org = await getCurrentOrg({ currentOrgSlug: params.orgSlug });
 
-  // The user try to go to another organization, we must sync with the URL
-  if (org?.slug !== params.orgSlug) {
-    await auth.api.setActiveOrganization({
-      headers: await headers(),
-      body: {
-        organizationSlug: params.orgSlug,
-      },
-    });
-    // Make a full refresh of the page
-    return <RefreshPage />;
-  }
+  if (!org) unauthorized();
 
   return (
     <InjectCurrentOrgStore

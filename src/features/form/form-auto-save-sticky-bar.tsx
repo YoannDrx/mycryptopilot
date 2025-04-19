@@ -4,7 +4,8 @@ import {
 } from "@/components/nowts/keyboard-shortcut";
 import { Typography } from "@/components/nowts/typography";
 import { Button } from "@/components/ui/button";
-import { AnimatePresence, motion } from "framer-motion";
+import { useIsClient } from "@/hooks/use-is-client";
+import { AnimatePresence, motion } from "motion/react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useFormAutoSave } from "./form-auto-save";
@@ -18,12 +19,15 @@ type FormAutoSaveStickyBarProps = {
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 export const FormAutoSaveStickyBar = (props: FormAutoSaveStickyBarProps) => {
   const ctx = useFormAutoSave();
+  const isClient = useIsClient();
   const onSubmit = ctx.submit;
   const onCancel = ctx.cancel;
   const isLoading = ctx.isLoading;
   const isDirty = ctx.isDirty;
 
   const isShow = isDirty;
+
+  if (!isClient) return null;
 
   return createPortal(
     <div

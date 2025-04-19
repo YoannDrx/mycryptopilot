@@ -11,9 +11,8 @@ import { z } from "zod";
 const statement = {
   ...defaultStatements,
   project: ["create", "share", "update", "delete"],
-  tweet: ["create", "update", "delete"],
   subscription: ["manage"],
-  videos: ["create", "update", "delete", "view"],
+  users: ["create", "delete"],
 } as const satisfies Statements;
 
 export const AuthPermissionSchema = z.object(
@@ -49,14 +48,12 @@ export const ac = createAccessControl(statement);
 
 const member = ac.newRole({
   project: ["create"],
-  videos: ["view"],
   ...memberAc.statements,
 });
 
 const admin = ac.newRole({
   project: ["create", "update"],
   subscription: ["manage"],
-  videos: ["view", "create", "update"],
   ...adminAc.statements,
 });
 

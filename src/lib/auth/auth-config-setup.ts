@@ -4,6 +4,7 @@ import { createOrganizationQuery } from "../../query/org/org-create.query";
 import { env } from "../env";
 import { generateSlug, getNameFromEmail } from "../format/id";
 import { resend } from "../mail/resend";
+import { prisma } from "../prisma";
 
 export const setupResendCustomer = async (user: User) => {
   if (!user.email) {
@@ -22,6 +23,15 @@ export const setupResendCustomer = async (user: User) => {
   });
 
   if (!contact.data) return;
+
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      resendContactId: contact.data.id,
+    },
+  });
 
   return contact.data.id;
 };

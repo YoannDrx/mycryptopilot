@@ -79,7 +79,7 @@ describe("SignUpCredentialsForm", () => {
         email: "john@example.com",
         password: "password123",
         name: "John Doe",
-        image: undefined,
+        image: "",
       });
     });
 

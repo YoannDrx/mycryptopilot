@@ -37,7 +37,7 @@ When we talk about big query, that involve some frontend logic AND when the retu
 Exemple with a query about organization : 
 
 ```tsx
-import type { OrganizationMembershipRole, Prisma, User } from "@prisma/client";
+import type { OrganizationMembershipRole, Prisma, User } from "@/generated/prisma";
 import { prisma } from "../prisma";
 
 // Can be just an object if no params needed

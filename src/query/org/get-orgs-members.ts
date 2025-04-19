@@ -1,5 +1,5 @@
+import type { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
 
 export const getOrgsMembers = async (orgId: string) => {
   return prisma.member.findMany({

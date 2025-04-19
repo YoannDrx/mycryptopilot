@@ -18,7 +18,7 @@ dialogManager.add({
   action: {
     label: "Delete",
     onClick: async () => {
-      // todo 
+      // function...
     }
   },
 });
@@ -43,7 +43,7 @@ dialogManager.add({
     label: "Rename",
     onClick: async (value) => {
       if (!value) return;
-      // TODO
+      // function ...
     },
   },
 });

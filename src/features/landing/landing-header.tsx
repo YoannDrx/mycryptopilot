@@ -2,11 +2,11 @@
 
 import { LogoSvg } from "@/components/svg/logo-svg";
 import { SiteConfig } from "@/site-config";
-import { motion, useMotionValue, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useScroll, useTransform } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AuthButtonClient } from "../auth/auth-button-client";
-import { dialogManager } from "../dialog-manager/dialog-manager-store";
 import { ThemeToggle } from "../theme/theme-toggle";
 
 function useBoundedScroll(threshold: number) {
@@ -47,6 +47,7 @@ function useBoundedScroll(threshold: number) {
 
 export function LandingHeader() {
   const { scrollYBoundedProgress } = useBoundedScroll(400);
+  const router = useRouter();
   const scrollYBoundedProgressDelayed = useTransform(
     scrollYBoundedProgress,
     [0, 0.75, 1],
@@ -65,22 +66,7 @@ export function LandingHeader() {
           <LogoSvg
             size={24}
             onClick={() => {
-              dialogManager.add({
-                title: "Rename campaign",
-                description: "Enter a new name for this campaign",
-                input: {
-                  label: "Name",
-                  defaultValue: "Some value",
-                  placeholder: "Enter a new name",
-                },
-                action: {
-                  label: "Rename",
-                  onClick: async (value) => {
-                    if (!value) return;
-                    // TODO
-                  },
-                },
-              });
+              router.push("/");
             }}
           />
           <motion.p

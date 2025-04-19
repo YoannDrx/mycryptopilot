@@ -7,9 +7,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ContactSupportDialog } from "@/features/contact/support/contact-support-dialog";
+import { getRequiredUser } from "@/lib/auth/auth-user";
 import { env } from "@/lib/env";
 import { resend } from "@/lib/mail/resend";
 import { combineWithParentMetadata } from "@/lib/metadata";
+import { prisma } from "@/lib/prisma";
 import { ToggleEmailCheckbox } from "./toggle-email-checkbox";
 
 export const generateMetadata = combineWithParentMetadata({
@@ -18,9 +20,17 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function MailProfilePage() {
-  const resendContactId = "" as null | string;
+  const user = await getRequiredUser();
+  const userWithResendContactId = await prisma.user.findUnique({
+    where: {
+      id: user.id,
+    },
+    select: {
+      resendContactId: true,
+    },
+  });
 
-  if (!resendContactId) {
+  if (!userWithResendContactId?.resendContactId) {
     return <ErrorComponent />;
   }
 
@@ -30,7 +40,7 @@ export default async function MailProfilePage() {
 
   const { data: resendUser } = await resend.contacts.get({
     audienceId: env.RESEND_AUDIENCE_ID,
-    id: resendContactId,
+    id: userWithResendContactId.resendContactId,
   });
 
   if (!resendUser) {

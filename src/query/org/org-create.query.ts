@@ -1,5 +1,5 @@
+import type { Prisma } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
 
 export const createOrganizationQuery = async (
   params: Prisma.OrganizationUncheckedCreateInput,

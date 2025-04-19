@@ -7,6 +7,11 @@ export const POST = orgRoute
       orgId: z.string(),
     }),
   )
+  .metadata({
+    permissions: {
+      users: ["create"],
+    },
+  })
   .body(z.object({ name: z.string() }))
   .handler(async () => {
     return {

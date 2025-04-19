@@ -3,11 +3,68 @@ import { unauthorized } from "next/navigation";
 import { auth } from "../auth";
 import type { AuthPermission, AuthRole } from "../auth/auth-permissions";
 import { getSession } from "../auth/auth-user";
+import { prisma } from "../prisma";
 import { isInRoles } from "./is-in-roles";
 
 type OrgParams = {
   roles?: AuthRole[];
   permissions?: AuthPermission;
+  currentOrgId?: string;
+  currentOrgSlug?: string;
+};
+
+const getOrg = async (params?: OrgParams) => {
+  const user = await getSession();
+
+  if (user?.session.activeOrganizationId) {
+    return auth.api.getFullOrganization({
+      headers: await headers(),
+      query: {
+        organizationId: user.session.activeOrganizationId ?? undefined,
+      },
+    });
+  }
+
+  if (params?.currentOrgId) {
+    await auth.api.setActiveOrganization({
+      headers: await headers(),
+      body: {
+        organizationId: params.currentOrgId,
+      },
+    });
+
+    return getOrg();
+  }
+
+  if (params?.currentOrgSlug) {
+    await auth.api.setActiveOrganization({
+      headers: await headers(),
+      body: {
+        organizationSlug: params.currentOrgSlug,
+      },
+    });
+
+    return getOrg();
+  }
+
+  const firstOrg = await prisma.organization.findFirst({
+    where: {
+      members: {
+        some: { userId: user?.session.userId },
+      },
+    },
+  });
+
+  if (firstOrg) {
+    await auth.api.setActiveOrganization({
+      headers: await headers(),
+      body: { organizationId: firstOrg.id },
+    });
+
+    return getOrg();
+  }
+
+  return null;
 };
 
 export const getCurrentOrg = async (params?: OrgParams) => {
@@ -17,12 +74,7 @@ export const getCurrentOrg = async (params?: OrgParams) => {
     return null;
   }
 
-  const org = await auth.api.getFullOrganization({
-    headers: await headers(),
-    query: {
-      organizationId: user.session.activeOrganizationId ?? undefined,
-    },
-  });
+  const org = await getOrg(params);
 
   if (!org) {
     return null;
@@ -62,10 +114,12 @@ export const getCurrentOrg = async (params?: OrgParams) => {
       (s.status === "active" || s.status === "trialing"),
   );
 
+  const OWNER = org.members.find((m) => m.role === "owner");
+
   return {
     ...org,
     user: user.user,
-    email: (org.email ?? null) as string | null,
+    email: (OWNER?.user.email ?? null) as string | null,
     memberRoles: memberRoles,
     subscription: currentSubscription ?? null,
   };

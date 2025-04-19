@@ -23,6 +23,13 @@ import { LoginCredentialsFormScheme } from "./signup.schema";
 export const SignUpCredentialsForm = () => {
   const form = useZodForm({
     schema: LoginCredentialsFormScheme,
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      verifyPassword: "",
+      image: "",
+    },
   });
   const searchParams = useSearchParams();
   const callbackURL = searchParams.get("callbackUrl") || "/orgs";

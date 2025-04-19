@@ -126,7 +126,7 @@ describe("SignInCredentialsAndMagicLinkForm", () => {
     await waitFor(() => {
       expect(authClient.signIn.magicLink).toHaveBeenCalledWith({
         email: "test@example.com",
-        callbackURL: undefined,
+        callbackURL: "/orgs",
       });
     });
 

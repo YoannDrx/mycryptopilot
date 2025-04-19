@@ -1,10 +1,10 @@
-import AuthNavigationWrapper from "@/features/navigation/log-in-navigation-wrapper";
+import { BaseNavigation } from "@/features/navigation/base-navigation";
 import { Page404 } from "@/features/page/page-404";
 
 export default function NotFoundPage() {
   return (
-    <AuthNavigationWrapper>
+    <BaseNavigation>
       <Page404 />
-    </AuthNavigationWrapper>
+    </BaseNavigation>
   );
 }

@@ -3,7 +3,7 @@
 import { Typography } from "@/components/nowts/typography";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { SectionLayout } from "./section-layout";

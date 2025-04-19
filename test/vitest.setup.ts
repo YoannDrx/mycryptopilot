@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 
+import type { PrismaClient } from "@/generated/prisma";
 import type { AuthClientType } from "@/lib/auth-client";
-import type { PrismaClient } from "@prisma/client";
 import { cleanup } from "@testing-library/react";
 import { fetch } from "cross-fetch";
 import type { ReadonlyURLSearchParams } from "next/navigation";

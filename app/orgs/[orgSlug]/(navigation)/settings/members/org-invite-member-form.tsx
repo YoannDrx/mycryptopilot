@@ -88,7 +88,7 @@ export const OrganizationInviteMemberForm = () => {
                 <AvatarImage src={activeOrg.logo} alt={activeOrg.name} />
               ) : null}
               <AvatarFallback>
-                {activeOrg?.name?.substring(0, 1).toUpperCase()}
+                {activeOrg?.name.substring(0, 1).toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </div>

@@ -25,10 +25,10 @@ export default async function RoutePage(props: PageParams) {
         <LayoutTitle>Videos</LayoutTitle>
       </LayoutHeader>
       <LayoutActions className="flex gap-2">
-        {(await hasPermission({ videos: ["delete"] })) && (
+        {(await hasPermission({ users: ["delete"] })) && (
           <Button variant="outline">Delete</Button>
         )}
-        {(await hasPermission({ videos: ["create"] })) && (
+        {(await hasPermission({ users: ["create"] })) && (
           <Button variant="default">Create</Button>
         )}
       </LayoutActions>

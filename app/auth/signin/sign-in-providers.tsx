@@ -17,9 +17,7 @@ export const SignInProviders = ({
   const searchParams = useSearchParams();
   const callbackUrlParams = searchParams.get("callbackUrl");
 
-  if (!callbackUrl) {
-    callbackUrl = callbackUrlParams as string;
-  }
+  callbackUrl ??= callbackUrlParams as string;
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6">
@@ -30,12 +28,12 @@ export const SignInProviders = ({
 
       <div className="flex flex-col gap-2 lg:gap-4">
         {/* ℹ️ Add provider you want to support here */}
-        {providers.includes("github") ? (
+        {providers.includes("github") && (
           <ProviderButton providerId="github" callbackUrl={callbackUrl} />
-        ) : null}
-        {providers.includes("google") ? (
+        )}
+        {providers.includes("google") && (
           <ProviderButton providerId="google" callbackUrl={callbackUrl} />
-        ) : null}
+        )}
       </div>
 
       <Typography variant="muted" className="text-xs">

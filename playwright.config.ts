@@ -17,8 +17,15 @@ const config: PlaywrightTestConfig = {
       use: { ...devices["Desktop Chrome"] },
     },
   ],
+  // Add retry options
+  retries: 1,
+  // Add delay between retries
+  workers: 3,
   globalTeardown: require.resolve("./e2e/global-teardown.ts"),
   use: {
+    launchOptions: {
+      slowMo: 1000,
+    },
     headless: HEADLESS,
     contextOptions: {
       extraHTTPHeaders: {

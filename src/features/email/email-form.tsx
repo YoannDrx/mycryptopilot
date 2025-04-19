@@ -12,8 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/features/form/submit-button";
 import { useMutation } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { addEmailAction } from "./email.action";
 import type { EmailActionSchemaType } from "./email.schema";
 import { EmailActionSchema } from "./email.schema";

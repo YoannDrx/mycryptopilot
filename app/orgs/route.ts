@@ -16,23 +16,24 @@ export const GET = async () => {
     return NextResponse.redirect(`${getServerUrl()}/auth/signin`);
   }
 
-  const organization = await prisma.organization.findFirst({
+  const member = await prisma.member.findFirst({
     where: {
-      members: {
-        some: {
-          userId: user.id,
+      userId: user.id,
+    },
+    select: {
+      organization: {
+        select: {
+          slug: true,
         },
       },
     },
-    select: {
-      id: true,
-      slug: true,
-    },
   });
 
-  if (!organization) {
+  if (!member) {
     return NextResponse.redirect(`${getServerUrl()}/orgs/new`);
   }
 
-  return NextResponse.redirect(`${getServerUrl()}/orgs/${organization.slug}`);
+  return NextResponse.redirect(
+    `${getServerUrl()}/orgs/${member.organization.slug}`,
+  );
 };

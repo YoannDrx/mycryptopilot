@@ -1,6 +1,6 @@
 "use client";
 
-import { animate } from "framer-motion";
+import { animate } from "motion/react";
 import { useEffect, useRef } from "react";
 import { SectionLayout } from "./section-layout";
 
