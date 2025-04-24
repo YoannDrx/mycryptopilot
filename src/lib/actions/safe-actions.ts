@@ -54,7 +54,7 @@ export const orgAction = createSafeActionClient({
   try {
     const org = await getRequiredCurrentOrg(metadata);
     return next({
-      ctx: org,
+      ctx: { org },
     });
   } catch {
     throw new ActionError(

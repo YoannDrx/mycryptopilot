@@ -6,7 +6,7 @@
 - Fix navigation styles
 - Fix hydratation error
 - Upgrade to next 15.3.0
-- Add middleware to handle authentification and organization issues
+- Update `getOrg` logic to avoid any bugs
 
 ## 2025-04-06
 

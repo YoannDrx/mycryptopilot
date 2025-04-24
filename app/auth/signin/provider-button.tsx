@@ -49,7 +49,7 @@ export const ProviderButton = (props: ProviderButtonProps) => {
       }}
     >
       {data.icon}
-      <span className="ml-2 text-base">Sign in with {data.name}</span>
+      <span className="ml-2">Sign in with {data.name}</span>
     </LoadingButton>
   );
 };
