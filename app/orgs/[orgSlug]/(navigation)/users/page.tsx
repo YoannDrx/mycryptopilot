@@ -6,6 +6,7 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { serverToast } from "@/features/server-sonner/server-toast";
 import { hasPermission } from "@/lib/auth/auth-org";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import type { PageParams } from "@/types/next";
@@ -29,7 +30,18 @@ export default async function RoutePage(props: PageParams) {
           <Button variant="outline">Delete</Button>
         )}
         {(await hasPermission({ users: ["create"] })) && (
-          <Button variant="default">Create</Button>
+          <form>
+            <Button
+              formAction={async () => {
+                "use server";
+
+                await serverToast("Important information");
+              }}
+              variant="default"
+            >
+              Create
+            </Button>
+          </form>
         )}
       </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-6">

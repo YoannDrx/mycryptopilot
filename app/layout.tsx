@@ -1,6 +1,7 @@
 import { TailwindIndicator } from "@/components/utils/tailwind-indicator";
 import { FloatingLegalFooter } from "@/features/legal/floating-legal-footer";
 import { NextTopLoader } from "@/features/page/next-top-loader";
+import { ServerToaster } from "@/features/server-sonner/server-toaster";
 import { getServerUrl } from "@/lib/server-url";
 import { cn } from "@/lib/utils";
 import { SiteConfig } from "@/site-config";
@@ -10,7 +11,7 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -52,6 +53,9 @@ export default function RootLayout({
               {modal}
               <TailwindIndicator />
               <FloatingLegalFooter />
+              <Suspense>
+                <ServerToaster />
+              </Suspense>
             </Providers>
           </NuqsAdapter>
         </body>
