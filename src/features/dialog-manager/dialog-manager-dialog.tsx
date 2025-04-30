@@ -124,6 +124,20 @@ export const DialogManagerRendererDialog = (
               value={inputValue}
               placeholder={props.input.placeholder}
               onChange={(e) => setInputValue(e.target.value)}
+              ref={(ref) => ref?.focus()}
+              onKeyDown={(e) => {
+                if (
+                  e.key === "Enter" &&
+                  !e.shiftKey &&
+                  props.action &&
+                  "onClick" in props.action
+                ) {
+                  e.preventDefault();
+                  if (!props.loading && !isConfirmDisabled) {
+                    void props.action.onClick(inputValue);
+                  }
+                }
+              }}
             />
           </div>
         )}

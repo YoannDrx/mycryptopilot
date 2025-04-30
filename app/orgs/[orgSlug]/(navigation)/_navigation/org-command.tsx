@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useKey } from "react-use";
+import { useHotkeys } from "react-hotkeys-hook";
 import { ORGANIZATION_LINKS } from "./org-navigation.links";
 
 export function OrgCommand() {
@@ -29,16 +29,7 @@ export function OrgCommand() {
     setOpen((open) => !open);
   };
 
-  useKey(
-    (event) => (event.ctrlKey || event.metaKey) && event.key === "k",
-    down,
-    {
-      event: "keydown",
-      options: {
-        capture: true,
-      },
-    },
-  );
+  useHotkeys("mod+k", down);
 
   return (
     <>
