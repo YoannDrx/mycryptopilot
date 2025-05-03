@@ -1,8 +1,11 @@
+import { RefreshPageOrganization } from "@/components/utils/refresh-organization";
+import { auth } from "@/lib/auth";
 import { orgMetadata } from "@/lib/metadata";
 import { getCurrentOrg } from "@/lib/organizations/get-org";
+import { prisma } from "@/lib/prisma";
 import type { LayoutParams, PageParams } from "@/types/next";
 import type { Metadata } from "next";
-import { unauthorized } from "next/navigation";
+import { headers } from "next/headers";
 import { InjectCurrentOrgStore } from "./use-current-org";
 
 export async function generateMetadata(
@@ -19,7 +22,35 @@ export default async function RouteLayout(
 
   const org = await getCurrentOrg({ currentOrgSlug: params.orgSlug });
 
-  if (!org) unauthorized();
+  // The user try to go to another organization, we must sync with the URL
+  if (org?.slug !== params.orgSlug) {
+    const isId = await prisma.organization.findUnique({
+      where: {
+        id: params.orgSlug,
+      },
+      select: {
+        slug: true,
+        id: true,
+      },
+    });
+
+    await auth.api.setActiveOrganization({
+      headers: await headers(),
+      body: {
+        organizationSlug: isId ? undefined : params.orgSlug,
+        organizationId: isId ? params.orgSlug : undefined,
+      },
+    });
+
+    // Force to always have the slug inside the URL
+    return (
+      <RefreshPageOrganization
+        replaceId={Boolean(isId)}
+        orgSlug={isId?.slug}
+        orgId={isId?.id}
+      />
+    );
+  }
 
   return (
     <InjectCurrentOrgStore
