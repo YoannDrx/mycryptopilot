@@ -1,7 +1,4 @@
-import type {
-  NavigationGroup,
-  NavigationLink,
-} from "@/features/navigation/navigation.type";
+import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
 import {
@@ -13,32 +10,33 @@ import {
   User2,
 } from "lucide-react";
 
-const replaceSlug = (href: string, slug: string) => {
-  return href.replace(":organizationSlug", slug);
-};
+const replaceSlug = (href: string, slug: string): string =>
+  href.replace(":organizationSlug", slug);
 
 export const getOrganizationNavigation = (
   slug: string,
   userRoles: AuthRole[] | undefined,
 ): NavigationGroup[] => {
-  return ORGANIZATION_LINKS.map((group: NavigationGroup) => {
-    return {
+  return ORGANIZATION_LINKS.reduce<NavigationGroup[]>((acc, group) => {
+    const filteredLinks = group.links
+      .filter((link) => !link.roles || isInRoles(userRoles, link.roles))
+      .map((link) => ({
+        ...link,
+        href: replaceSlug(link.href, slug),
+      }));
+
+    if (filteredLinks.length === 0) return acc;
+
+    acc.push({
       ...group,
       defaultOpenStartPath: group.defaultOpenStartPath
         ? replaceSlug(group.defaultOpenStartPath, slug)
         : undefined,
-      links: group.links
-        .filter((link: NavigationLink) =>
-          link.roles ? isInRoles(userRoles, link.roles) : true,
-        )
-        .map((link: NavigationLink) => {
-          return {
-            ...link,
-            href: replaceSlug(link.href, slug),
-          };
-        }),
-    };
-  });
+      links: filteredLinks,
+    });
+
+    return acc;
+  }, []);
 };
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
@@ -67,6 +65,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         href: `${ORGANIZATION_PATH}/settings`,
         Icon: Settings,
         label: "Settings",
+        roles: ["admin"],
       },
       {
         href: `${ORGANIZATION_PATH}/settings/members`,
@@ -76,15 +75,15 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       },
       {
         href: `${ORGANIZATION_PATH}/settings/billing`,
+        Icon: CreditCard,
         label: "Billing",
         roles: ["admin"],
-        Icon: CreditCard,
       },
       {
         href: `${ORGANIZATION_PATH}/settings/danger`,
+        Icon: TriangleAlert,
         label: "Danger Zone",
         roles: ["owner"],
-        Icon: TriangleAlert,
       },
     ],
   },

@@ -44,7 +44,7 @@ export function OrgSidebar({
     <Sidebar variant="inset">
       <SidebarHeader className="flex flex-col gap-2">
         <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
-        <OrgCommand />
+        <OrgCommand orgSlug={slug} roles={roles} />
       </SidebarHeader>
       <SidebarContent>
         {links.map((link) => (

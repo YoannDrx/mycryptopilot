@@ -13,13 +13,17 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
+import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { getOrganizationNavigation } from "./org-navigation.links";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ORGANIZATION_LINKS } from "./org-navigation.links";
 
-export function OrgCommand() {
+export function OrgCommand(props: {
+  roles: AuthRole[] | undefined;
+  orgSlug: string;
+}) {
   const [open, setOpen] = useState(false);
   const params = useParams();
   const router = useRouter();
@@ -30,6 +34,8 @@ export function OrgCommand() {
   };
 
   useHotkeys("mod+k", down);
+
+  const links = getOrganizationNavigation(props.orgSlug, props.roles);
 
   return (
     <>
@@ -55,7 +61,7 @@ export function OrgCommand() {
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          {ORGANIZATION_LINKS.map((link, index) => (
+          {links.map((link, index) => (
             <CommandGroup heading={link.title} key={index}>
               {link.links.map((link) => (
                 <CommandItem
