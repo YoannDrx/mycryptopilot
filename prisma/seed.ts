@@ -66,7 +66,7 @@ async function main() {
 
   // Process members and invitations for each organization
   organizations.forEach((organization) => {
-    const roleOptions = ["OWNER", "ADMIN", "MEMBER"];
+    const roleOptions = ["owner", "admin", "member"];
 
     // Make sure each org has at least one owner
     memberPromises.push(
@@ -76,7 +76,7 @@ async function main() {
             id: faker.string.uuid(),
             organizationId: organization.id,
             userId: users[0].id, // First user is always an owner
-            role: "OWNER",
+            role: "owner",
             createdAt: faker.date.past(),
           },
         })
