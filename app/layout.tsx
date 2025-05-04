@@ -14,6 +14,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense, type ReactNode } from "react";
 import "./globals.css";
 import { Providers } from "./providers";
+import { NotifyNowts } from "@/features/nowts/notify-nowts";
 
 export const metadata: Metadata = {
   title: SiteConfig.title,
@@ -58,6 +59,8 @@ export default function RootLayout({
               </Suspense>
             </Providers>
           </NuqsAdapter>
+
+          <NotifyNowts />
         </body>
       </html>
     </>

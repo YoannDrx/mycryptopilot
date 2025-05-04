@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import type { ServerToastEnum } from "./server-toast.schema";
+import type { ServerToastEnum } from "../features/server-sonner/server-toast.schema";
 
 export async function serverToast(
   message: string,

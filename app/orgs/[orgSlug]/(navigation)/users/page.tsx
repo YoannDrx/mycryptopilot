@@ -6,9 +6,9 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { serverToast } from "@/features/server-sonner/server-toast";
 import { hasPermission } from "@/lib/auth/auth-org";
 import { combineWithParentMetadata } from "@/lib/metadata";
+import { serverToast } from "@/lib/server-toast";
 import type { PageParams } from "@/types/next";
 import { ClientOrg } from "./client-org";
 import { DonutChart } from "./donuts-chart";
