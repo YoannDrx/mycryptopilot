@@ -1,8 +1,18 @@
 import { Typography } from "@/components/nowts/typography";
+import { NotifyNowts } from "@/features/nowts/notify-nowts";
 import { Layout, LayoutContent } from "@/features/page/layout";
+import { SiteConfig } from "@/site-config";
+import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote-client/rsc";
 
 const markdown = `Terms demo`;
+
+export const metadata: Metadata = {
+  title: `${SiteConfig.title} - Terms`,
+  description: "Terms of service",
+};
+
+export const dynamic = "force-static";
 
 export default function page() {
   return (
@@ -15,6 +25,9 @@ export default function page() {
           <MDXRemote source={markdown} />
         </LayoutContent>
       </Layout>
+
+      {/* Notify NOWTS during build only */}
+      <NotifyNowts />
     </div>
   );
 }
