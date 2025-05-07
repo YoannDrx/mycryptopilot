@@ -6,10 +6,8 @@ import { getServerUrl } from "@/lib/server-url";
 import { cn } from "@/lib/utils";
 import { SiteConfig } from "@/site-config";
 import type { LayoutParams } from "@/types/next";
-import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense, type ReactNode } from "react";
 import "./globals.css";
@@ -24,6 +22,16 @@ export const metadata: Metadata = {
 const CaptionFont = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-caption",
+});
+
+const GeistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+});
+
+const GeistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
 });
 
 export default function RootLayout({

@@ -1,4 +1,9 @@
-## 2024-04.17
+## 2025-05.03
+
+- Add NOW.TS deployed app tracker (can be removed)
+- Add functional seed
+
+## 2025-04.17
 
 - Upgrade Prisma with output directory
 - Replace redirect method

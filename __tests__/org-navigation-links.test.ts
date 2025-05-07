@@ -32,25 +32,9 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Check that member can access general links
+    // Only Menu group is present
+    expect(result).toHaveLength(1);
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
-
-    // Check that member cannot access admin/owner restricted links
-    const settingsGroup = result[1];
-    const allowedLinks = settingsGroup.links;
-
-    // Should only see Settings page, not Members, Billing or Danger Zone
-    expect(allowedLinks.length).toBeLessThan(
-      ORGANIZATION_LINKS[1].links.length,
-    );
-
-    // Should only see Settings
-    expect(allowedLinks.map((link) => link.label)).toContain("Settings");
-
-    // Should not see Members, Billing, Danger Zone (admin/owner only)
-    expect(allowedLinks.map((link) => link.label)).not.toContain("Members");
-    expect(allowedLinks.map((link) => link.label)).not.toContain("Billing");
-    expect(allowedLinks.map((link) => link.label)).not.toContain("Danger Zone");
   });
 
   it("should filter links based on user roles - admin", () => {
@@ -59,14 +43,12 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Check that admin can access general links
+    // Admin can access Menu links
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
 
-    // Check that admin can access admin links but not owner links
+    // Admin can access Settings, Members, Billing (not Danger Zone)
     const settingsGroup = result[1];
     const allowedLinks = settingsGroup.links;
-
-    // Should see Settings, Members, and Billing, but not Danger Zone
     expect(allowedLinks.map((link) => link.label)).toContain("Settings");
     expect(allowedLinks.map((link) => link.label)).toContain("Members");
     expect(allowedLinks.map((link) => link.label)).toContain("Billing");
@@ -79,14 +61,10 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Check that owner can access all links
+    // Owner can access all links
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
-
-    // Check that owner can access all links
     const settingsGroup = result[1];
     const allowedLinks = settingsGroup.links;
-
-    // Should see all settings links
     expect(allowedLinks.length).toEqual(ORGANIZATION_LINKS[1].links.length);
     expect(allowedLinks.map((link) => link.label)).toContain("Settings");
     expect(allowedLinks.map((link) => link.label)).toContain("Members");
@@ -100,19 +78,8 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Should only return links with no role restrictions
-    result.forEach((group) => {
-      group.links.forEach((link) => {
-        // Only links without roles should be included
-        expect(link.roles).toBeUndefined();
-      });
-    });
-
-    // First group has no role restrictions
+    // Only Menu group is present
+    expect(result).toHaveLength(1);
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
-
-    // Second group has links with role restrictions
-    expect(result[1].links).toHaveLength(1); // Only Settings link has no role restriction
-    expect(result[1].links[0].label).toBe("Settings");
   });
 });

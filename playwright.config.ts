@@ -24,7 +24,7 @@ const config: PlaywrightTestConfig = {
   globalTeardown: require.resolve("./e2e/global-teardown.ts"),
   use: {
     launchOptions: {
-      slowMo: 1000,
+      slowMo: 200,
     },
     headless: HEADLESS,
     contextOptions: {

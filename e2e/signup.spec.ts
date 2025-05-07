@@ -8,6 +8,8 @@ test("sign up and verify account creation", async ({ page }) => {
     callbackURL: "/orgs",
   });
 
+  await page.waitForURL(/\/orgs\/.*/);
+
   // Verify we're on an organization page
   const currentUrl = page.url();
   expect(currentUrl).toMatch(/\/orgs\/.*/);

@@ -1,4 +1,5 @@
 import { getServerUrl } from "@/lib/server-url";
+import { upfetch } from "@/lib/up-fetch";
 
 /**
  * This component is used to notify Nowts when a new deployment is made.
@@ -6,7 +7,7 @@ import { getServerUrl } from "@/lib/server-url";
  */
 
 export const NotifyNowts = async () => {
-  await fetch("https://codelynx.dev/api/nowts/deploy", {
+  await upfetch("https://codelynx.dev/api/nowts/deploy", {
     method: "POST",
     body: JSON.stringify({
       domain: getServerUrl(),

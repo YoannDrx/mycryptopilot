@@ -35,7 +35,7 @@ export default async function RoutePage(props: PageParams) {
               formAction={async () => {
                 "use server";
 
-                await serverToast("Important information");
+                await serverToast("Important information", "error");
               }}
               variant="default"
             >

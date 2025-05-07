@@ -68,8 +68,7 @@ test("invite and login as invited user", async ({ page }) => {
     initialUserData: invitedUserData,
   });
 
-  // Wait to be on the account page after successful login
-  await page.waitForURL(/\/account/, { timeout: 10000 });
+  await page.waitForURL("/account");
 
   const lastInvitation = await prisma.invitation.findFirst({
     where: {
