@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
 import {
   createTestAccount,
+  getUserEmail,
   signInAccount,
   signOutAccount,
 } from "./utils/auth-test";
@@ -36,7 +37,7 @@ test("invite and login as invited user", async ({ page }) => {
   await page.getByRole("button", { name: /invite/i }).click();
 
   // 6. Fill out the invite form
-  const memberEmail = faker.internet.email().toLowerCase();
+  const memberEmail = getUserEmail();
   await page.getByLabel("Email").fill(memberEmail);
 
   // Send invitation (using default role)

@@ -2,6 +2,9 @@ import { logger } from "@/lib/logger";
 import { faker } from "@faker-js/faker";
 import type { Page } from "@playwright/test";
 
+export const getUserEmail = () =>
+  `playwright-test-${faker.internet.email().toLowerCase()}`;
+
 /**
  * Helper function to create a test account
  * @returns Object containing the test user's credentials
@@ -16,7 +19,7 @@ export async function createTestAccount(options: {
   // Generate fake user data
   const userData = initialUserData ?? {
     name: faker.person.fullName(),
-    email: `playwright-test-${faker.internet.email().toLowerCase()}`,
+    email: getUserEmail(),
     password: faker.internet.password({ length: 12, memorable: true }),
   };
 
