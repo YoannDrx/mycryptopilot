@@ -43,13 +43,7 @@ export default async function RouteLayout(
     });
 
     // Force to always have the slug inside the URL
-    return (
-      <RefreshPageOrganization
-        replaceId={Boolean(isId)}
-        orgSlug={isId?.slug}
-        orgId={isId?.id}
-      />
-    );
+    return <RefreshPageOrganization />;
   }
 
   return (

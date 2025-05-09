@@ -2,6 +2,7 @@ export const SiteConfig = {
   title: "NOW.TS",
   description: "Collect and showcase powerful video and text testimonials",
   prodUrl: "https://demo.nowts.app",
+  appId: "nowts",
   domain: "demo.nowts.app",
   appIcon: "/images/icon.png",
   company: {

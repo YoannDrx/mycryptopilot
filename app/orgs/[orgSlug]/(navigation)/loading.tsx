@@ -3,7 +3,7 @@ import { Layout, LayoutContent } from "@/features/page/layout";
 
 export default function RouteLoading() {
   return (
-    <Layout>
+    <Layout size="lg">
       <LayoutContent className="space-y-6">
         <Skeleton className="h-16" />
         <div className="space-y-4">

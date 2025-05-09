@@ -1,4 +1,3 @@
-import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { CircleSvg } from "@/components/svg/circle-svg";
 import { buttonVariants } from "@/components/ui/button";
 import Image from "next/image";
@@ -31,16 +30,15 @@ export const Hero = () => {
               your account with AI.
             </Typography>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <ShimmerButton
+              <Link
                 href="/signin"
-                background="hsl(var(--primary))"
-                className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
+                className={buttonVariants({ size: "lg", variant: "default" })}
               >
                 Get started
-              </ShimmerButton>
+              </Link>
               <Link
                 href="#pricing"
-                className={buttonVariants({ variant: "link" })}
+                className={buttonVariants({ size: "lg", variant: "link" })}
               >
                 Learn more <span aria-hidden="true">→</span>
               </Link>
@@ -61,7 +59,7 @@ export const Hero = () => {
 
 const GridBackground = () => {
   return (
-    <div className="bg-grid absolute inset-0 [mask-image:linear-gradient(180deg,transparent,black,transparent)]"></div>
+    <div className="bg-grid absolute inset-0 [mask-image:linear-gradient(180deg,transparent,var(--foreground),transparent)]"></div>
   );
 };
 

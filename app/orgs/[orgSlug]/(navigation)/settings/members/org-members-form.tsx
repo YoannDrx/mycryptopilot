@@ -213,7 +213,7 @@ export const OrgMembersForm = ({
               }}
             >
               <Zap className="mr-2" size={16} />
-              Invite member
+              Invite
             </Button>
           )}
         </div>
@@ -222,13 +222,13 @@ export const OrgMembersForm = ({
         <TabsList className="flex gap-4 px-6">
           <TabsTrigger
             value="members"
-            className="text-muted-foreground hover:bg-accent/50 translate-y-px rounded-t-md border-b px-3 py-2 text-sm transition data-[state=active]:border-white"
+            className="text-muted-foreground hover:bg-accent/50 data-[state=active]:border-foreground translate-y-px rounded-t-md border-b px-3 py-2 text-sm transition"
           >
             Members
           </TabsTrigger>
           <TabsTrigger
             value="invitations"
-            className="text-muted-foreground hover:bg-accent/50 translate-y-px rounded-t-md border-b px-3 py-2 text-sm transition data-[state=active]:border-white"
+            className="text-muted-foreground hover:bg-accent/50 data-[state=active]:border-foreground translate-y-px rounded-t-md border-b px-3 py-2 text-sm transition"
           >
             Invitations
           </TabsTrigger>
@@ -325,76 +325,85 @@ export const OrgMembersForm = ({
         </TabsContent>
         <TabsContent value="invitations" className="mt-0 border-t pt-4">
           <CardContent className="flex flex-col">
-            {invitations.map((invitation) => {
-              if (invitation.status === "accepted") {
-                return null;
-              }
-              const isExpired = new Date(invitation.expiresAt) < new Date();
-              const isCanceled = invitation.status === "canceled" || isExpired;
-              return (
-                <div key={invitation.id}>
-                  <div className="my-2 flex flex-wrap items-center gap-2">
-                    <Avatar>
-                      <AvatarFallback>
-                        {invitation.email.slice(0, 1).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex items-center gap-2">
-                      <Typography
-                        className={cn("text-sm font-medium", {
-                          "text-muted-foreground line-through": isCanceled,
-                        })}
-                      >
-                        {invitation.email}
-                      </Typography>
+            {invitations.length === 0 ? (
+              <Typography variant="muted">No invitations</Typography>
+            ) : (
+              <>
+                {invitations.map((invitation) => {
+                  if (invitation.status === "accepted") {
+                    return null;
+                  }
+                  const isExpired = new Date(invitation.expiresAt) < new Date();
+                  const isCanceled =
+                    invitation.status === "canceled" || isExpired;
+                  return (
+                    <div key={invitation.id}>
+                      <div className="my-2 flex flex-wrap items-center gap-2">
+                        <Avatar>
+                          <AvatarFallback>
+                            {invitation.email.slice(0, 1).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex items-center gap-2">
+                          <Typography
+                            className={cn("text-sm font-medium", {
+                              "text-muted-foreground line-through": isCanceled,
+                            })}
+                          >
+                            {invitation.email}
+                          </Typography>
 
-                      {isExpired ? (
-                        <Badge variant="outline">Expired</Badge>
-                      ) : (
-                        <Badge variant="outline">{invitation.status}</Badge>
-                      )}
-                    </div>
-                    <div className="flex-1"></div>
-                    <Typography variant="muted">{invitation.role}</Typography>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={async () =>
-                            navigator.clipboard.writeText(invitation.id)
-                          }
-                        >
-                          <Copy className="mr-2 size-4" />
-                          Copy invitation ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            return removeInvitationMutation.mutate(
-                              invitation.id,
-                            );
-                          }}
-                        >
-                          {removeInvitationMutation.isPaused ? (
-                            <Loader className="mr-2 size-4" />
+                          {isExpired ? (
+                            <Badge variant="outline">Expired</Badge>
                           ) : (
-                            <Trash className="mr-2 size-4" />
+                            <Badge variant="outline">{invitation.status}</Badge>
                           )}
-                          Cancel
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              );
-            })}
+                        </div>
+                        <div className="flex-1"></div>
+                        <Typography variant="muted">
+                          {invitation.role}
+                        </Typography>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={async () =>
+                                navigator.clipboard.writeText(invitation.id)
+                              }
+                            >
+                              <Copy className="mr-2 size-4" />
+                              Copy invitation ID
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                return removeInvitationMutation.mutate(
+                                  invitation.id,
+                                );
+                              }}
+                            >
+                              {removeInvitationMutation.isPaused ? (
+                                <Loader className="mr-2 size-4" />
+                              ) : (
+                                <Trash className="mr-2 size-4" />
+                              )}
+                              Cancel
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </CardContent>
         </TabsContent>
       </Tabs>

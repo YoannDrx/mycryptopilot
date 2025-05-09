@@ -53,6 +53,9 @@ export const auth = betterAuth({
       },
     },
   },
+  advanced: {
+    cookiePrefix: SiteConfig.appId,
+  },
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {

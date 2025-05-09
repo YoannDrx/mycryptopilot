@@ -60,12 +60,8 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
               .map((org) => {
                 if (typeof window === "undefined") return null;
 
-                const href = props.currentOrgSlug
-                  ? pathname.replace(
-                      `/orgs/${props.currentOrgSlug}`,
-                      `/orgs/${org.slug}`,
-                    )
-                  : `/orgs/${org.slug}`;
+                // Do not replace current URL to avoid 404
+                const href = `/orgs/${org.slug}`;
 
                 return (
                   <DropdownMenuItem key={org.slug} asChild>
