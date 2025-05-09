@@ -23,10 +23,10 @@ export const SignInProviders = ({
     <div className="flex flex-col gap-4 lg:gap-6">
       <>
         <SignInCredentialsAndMagicLinkForm callbackUrl={callbackUrl} />
-        <Divider>or</Divider>
+        {providers.length > 0 && <Divider>or</Divider>}
       </>
 
-      <div className="flex flex-col gap-2 lg:gap-4">
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 lg:gap-4">
         {/* ℹ️ Add provider you want to support here */}
         {providers.includes("github") && (
           <ProviderButton providerId="github" callbackUrl={callbackUrl} />

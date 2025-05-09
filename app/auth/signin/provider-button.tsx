@@ -38,9 +38,9 @@ export const ProviderButton = (props: ProviderButtonProps) => {
     <LoadingButton
       loading={githubSignInMutation.isPending}
       className={clsx({
-        "border-gray-500 bg-white text-black hover:bg-white":
+        "border bg-white text-black hover:bg-white dark:border-neutral-700":
           data.name === "Google",
-        "border-gray-500 bg-black text-white hover:bg-gray-950":
+        "border bg-black text-white hover:bg-gray-950 dark:border-neutral-700":
           data.name === "Github",
       })}
       size="lg"
