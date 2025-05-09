@@ -33,6 +33,10 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
 }) => {
   const form = useZodForm({
     schema: LoginCredentialsFormScheme,
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
   const [isUsingCredentials, setIsUsingCredentials] = useLocalStorage(
     "sign-in-with-credentials",
