@@ -1,5 +1,6 @@
 import { logger } from "@/lib/logger";
 import { faker } from "@faker-js/faker";
+import { nanoid } from "nanoid";
 import { prisma } from "../src/lib/prisma";
 
 // Set seed for reproducibility
@@ -15,7 +16,7 @@ async function main() {
       where: { email },
       update: {},
       create: {
-        id: faker.string.uuid(),
+        id: nanoid(11),
         name: faker.person.fullName(),
         email,
         emailVerified: faker.datatype.boolean(0.8), // 80% chance of being verified
@@ -49,7 +50,7 @@ async function main() {
           where: { slug: orgSlug },
           update: {},
           create: {
-            id: faker.string.uuid(),
+            id: nanoid(11),
             name: orgName,
             slug: orgSlug,
             logo: faker.image.url(),
@@ -73,7 +74,7 @@ async function main() {
       prisma.member
         .create({
           data: {
-            id: faker.string.uuid(),
+            id: nanoid(11),
             organizationId: organization.id,
             userId: users[0].id, // First user is always an owner
             role: "owner",
@@ -102,7 +103,7 @@ async function main() {
         prisma.member
           .create({
             data: {
-              id: faker.string.uuid(),
+              id: nanoid(11),
               organizationId: organization.id,
               userId: user.id,
               role,
@@ -116,61 +117,10 @@ async function main() {
           ),
       );
     }
-
-    // Create 1-3 invitations for each organization
-    const invitationCount = faker.number.int({ min: 1, max: 3 });
-    for (let j = 0; j < invitationCount; j++) {
-      const invitationEmail = faker.internet.email();
-      invitationPromises.push(
-        prisma.invitation
-          .create({
-            data: {
-              id: faker.string.uuid(),
-              organizationId: organization.id,
-              email: invitationEmail,
-              role: faker.helpers.arrayElement(roleOptions),
-              status: faker.helpers.arrayElement([
-                "PENDING",
-                "ACCEPTED",
-                "EXPIRED",
-              ]),
-              expiresAt: faker.date.future(),
-              inviterId: users[0].id, // First user is always the inviter
-            },
-          })
-          .then(() =>
-            logger.info(
-              `📨 Created invitation to ${invitationEmail} for ${organization.name}`,
-            ),
-          ),
-      );
-    }
   });
 
   await Promise.all([...memberPromises, ...invitationPromises]);
 
-  // Create feedback entries
-  const feedbackPromises = Array.from({ length: 15 }, async () => {
-    const randomUser = faker.helpers.arrayElement(users);
-
-    return prisma.feedback
-      .create({
-        data: {
-          id: faker.string.nanoid(11),
-          review: faker.number.int({ min: 1, max: 5 }),
-          message: faker.lorem.paragraph(),
-          email: randomUser.email,
-          userId: faker.datatype.boolean(0.7) ? randomUser.id : null, // 70% chance of having a user ID
-        },
-      })
-      .then((feedback) =>
-        logger.info(
-          `📝 Created feedback from ${feedback.email ?? "anonymous"}`,
-        ),
-      );
-  });
-
-  await Promise.all(feedbackPromises);
   logger.info("✅ Seeding completed!");
 }
 

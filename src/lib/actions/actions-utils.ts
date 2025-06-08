@@ -13,12 +13,8 @@ import type { z } from "zod";
  * @param action Return value of a server action
  * @returns A boolean indicating if the action is successful
  */
-export const isActionSuccessful = <
-  T extends z.ZodType,
-  Data,
-  CVE = ValidationErrors<T>,
->(
-  action?: SafeActionResult<string, T, readonly [], any, CVE, Data>,
+export const isActionSuccessful = <T extends z.ZodType, Data>(
+  action?: SafeActionResult<string, T, any, Data>,
 ): action is {
   data: Data;
   serverError: undefined;
@@ -45,14 +41,8 @@ export const isActionSuccessful = <
  * @param action Return value of a server action
  * @returns A promise that resolves to false
  */
-export const resolveActionResult = async <
-  T extends z.ZodType,
-  Data,
-  CVE = ValidationErrors<T>,
->(
-  action: Promise<
-    SafeActionResult<string, T, readonly [], any, CVE, Data> | undefined
-  >,
+export const resolveActionResult = async <T extends z.ZodType, Data>(
+  action: Promise<SafeActionResult<string, T, any, Data>>,
 ): Promise<Data> => {
   return new Promise((resolve, reject) => {
     action
@@ -60,14 +50,14 @@ export const resolveActionResult = async <
         if (isActionSuccessful(result)) {
           resolve(result.data);
         } else {
-          if (result?.validationErrors) {
+          if (result.validationErrors) {
             const str = validationErrorToString(result.validationErrors);
             return reject(new Error(str));
           }
-          if (result?.serverError) {
+          if (result.serverError) {
             return reject(new Error(result.serverError));
           }
-          reject(new Error(result?.serverError ?? "Something went wrong"));
+          reject(new Error(result.serverError ?? "Something went wrong"));
         }
       })
       .catch((error) => {
@@ -86,7 +76,11 @@ export const validationErrorToString = (
   validationError: ValidationErrors<any>,
 ) => {
   const flatten = flattenValidationErrors(validationError);
+
   return Object.entries(flatten.fieldErrors)
-    .map(([key, value]) => `${key}: ${value?.join(", ")}`)
+    .map(
+      ([key, value]) =>
+        `${key}: ${Array.isArray(value) ? value.join(", ") : value}`,
+    )
     .join("\n");
 };

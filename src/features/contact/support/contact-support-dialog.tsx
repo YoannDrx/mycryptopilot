@@ -20,8 +20,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { resolveActionResult } from "@/lib/actions/actions-utils";
 import { useSession } from "@/lib/auth-client";
 import { env } from "@/lib/env";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
@@ -43,17 +45,22 @@ export const ContactSupportDialog = (props: ContactSupportDialogProps) => {
     },
   });
 
-  const onSubmit = async (values: ContactSupportSchemaType) => {
-    const result = await contactSupportAction(values);
+  const mutation = useMutation({
+    mutationFn: async (values: ContactSupportSchemaType) => {
+      return resolveActionResult(contactSupportAction(values));
+    },
+    onSuccess: () => {
+      toast.success("Your message has been sent.");
+      form.reset();
+      setOpen(false);
+    },
+    onError: () => {
+      toast.error("An error occurred");
+    },
+  });
 
-    if (!result?.data) {
-      toast.error(result?.serverError);
-      return;
-    }
-
-    toast.success("Your message has been sent.");
-    form.reset();
-    setOpen(false);
+  const onSubmit = (values: ContactSupportSchemaType) => {
+    mutation.mutate(values);
   };
 
   return (

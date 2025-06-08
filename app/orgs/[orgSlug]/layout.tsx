@@ -1,11 +1,13 @@
 import { RefreshPageOrganization } from "@/components/utils/refresh-organization";
 import { auth } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 import { orgMetadata } from "@/lib/metadata";
 import { getCurrentOrg } from "@/lib/organizations/get-org";
 import { prisma } from "@/lib/prisma";
 import type { LayoutParams, PageParams } from "@/types/next";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { OrgList } from "./(navigation)/_navigation/org-list";
 import { InjectCurrentOrgStore } from "./use-current-org";
 
 export async function generateMetadata(
@@ -20,10 +22,14 @@ export default async function RouteLayout(
 ) {
   const params = await props.params;
 
-  const org = await getCurrentOrg({ currentOrgSlug: params.orgSlug });
+  const org = await getCurrentOrg();
+
+  if (!org) {
+    return <OrgList />;
+  }
 
   // The user try to go to another organization, we must sync with the URL
-  if (org?.slug !== params.orgSlug) {
+  if (org.slug !== params.orgSlug) {
     const isId = await prisma.organization.findUnique({
       where: {
         id: params.orgSlug,
@@ -43,6 +49,7 @@ export default async function RouteLayout(
     });
 
     // Force to always have the slug inside the URL
+    logger.warn("Full reload because unsync state");
     return <RefreshPageOrganization />;
   }
 

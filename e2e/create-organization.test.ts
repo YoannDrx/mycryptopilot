@@ -13,6 +13,12 @@ test.describe("Create Organization", () => {
       callbackURL: "/orgs",
     });
 
+    await page.waitForURL(/\/orgs\/[^/]+$/);
+
+    await expect(
+      page.getByRole("heading", { name: "Dashboard" }),
+    ).toBeVisible();
+
     // Click on organization selector
     await page.getByTestId("org-selector").click();
 
@@ -28,10 +34,6 @@ test.describe("Create Organization", () => {
 
     // Submit form
     await page.getByRole("button", { name: /create organization/i }).click();
-
-    await expect(
-      page.getByText("Organization created successfully"),
-    ).toBeVisible();
 
     await expect(page).toHaveURL(`/orgs/${expectedSlug}`);
 

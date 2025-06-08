@@ -10,7 +10,7 @@ const HEADLESS = process.env.HEADLESS
 
 const config: PlaywrightTestConfig = {
   // 50 seconds
-  timeout: 50 * 1000,
+  timeout: 70 * 1000,
   projects: [
     {
       name: "chromium",

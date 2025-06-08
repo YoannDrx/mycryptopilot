@@ -3,17 +3,14 @@ import { unauthorized } from "next/navigation";
 import { auth } from "../auth";
 import type { AuthPermission, AuthRole } from "../auth/auth-permissions";
 import { getSession } from "../auth/auth-user";
-import { prisma } from "../prisma";
 import { isInRoles } from "./is-in-roles";
 
 type OrgParams = {
   roles?: AuthRole[];
   permissions?: AuthPermission;
-  currentOrgId?: string;
-  currentOrgSlug?: string;
 };
 
-const getOrg = async (params?: OrgParams) => {
+const getOrg = async () => {
   const user = await getSession();
 
   if (user?.session.activeOrganizationId) {
@@ -23,45 +20,6 @@ const getOrg = async (params?: OrgParams) => {
         organizationId: user.session.activeOrganizationId ?? undefined,
       },
     });
-  }
-
-  if (params?.currentOrgId) {
-    await auth.api.setActiveOrganization({
-      headers: await headers(),
-      body: {
-        organizationId: params.currentOrgId,
-      },
-    });
-
-    return getOrg();
-  }
-
-  if (params?.currentOrgSlug) {
-    await auth.api.setActiveOrganization({
-      headers: await headers(),
-      body: {
-        organizationSlug: params.currentOrgSlug,
-      },
-    });
-
-    return getOrg();
-  }
-
-  const firstOrg = await prisma.organization.findFirst({
-    where: {
-      members: {
-        some: { userId: user?.session.userId },
-      },
-    },
-  });
-
-  if (firstOrg) {
-    await auth.api.setActiveOrganization({
-      headers: await headers(),
-      body: { organizationId: firstOrg.id },
-    });
-
-    return getOrg();
   }
 
   return null;
@@ -74,7 +32,7 @@ export const getCurrentOrg = async (params?: OrgParams) => {
     return null;
   }
 
-  const org = await getOrg(params);
+  const org = await getOrg();
 
   if (!org) {
     return null;

@@ -5,8 +5,13 @@ import { hasPermission } from "@/lib/auth/auth-org";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";
 
-export const openStripePortalAction = orgAction.action(
-  async ({ ctx: { org } }) => {
+export const openStripePortalAction = orgAction
+  .metadata({
+    permissions: {
+      subscription: ["manage"],
+    },
+  })
+  .action(async ({ ctx: { org } }) => {
     const stripeCustomerId = org.subscription?.stripeCustomerId;
 
     if (!stripeCustomerId) {
@@ -31,5 +36,4 @@ export const openStripePortalAction = orgAction.action(
     return {
       url: stripeBilling.url,
     };
-  },
-);
+  });

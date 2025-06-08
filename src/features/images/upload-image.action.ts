@@ -1,11 +1,12 @@
 "use server";
 
 import { ActionError, orgAction } from "@/lib/actions/safe-actions";
-import { utapi } from "@/lib/utapi";
+import { utapi } from "@/lib/files/utapi";
 import { z } from "zod";
 
 export const uploadImageAction = orgAction
-  .schema(
+  .metadata({})
+  .inputSchema(
     z.object({
       formData: z.instanceof(FormData),
     }),

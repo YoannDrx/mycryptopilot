@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { LoadingButton } from "@/features/form/submit-button";
+import { resolveActionResult } from "@/lib/actions/actions-utils";
 import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { toast } from "sonner";
 import { addEmailAction } from "./email.action";
 import type { EmailActionSchemaType } from "./email.schema";
 import { EmailActionSchema } from "./email.schema";
@@ -33,13 +35,13 @@ export const EmailForm = ({
 
   const submit = useMutation({
     mutationFn: async ({ email }: EmailActionSchemaType) => {
-      const result = await addEmailAction({ email });
-
-      if (result?.data) {
-        return result.data;
-      } else {
-        throw new Error(result?.serverError ?? "Unknown error");
-      }
+      return resolveActionResult(addEmailAction({ email }));
+    },
+    onSuccess: () => {
+      toast.success(successMessage);
+    },
+    onError: () => {
+      toast.error("An error occurred");
     },
   });
 

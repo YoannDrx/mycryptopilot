@@ -48,12 +48,14 @@ export const ac = createAccessControl(statement);
 
 const member = ac.newRole({
   project: ["create"],
+  users: ["create"],
   ...memberAc.statements,
 });
 
 const admin = ac.newRole({
   project: ["create", "update"],
   subscription: ["manage"],
+  users: ["create", "delete"],
   ...adminAc.statements,
 });
 

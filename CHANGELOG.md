@@ -1,9 +1,16 @@
-## 2025-05.03
+## 2025-06-01
+
+- Add a "orgs-list" page to view the list
+- Fix the error of "API Error : No active organization"
+- Add a "adapter" system for e-mail and upload of images
+- Upgrade library to latest
+
+## 2025-05-03
 
 - Add NOW.TS deployed app tracker (can be removed)
 - Add functional seed
 
-## 2025-04.17
+## 2025-04-17
 
 - Upgrade Prisma with output directory
 - Replace redirect method

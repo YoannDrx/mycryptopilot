@@ -18,8 +18,10 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineTooltip } from "@/components/ui/tooltip";
+import { resolveActionResult } from "@/lib/actions/actions-utils";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
 import { Angry, Frown, Meh, SmilePlus } from "lucide-react";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
@@ -41,17 +43,22 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
     },
   });
 
+  const mutation = useMutation({
+    mutationFn: async (values: ContactFeedbackSchemaType) => {
+      return resolveActionResult(contactSupportAction(values));
+    },
+    onSuccess: () => {
+      toast.success("Your feedback has been sent! Thanks you.");
+      form.reset();
+      setOpen(false);
+    },
+    onError: () => {
+      toast.error("An error occurred");
+    },
+  });
+
   const onSubmit = async (values: ContactFeedbackSchemaType) => {
-    const result = await contactSupportAction(values);
-
-    if (!result?.data) {
-      toast.error(result?.serverError);
-      return;
-    }
-
-    toast.success("Your feedback has been sent! Thanks you.");
-    form.reset();
-    setOpen(false);
+    mutation.mutate(values);
   };
 
   return (

@@ -12,7 +12,7 @@ const ToggleSubscribedActionSchema = z.object({
 });
 
 export const toggleSubscribedAction = authAction
-  .schema(ToggleSubscribedActionSchema)
+  .inputSchema(ToggleSubscribedActionSchema)
   .action(async ({ parsedInput: input, ctx }) => {
     logger.debug("Toggle subscribed", { input, ctx });
 

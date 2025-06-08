@@ -11,7 +11,7 @@ test("update organization name", async ({ page }) => {
   });
 
   // Wait for navigation to complete - we should be redirected to the organization page
-  await page.waitForURL(/\/orgs\/.*/, { timeout: 30000 });
+  await page.waitForURL(/\/orgs\/[^/]+$/);
 
   // Extract organization slug from URL
   const currentUrl = page.url();

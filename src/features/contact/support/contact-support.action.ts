@@ -6,7 +6,7 @@ import { sendEmail } from "@/lib/mail/send-email";
 import { ContactSupportSchema } from "./contact-support.schema";
 
 export const contactSupportAction = action
-  .schema(ContactSupportSchema)
+  .inputSchema(ContactSupportSchema)
   .action(async ({ parsedInput: { email, subject, message } }) => {
     await sendEmail({
       to: env.NEXT_PUBLIC_EMAIL_CONTACT,

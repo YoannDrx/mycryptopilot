@@ -3,6 +3,7 @@
 import { Typography } from "@/components/nowts/typography";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { resolveActionResult } from "@/lib/actions/actions-utils";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -17,16 +18,17 @@ export const ToggleEmailCheckbox = ({
 }: ToggleEmailCheckboxProps) => {
   const mutation = useMutation({
     mutationFn: async (unsubscribed: boolean) => {
-      const result = await toggleSubscribedAction({
-        unsubscribed,
-      });
-
-      if (!result?.data) {
-        toast.error(result?.serverError ?? "An error occurred");
-        return;
-      }
-
+      return resolveActionResult(
+        toggleSubscribedAction({
+          unsubscribed,
+        }),
+      );
+    },
+    onSuccess: () => {
       toast.success("You've updated your email settings.");
+    },
+    onError: () => {
+      toast.error("An error occurred");
     },
   });
 

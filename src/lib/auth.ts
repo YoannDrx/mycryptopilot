@@ -62,7 +62,7 @@ export const auth = betterAuth({
       await sendEmail({
         to: user.email,
         subject: "Reset your password",
-        react: MarkdownEmail({
+        html: MarkdownEmail({
           preview: `Reset your password for ${SiteConfig.title}`,
           markdown: `
           Hello,
@@ -82,7 +82,7 @@ export const auth = betterAuth({
         await sendEmail({
           to: newEmail,
           subject: "Change email address",
-          react: MarkdownEmail({
+          html: MarkdownEmail({
             preview: `Change your email address for ${SiteConfig.title}`,
             markdown: `
             Hello,
@@ -102,7 +102,7 @@ export const auth = betterAuth({
         await sendEmail({
           to: user.email,
           subject: "Delete your account",
-          react: MarkdownEmail({
+          html: MarkdownEmail({
             preview: `Delete your account from ${SiteConfig.title}`,
             markdown: `
             Hello,
@@ -121,7 +121,7 @@ export const auth = betterAuth({
       await sendEmail({
         to: user.email,
         subject: "Verify your email address",
-        react: MarkdownEmail({
+        html: MarkdownEmail({
           preview: `Verify your email for ${SiteConfig.title}`,
           markdown: `
           Hello,
@@ -146,7 +146,7 @@ export const auth = betterAuth({
         await sendEmail({
           to: email,
           subject: "You are invited to join an organization",
-          react: MarkdownEmail({
+          html: MarkdownEmail({
             preview: `Join an organization on ${SiteConfig.title}`,
             markdown: `
             Hello,
@@ -208,7 +208,7 @@ export const auth = betterAuth({
         await sendEmail({
           to: email,
           subject: "Sign in to your account",
-          react: MarkdownEmail({
+          html: MarkdownEmail({
             preview: `Magic link to login ${SiteConfig.title}`,
             markdown: `
             Hello,

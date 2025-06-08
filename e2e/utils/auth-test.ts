@@ -37,11 +37,8 @@ export async function createTestAccount(options: {
 
   // Wait for navigation to complete - we should be redirected to the callback URL
   if (callbackURL) {
-    try {
-      await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
-    } catch (error) {
-      logger.error("Error waiting for navigation to complete", error);
-    }
+    await page.pause();
+    await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
   }
 
   return userData;

@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { AuthOrganization } from "@/lib/auth/auth-type";
 import { Plus } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 type OrganizationsSelectProps = {
@@ -26,7 +25,6 @@ type OrganizationsSelectProps = {
 
 export const OrgsSelect = (props: OrganizationsSelectProps) => {
   const router = useRouter();
-  const pathname = usePathname();
   const org = props.orgs.find((org) => org.slug === props.currentOrgSlug);
 
   return (
@@ -65,7 +63,8 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
 
                 return (
                   <DropdownMenuItem key={org.slug} asChild>
-                    <Link
+                    {/* Need to perform a FULL Reload when switching organization */}
+                    <a
                       href={href}
                       key={org.slug}
                       className="inline-flex w-full items-center gap-2"
@@ -77,7 +76,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
                         {org.logo ? <AvatarImage src={org.logo} /> : null}
                       </Avatar>
                       <span className="line-clamp-1 text-left">{org.name}</span>
-                    </Link>
+                    </a>
                   </DropdownMenuItem>
                 );
               })}

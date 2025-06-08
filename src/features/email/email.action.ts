@@ -5,7 +5,7 @@ import { logger } from "@/lib/logger";
 import { EmailActionSchema } from "./email.schema";
 
 export const addEmailAction = action
-  .schema(EmailActionSchema)
+  .inputSchema(EmailActionSchema)
   .action(async ({ parsedInput: { email } }) => {
     logger.info("Add email", { email });
     // Add the user in your mailing tools

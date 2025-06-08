@@ -63,7 +63,7 @@ const UseImageUpload = ({ onChange }: { onChange: (url: string) => void }) => {
       const result = await uploadImageAction({ formData });
 
       if (!isActionSuccessful(result)) {
-        toast.error(result?.serverError ?? "Something went wrong");
+        toast.error(result.serverError ?? "Something went wrong");
         return;
       }
 

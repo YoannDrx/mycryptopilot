@@ -1,14 +1,43 @@
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { pretty, render } from "@react-email/render";
 import { nanoid } from "nanoid";
-import { resend } from "./resend";
+import { resendMailAdapter } from "./resend";
 
-type ResendSendType = typeof resend.emails.send;
-type ResendParamsType = Parameters<ResendSendType>;
-type ResendParamsTypeWithConditionalFrom = [
-  payload: Omit<ResendParamsType[0], "from"> & { from?: string },
-  options?: ResendParamsType[1],
-];
+type EmailParams = {
+  from: string;
+  to: string | string[];
+  subject: string;
+
+  text?: string;
+  replyTo?: string;
+  cc?: string | string[];
+  bcc?: string | string[];
+  attachments?: Attachment[];
+  html: string;
+};
+
+type Attachment = {
+  content?: string | Buffer;
+  filename?: string | false | undefined;
+  path?: string;
+  contentType?: string;
+};
+
+export type MailAdapter = {
+  send: (params: EmailParams) => Promise<
+    | {
+        error: null;
+        data: {
+          id: string;
+        };
+      }
+    | {
+        error: Error;
+        data: null;
+      }
+  >;
+};
 
 /**
  * sendEmail will send an email using resend.
@@ -18,23 +47,31 @@ type ResendParamsTypeWithConditionalFrom = [
  * @param params[1] : options
  * @returns a promise of the email sent
  */
-export const sendEmail = async (
-  ...params: ResendParamsTypeWithConditionalFrom
-) => {
+
+// If you use another mail adapter, you can replace the mailAdapter with your own
+const mailAdapter: MailAdapter = resendMailAdapter;
+
+type SendEmailParams = Omit<EmailParams, "from" | "html"> & {
+  from?: string;
+  html?: string | React.ReactElement;
+};
+
+export const sendEmail = async (params: SendEmailParams) => {
   if (env.NODE_ENV === "development") {
-    params[0].subject = `[DEV] ${params[0].subject}`;
+    params.subject = `[DEV] ${params.subject}`;
   }
 
   // Avoid sending emails to playwright-test emails
   if (
-    Array.isArray(params[0].to)
-      ? params[0].to.some((to) => to.startsWith("playwright-test-"))
-      : params[0].to.startsWith("playwright-test-")
+    Array.isArray(params.to)
+      ? params.to.some((to) => to.startsWith("playwright-test-"))
+      : params.to.startsWith("playwright-test-")
   ) {
     logger.info("[sendEmail] Sending email to playwright-test", {
-      subject: params[0].subject,
-      to: params[0].to,
+      subject: params.subject,
+      to: params.to,
     });
+
     return {
       error: null,
       data: {
@@ -43,18 +80,22 @@ export const sendEmail = async (
     };
   }
 
-  const resendParams = [
-    {
-      from: params[0].from ?? env.RESEND_EMAIL_FROM,
-      ...params[0],
-    } as ResendParamsType[0],
-    params[1],
-  ] satisfies ResendParamsType;
+  let html = "";
 
-  const result = await resend.emails.send(...resendParams);
+  if (typeof params.html === "string") {
+    html = params.html;
+  } else {
+    html = await pretty(await render(params.html));
+  }
+
+  const result = await mailAdapter.send({
+    ...params,
+    from: params.from ?? env.RESEND_EMAIL_FROM,
+    html,
+  });
 
   if (result.error) {
-    logger.error("[sendEmail] Error", { result, subject: params[0].subject });
+    logger.error("[sendEmail] Error", { result, subject: params.subject });
   }
 
   return result;

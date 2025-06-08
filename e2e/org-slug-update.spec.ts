@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { getServerUrl } from "@/lib/server-url";
 import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
 import { createTestAccount } from "./utils/auth-test";
@@ -8,8 +7,9 @@ test("update organization slug", async ({ page }) => {
   // 1. Create a test account (owner)
   await createTestAccount({ page, callbackURL: "/orgs" });
 
-  // Wait for navigation to complete - we should be redirected to the organization page
-  await page.waitForURL(/\/orgs\/.*/, { timeout: 30000 });
+  await page.waitForURL(/\/orgs\/[^/]+$/);
+
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
 
   // Extract organization slug from URL
   const currentUrl = page.url();
@@ -27,7 +27,11 @@ test("update organization slug", async ({ page }) => {
   }
 
   // 2. Navigate to organization danger settings page
-  await page.goto(`${getServerUrl()}/orgs/${originalSlug}/settings/danger`);
+
+  await page.goto(`/orgs/${originalOrg.slug}/settings`);
+
+  // 3. Click on the Members tab
+  await page.getByRole("link", { name: /danger zone/i }).click();
 
   // 4. Generate a new organization slug
   const newSlug = `${faker.internet.domainWord().toLowerCase()}-${faker.string.alphanumeric(4).toLowerCase()}`;

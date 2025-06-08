@@ -17,7 +17,6 @@ import { useDebounceFn } from "@/hooks/use-debounce-fn";
 import { authClient } from "@/lib/auth-client";
 import { formatId } from "@/lib/format/id";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import type { NewOrganizationSchemaType } from "./new-org.schema";
@@ -27,7 +26,6 @@ export const NewOrganizationForm = () => {
   const form = useZodForm({
     schema: CreateOrgSchema,
   });
-  const router = useRouter();
 
   const checkSlugMutation = useMutation({
     mutationFn: async (slug: string) => {
@@ -74,8 +72,8 @@ export const NewOrganizationForm = () => {
       }
 
       toast.success("Organization created successfully");
-      router.refresh();
-      router.push(`/orgs/${result.data.slug}`);
+      // Need to perform a FULL Reload when creating a new organization
+      window.location.href = `/orgs/${result.data.slug}`;
     },
   });
 
