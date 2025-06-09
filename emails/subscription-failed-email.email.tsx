@@ -1,6 +1,6 @@
 import { SiteConfig } from "@/site-config";
 import { Preview, Text } from "@react-email/components";
-import { EmailLink, EmailSection, EmailText } from "./utils/components.utils";
+import { EmailLink, EmailSection, EmailText } from "./utils/components-utils";
 import { EmailLayout } from "./utils/email-layout";
 
 export default function SubscriptionFailedEmail({ url }: { url: string }) {
