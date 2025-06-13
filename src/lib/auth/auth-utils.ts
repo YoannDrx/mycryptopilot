@@ -4,6 +4,7 @@ export const getCallbackUrl = (fallbackUrl: string): string => {
 
   if (callbackUrlParams) {
     if (callbackUrlParams.startsWith("/")) return callbackUrlParams;
+    if (callbackUrlParams === "null") return "/";
     return `/${callbackUrlParams}`;
   }
 
