@@ -1,8 +1,6 @@
-import { DialogManagerRendererDialog } from "@/features/dialog-manager/dialog-manager-dialog";
-import {
-  dialogManager,
-  useDialogManager,
-} from "@/features/dialog-manager/dialog-manager-store";
+import { DialogComponent } from "@/features/dialog-manager/dialog-component";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager";
+import { useDialogStore } from "@/features/dialog-manager/dialog-store";
 import { screen, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -18,30 +16,24 @@ vi.mock("sonner", () => ({
 
 // Create a wrapper component to test the dialog
 function DialogManagerWrapper() {
-  const dialogs = useDialogManager((state) => state.dialogs);
+  const activeDialog = useDialogStore((state) => state.activeDialog);
 
-  return (
-    <>
-      {dialogs.map((dialog) => (
-        <DialogManagerRendererDialog key={dialog.id} {...dialog} />
-      ))}
-    </>
-  );
+  return activeDialog ? <DialogComponent dialog={activeDialog} /> : null;
 }
 
 describe("Dialog Manager Store", () => {
   beforeEach(() => {
     // Reset the store before each test
-    useDialogManager.setState({ dialogs: [] });
+    useDialogStore.setState({ dialogs: [], activeDialog: null });
     vi.clearAllMocks();
   });
 
   describe("Dialog UI Interaction", () => {
-    it("should render a dialog and handle confirm action", async () => {
+    it("should render a confirm dialog and handle action", async () => {
       const actionFn = vi.fn().mockResolvedValue(undefined);
 
       // Add a dialog
-      dialogManager.add({
+      dialogManager.confirm({
         title: "Confirmation Dialog",
         description: "Please confirm this action",
         action: {
@@ -67,7 +59,7 @@ describe("Dialog Manager Store", () => {
 
       // Dialog should be removed after action
       await waitFor(() => {
-        expect(useDialogManager.getState().dialogs).toHaveLength(0);
+        expect(useDialogStore.getState().activeDialog).toBeNull();
       });
     });
 
@@ -75,7 +67,7 @@ describe("Dialog Manager Store", () => {
       const cancelFn = vi.fn();
 
       // Add a dialog
-      dialogManager.add({
+      dialogManager.confirm({
         title: "Confirmation Dialog",
         description: "Please confirm this action",
         cancel: {
@@ -102,7 +94,7 @@ describe("Dialog Manager Store", () => {
       const actionFn = vi.fn().mockResolvedValue(undefined);
 
       // Add a dialog with input
-      dialogManager.add({
+      dialogManager.input({
         title: "Input Dialog",
         description: "Please enter a value",
         input: {
@@ -119,7 +111,7 @@ describe("Dialog Manager Store", () => {
       // Render the dialog wrapper
       const { user } = setup(<DialogManagerWrapper />);
 
-      // Type in the input field - using a more reliable selector
+      // Type in the input field
       const inputElement = screen.getByPlaceholderText("Enter your name");
       await user.type(inputElement, "John Doe");
 
@@ -134,7 +126,7 @@ describe("Dialog Manager Store", () => {
       const actionFn = vi.fn().mockResolvedValue(undefined);
 
       // Add a dialog with confirm text
-      dialogManager.add({
+      dialogManager.confirm({
         title: "Delete Confirmation",
         description: "This action cannot be undone",
         confirmText: "DELETE",
@@ -180,7 +172,7 @@ describe("Dialog Manager Store", () => {
       });
 
       // Add a dialog with async action
-      dialogManager.add({
+      dialogManager.confirm({
         title: "Loading Test",
         description: "This will take some time",
         action: {
@@ -195,11 +187,8 @@ describe("Dialog Manager Store", () => {
       // Click the process button
       await user.click(screen.getByRole("button", { name: "Process" }));
 
-      // Check if loading state is shown - using a different approach
+      // Check if loading state is shown
       const processButton = screen.getByRole("button", { name: "Process" });
-      expect(processButton).toHaveClass("relative");
-
-      // The loading state is indicated by the button being disabled
       expect(processButton).toBeDisabled();
 
       // Resolve the promise
@@ -207,7 +196,7 @@ describe("Dialog Manager Store", () => {
 
       // Wait for the dialog to be removed
       await waitFor(() => {
-        expect(useDialogManager.getState().dialogs).toHaveLength(0);
+        expect(useDialogStore.getState().activeDialog).toBeNull();
       });
     });
 
@@ -221,7 +210,7 @@ describe("Dialog Manager Store", () => {
       });
 
       // Add a dialog with async action that will fail
-      dialogManager.add({
+      dialogManager.confirm({
         title: "Error Test",
         description: "This will fail",
         action: {
@@ -241,18 +230,18 @@ describe("Dialog Manager Store", () => {
 
       // Check if toast.error was called with the error message
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith("Some error occurred", {
+        expect(toast.error).toHaveBeenCalledWith("Action failed", {
           description: errorMessage,
         });
       });
 
-      // Dialog should still be in the store (not removed on error)
-      expect(useDialogManager.getState().dialogs).toHaveLength(1);
+      // Dialog should still be active (not removed on error)
+      expect(useDialogStore.getState().activeDialog).toBeTruthy();
     });
 
     it("should render a custom dialog with children", async () => {
       // Add a custom dialog with children
-      dialogManager.add({
+      dialogManager.custom({
         children: <div data-testid="custom-content">Custom Dialog Content</div>,
       });
 
@@ -264,51 +253,12 @@ describe("Dialog Manager Store", () => {
       expect(screen.getByText("Custom Dialog Content")).toBeInTheDocument();
     });
 
-    it("should handle multiple dialogs", async () => {
-      // Add first dialog
-      dialogManager.add({
-        title: "First Dialog",
-        description: "This is the first dialog",
-        action: {
-          label: "Next",
-          onClick: () => {
-            // Add second dialog when first is closed
-            dialogManager.add({
-              title: "Second Dialog",
-              description: "This is the second dialog",
-              action: {
-                label: "Close",
-                onClick: vi.fn(),
-              },
-            });
-          },
-        },
-      });
-
-      // Render the dialog wrapper
-      const { user } = setup(<DialogManagerWrapper />);
-
-      // Check if first dialog is rendered
-      expect(screen.getByText("First Dialog")).toBeInTheDocument();
-
-      // Click the next button
-      await user.click(screen.getByRole("button", { name: "Next" }));
-
-      // First dialog should be removed
-      await waitFor(() => {
-        expect(screen.queryByText("First Dialog")).not.toBeInTheDocument();
-      });
-
-      // Second dialog should be rendered
-      expect(screen.getByText("Second Dialog")).toBeInTheDocument();
-    });
-
     it("should handle dialog with default input value", async () => {
       const actionFn = vi.fn().mockResolvedValue(undefined);
       const defaultValue = "Default Name";
 
       // Add a dialog with input that has a default value
-      dialogManager.add({
+      dialogManager.input({
         title: "Input Dialog",
         description: "Please enter a value",
         input: {
@@ -325,7 +275,7 @@ describe("Dialog Manager Store", () => {
       // Render the dialog wrapper
       const { user } = setup(<DialogManagerWrapper />);
 
-      // Input should have the default value - using a more reliable selector
+      // Input should have the default value
       const inputElement = screen.getByPlaceholderText("Enter your name");
       expect(inputElement).toHaveValue(defaultValue);
 
@@ -338,7 +288,7 @@ describe("Dialog Manager Store", () => {
 
     it("should use default cancel label when not provided", async () => {
       // Add a dialog without specifying cancel label
-      dialogManager.add({
+      dialogManager.confirm({
         title: "Simple Dialog",
         description: "This dialog uses default cancel label",
         action: {

@@ -17,7 +17,6 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
 import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
 import { formatId } from "@/lib/format/id";
@@ -27,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { OrgDangerFormSchemaType } from "../org.schema";
 import { OrgDangerFormSchema } from "../org.schema";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager";
 
 type ProductFormProps = {
   defaultValues: OrgDangerFormSchemaType;
@@ -66,7 +66,7 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
     <Form
       form={form}
       onSubmit={(v) => {
-        dialogManager.add({
+        dialogManager.confirm({
           title: "Are you sure ?",
           description:
             "You are about to change the unique identifier of your organization. All the previous URLs will be changed.",

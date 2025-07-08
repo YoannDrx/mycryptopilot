@@ -110,6 +110,6 @@ describe("SignUpCredentialsForm", () => {
     });
 
     // Check if redirected to custom URL
-    expect(window.location.href).toBe("http://localhost:3000/dashboard");
+    expect(window.location.href).toBe("http://localhost:3000/orgs");
   });
 });

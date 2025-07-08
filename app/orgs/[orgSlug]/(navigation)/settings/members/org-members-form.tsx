@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { InlineTooltip } from "@/components/ui/tooltip";
-import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager";
 import { openGlobalDialog } from "@/features/global-dialog/global-dialog.store";
 import type { Invitation } from "@/generated/prisma";
 import { authClient, useSession } from "@/lib/auth-client";
@@ -145,7 +145,7 @@ export const OrgMembersForm = ({
   });
 
   const handleRemoveMember = (memberId: string) => {
-    dialogManager.add({
+    dialogManager.confirm({
       title: "Remove member",
       description:
         "Are you sure you want to remove this member from the organization?",
@@ -179,7 +179,7 @@ export const OrgMembersForm = ({
                 e.preventDefault();
                 e.stopPropagation();
 
-                const dialogId = dialogManager.add({
+                const dialogId = dialogManager.confirm({
                   title: "Oh no! You've reached the maximum number of members",
                   description: (
                     <>
@@ -198,17 +198,13 @@ export const OrgMembersForm = ({
                       </Alert>
                     </>
                   ),
-                  action: (
-                    <Button
-                      onClick={() => {
-                        openGlobalDialog("org-plan");
-                        dialogManager.remove(dialogId);
-                      }}
-                    >
-                      <Zap className="mr-2" size={16} />
-                      Upgrade your plan
-                    </Button>
-                  ),
+                  action: {
+                    label: "Upgrade your plan",
+                    onClick: () => {
+                      openGlobalDialog("org-plan");
+                      dialogManager.close(dialogId);
+                    },
+                  },
                 });
               }}
             >

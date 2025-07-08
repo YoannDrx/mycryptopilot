@@ -1,15 +1,12 @@
-import { DialogManagerRendererDialog } from "./dialog-manager-dialog";
-import type { DialogManagerType } from "./dialog-manager-store";
-import { useDialogManager } from "./dialog-manager-store";
+import { DialogComponent } from "./dialog-component";
+import { useDialogStore } from "./dialog-store";
 
-export const DialogManagerRenderer = () => {
-  const dialog = useDialogManager((state) => state.dialogs[0]) as
-    | DialogManagerType
-    | undefined;
+export function DialogManagerRenderer() {
+  const activeDialog = useDialogStore((state) => state.activeDialog);
 
-  if (dialog) {
-    return <DialogManagerRendererDialog {...dialog} />;
+  if (activeDialog) {
+    return <DialogComponent dialog={activeDialog} />;
   }
 
   return null;
-};
+}

@@ -28,7 +28,11 @@ export const LoadingButton = ({
   success?: string;
 }) => {
   return (
-    <Button {...props} className={cn(className, "relative")}>
+    <Button
+      {...props}
+      disabled={props.disabled ?? loading}
+      className={cn(className, "relative")}
+    >
       <motion.span
         className="flex items-center gap-1"
         animate={{

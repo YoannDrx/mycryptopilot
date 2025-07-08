@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager";
 import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
@@ -73,10 +73,10 @@ export default function DeleteProfilePage() {
           size="lg"
           loading={deleteAccountMutation.isPending}
           onClick={() => {
-            dialogManager.add({
+            dialogManager.confirm({
               title: "Delete your account ?",
               description: "Are you sure you want to delete your profile?",
-              confirmText: "delete",
+              confirmText: "Delete",
               action: {
                 label: "Delete",
                 onClick: async () => {

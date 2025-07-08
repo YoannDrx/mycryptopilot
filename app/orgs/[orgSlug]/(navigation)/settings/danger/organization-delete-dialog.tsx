@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { dialogManager } from "@/features/dialog-manager/dialog-manager-store";
+import { dialogManager } from "@/features/dialog-manager/dialog-manager";
 import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
-import { Trash2, X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -41,9 +41,7 @@ export const OrganizationDeleteDialog = ({
       type="button"
       variant="destructive"
       onClick={() => {
-        dialogManager.add({
-          style: "centered",
-          icon: X,
+        dialogManager.confirm({
           title: "Delete Organization",
           description: "Are you sure you want to delete your organization?",
           confirmText: org.slug,
