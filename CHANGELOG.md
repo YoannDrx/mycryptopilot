@@ -1,6 +1,7 @@
 ## 2025-07-14 - NOW.TS Claude Migration
 
 ### 🔧 **Prisma Configuration Migration**
+
 - Migrate from deprecated `package.json#prisma` property to `prisma.config.ts`
 
 ### 🧪 **Playwright CI/CD Improvements**
@@ -30,13 +31,6 @@
   - Improved test isolation and cleanup procedures
   - Added better error context and retry mechanisms
 - Rename `RESEND_EMAIL_FROM` to `EMAIL_FROM`
-
-### 📋 **Files Changed**
-
-- `.github/workflows/playwright.yml` - Complete workflow overhaul
-- `src/features/nowts/notify-nowts.tsx` - Added error handling
-- `e2e/account.spec.ts` - Enhanced logging and fixed confirmation text
-- `playwright.config.ts` - Improved CI reporter configuration
 
 ## 2025-06-01
 
