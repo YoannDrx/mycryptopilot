@@ -7,3 +7,5 @@ Please follow the [NOW.TS Course](https://codeline.app/courses/clqn8pmte0001lr54
 ## Contributions
 
 Feel free to create a pull request with any changes you think valuable
+
+x

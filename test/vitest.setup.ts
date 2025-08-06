@@ -134,7 +134,7 @@ vi.mock("@/lib/organizations/get-org", () => ({
 // Define the type for our global helper
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var createTestSearchParams: (
     params?: Record<string, string>,
   ) => ReadonlyURLSearchParams;

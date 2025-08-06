@@ -45,6 +45,7 @@ import { Copy, MoreVertical, Trash, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useOptimistic } from "react";
 import { toast } from "sonner";
+import { useCurrentOrg } from "../../../use-current-org";
 import { OrganizationInviteMemberForm } from "./org-invite-member-form";
 
 type OrgMembersFormProps = {
@@ -55,11 +56,13 @@ type OrgMembersFormProps = {
 
 export const OrgMembersForm = ({
   maxMembers,
+
   members,
   invitations,
 }: OrgMembersFormProps) => {
   const router = useRouter();
   const session = useSession();
+  const org = useCurrentOrg();
   const [optimisticMembers, updateOptimisticMembers] = useOptimistic(
     members,
     (state, update: { type: string; memberId: string; role?: string }) => {
@@ -108,9 +111,13 @@ export const OrgMembersForm = ({
 
   const removeMemberMutation = useMutation({
     mutationFn: async (memberId: string) => {
+      if (!org?.id) {
+        throw new Error("Organization ID is required");
+      }
       // Using BetterAuth client to remove member
       await authClient.organization.removeMember({
         memberIdOrEmail: memberId,
+        organizationId: org.id,
       });
       return memberId;
     },

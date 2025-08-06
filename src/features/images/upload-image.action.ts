@@ -1,7 +1,7 @@
 "use server";
 
 import { ActionError, orgAction } from "@/lib/actions/safe-actions";
-import { utapi } from "@/lib/files/utapi";
+import { fileAdapter } from "@/lib/files/placeholder-adapter";
 import { z } from "zod";
 
 export const uploadImageAction = orgAction
@@ -36,19 +36,14 @@ export const uploadImageAction = orgAction
       throw new ActionError("File too large (max 2mb)");
     }
 
-    const response = await utapi.uploadFiles([file]);
+    const response = await fileAdapter.uploadFile({
+      file,
+      path: "images",
+    });
 
-    if (response[0].error) {
-      throw new ActionError(response[0].error.message);
+    if (response.error) {
+      throw new ActionError(response.error.message);
     }
 
-    // const image = await prisma.image.create({
-    //   data: {
-    //     url: response[0].data.url,
-    //     name: response[0].data.name,
-    //     organizationId: ctx.org.id,
-    //   },
-    // });
-
-    return response[0].data.url;
+    return response.data.url;
   });

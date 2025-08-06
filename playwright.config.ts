@@ -22,6 +22,8 @@ const config: PlaywrightTestConfig = {
   // Add delay between retries
   workers: 3,
   globalTeardown: require.resolve("./e2e/global-teardown.ts"),
+  // Enable console logs in CI
+  reporter: process.env.CI ? [['list'], ['html']] : 'list',
   use: {
     launchOptions: {
       slowMo: 200,

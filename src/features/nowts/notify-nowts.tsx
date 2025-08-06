@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { getServerUrl } from "@/lib/server-url";
 import { upfetch } from "@/lib/up-fetch";
 
@@ -7,13 +8,18 @@ import { upfetch } from "@/lib/up-fetch";
  */
 
 export const NotifyNowts = async () => {
-  await upfetch("https://codelynx.dev/api/nowts/deploy", {
-    method: "POST",
-    body: JSON.stringify({
-      domain: getServerUrl(),
-      vercelDomain: process.env.VERCEL_URL ?? "",
-    }),
-  });
+  try {
+    await upfetch("https://codelynx.dev/api/nowts/deploy", {
+      method: "POST",
+      body: JSON.stringify({
+        domain: getServerUrl(),
+        vercelDomain: process.env.VERCEL_URL ?? "",
+      }),
+    });
+  } catch (error) {
+    // Silently ignore errors during build time
+    logger.info("Failed to notify Nowts deployment:", error);
+  }
 
   return null;
 };

@@ -24,6 +24,7 @@ import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useCurrentOrg } from "../../../use-current-org";
 import type { OrgDangerFormSchemaType } from "../org.schema";
 import { OrgDangerFormSchema } from "../org.schema";
 import { dialogManager } from "@/features/dialog-manager/dialog-manager";
@@ -38,14 +39,19 @@ export const OrganizationDangerForm = ({ defaultValues }: ProductFormProps) => {
     defaultValues,
   });
   const router = useRouter();
+  const org = useCurrentOrg();
 
   const mutation = useMutation({
     mutationFn: async (values: OrgDangerFormSchemaType) => {
+      if (!org?.id) {
+        throw new Error("Organization ID is required");
+      }
       return unwrapSafePromise(
         authClient.organization.update({
           data: {
             slug: values.slug,
           },
+          organizationId: org.id,
         }),
       );
     },

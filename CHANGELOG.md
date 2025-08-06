@@ -1,3 +1,43 @@
+## 2025-07-14 - NOW.TS Claude Migration
+
+### 🔧 **Prisma Configuration Migration**
+- Migrate from deprecated `package.json#prisma` property to `prisma.config.ts`
+
+### 🧪 **Playwright CI/CD Improvements**
+
+- **Migrated Playwright workflow from Vercel deployment testing to local CI testing**
+  - Changed trigger from `deployment_status` to `pull_request` and `push` events
+  - Added PostgreSQL service container for database testing
+  - Configured complete local environment with all required secrets
+- **Enhanced test reliability and debugging**
+  - Fixed delete account test case sensitivity issue (Delete vs delete)
+  - Added comprehensive logging throughout all E2E tests
+  - Improved button state validation and error handling
+  - Added step-by-step emoji logging for better CI debugging
+- **Build and deployment fixes**
+  - Fixed NotifyNowts API call error handling to prevent build failures
+  - Added proper error catching for external API dependencies
+  - Updated Prisma migration strategy for CI environments
+
+### 🔧 **Technical Improvements**
+
+- **Environment configuration**
+  - Added all required GitHub secrets for CI testing
+  - Fixed DATABASE_URL_UNPOOLED configuration for Prisma
+  - Properly configured OAuth secrets (renamed GITHUB*\* to OAUTH_GITHUB*\*)
+- **Test infrastructure**
+  - Enhanced Playwright reporter configuration for CI visibility
+  - Improved test isolation and cleanup procedures
+  - Added better error context and retry mechanisms
+- Rename `RESEND_EMAIL_FROM` to `EMAIL_FROM`
+
+### 📋 **Files Changed**
+
+- `.github/workflows/playwright.yml` - Complete workflow overhaul
+- `src/features/nowts/notify-nowts.tsx` - Added error handling
+- `e2e/account.spec.ts` - Enhanced logging and fixed confirmation text
+- `playwright.config.ts` - Improved CI reporter configuration
+
 ## 2025-06-01
 
 - Add a "orgs-list" page to view the list

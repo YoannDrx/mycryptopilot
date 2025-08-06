@@ -1,4 +1,4 @@
-import { utapiUploadFileAdapter } from "./utapi";
+import { fileAdapter } from "./placeholder-adapter";
 
 type UploadFileParams = {
   file: File;
@@ -28,7 +28,7 @@ export type UploadFileAdapter = {
   >;
 };
 
-const uploadFileAdapter: UploadFileAdapter = utapiUploadFileAdapter;
+const uploadFileAdapter: UploadFileAdapter = fileAdapter;
 
 export const uploadFile = async (params: UploadFileParams) => {
   const response = await uploadFileAdapter.uploadFile(params);

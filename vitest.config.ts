@@ -18,6 +18,15 @@ export default defineConfig({
       IS_REACT_ACT_ENVIRONMENT: "true",
     },
     include: ["__tests__/**/*.[jt]s?(x)"],
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/cypress/**",
+      "**/.{idea,git,cache,output,temp}/**",
+      "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+      "**/e2e/**", // Exclude e2e tests
+      "**/playwright-tests/**"
+    ],
   },
   resolve: {
     alias: {

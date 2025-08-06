@@ -12,10 +12,6 @@ export const resendMailAdapter: MailAdapter = {
       return { error: new Error(result.error.message), data: null };
     }
 
-    if (!result.data) {
-      return { error: new Error("No data returned from Resend"), data: null };
-    }
-
     return { error: null, data: { id: result.data.id } };
   },
 };

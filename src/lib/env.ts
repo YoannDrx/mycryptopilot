@@ -15,7 +15,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     RESEND_API_KEY: z.string().min(1),
     RESEND_AUDIENCE_ID: z.string().optional(),
-    RESEND_EMAIL_FROM: z.string().min(1),
+    EMAIL_FROM: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().min(1),
     NODE_ENV: z.enum(["development", "production", "test"]),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),

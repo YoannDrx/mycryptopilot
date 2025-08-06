@@ -90,7 +90,7 @@ export const sendEmail = async (params: SendEmailParams) => {
 
   const result = await mailAdapter.send({
     ...params,
-    from: params.from ?? env.RESEND_EMAIL_FROM,
+    from: params.from ?? env.EMAIL_FROM,
     html,
   });
 
