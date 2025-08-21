@@ -1,20 +1,15 @@
-import { stripe as stripePlugin } from "@better-auth/stripe";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { magicLink, organization } from "better-auth/plugins";
+import { admin, magicLink, organization } from "better-auth/plugins";
 import { ac, roles } from "./auth/auth-permissions";
 
 import { sendEmail } from "@/lib/mail/send-email";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
-import type Stripe from "stripe";
-import {
-  setupDefaultOrganizationsOrInviteUser,
-  setupResendCustomer,
-} from "./auth/auth-config-setup";
-import { AUTH_PLANS } from "./auth/auth-plans";
+import { setupResendCustomer } from "./auth/auth-config-setup";
 import { env } from "./env";
+import { generateSlug } from "./format/id";
 import { logger } from "./logger";
 import { prisma } from "./prisma";
 import { getServerUrl } from "./server-url";
@@ -46,9 +41,23 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
-          await setupDefaultOrganizationsOrInviteUser(user);
+        after: async (user, req) => {
           await setupResendCustomer(user);
+
+          const emailName = user.email.slice(0, 8);
+          try {
+            await auth.api.createOrganization({
+              body: {
+                name: `${emailName}'s org`, // required
+                slug: generateSlug(emailName), // required
+                logo: `${getServerUrl()}/images/org-logo.png`,
+                userId: user.id,
+                keepCurrentActiveOrganization: false,
+              },
+            });
+          } catch (err) {
+            logger.error("Failed to create org", { err });
+          }
         },
       },
     },
@@ -141,6 +150,23 @@ export const auth = betterAuth({
       roles: roles,
       organizationLimit: 5,
       membershipLimit: 10,
+      autoCreateOrganizationOnSignUp: true,
+
+      organizationCreation: {
+        async afterCreate(data) {
+          const stripeCustomer = await stripe.customers.create({
+            email: data.user.email,
+            name: data.organization.name,
+            metadata: {
+              organizationId: data.organization.id,
+            },
+          });
+          await prisma.organization.update({
+            where: { id: data.organization.id },
+            data: { stripeCustomerId: stripeCustomer.id },
+          });
+        },
+      },
       async sendInvitationEmail({ id, email }) {
         const inviteLink = `${getServerUrl()}/orgs/accept-invitation/${id}`;
         await sendEmail({
@@ -157,50 +183,6 @@ export const auth = betterAuth({
             `,
           }),
         });
-      },
-    }),
-    stripePlugin({
-      stripeClient: stripe,
-      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET ?? "",
-      createCustomerOnSignUp: true,
-      subscription: {
-        onSubscriptionUpdate: async ({ event, subscription }) => {
-          const object = event.data.object as Stripe.Subscription;
-          const priceId = object.items.data[0].price.id;
-
-          const matchingPlan = AUTH_PLANS.find(
-            (p) => p.annualDiscountPriceId === priceId || p.priceId === priceId,
-          );
-
-          if (!matchingPlan) {
-            logger.error("No matching plan found", { event, subscription });
-            return;
-          }
-
-          if (subscription.plan === matchingPlan.name) {
-            return;
-          }
-
-          // Sync the subscription plan with the matching plan
-          await prisma.subscription.update({
-            where: { id: subscription.id },
-            data: {
-              plan: matchingPlan.name,
-            },
-          });
-        },
-        authorizeReference: async ({ user, referenceId }) => {
-          const member = await prisma.member.findFirst({
-            where: {
-              userId: user.id,
-              organizationId: referenceId,
-            },
-          });
-
-          return member?.role === "owner" || member?.role === "admin";
-        },
-        enabled: true,
-        plans: AUTH_PLANS,
       },
     }),
     magicLink({
@@ -221,6 +203,7 @@ export const auth = betterAuth({
         });
       },
     }),
+    admin({}),
     // Warning: always last plugin
     nextCookies(),
   ],

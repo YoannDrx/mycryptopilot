@@ -85,7 +85,7 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
                 router.push("/orgs/new");
               }}
             >
-              <Plus className="mr-2 size-6" />
+              <Plus className="mr-2 size-4" />
               <span className="line-clamp-1 text-left">
                 Add a new organization
               </span>

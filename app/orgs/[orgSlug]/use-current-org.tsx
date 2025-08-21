@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/promise-function-async */
 "use client";
 
-import type { PlanLimit } from "@/lib/auth/auth-plans";
-import { getPlanLimits } from "@/lib/auth/auth-plans";
-import type { Subscription } from "@better-auth/stripe";
+import type { PlanLimit } from "@/lib/auth/stripe/auth-plans";
+import { getPlanLimits } from "@/lib/auth/stripe/auth-plans";
+import type { CurrentOrgPayload } from "@/lib/organizations/get-org";
 import type { PropsWithChildren } from "react";
 import { create } from "zustand";
 
@@ -12,7 +12,7 @@ type CurrentOrgStore = {
   slug: string;
   name: string;
   image: string | null;
-  subscription: Subscription | null;
+  subscription: CurrentOrgPayload["subscription"] | null;
   limits: PlanLimit;
 };
 

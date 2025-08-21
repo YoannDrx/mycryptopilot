@@ -30,3 +30,13 @@ export const getRequiredUser = async () => {
 
   return user;
 };
+
+export const getRequiredAdmin = async () => {
+  const user = await getRequiredUser();
+
+  if (user.role !== "admin") {
+    unauthorized();
+  }
+
+  return user;
+};

@@ -146,12 +146,16 @@ If you read this, ask question about the project to fill this part. You need to 
 - `src/components/ui/form.tsx` - Form components
 - `prisma/schema.prisma` - Database schema
 - `src/site-config.ts` - Site configuration
+- `src/lib/actions/safe-actions.ts` - All Server Action SHOULD use this logic
+- `src/lib/zod-route.ts` - All Next.js route (inside the folder `/app/api` and name `route.ts`) SHOULD use this logic
 
 ## Development Notes
 
 - Always use `pnpm` for package management
 - Use TypeScript strict mode - no `any` types
 - Prefer server components and avoid unnecessary client-side state
+- Prefer using `??` than `||`
+- Avoid `any` at ALL cost
 
 ## Debugging and complexe tasks
 

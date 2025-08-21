@@ -1,4 +1,3 @@
-// app/api/hello/route.ts
 import { createZodRoute } from "next-zod-route";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -7,6 +6,9 @@ import { getUser } from "./auth/auth-user";
 import { logger } from "./logger";
 import { getCurrentOrg } from "./organizations/get-org";
 
+/**
+ * Custom error class for route validation and authorization failures
+ */
 export class ZodRouteError extends Error {
   status?: number;
   constructor(message: string, status?: number) {
@@ -15,6 +17,19 @@ export class ZodRouteError extends Error {
   }
 }
 
+/**
+ * Base route handler with automatic error handling and validation
+ * 
+ * @example
+ * ```ts
+ * export const POST = route
+ *   .params(z.object({ id: z.string() }))
+ *   .body(z.object({ name: z.string() }))
+ *   .handler(async (req, { params, body }) => {
+ *     return { success: true };
+ *   });
+ * ```
+ */
 export const route = createZodRoute({
   handleServerError: (e: Error) => {
     if (e instanceof ZodRouteError) {
@@ -40,6 +55,10 @@ export const route = createZodRoute({
   },
 });
 
+/**
+ * Route handler with authentication middleware
+ * Ensures user is logged in before accessing the route
+ */
 export const authRoute = route.use(async ({ next }) => {
   const user = await getUser();
 
@@ -52,6 +71,20 @@ export const authRoute = route.use(async ({ next }) => {
   });
 });
 
+/**
+ * Route handler with organization-based authorization
+ * Validates user permissions within an organization context
+ * 
+ * @example
+ * ```ts
+ * export const POST = orgRoute
+ *   .metadata({ permissions: { users: ["create"] } })
+ *   .handler(async (req, { ctx }) => {
+ *     // ctx.organization is available
+ *     return { success: true };
+ *   });
+ * ```
+ */
 export const orgRoute = route
   .defineMetadata(
     z.object({

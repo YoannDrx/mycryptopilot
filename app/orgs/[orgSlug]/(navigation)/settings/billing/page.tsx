@@ -5,10 +5,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Pricing } from "@/features/plans/pricing-section";
-import { auth } from "@/lib/auth";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
-import { headers } from "next/headers";
+import { getOrgActiveSubscription } from "@/lib/organizations/get-org-subscription";
 import { OrgBilling } from "./org-billing";
 
 export const generateMetadata = combineWithParentMetadata({
@@ -23,14 +22,9 @@ export default async function OrgBillingPage() {
     },
   });
 
-  const subscriptions = await auth.api.listActiveSubscriptions({
-    headers: await headers(),
-    query: {
-      referenceId: org.id,
-    },
-  });
+  const subscription = await getOrgActiveSubscription(org.id);
 
-  if (!subscriptions[0]) {
+  if (!subscription) {
     return (
       <div className="flex flex-col gap-4">
         <Card>
@@ -50,7 +44,7 @@ export default async function OrgBillingPage() {
     <OrgBilling
       orgId={org.id}
       orgSlug={org.slug}
-      subscription={subscriptions[0]}
+      subscription={subscription}
     />
   );
 }

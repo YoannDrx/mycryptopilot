@@ -1,6 +1,8 @@
 import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker";
 import type { Page } from "@playwright/test";
+import { retry } from "./retry";
 
 export const getUserEmail = () =>
   `playwright-test-${faker.internet.email().toLowerCase()}`;
@@ -13,32 +15,56 @@ export async function createTestAccount(options: {
   page: Page;
   callbackURL?: string;
   initialUserData?: { name: string; email: string; password: string };
+  admin?: boolean;
 }) {
-  const { page, callbackURL, initialUserData } = options;
-
   // Generate fake user data
-  const userData = initialUserData ?? {
+  const userData = options.initialUserData ?? {
     name: faker.person.fullName(),
     email: getUserEmail(),
     password: faker.internet.password({ length: 12, memorable: true }),
   };
 
   // Navigate to signup page
-  await page.goto(`/auth/signup?callbackUrl=${callbackURL}`);
+  await options.page.goto(`/auth/signup?callbackUrl=${options.callbackURL}`);
 
   // Fill out the form
-  await page.getByLabel("Name").fill(userData.name);
-  await page.getByLabel("Email").fill(userData.email);
-  await page.locator('input[name="password"]').fill(userData.password);
-  await page.locator('input[name="verifyPassword"]').fill(userData.password);
+  await options.page.getByLabel("Name").fill(userData.name);
+  await options.page.getByLabel("Email").fill(userData.email);
+  await options.page.locator('input[name="password"]').fill(userData.password);
+  await options.page
+    .locator('input[name="verifyPassword"]')
+    .fill(userData.password);
 
   // Submit the form
-  await page.getByRole("button", { name: /sign up/i }).click();
+  await options.page.getByRole("button", { name: /sign up/i }).click();
 
   // Wait for navigation to complete - we should be redirected to the callback URL
-  if (callbackURL) {
-    await page.pause();
-    await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
+  if (options.callbackURL) {
+    await options.page.waitForLoadState("networkidle");
+    await options.page.waitForURL(new RegExp(options.callbackURL), {
+      timeout: 30000,
+    });
+  }
+
+  if (options.admin) {
+    const user = await retry(
+      async () =>
+        prisma.user.findUniqueOrThrow({
+          where: { email: userData.email },
+        }),
+      {
+        maxAttempts: 5,
+        delayMs: 1000,
+        backoff: true,
+      },
+    );
+    console.log("Creating admin user", user);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { role: "admin" },
+    });
+    // await 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 
   return userData;

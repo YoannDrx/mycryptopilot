@@ -3,15 +3,14 @@
 // `npx @better-auth/cli generate --output prisma/schema/better-auth.prisma`
 
 model User {
-  id               String   @id
-  name             String
-  email            String
-  emailVerified    Boolean
-  image            String?
-  createdAt        DateTime
-  updatedAt        DateTime
-  resendContactId  String?
-  stripeCustomerId String?
+  id              String   @id
+  name            String
+  email           String
+  emailVerified   Boolean
+  image           String?
+  createdAt       DateTime
+  updatedAt       DateTime
+  resendContactId String?
 
   // Outgoing
   sessions    Session[]
@@ -19,6 +18,11 @@ model User {
   feedbacks   Feedback[]
   members     Member[]
   invitations Invitation[]
+
+  role       String?
+  banned     Boolean?
+  banReason  String?
+  banExpires DateTime?
 
   @@unique([email])
   @@map("user")
@@ -35,6 +39,8 @@ model Session {
   userId               String
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activeOrganizationId String?
+
+  impersonatedBy String?
 
   @@unique([token])
   @@map("session")
@@ -71,15 +77,17 @@ model Verification {
 }
 
 model Organization {
-  id          String       @id
-  name        String
-  slug        String?
-  logo        String?
-  createdAt   DateTime
-  metadata    String?
-  members     Member[]
-  invitations Invitation[]
-  email       String?
+  id               String        @id
+  name             String
+  slug             String?
+  logo             String?
+  createdAt        DateTime
+  metadata         String?
+  stripeCustomerId String?
+  members          Member[]
+  invitations      Invitation[]
+  subscription     Subscription?
+  email            String?
 
   @@unique([slug])
   @@map("organization")
@@ -112,9 +120,10 @@ model Invitation {
 }
 
 model Subscription {
-  id                   String    @id
+  id                   String       @id
   plan                 String
-  referenceId          String
+  referenceId          String       @unique
+  organization         Organization @relation(fields: [referenceId], references: [id], onDelete: Cascade)
   stripeCustomerId     String?
   stripeSubscriptionId String?
   status               String?

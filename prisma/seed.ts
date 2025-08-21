@@ -23,7 +23,6 @@ async function main() {
         image: faker.image.avatar(),
         createdAt: faker.date.past(),
         updatedAt: faker.date.recent(),
-        stripeCustomerId: faker.string.alphanumeric(10),
       },
     });
   });

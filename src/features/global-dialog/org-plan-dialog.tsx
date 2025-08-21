@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AUTH_PLANS } from "@/lib/auth/auth-plans";
+import { AUTH_PLANS } from "@/lib/auth/stripe/auth-plans";
 import { PricingCard } from "../plans/pricing-card";
 import { closeGlobalDialog } from "./global-dialog.store";
 

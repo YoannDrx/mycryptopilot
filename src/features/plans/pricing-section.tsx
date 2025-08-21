@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { AUTH_PLANS } from "@/lib/auth/auth-plans";
+import { AUTH_PLANS } from "@/lib/auth/stripe/auth-plans";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { PricingCard } from "./pricing-card";

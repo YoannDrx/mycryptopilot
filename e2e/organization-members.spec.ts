@@ -5,7 +5,6 @@ import { expect, test } from "@playwright/test";
 import {
   createTestAccount,
   getUserEmail,
-  signInAccount,
   signOutAccount,
 } from "./utils/auth-test";
 

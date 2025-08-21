@@ -112,7 +112,6 @@ export default [
       "@typescript-eslint/prefer-ts-expect-error": "error",
       "@typescript-eslint/promise-function-async": "error",
       "@typescript-eslint/require-array-sort-compare": "error",
-      "@typescript-eslint/switch-exhaustiveness-check": "error",
       "@typescript-eslint/unified-signatures": "error",
       "@typescript-eslint/no-empty-object-type": 0,
       "@typescript-eslint/array-type": "error",

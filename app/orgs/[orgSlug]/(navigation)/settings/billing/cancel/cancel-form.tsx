@@ -13,13 +13,11 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingButton } from "@/features/form/submit-button";
-import { authClient } from "@/lib/auth-client";
-import { logger } from "@/lib/logger";
-import { unwrapSafePromise } from "@/lib/promises";
-import { useMutation } from "@tanstack/react-query";
+import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
+import { cancelOrgSubscriptionAction } from "../billing.action";
 
 const CANCEL_REASONS = {
   too_expensive: "Too expensive",
@@ -45,7 +43,6 @@ const CancelSchema = z.object({
 });
 
 export function CancelSubscriptionForm({
-  orgId,
   orgSlug,
 }: {
   orgId: string;
@@ -59,29 +56,22 @@ export function CancelSubscriptionForm({
     },
   });
 
-  const cancelSubscriptionMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof CancelSchema>) => {
-      logger.info("Cancelling subscription", {
-        orgId,
-        orgSlug,
-        data,
-      });
-      return unwrapSafePromise(
-        authClient.subscription.cancel({
-          referenceId: orgId,
-          returnUrl: `/orgs/${orgSlug}/settings/billing`,
-        }),
-      );
+  const { execute: cancelSubscription, isPending } = useAction(
+    cancelOrgSubscriptionAction,
+    {
+      onSuccess: (result) => {
+        if (result.data.url) {
+          toast.success(
+            "Redirecting to billing portal where you can cancel your subscription.",
+          );
+          window.location.href = result.data.url;
+        }
+      },
+      onError: (error) => {
+        toast.error(error.error.serverError ?? "Failed to open billing portal");
+      },
     },
-    onSuccess: () => {
-      toast.success(
-        "You will be redirected to the billing page where you can cancel your subscription.",
-      );
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  );
 
   return (
     <Card className="w-full">
@@ -91,8 +81,10 @@ export function CancelSubscriptionForm({
       <CardContent>
         <Form
           form={form}
-          onSubmit={async (data) => {
-            cancelSubscriptionMutation.mutate(data);
+          onSubmit={async () => {
+            cancelSubscription({
+              returnUrl: `/orgs/${orgSlug}/settings/billing`,
+            });
           }}
         >
           <div className="space-y-6">
@@ -150,7 +142,7 @@ export function CancelSubscriptionForm({
               <LoadingButton
                 type="submit"
                 variant="destructive"
-                loading={cancelSubscriptionMutation.isPending}
+                loading={isPending}
               >
                 Confirm Cancellation
               </LoadingButton>

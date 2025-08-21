@@ -66,6 +66,7 @@ describe("zod-route", () => {
     emailVerified: true,
     createdAt: new Date(1, 1, 1, 1),
     updatedAt: new Date(1, 1, 1, 1),
+    banned: null,
   };
 
   it("authRoute should add the user inside the context if the user is authenticated", async () => {
@@ -103,6 +104,8 @@ describe("zod-route", () => {
       subscription: null,
       user,
       invitations: [],
+      metadata: null,
+      stripeCustomerId: null,
     };
     vi.mocked(getCurrentOrg).mockResolvedValue(organization);
 

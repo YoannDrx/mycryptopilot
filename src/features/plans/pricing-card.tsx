@@ -10,13 +10,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
-import type { AppAuthPlan } from "@/lib/auth/auth-plans";
-import { ADDITIONAL_FEATURES, LIMITS_CONFIG } from "@/lib/auth/auth-plans";
+import type { AppAuthPlan } from "@/lib/auth/stripe/auth-plans";
+import {
+  ADDITIONAL_FEATURES,
+  LIMITS_CONFIG,
+} from "@/lib/auth/stripe/auth-plans";
 import { cn } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
 import { Clock } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import { LoadingButton } from "../form/submit-button";
+import { upgradeOrgAction } from "./plans.action";
 
 export function PricingCard({
   plan,
@@ -28,26 +32,14 @@ export function PricingCard({
   // Get the active organization
   const { data: activeOrg } = authClient.useActiveOrganization();
 
-  const upgradeMutation = useMutation({
-    mutationFn: async (name: string) => {
-      if (!activeOrg) {
-        throw new Error("No active organization");
+  const { execute: upgradeOrg, isPending } = useAction(upgradeOrgAction, {
+    onSuccess: (result) => {
+      if (result.data.url) {
+        window.location.href = result.data.url;
       }
-
-      // Create a subscription for the organization
-      const result = await authClient.subscription.upgrade({
-        plan: name,
-        referenceId: activeOrg.id,
-        annual: false,
-        successUrl: `/orgs/${activeOrg.slug}/settings/billing/success`,
-        cancelUrl: `/orgs/${activeOrg.slug}/settings/billing`,
-      });
-
-      if (result.error) {
-        toast.error(result.error.message);
-      }
-
-      return result.data;
+    },
+    onError: (error) => {
+      toast.error(error.error.serverError ?? "Failed to upgrade plan");
     },
   });
 
@@ -183,14 +175,23 @@ export function PricingCard({
 
       <CardFooter className="pt-6 pb-8">
         <LoadingButton
-          loading={upgradeMutation.isPending}
+          loading={isPending}
           size="lg"
           className={cn(
             "w-full text-base font-medium",
             plan.isPopular ? "bg-primary hover:bg-primary/90" : "",
           )}
           onClick={() => {
-            upgradeMutation.mutate(plan.name);
+            if (!activeOrg) {
+              toast.error("No active organization");
+              return;
+            }
+            upgradeOrg({
+              plan: plan.name,
+              annual: isYearly,
+              successUrl: `/orgs/${activeOrg.slug}/settings/billing/success`,
+              cancelUrl: `/orgs/${activeOrg.slug}/settings/billing`,
+            });
           }}
         >
           {plan.price === 0

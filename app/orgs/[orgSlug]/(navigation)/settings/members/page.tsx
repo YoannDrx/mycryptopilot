@@ -1,4 +1,4 @@
-import { getPlanLimits } from "@/lib/auth/auth-plans";
+import { getPlanLimits } from "@/lib/auth/stripe/auth-plans";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";

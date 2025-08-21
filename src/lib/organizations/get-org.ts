@@ -3,6 +3,8 @@ import { unauthorized } from "next/navigation";
 import { auth } from "../auth";
 import type { AuthPermission, AuthRole } from "../auth/auth-permissions";
 import { getSession } from "../auth/auth-user";
+import { prisma } from "../prisma";
+import { getOrgActiveSubscription } from "./get-org-subscription";
 import { isInRoles } from "./is-in-roles";
 
 type OrgParams = {
@@ -14,10 +16,16 @@ const getOrg = async () => {
   const user = await getSession();
 
   if (user?.session.activeOrganizationId) {
-    return auth.api.getFullOrganization({
-      headers: await headers(),
-      query: {
-        organizationId: user.session.activeOrganizationId ?? undefined,
+    // Get organization directly from Prisma to include stripeCustomerId
+    return prisma.organization.findFirst({
+      where: { id: user.session.activeOrganizationId },
+      include: {
+        members: {
+          include: {
+            user: true,
+          },
+        },
+        invitations: true,
       },
     });
   }
@@ -40,7 +48,7 @@ export const getCurrentOrg = async (params?: OrgParams) => {
 
   const memberRoles = org.members
     .filter((member) => member.userId === user.session.userId)
-    .map((member) => member.role);
+    .map((member) => member.role) as AuthRole[];
 
   if (memberRoles.length === 0 || !isInRoles(memberRoles, params?.roles)) {
     return null;
@@ -59,23 +67,13 @@ export const getCurrentOrg = async (params?: OrgParams) => {
     }
   }
 
-  const subscriptions = await auth.api.listActiveSubscriptions({
-    headers: await headers(),
-    query: {
-      referenceId: org.id,
-    },
-  });
-
-  const currentSubscription = subscriptions.find(
-    (s) =>
-      s.referenceId === org.id &&
-      (s.status === "active" || s.status === "trialing"),
-  );
+  const currentSubscription = await getOrgActiveSubscription(org.id);
 
   const OWNER = org.members.find((m) => m.role === "owner");
 
   return {
     ...org,
+    slug: org.slug ?? "org-slug-default",
     user: user.user,
     email: (OWNER?.user.email ?? null) as string | null,
     memberRoles: memberRoles,

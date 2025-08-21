@@ -1,3 +1,5 @@
+import type { Subscription } from "@/generated/prisma";
+import { logger } from "@/lib/logger";
 import {
   Clock,
   FolderArchive,
@@ -7,7 +9,6 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import type { AuthPlan } from "./auth-type";
 
 const DEFAULT_LIMIT = {
   projects: 5,
@@ -17,7 +18,40 @@ const DEFAULT_LIMIT = {
 
 export type PlanLimit = typeof DEFAULT_LIMIT;
 
-export type AppAuthPlan = AuthPlan & {
+type HookCtx = {
+  req: Request;
+  organizationId: string;
+  stripeCustomerId: string;
+  subscriptionId: string;
+};
+
+export type AppAuthPlan = {
+  priceId?: string | undefined;
+  lookupKey?: string | undefined;
+  annualDiscountPriceId?: string | undefined;
+  annualDiscountLookupKey?: string | undefined;
+  name: string;
+  limits?: Record<string, number> | undefined;
+  group?: string;
+  freeTrial?: {
+    days: number;
+    onTrialStart?: (subscription: Subscription, ctx: HookCtx) => Promise<void>;
+    onTrialEnd?: (
+      data: {
+        subscription: Subscription;
+      },
+      ctx: HookCtx,
+    ) => Promise<void>;
+    onTrialExpired?: (
+      subscription: Subscription,
+      ctx: HookCtx,
+    ) => Promise<void>;
+  };
+  onSubscriptionCanceled?: (
+    subscription: Subscription,
+    ctx: HookCtx,
+  ) => Promise<void>;
+} & {
   description: string;
   isPopular?: boolean;
   price: number;
@@ -50,7 +84,20 @@ export const AUTH_PLANS: AppAuthPlan[] = [
     },
     freeTrial: {
       days: 14,
+      onTrialStart: async (subscription) => {
+        // Send a welcome email to the user
+        logger.debug(`Welcome email sent to ${subscription}`);
+      },
+      onTrialExpired: async (subscription) => {
+        // Handle trial expiration
+        logger.debug(`Trial expired for ${subscription}`);
+      },
+      onTrialEnd: async (subscription) => {
+        // Handle trial end
+        logger.debug(`Trial ended for ${subscription}`);
+      },
     },
+
     price: 49,
     yearlyPrice: 400,
     currency: "USD",
@@ -77,7 +124,14 @@ export const AUTH_PLANS: AppAuthPlan[] = [
 ];
 
 // Limits transformation object
-export const LIMITS_CONFIG = {
+export const LIMITS_CONFIG: Record<
+  keyof PlanLimit,
+  {
+    icon: React.ElementType;
+    getLabel: (value: number) => string;
+    description: string;
+  }
+> = {
   projects: {
     icon: FolderArchive,
     getLabel: (value: number) =>

@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader } from "@/components/nowts/loader";
 import { Typography } from "@/components/nowts/typography";
 import {
   DropdownMenu,
@@ -15,11 +14,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut, useSession } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
+import { useSession } from "@/lib/auth-client";
 import {
   LayoutDashboard,
-  LogOut,
   Monitor,
   Moon,
   Settings,
@@ -29,17 +26,11 @@ import {
 
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { PropsWithChildren } from "react";
+import { UserDropdownLogout } from "./user-dropdown-logout";
+import { UserDropdownStopImpersonating } from "./user-dropdown-stop-impersonating";
 
 export const UserDropdown = ({ children }: PropsWithChildren) => {
-  const router = useRouter();
-  const logout = useMutation({
-    mutationFn: async () => signOut(),
-    onSuccess: () => {
-      void router.push("/auth/signin");
-    },
-  });
   const session = useSession();
   const theme = useTheme();
 
@@ -79,7 +70,7 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
-            <SunMoon className="mr-2 size-4" />
+            <SunMoon className="text-muted-foreground mr-4 size-4" />
             <span>Theme</span>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
@@ -104,20 +95,10 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              logout.mutate();
-            }}
-          >
-            {logout.isPending ? (
-              <Loader className="mr-2 size-4" />
-            ) : (
-              <LogOut className="mr-2 size-4" />
-            )}
-            <span>Logout</span>
-          </DropdownMenuItem>
+          <UserDropdownLogout />
+          {session.data.session.impersonatedBy ? (
+            <UserDropdownStopImpersonating />
+          ) : null}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
