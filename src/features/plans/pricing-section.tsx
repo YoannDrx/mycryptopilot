@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { AUTH_PLANS } from "@/lib/auth/stripe/auth-plans";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { useState } from "react";
 import { PricingCard } from "./pricing-card";
 
@@ -12,7 +13,7 @@ export function Pricing() {
 
   return (
     <section className="from-background to-muted/20 w-full bg-gradient-to-b py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -60,9 +61,9 @@ export function Pricing() {
         </div>
 
         <div
-          className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12"
+          className="mt-16 grid gap-8 lg:gap-12"
           style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           }}
         >
           {AUTH_PLANS.filter((p) => !p.isHidden).map((plan) => (
@@ -77,9 +78,12 @@ export function Pricing() {
           </p>
           <p className="text-muted-foreground mt-2">
             Need a custom plan?{" "}
-            <a href="#" className="text-primary font-medium hover:underline">
+            <Link
+              href="/contact"
+              className="text-primary font-medium hover:underline"
+            >
               Contact us
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -1,36 +1,48 @@
 import { Typography } from "@/components/nowts/typography";
+import { Card } from "@/components/ui/card";
 import { SectionLayout } from "../landing/section-layout";
 import { EmailForm } from "./email-form";
 
 export const EmailFormSection = () => {
   return (
-    <SectionLayout
-      size="lg"
-      className="relative flex w-full flex-col items-center gap-16"
-    >
-      <div className="relative m-auto flex max-w-xl flex-col gap-4 text-center">
+    <SectionLayout>
+      <Card className="relative isolate overflow-hidden py-24 text-center shadow-2xl lg:rounded-3xl">
         <Typography
-          variant="small"
-          className="text-primary font-extrabold uppercase"
+          as="h2"
+          className="mx-auto max-w-3xl text-center text-4xl font-semibold tracking-tight text-white sm:text-5xl"
         >
-          Be the first to use Threader
+          Get notified when we're launching
         </Typography>
-        <Typography variant="h2" className="text-center text-4xl lg:text-5xl">
-          Join the waiting list of{" "}
-          <span className="text-gradient from-primary to-secondary bg-gradient-to-r font-mono font-extrabold uppercase">
-            Threader
-          </span>
+        <Typography className="mx-auto mt-6 max-w-lg text-center text-lg text-gray-300">
+          Be the first to use Threader. Get early access, exclusive content and
+          more.
         </Typography>
-        <Typography variant="h3">
-          Get early access, exclusive content and more.
-        </Typography>
-        <div className="mx-auto mt-6 w-full max-w-md">
+        <div className="mx-auto mt-10 w-full max-w-lg">
           <EmailForm
-            submitButtonLabel="Join"
+            submitButtonLabel="Notify me"
             successMessage="Thank you for joining the waiting list"
           />
         </div>
-      </div>
+        <svg
+          viewBox="0 0 1024 1024"
+          aria-hidden="true"
+          className="absolute top-1/2 left-1/2 -z-10 size-256 -translate-x-1/2 mask-[radial-gradient(closest-side,white,transparent)]"
+        >
+          <circle
+            r={512}
+            cx={512}
+            cy={512}
+            fill="url(#827591b1-ce8c-4110-b064-7cb85a0b1217)"
+            fillOpacity="0.7"
+          />
+          <defs>
+            <radialGradient id="827591b1-ce8c-4110-b064-7cb85a0b1217">
+              <stop stopColor="#7775D6" />
+              <stop offset={1} stopColor="#E935C1" />
+            </radialGradient>
+          </defs>
+        </svg>
+      </Card>
     </SectionLayout>
   );
 };

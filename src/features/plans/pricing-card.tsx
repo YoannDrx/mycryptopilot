@@ -62,7 +62,7 @@ export function PricingCard({
   return (
     <Card
       className={cn(
-        "flex flex-col transition-all duration-200 hover:shadow-lg",
+        "flex flex-col pb-0 transition-all duration-200 hover:shadow-lg",
         plan.isPopular && "border-primary relative overflow-hidden shadow-md",
       )}
     >
