@@ -94,30 +94,27 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
         )}
       />
       {isUsingCredentials ? (
-        <>
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <div className="flex items-center justify-between">
-                  <FormLabel>Password</FormLabel>
-                  <Link
-                    href="/auth/forget-password"
-                    className="text-sm underline"
-                    tabIndex={2}
-                  >
-                    Forgot password ?
-                  </Link>
-                </div>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </>
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <div className="flex items-center justify-between">
+                <FormLabel>Password</FormLabel>
+                <Link
+                  href="/auth/forget-password"
+                  className="text-sm underline"
+                >
+                  Forgot password ?
+                </Link>
+              </div>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       ) : null}
 
       <LoadingButton
@@ -130,7 +127,7 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
 
       {isUsingCredentials ? (
         <Typography variant="muted" className="text-xs">
-          Forgot password ?{" "}
+          Want faster sign in?{" "}
           <Typography
             variant="link"
             as="button"
@@ -143,16 +140,18 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
           </Typography>
         </Typography>
       ) : (
-        <Typography
-          variant="link"
-          as="button"
-          type="button"
-          className="text-xs"
-          onClick={() => {
-            setIsUsingCredentials(true);
-          }}
-        >
-          Use password
+        <Typography variant="muted" className="text-xs">
+          Prefer password sign in?{" "}
+          <Typography
+            variant="link"
+            as="button"
+            type="button"
+            onClick={() => {
+              setIsUsingCredentials(true);
+            }}
+          >
+            Use password
+          </Typography>
         </Typography>
       )}
     </Form>

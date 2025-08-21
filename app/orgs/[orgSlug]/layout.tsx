@@ -1,6 +1,6 @@
 import { RefreshPageOrganization } from "@/components/utils/refresh-organization";
 import { auth } from "@/lib/auth";
-import { logger } from "@/lib/logger";
+import { getRequiredUser } from "@/lib/auth/auth-user";
 import { orgMetadata } from "@/lib/metadata";
 import { getCurrentOrg } from "@/lib/organizations/get-org";
 import { prisma } from "@/lib/prisma";
@@ -24,32 +24,42 @@ export default async function RouteLayout(
 
   const org = await getCurrentOrg();
 
-  if (!org) {
-    return <OrgList />;
-  }
-
   // The user try to go to another organization, we must sync with the URL
-  if (org.slug !== params.orgSlug) {
-    const isId = await prisma.organization.findUnique({
+  if (org?.slug !== params.orgSlug) {
+    const user = await getRequiredUser();
+    const org = await prisma.organization.findFirst({
       where: {
-        id: params.orgSlug,
+        OR: [
+          {
+            slug: params.orgSlug,
+          },
+          {
+            id: params.orgSlug,
+          },
+        ],
+        members: {
+          some: {
+            userId: user.id,
+          },
+        },
       },
       select: {
-        slug: true,
         id: true,
       },
     });
 
+    // If we can't find the organization, we must show the org list
+    if (!org) {
+      return <OrgList />;
+    }
+
     await auth.api.setActiveOrganization({
       headers: await headers(),
       body: {
-        organizationSlug: isId ? undefined : params.orgSlug,
-        organizationId: isId ? params.orgSlug : undefined,
+        organizationId: org.id,
       },
     });
 
-    // Force to always have the slug inside the URL
-    logger.warn("Full reload because unsync state");
     return <RefreshPageOrganization />;
   }
 

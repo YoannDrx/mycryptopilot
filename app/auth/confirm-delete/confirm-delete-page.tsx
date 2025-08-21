@@ -1,10 +1,18 @@
 "use client";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -49,28 +57,46 @@ export function ConfirmDeletePage({
     router.push("/account");
   };
 
-  if (error) {
-    return <div className="mb-4 text-red-500">{error}</div>;
+  if (!token) {
+    router.push("/account");
+    return null;
   }
 
   return (
-    <>
-      <p>
-        This action is permanent and cannot be undone. All your data will be
-        permanently removed from our systems.
-      </p>
-      <div className="flex gap-4 pt-4">
-        <LoadingButton
-          loading={isLoading || confirmDeleteMutation.isPending}
-          variant="destructive"
-          onClick={handleConfirmDelete}
-        >
-          Yes, Delete My Account
-        </LoadingButton>
-        <Button variant="outline" onClick={handleCancel}>
-          Cancel
-        </Button>
-      </div>
-    </>
+    <Card className="mx-auto w-full max-w-md">
+      <CardHeader>
+        <div className="flex justify-center">
+          <Avatar className="size-16">
+            <AvatarFallback>
+              <Trash2 />
+            </AvatarFallback>
+          </Avatar>
+        </div>
+        <CardHeader className="text-center">
+          Confirm Account Deletion
+        </CardHeader>
+
+        <CardDescription className="text-center">
+          Are you sure you want to delete your account? This action is permanent
+          and cannot be undone.
+        </CardDescription>
+      </CardHeader>
+      <CardFooter className="border-t pt-6">
+        {error && <div className="mb-4 text-red-500">{error}</div>}
+        <div className="flex w-full gap-4">
+          <LoadingButton
+            loading={isLoading || confirmDeleteMutation.isPending}
+            variant="destructive"
+            onClick={handleConfirmDelete}
+            className="flex-1"
+          >
+            Yes, Delete My Account
+          </LoadingButton>
+          <Button variant="outline" onClick={handleCancel} className="flex-1">
+            Cancel
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

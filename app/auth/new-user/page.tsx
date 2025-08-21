@@ -7,12 +7,19 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
+import { SiteConfig } from "@/site-config";
 import type { PageParams } from "@/types/next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+export const metadata: Metadata = {
+  title: `Welcome | ${SiteConfig.title}`,
+  description: "Welcome to your new account! You're all set up and ready to start collecting testimonials.",
+};
+
 /**
- * This page is show when a user loggin. You can add an onboarding process here.
+ * This page is show when a user login. You can add an onboarding process here.
  */
 export default async function NewUserPage(props: PageParams) {
   const searchParams = await props.searchParams;

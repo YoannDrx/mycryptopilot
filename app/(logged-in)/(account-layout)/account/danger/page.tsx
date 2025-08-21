@@ -28,8 +28,8 @@ export default function DeleteProfilePage() {
   });
 
   return (
-    <Card className="border-destructive/20">
-      <CardHeader className="space-y-4 pb-6">
+    <Card>
+      <CardHeader>
         <div className="flex items-center gap-2">
           <AlertTriangle className="text-destructive size-5" />
           <CardTitle className="text-xl font-semibold">
@@ -67,7 +67,7 @@ export default function DeleteProfilePage() {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="pt-4">
+      <CardFooter className="flex justify-end border-t pt-4">
         <LoadingButton
           variant="destructive"
           size="lg"

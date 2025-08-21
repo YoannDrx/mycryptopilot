@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import { SiteConfig } from "@/site-config";
 import type { LayoutParams } from "@/types/next";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -24,7 +24,7 @@ const CaptionFont = Space_Grotesk({
   variable: "--font-caption",
 });
 
-const GeistSans = Geist({
+const GeistSans = Inter({
   subsets: ["latin"],
   variable: "--font-geist-sans",
 });
@@ -39,35 +39,33 @@ export default function RootLayout({
   modal,
 }: LayoutParams & { modal?: ReactNode }) {
   return (
-    <>
-      <html lang="en" className="h-full" suppressHydrationWarning>
-        <body
-          suppressHydrationWarning
-          className={cn(
-            "bg-background h-full font-sans antialiased",
-            GeistMono.variable,
-            GeistSans.variable,
-            CaptionFont.variable,
-          )}
-        >
-          <NuqsAdapter>
-            <Providers>
-              <NextTopLoader
-                delay={100}
-                showSpinner={false}
-                color="hsl(var(--primary))"
-              />
-              {children}
-              {modal}
-              <TailwindIndicator />
-              <FloatingLegalFooter />
-              <Suspense>
-                <ServerToaster />
-              </Suspense>
-            </Providers>
-          </NuqsAdapter>
-        </body>
-      </html>
-    </>
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className={cn(
+          "bg-background h-full font-sans antialiased",
+          GeistMono.variable,
+          GeistSans.variable,
+          CaptionFont.variable,
+        )}
+      >
+        <NuqsAdapter>
+          <Providers>
+            <NextTopLoader
+              delay={100}
+              showSpinner={false}
+              color="hsl(var(--primary))"
+            />
+            {children}
+            {modal}
+            <TailwindIndicator />
+            <FloatingLegalFooter />
+            <Suspense>
+              <ServerToaster />
+            </Suspense>
+          </Providers>
+        </NuqsAdapter>
+      </body>
+    </html>
   );
 }

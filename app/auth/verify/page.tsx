@@ -6,7 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SiteConfig } from "@/site-config";
 import { Mail } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `Verify Your Email | ${SiteConfig.title}`,
+  description: "Please check your email and click the verification link to complete your account setup.",
+};
 
 export default function VerificationCard() {
   return (

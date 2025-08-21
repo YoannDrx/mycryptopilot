@@ -10,10 +10,16 @@ import {
 } from "@/components/ui/card";
 import { getUser } from "@/lib/auth/auth-user";
 import { SiteConfig } from "@/site-config";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { SignUpCredentialsForm } from "./sign-up-credentials-form";
+
+export const metadata: Metadata = {
+  title: `Sign Up | ${SiteConfig.title}`,
+  description: "Create your account to start collecting powerful testimonials for your projects.",
+};
 
 export default async function AuthSignInPage() {
   const user = await getUser();

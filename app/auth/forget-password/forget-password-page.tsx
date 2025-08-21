@@ -21,28 +21,28 @@ import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation } from "@tanstack/react-query";
-import { RefreshCcw } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const PasswordFormSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
+const EmailFormSchema = z.object({
+  email: z.string().email(),
 });
 
-export function ResetPasswordPage({ token }: { token: string }) {
+export function ForgetPasswordPage() {
   const router = useRouter();
 
-  const passwordForm = useZodForm({
-    schema: PasswordFormSchema,
+  const emailForm = useZodForm({
+    schema: EmailFormSchema,
   });
 
-  const resetPasswordMutation = useMutation({
-    mutationFn: async (values: { password: string }) => {
+  const forgetPasswordMutation = useMutation({
+    mutationFn: async (values: { email: string }) => {
       return unwrapSafePromise(
-        authClient.resetPassword({
-          token: token,
-          newPassword: values.password,
+        authClient.forgetPassword({
+          email: values.email,
+          redirectTo: "/auth/reset-password",
         }),
       );
     },
@@ -50,19 +50,12 @@ export function ResetPasswordPage({ token }: { token: string }) {
       toast.error(error.message);
     },
     onSuccess: () => {
-      toast.success("Password reset successfully");
-      const newUrl = `${window.location.origin}/auth/signin`;
-      window.location.href = newUrl;
+      router.push("/auth/verify");
     },
   });
 
-  function onSubmitPassword(values: z.infer<typeof PasswordFormSchema>) {
-    resetPasswordMutation.mutate(values);
-  }
-
-  if (!token) {
-    router.push("/auth/forget-password");
-    return null;
+  function onSubmitEmail(values: z.infer<typeof EmailFormSchema>) {
+    forgetPasswordMutation.mutate(values);
   }
 
   return (
@@ -71,41 +64,42 @@ export function ResetPasswordPage({ token }: { token: string }) {
         <div className="flex justify-center">
           <Avatar className="size-16">
             <AvatarFallback>
-              <RefreshCcw />
+              <Lock />
             </AvatarFallback>
           </Avatar>
         </div>
-        <CardHeader className="text-center">Reset Password</CardHeader>
+        <CardHeader className="text-center">Forget Password</CardHeader>
 
         <CardDescription className="text-center">
-          Enter your new password below
+          Enter your email to reset your password
         </CardDescription>
       </CardHeader>
+
       <CardFooter className="border-t pt-6">
         <Form
-          form={passwordForm}
-          onSubmit={onSubmitPassword}
-          className="space-y-4"
+          form={emailForm}
+          onSubmit={onSubmitEmail}
+          className="w-full space-y-4"
         >
           <FormField
-            control={passwordForm.control}
-            name="password"
+            control={emailForm.control}
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>New Password</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input placeholder="your@email.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <LoadingButton
-            loading={resetPasswordMutation.isPending}
+            loading={forgetPasswordMutation.isPending}
             type="submit"
             className="w-full"
           >
-            Reset Password
+            Send Reset Link
           </LoadingButton>
         </Form>
       </CardFooter>

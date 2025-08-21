@@ -6,8 +6,8 @@ export const SiteConfig = {
   domain: "demo.nowts.app",
   appIcon: "/images/icon.png",
   company: {
-    name: "NowTS",
-    address: "", // Remove if not needed
+    name: "NOW.TS LLC",
+    address: "421 Rue de Paris, France", // Remove if not needed
   },
   brand: {
     primary: "#007291", // You can adjust this to your brand color
