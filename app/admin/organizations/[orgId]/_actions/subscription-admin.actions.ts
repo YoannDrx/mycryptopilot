@@ -21,11 +21,12 @@ const reactivateSubscriptionSchema = z.object({
 });
 
 export async function updateSubscriptionPlanAction(
-  data: z.infer<typeof updateSubscriptionPlanSchema>
+  data: z.infer<typeof updateSubscriptionPlanSchema>,
 ) {
   await getRequiredAdmin();
-  
-  const { organizationId, planName, isYearly } = updateSubscriptionPlanSchema.parse(data);
+
+  const { organizationId, planName, isYearly } =
+    updateSubscriptionPlanSchema.parse(data);
 
   const plan = AUTH_PLANS.find((p) => p.name === planName);
   if (!plan) {
@@ -47,7 +48,7 @@ export async function updateSubscriptionPlanAction(
     if (subscription.stripeSubscriptionId) {
       await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
     }
-    
+
     await prisma.subscription.update({
       where: { id: subscription.id },
       data: {
@@ -59,12 +60,15 @@ export async function updateSubscriptionPlanAction(
     return;
   }
 
-  const priceId = isYearly && plan.annualDiscountPriceId 
-    ? plan.annualDiscountPriceId 
-    : plan.priceId;
+  const priceId =
+    isYearly && plan.annualDiscountPriceId
+      ? plan.annualDiscountPriceId
+      : plan.priceId;
 
   if (!priceId) {
-    throw new Error("Plan does not have a price ID for the selected billing frequency");
+    throw new Error(
+      "Plan does not have a price ID for the selected billing frequency",
+    );
   }
 
   if (!subscription.stripeSubscriptionId) {
@@ -72,7 +76,7 @@ export async function updateSubscriptionPlanAction(
   }
 
   const stripeSubscription = await stripe.subscriptions.retrieve(
-    subscription.stripeSubscriptionId
+    subscription.stripeSubscriptionId,
   );
 
   await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
@@ -94,10 +98,10 @@ export async function updateSubscriptionPlanAction(
 }
 
 export async function cancelSubscriptionAction(
-  data: z.infer<typeof cancelSubscriptionSchema>
+  data: z.infer<typeof cancelSubscriptionSchema>,
 ) {
   await getRequiredAdmin();
-  
+
   const { organizationId } = cancelSubscriptionSchema.parse(data);
 
   const subscription = await prisma.subscription.findFirst({
@@ -121,10 +125,10 @@ export async function cancelSubscriptionAction(
 }
 
 export async function reactivateSubscriptionAction(
-  data: z.infer<typeof reactivateSubscriptionSchema>
+  data: z.infer<typeof reactivateSubscriptionSchema>,
 ) {
   await getRequiredAdmin();
-  
+
   const { organizationId } = reactivateSubscriptionSchema.parse(data);
 
   const subscription = await prisma.subscription.findFirst({
@@ -148,23 +152,27 @@ export async function reactivateSubscriptionAction(
 }
 
 export async function createSubscriptionAction(
-  data: z.infer<typeof updateSubscriptionPlanSchema>
+  data: z.infer<typeof updateSubscriptionPlanSchema>,
 ) {
   await getRequiredAdmin();
-  
-  const { organizationId, planName, isYearly } = updateSubscriptionPlanSchema.parse(data);
+
+  const { organizationId, planName, isYearly } =
+    updateSubscriptionPlanSchema.parse(data);
 
   const plan = AUTH_PLANS.find((p) => p.name === planName);
   if (!plan || planName === "free") {
     throw new Error("Invalid plan for subscription creation");
   }
 
-  const priceId = isYearly && plan.annualDiscountPriceId 
-    ? plan.annualDiscountPriceId 
-    : plan.priceId;
+  const priceId =
+    isYearly && plan.annualDiscountPriceId
+      ? plan.annualDiscountPriceId
+      : plan.priceId;
 
   if (!priceId) {
-    throw new Error("Plan does not have a price ID for the selected billing frequency");
+    throw new Error(
+      "Plan does not have a price ID for the selected billing frequency",
+    );
   }
 
   const organization = await prisma.organization.findUnique({

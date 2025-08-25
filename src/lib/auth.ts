@@ -41,7 +41,7 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        after: async (user, req) => {
+        after: async (user, _req) => {
           await setupResendCustomer(user);
 
           const emailName = user.email.slice(0, 8);

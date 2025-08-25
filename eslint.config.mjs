@@ -145,6 +145,7 @@ export default [
       "eslint.config.mjs",
       "**/worker.js",
       "src/generated",
+      ".claude",
     ],
   },
 ];

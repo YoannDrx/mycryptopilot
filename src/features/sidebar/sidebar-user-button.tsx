@@ -9,6 +9,7 @@ import { UserDropdown } from "../auth/user-dropdown";
 export const SidebarUserButton = () => {
   const session = useSession();
   const data = session.data?.user;
+
   return (
     <UserDropdown>
       <SidebarMenuButton variant="outline" className="h-12">

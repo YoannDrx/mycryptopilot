@@ -51,6 +51,8 @@ export const useWarnIfUnsavedChanges = (unsaved: boolean, message?: string) => {
       if (!yes) return;
 
       useNextTopLoaderStore.getState().enable();
+
+      return true;
     };
     window.onbeforeunload = unsaved ? beforeUnloadHandler : null;
 

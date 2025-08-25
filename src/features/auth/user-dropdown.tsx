@@ -20,6 +20,7 @@ import {
   Monitor,
   Moon,
   Settings,
+  Shield,
   SunMedium,
   SunMoon,
 } from "lucide-react";
@@ -67,6 +68,14 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
             Account Settings
           </Link>
         </DropdownMenuItem>
+        {session.data.user.role === "admin" && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin">
+              <Shield className="mr-2 size-4" />
+              Admin
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

@@ -58,7 +58,7 @@ export async function createTestAccount(options: {
         backoff: true,
       },
     );
-    console.log("Creating admin user", user);
+    logger.info("Creating admin user", user);
     await prisma.user.update({
       where: { id: user.id },
       data: { role: "admin" },

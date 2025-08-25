@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineTooltip } from "@/components/ui/tooltip";
+import { LoadingButton } from "@/features/form/submit-button";
 import { resolveActionResult } from "@/lib/actions/actions-utils";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -26,7 +27,7 @@ import { Angry, Frown, Meh, SmilePlus } from "lucide-react";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { contactSupportAction } from "./contact-feedback.action";
+import { feedbackAction } from "./contact-feedback.action";
 import type { ContactFeedbackSchemaType } from "./contact-feedback.schema";
 import { ContactFeedbackSchema } from "./contact-feedback.schema";
 
@@ -45,7 +46,7 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
 
   const mutation = useMutation({
     mutationFn: async (values: ContactFeedbackSchemaType) => {
-      return resolveActionResult(contactSupportAction(values));
+      return resolveActionResult(feedbackAction(values));
     },
     onSuccess: () => {
       toast.success("Your feedback has been sent! Thanks you.");
@@ -118,9 +119,13 @@ export const ContactFeedbackPopover = (props: ContactFeedbackPopoverProps) => {
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="outline">
+            <LoadingButton
+              loading={mutation.isPending}
+              type="submit"
+              variant="outline"
+            >
               Send
-            </Button>
+            </LoadingButton>
           </div>
         </Form>
       </PopoverContent>

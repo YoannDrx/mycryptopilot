@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,9 +14,9 @@ import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ban, Crown, Eye, MoreHorizontal, UserCheck } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { UserTableCell } from "../../_components/user-table-cell";
 import type { UserWithStats } from "../_actions/admin-users";
 
 type UserRowProps = {
@@ -120,44 +119,10 @@ export const UserRow = ({ user }: UserRowProps) => {
     },
   });
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
     <TableRow key={user.id}>
       <TableCell>
-        <div className="flex items-center gap-3">
-          <Avatar className="size-10">
-            <AvatarImage src={user.image ?? undefined} alt={user.name || ""} />
-            <AvatarFallback className="text-sm">
-              {getInitials(user.name || user.email || "U")}
-            </AvatarFallback>
-          </Avatar>
-          <Link href={`/admin/users/${user.id}`} className="flex-1">
-            <div className="space-y-1 transition-opacity hover:opacity-80">
-              <div className="font-medium">{user.name}</div>
-              <div className="text-muted-foreground text-sm">{user.email}</div>
-              <div className="mt-1 flex items-center gap-1">
-                {!user.emailVerified && (
-                  <Badge variant="outline" className="text-xs">
-                    Unverified
-                  </Badge>
-                )}
-                {user.banned && (
-                  <Badge variant="destructive" className="text-xs">
-                    Banned
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </Link>
-        </div>
+        <UserTableCell user={user} href={`/admin/users/${user.id}`} />
       </TableCell>
       <TableCell>
         <Badge variant={user.role === "admin" ? "default" : "secondary"}>

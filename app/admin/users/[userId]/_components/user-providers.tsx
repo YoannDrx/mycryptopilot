@@ -112,16 +112,16 @@ export function UserProviders({ accounts }: UserProvidersProps) {
                           new Date(account.accessTokenExpiresAt) > new Date()
                             ? "default"
                             : account.accessToken
-                            ? "secondary"
-                            : "outline"
+                              ? "secondary"
+                              : "outline"
                         }
                       >
                         {account.accessTokenExpiresAt &&
                         new Date(account.accessTokenExpiresAt) > new Date()
                           ? "Active"
                           : account.accessToken
-                          ? "Connected"
-                          : "Inactive"}
+                            ? "Connected"
+                            : "Inactive"}
                       </Badge>
                     </TableCell>
                     <TableCell>

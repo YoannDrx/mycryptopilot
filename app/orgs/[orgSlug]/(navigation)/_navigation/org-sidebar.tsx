@@ -16,6 +16,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { SidebarNavigationMenu } from "@/components/ui/sidebar-utils";
+import { ContactFeedbackPopover } from "@/features/contact/feedback/contact-feedback-popover";
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
 import type { AuthRole } from "@/lib/auth/auth-permissions";
@@ -70,6 +71,7 @@ export function OrgSidebar({
       </SidebarContent>
       <SidebarFooter className="flex flex-col gap-2">
         <UpgradeCard />
+        <ContactFeedbackPopover />
         <SidebarUserButton />
       </SidebarFooter>
       <SidebarRail />

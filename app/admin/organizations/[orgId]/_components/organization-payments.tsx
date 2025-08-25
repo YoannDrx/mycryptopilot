@@ -38,7 +38,7 @@ export function OrganizationPayments({
     const fetchPayments = async () => {
       try {
         const response = await fetch(
-          `/api/admin/organizations/${organizationId}/payments`
+          `/api/admin/organizations/${organizationId}/payments`,
         );
         if (response.ok) {
           const data = await response.json();
@@ -125,7 +125,7 @@ export function OrganizationPayments({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <DollarSign className="text-muted-foreground h-4 w-4" />
                     <span className="font-medium">
                       {formatAmount(payment.amount, payment.currency)}
                     </span>
@@ -142,7 +142,7 @@ export function OrganizationPayments({
                       href={payment.invoice.invoice_pdf}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline text-sm"
+                      className="text-primary text-sm hover:underline"
                     >
                       View Invoice
                     </a>

@@ -1,21 +1,21 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-export type DialogVariant = "default" | "destructive" | "warning";
-export type DialogSize = "sm" | "md" | "lg";
+type DialogVariant = "default" | "destructive" | "warning";
+type DialogSize = "sm" | "md" | "lg";
 
-export type DialogAction = {
+type DialogAction = {
   label: ReactNode;
   onClick?: () => void | Promise<void>;
   variant?: "default" | "destructive";
 };
 
-export type DialogCancel = {
+type DialogCancel = {
   label: ReactNode;
   onClick?: () => void | Promise<void>;
 };
 
-export type DialogBaseConfig = {
+type DialogBaseConfig = {
   id?: string;
   title?: string;
   description?: ReactNode;

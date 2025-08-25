@@ -15,7 +15,7 @@ type Error401Props = PropsWithChildren<{
 
 export function Error401(props: Error401Props) {
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-lg">
       <CardHeader className="flex flex-col">
         <Typography variant="code">401</Typography>
         <CardTitle>{props.title ?? "Unauthorized"}</CardTitle>

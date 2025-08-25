@@ -19,7 +19,7 @@ export class ZodRouteError extends Error {
 
 /**
  * Base route handler with automatic error handling and validation
- * 
+ *
  * @example
  * ```ts
  * export const POST = route
@@ -74,7 +74,7 @@ export const authRoute = route.use(async ({ next }) => {
 /**
  * Route handler with organization-based authorization
  * Validates user permissions within an organization context
- * 
+ *
  * @example
  * ```ts
  * export const POST = orgRoute

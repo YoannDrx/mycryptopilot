@@ -18,7 +18,8 @@ import { SignUpCredentialsForm } from "./sign-up-credentials-form";
 
 export const metadata: Metadata = {
   title: `Sign Up | ${SiteConfig.title}`,
-  description: "Create your account to start collecting powerful testimonials for your projects.",
+  description:
+    "Create your account to start collecting powerful testimonials for your projects.",
 };
 
 export default async function AuthSignInPage() {

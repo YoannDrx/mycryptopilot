@@ -12,6 +12,7 @@ export const contactSupportAction = action
       to: env.NEXT_PUBLIC_EMAIL_CONTACT,
       subject: `Support needed from ${email} - ${subject}`,
       text: message,
+      html: `<p>${message}</p>`,
       replyTo: email,
     });
     return { message: "Your message has been sent to support." };

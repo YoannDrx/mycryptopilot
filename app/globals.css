@@ -1,6 +1,5 @@
 @import "tailwindcss";
-
-@plugin "@tailwindcss/typography";
+@import "shadcn-prose";
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -124,8 +123,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.6801 0.1583 276.9349);
+  --primary-foreground: oklch(0.2077 0.0398 265.7549);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -235,41 +234,40 @@
   background-size: var(--size, 10px) var(--size, 10px);
 }
 
+html.dark .shiki,
+html.dark .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  /* Optional, if you also want font styles */
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
 .prose {
-  scroll-margin-top: 40px;
-
-  & h1,
-  & h2,
-  & h3,
-  & h4,
-  & h5,
-  & h6 {
-    position: relative;
-    scroll-margin-top: 70px;
-
-    &:hover {
-      & .icon-link {
-        opacity: 1;
-      }
+  code:not(pre code) {
+    &::after {
+      display: none;
     }
-  }
-
-  & .icon.icon-link {
-    width: 20px;
-    height: 100%;
-    display: block;
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    left: -24px;
-
-    opacity: 0;
-    transition: opacity 0.2s ease;
     &::before {
-      content: "#";
-      font-size: 1.5rem;
-      color: hsl(var(--primary));
+      display: none;
     }
+
+    background-color: var(--muted);
+    padding: calc(var(--spacing) * 1.5);
+    border-radius: var(--radius);
+  }
+}
+.chat-prose {
+  h1,
+  h2,
+  h3 {
+    font-size: 1rem !important;
+  }
+}
+
+.code-example {
+  & pre {
+    margin: 0 !important;
   }
 }

@@ -15,7 +15,8 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: `Welcome | ${SiteConfig.title}`,
-  description: "Welcome to your new account! You're all set up and ready to start collecting testimonials.",
+  description:
+    "Welcome to your new account! You're all set up and ready to start collecting testimonials.",
 };
 
 /**

@@ -15,7 +15,8 @@ import { SignInProviders } from "./sign-in-providers";
 
 export const metadata: Metadata = {
   title: `Sign In | ${SiteConfig.title}`,
-  description: "Sign in to your account to access testimonials and manage your projects.",
+  description:
+    "Sign in to your account to access testimonials and manage your projects.",
 };
 
 export default async function AuthSignInPage() {

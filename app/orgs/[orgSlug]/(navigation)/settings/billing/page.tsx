@@ -41,10 +41,6 @@ export default async function OrgBillingPage() {
   }
 
   return (
-    <OrgBilling
-      orgId={org.id}
-      orgSlug={org.slug}
-      subscription={subscription}
-    />
+    <OrgBilling orgId={org.id} orgSlug={org.slug} subscription={subscription} />
   );
 }

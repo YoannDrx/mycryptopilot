@@ -7,7 +7,7 @@ import { sendEmail } from "@/lib/mail/send-email";
 import { prisma } from "@/lib/prisma";
 import { ContactFeedbackSchema } from "./contact-feedback.schema";
 
-export const contactSupportAction = action
+export const feedbackAction = action
   .inputSchema(ContactFeedbackSchema)
   .action(async ({ parsedInput: data }) => {
     const user = await getUser();

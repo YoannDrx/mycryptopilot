@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import type { ComponentPropsWithoutRef } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader } from "../../components/nowts/loader";
 import type { ButtonProps } from "../../components/ui/button";
@@ -60,19 +59,5 @@ export const LoadingButton = ({
         <Loader size={20} />
       </motion.span>
     </Button>
-  );
-};
-
-export const SubmitButtonUnstyled = (
-  props: ComponentPropsWithoutRef<"button">,
-) => {
-  const { pending } = useFormStatus();
-
-  return (
-    <button
-      {...props}
-      type={props.type ?? "submit"}
-      disabled={props.disabled ?? pending}
-    />
   );
 };

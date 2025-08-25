@@ -55,8 +55,3 @@ export const InjectCurrentOrgStore = (
   });
   return props.children;
 };
-
-export const getCurrentOrgSlug = () => {
-  const currentOrg = useCurrentOrg.getState();
-  return currentOrg?.slug;
-};

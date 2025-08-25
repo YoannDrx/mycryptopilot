@@ -69,9 +69,9 @@ export default async function OrganizationDetailPage(
       <LayoutActions>
         {organization.stripeCustomerId && (
           <Button variant="outline" asChild>
-            <a 
-              href={`https://dashboard.stripe.com/customers/${organization.stripeCustomerId}`} 
-              target="_blank" 
+            <a
+              href={`https://dashboard.stripe.com/customers/${organization.stripeCustomerId}`}
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2"
             >
@@ -86,9 +86,9 @@ export default async function OrganizationDetailPage(
         <div className="space-y-6">
           <OrganizationMembers members={organization.members} />
           <OrganizationPayments organizationId={organization.id} />
-          <OrganizationSubscription 
-            organization={organization} 
-            subscription={organization.subscription} 
+          <OrganizationSubscription
+            organization={organization}
+            subscription={organization.subscription}
           />
         </div>
       </LayoutContent>

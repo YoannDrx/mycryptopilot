@@ -1,5 +1,3 @@
-import { fileAdapter } from "./placeholder-adapter";
-
 type UploadFileParams = {
   file: File;
   path: string;
@@ -26,16 +24,4 @@ export type UploadFileAdapter = {
       } | null;
     }[]
   >;
-};
-
-const uploadFileAdapter: UploadFileAdapter = fileAdapter;
-
-export const uploadFile = async (params: UploadFileParams) => {
-  const response = await uploadFileAdapter.uploadFile(params);
-
-  if (response.error) {
-    throw new Error(response.error.message);
-  }
-
-  return response.data.url;
 };

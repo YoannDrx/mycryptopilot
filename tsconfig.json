@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@email/*": ["./emails/*"]
+      "@email/*": ["./emails/*"],
+      "@app/*": ["./app/*"]
     }
   },
 
@@ -31,5 +32,5 @@
     ".next/types/**/*.ts",
     "tailwind.config.js"
   ],
-  "exclude": ["node_modules", ".next", "src/generated"]
+  "exclude": ["node_modules", ".next", "src/generated", ".claude"]
 }

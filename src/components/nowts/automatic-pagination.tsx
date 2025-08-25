@@ -17,16 +17,16 @@ type AutomaticPaginationProps = {
   paramName?: string;
 };
 
-export function AutomaticPagination({ 
-  currentPage, 
-  totalPages, 
+export function AutomaticPagination({
+  currentPage,
+  totalPages,
   searchParam,
-  paramName = "page"
+  paramName = "page",
 }: AutomaticPaginationProps) {
   const generatePageNumbers = () => {
     const pages = [];
     const showEllipsis = totalPages > 7;
-    
+
     if (!showEllipsis) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -52,7 +52,9 @@ export function AutomaticPagination({
   };
 
   const buildUrl = (page: number) => {
-    const searchQuery = searchParam ? `&${getSearchParamName()}=${searchParam}` : '';
+    const searchQuery = searchParam
+      ? `&${getSearchParamName()}=${searchParam}`
+      : "";
     return `?${paramName}=${page}${searchQuery}`;
   };
 
@@ -68,12 +70,14 @@ export function AutomaticPagination({
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious 
+            <PaginationPrevious
               href={currentPage > 1 ? buildUrl(currentPage - 1) : undefined}
-              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+              className={
+                currentPage === 1 ? "pointer-events-none opacity-50" : ""
+              }
             />
           </PaginationItem>
-          
+
           {generatePageNumbers().map((pageNum, index) => (
             <PaginationItem key={index}>
               {pageNum === "ellipsis" ? (
@@ -88,11 +92,17 @@ export function AutomaticPagination({
               )}
             </PaginationItem>
           ))}
-          
+
           <PaginationItem>
             <PaginationNext
-              href={currentPage < totalPages ? buildUrl(currentPage + 1) : undefined}
-              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+              href={
+                currentPage < totalPages ? buildUrl(currentPage + 1) : undefined
+              }
+              className={
+                currentPage === totalPages
+                  ? "pointer-events-none opacity-50"
+                  : ""
+              }
             />
           </PaginationItem>
         </PaginationContent>

@@ -39,14 +39,12 @@ export default async function AdminOrganizationsPage(props: PageProps) {
           View and manage all organizations in the system
         </LayoutDescription>
       </LayoutHeader>
-      <LayoutActions>
-        {/* Add actions here if needed */}
-      </LayoutActions>
+      <LayoutActions>{/* Add actions here if needed */}</LayoutActions>
 
       <LayoutContent>
         <div className="space-y-4">
           <OrganizationFilters />
-          
+
           <Suspense fallback={<OrganizationTableSkeleton />}>
             <OrganizationsList searchParams={params} />
           </Suspense>

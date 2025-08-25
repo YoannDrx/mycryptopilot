@@ -17,7 +17,7 @@ type SectionLayoutProps = {
    * invert = foreground background and background foreground
    * image = background image with foreground text. The background image will be blured.
    */
-  variant?: "default" | "card" | "primary" | "invert" | "image";
+  variant?: "default" | "card" | "primary" | "invert" | "image" | "transparent";
   /**
    * The class name of the div that contain colors.
    */
@@ -42,6 +42,7 @@ export const SectionLayout = ({
           "bg-foreground text-background": variant === "invert",
           "text-foreground backdrop-blur-sm backdrop-brightness-75":
             variant === "image",
+          "text-foreground bg-transparent": variant === "transparent",
         },
         containerClassName,
       )}

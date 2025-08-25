@@ -24,6 +24,7 @@ import { notFound } from "next/navigation";
 import { UserActions } from "./_components/user-actions";
 import { UserProviders } from "./_components/user-providers";
 import { UserSessions } from "./_components/user-sessions";
+import { UserDetailsCard } from "../../_components/user-details-card";
 
 export default async function RoutePage(props: {
   params: Promise<{ userId: string }>;
@@ -70,35 +71,7 @@ export default async function RoutePage(props: {
       </LayoutActions>
 
       <LayoutContent className="flex flex-col gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>User Information</CardTitle>
-            <CardDescription>Basic user details and status</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="font-medium">{userData.name || "No name"}</div>
-              <div className="text-muted-foreground text-sm">
-                {userData.email}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge
-                variant={userData.role === "admin" ? "default" : "secondary"}
-              >
-                {userData.role ?? "user"}
-              </Badge>
-              {!userData.emailVerified && (
-                <Badge variant="outline">Unverified</Badge>
-              )}
-              {userData.banned && <Badge variant="destructive">Banned</Badge>}
-            </div>
-            <div className="text-muted-foreground text-sm">
-              Created: {new Date(userData.createdAt).toLocaleDateString()}
-            </div>
-          </CardContent>
-        </Card>
-
+        <UserDetailsCard user={userData} />
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">

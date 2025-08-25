@@ -31,7 +31,7 @@ export function AdminSidebar() {
     <Sidebar variant="inset">
       <SidebarHeader className="flex flex-col gap-2">
         <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg">
             <span className="text-sm font-semibold">A</span>
           </div>
           <span className="font-semibold">Admin Panel</span>

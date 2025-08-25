@@ -6,7 +6,6 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Layout, LayoutContent } from "@/features/page/layout";
 import { SiteConfig } from "@/site-config";
 import { CheckCircle } from "lucide-react";
 import type { Metadata } from "next";
@@ -14,7 +13,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: `Account Deleted | ${SiteConfig.title}`,
-  description: "Your account has been successfully deleted. Thank you for using our service.",
+  description:
+    "Your account has been successfully deleted. Thank you for using our service.",
 };
 
 export default function GoodbyePage() {

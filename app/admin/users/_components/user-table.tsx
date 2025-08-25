@@ -26,7 +26,6 @@ export const UserTable = async ({ searchParams }: UserTableProps) => {
     search: searchParams.search || undefined,
   });
 
-
   return (
     <>
       <Table>

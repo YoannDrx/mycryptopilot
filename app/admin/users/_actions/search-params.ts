@@ -18,8 +18,3 @@ export const adminSearchParams = {
 };
 
 export const searchParamsCache = createSearchParamsCache(adminSearchParams);
-
-export type AdminSearchParams = typeof adminSearchParams;
-export type SortBy = (typeof sortOptions)[number];
-export type Order = (typeof orderOptions)[number];
-export type Filter = (typeof filterOptions)[number];

@@ -5,7 +5,8 @@ import { ConfirmDeletePage } from "./confirm-delete-page";
 
 export const metadata: Metadata = {
   title: `Confirm Account Deletion | ${SiteConfig.title}`,
-  description: "Confirm that you want to permanently delete your account and all associated data.",
+  description:
+    "Confirm that you want to permanently delete your account and all associated data.",
 };
 
 export default async function ConfirmDelete(props: PageParams) {

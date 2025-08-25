@@ -40,3 +40,5 @@ src/generated
 
 # CI artifacts
 /ci-artifacts
+
+.playwright-mcp
