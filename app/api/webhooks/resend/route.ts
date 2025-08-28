@@ -10,7 +10,7 @@ const ResendWebhookSchema = z.object({
 });
 
 /**
- * Resends webhooks
+ * Resend webhooks
  *
  * @docs How it work https://resend.com/docs/dashboard/webhooks/introduction
  * @docs Event type https://resend.com/docs/dashboard/webhooks/event-types
@@ -29,7 +29,6 @@ export const POST = async (req: NextRequest) => {
       break;
   }
 
-  NextResponse.redirect("");
   return NextResponse.json({
     ok: true,
   });

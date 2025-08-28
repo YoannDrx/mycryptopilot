@@ -18,7 +18,7 @@ export const isActionSuccessful = <T extends z.ZodType, Data>(
 ): action is {
   data: Data;
   serverError: undefined;
-  validationError: undefined;
+  validationErrors: undefined;
 } => {
   if (!action) {
     return false;

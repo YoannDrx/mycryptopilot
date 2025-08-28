@@ -32,13 +32,13 @@ In the prompts of each agent, put the following :
 
 <prompt-example>
 
-file1.ts :
+complete/file/path/file1.ts :
 
 - error ts 1
 - error lint 2
 - error ts 3
 
-file2.ts :
+complete/file/path/file2.ts :
 
 - error ts 4
 - error lint 5
@@ -50,3 +50,7 @@ etc...
 3. Return to step 1
 
 Run lint and ts commands again and verify that there is no remaining error.
+
+## Important
+
+You SHOULD use the "Task" named `Snipper` to fix. As a main agent, you should not update any files by hand.

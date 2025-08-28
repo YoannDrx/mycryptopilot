@@ -193,8 +193,13 @@ This is **NON-NEGOTIABLE**. Do not skip this step under any circumstances. Readi
 - Following established architecture
 - Avoiding breaking changes
 
+**Types of files you MUST read:**
+
+1. **Similar files**: Read files that do similar functionality to understand patterns and conventions
+2. **Imported dependencies**: Read the definition/implementation of any imports you're not 100% sure how to use correctly - understand their API, types, and usage patterns
+
 **Steps to follow:**
 
-1. Read at least 3 relevant existing files first
-2. Understand the patterns and conventions
+1. Read at least 3 relevant existing files (similar functionality + imported dependencies)
+2. Understand the patterns, conventions, and API usage
 3. Only then proceed with creating/editing files

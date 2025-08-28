@@ -3,19 +3,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { AuthPermissionSchema, RolesKeys } from "./auth/auth-permissions";
 import { getUser } from "./auth/auth-user";
+import { ApplicationError } from "./errors/application-error";
+import { ZodRouteError } from "./errors/zod-route-error";
 import { logger } from "./logger";
 import { getCurrentOrg } from "./organizations/get-org";
-
-/**
- * Custom error class for route validation and authorization failures
- */
-export class ZodRouteError extends Error {
-  status?: number;
-  constructor(message: string, status?: number) {
-    super(message);
-    this.status = status ?? 400;
-  }
-}
 
 /**
  * Base route handler with automatic error handling and validation
@@ -40,6 +31,11 @@ export const route = createZodRoute({
           status: e.status,
         },
       );
+    }
+
+    if (e instanceof ApplicationError) {
+      logger.debug("[DEV] - ApplicationError", e);
+      return NextResponse.json({ message: e.message }, { status: 400 });
     }
 
     logger.info("Unknown Error", e);
