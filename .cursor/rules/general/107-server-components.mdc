@@ -1,16 +1,15 @@
 ---
-description: Create and understand Server Components in NextJS 15
+description: Use React Server Components for async server-side operations in Next.js 15.
 globs: *.tsx
 ---
 ## Context
 
-* Since React 19 and NextJS 13 Server Component can be used.
-* Server Component enable use to make backend query directly on our Component
-* Server Component NEVER run on the client
+* React Server Components run only on the server and enable async operations.
+* Use for database queries, file system operations, and backend logic directly in components.
 
 ## Usage
 
-Utilize React 19 with Server Components. Implement Prisma queries and backend logic inside `page` or `layout` files like this:
+Use async server components for backend operations in pages and layouts:
 
 ```tsx
 // Use "async" for server components
@@ -27,14 +26,14 @@ export default async function Page() {
 }
 ```
 
-You can also implement this logic in every component that is `async`. A Server Components can do backend stuff inside is body like :
+Server components can perform backend operations including:
 
-* prisma query
-* fs read / write
-* analytics
-* third partie stuff
+* Prisma database queries
+* File system operations
+* Analytics tracking
+* Third-party API calls
 
-Some method are avaiable : 
+Available Next.js server methods: 
 
 ```tsx
 import { redirect } from 'next/navigation'
@@ -47,8 +46,8 @@ redirect('/login');
 notFound()
 ```
 
-Some rules about Server Components :
+Server component rules:
 
-1. Server components are always `async`
-2. Server components can't use hooks
-3. Server Components can't use `document` or `window` because they are only run in backend
+1. Server components must be `async` functions
+2. Cannot use React hooks (useState, useEffect, etc.)
+3. Cannot access browser APIs (document, window) as they run server-side only

@@ -1,5 +1,5 @@
 ---
-description: 
+description: Use Suspense and streaming to progressively render components that perform asynchronous data fetching.
 globs: *.tsx
 alwaysApply: false
 ---
@@ -31,7 +31,7 @@ export default function Posts() {
 }
 ```
 
-* PostFeed is a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) that fetch data
-* Weather is a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) that  fetch data
+* PostFeed is a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) that fetches data
+* Weather is a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) that fetches data
 
 You can use [skeleton.tsx](mdc:src/components/ui/skeleton.tsx) in `fallback` to have a better UI/UX on the application.

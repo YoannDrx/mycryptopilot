@@ -1,18 +1,18 @@
 ---
-description: 
+description: Create components using Test-Driven Development principles for non-integration testing scenarios.
 globs: 
 alwaysApply: false
 ---
 ## Context:
 
--  Create a component following TDD principles
--  Only apply to components that don't include integration tests (such as databases)
-- You need to FIRST create the TEST file and then the component
+- Create components following Test-Driven Development principles.
+- Apply only to components that don't require integration tests (such as database interactions).
+- Always create the test file first, then implement the component.
 
 ## Workflow
 
-0. Plan what you will do like where the components will be created, the name of the component etc...
-1. Create a test file in the `__tests__` folder
-2. Create the component in the correct folder (like `src/features`)
-3. Run the tests with `pnpm test:ci`
-4. Correct the component until the tests pass
+1. Plan the implementation: component location, naming, and structure.
+2. Create a test file in the `__tests__` folder.
+3. Create the component in the appropriate folder (e.g., `src/features`).
+4. Run tests with `pnpm test:ci`.
+5. Iterate on the component implementation until all tests pass.

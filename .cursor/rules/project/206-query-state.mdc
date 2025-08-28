@@ -1,16 +1,16 @@
 ---
-description: EXPLAIN how to use NUQS to create Query State that sync React useState with the URL Query
+description: Use NUQS to synchronize React state with URL query parameters for persistent client-side state.
 globs: *.tsx, *.ts
 ---
 ## Context
 
-NUQS is a libriarie that enable you to store value in the QUERY of the URL :
+NUQS is a library that enables you to store values in the URL query parameters:
 
 * `/users?page=12&q=hello&name=Melvyn`
 
 ## Usage
 
-The Query can be stored in a [101-client-components.mdc](mdc:.cursor/rules/general/101-client-components.mdc) with useQuery hooks : 
+Query parameters can be stored in [101-client-components.mdc](mdc:.cursor/rules/general/101-client-components.mdc) using useQueryState hooks: 
 
 ```tsx
 'use client'
@@ -29,7 +29,7 @@ export function Demo() {
 }
 ```
 
-You can parse the data with utility method :
+You can parse the data with utility methods:
 
 ```tsx
 import { useQueryState, parseAsInteger } from 'nuqs'
@@ -49,7 +49,7 @@ export default () => {
 }
 ```
 
-Here are some other exemple :
+Here are some other examples:
 
 ```tsx
 import { parseAsString } from 'nuqs'
@@ -97,7 +97,7 @@ const [state, setState] = useQueryState(
 )
 ```
 
-Here is the option :
+Here are the available options:
 
 * history: By default, state updates are done by replacing the current history entry with the updated query when state changes.
 * shallow: By default, query state updates are done in a client-first manner: there are no network calls to the server. This is equivalent to the shallow option of the Next.js router set to true. To opt-in to notifying the server on query updates, you can set shallow to false.
@@ -150,7 +150,7 @@ export default async function Page(props: PageParams) {
 }
 ```
 
-Only work in page, not in layout, because layout doesn't have searchParams.
+This only works in page components, not in layouts, because layouts don't have access to searchParams.
 
 ### Cache
 
@@ -222,9 +222,9 @@ export function useCoordinates() {
 
 ## Rules
 
-* When you want use a query-state in a server component, you must add shallow and throttleMs
+* When using query-state that triggers server updates, you must add shallow: false and throttleMs options
 
-Exemple :
+Example:
 
 ```tsx
 const [status, setStatus] = useQueryState("status", {

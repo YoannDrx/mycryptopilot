@@ -1,3 +1,9 @@
+---
+description: Use DialogManager for type-safe global dialogs including confirm, input, and custom modals with automatic loading states.
+globs: *.tsx
+alwaysApply: false
+---
+
 ## Context
 
 * DialogManager provides a clean, type-safe way to show global dialogs with different types and features.

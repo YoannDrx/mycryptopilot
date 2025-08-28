@@ -1,13 +1,13 @@
 ---
-description: 
+description: Create unit tests using Vitest and React Testing Library for component testing.
 globs: 
 alwaysApply: false
 ---
 ## Context
 
-- Create a new component with a tests inside the folder `/__tests__`.
-- Use ONLY the folder that is in the root of the projects `/__tests__`
-- Fix the test or the component until the command `pnpm test:ci <name-of-the-file>` work
+- Create unit tests in the `/__tests__` folder at the project root.
+- Use only the root-level `/__tests__` folder for all test files.
+- Iterate on tests and components until `pnpm test:ci <file-name>` passes successfully.
 
 ## React Tests
 

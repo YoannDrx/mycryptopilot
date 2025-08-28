@@ -1,17 +1,15 @@
 ---
-description: How write PostgresQL queries
+description: Write PostgreSQL queries with proper syntax for Prisma migrations and raw SQL.
 globs: *.sql
 ---
 ## Context
 
-* We use Prisma with Postgres
-* Migration should be write in Postgres
+* Use Prisma with PostgreSQL database for data management.
+* Write migrations using proper PostgreSQL syntax.
 
 ## Rules
 
-You must always write PostgresQL code when you are in `.sql` files.
-
-PostgresQL use quotes in the tables, here is a valid example :
+Always use PostgreSQL syntax with double quotes for table and column names in .sql files.
 
 ```sql
 INSERT INTO "OrganizationPlan" ("id", "name", "maximumMembers", "createdAt", "updatedAt")
@@ -21,4 +19,4 @@ VALUES
 ON CONFLICT ("id") DO NOTHING;
 ```
 
-- Use valid PostgresQL syntax with guillemet for table and column names.
+- Use valid PostgreSQL syntax with double quotes for table and column names.

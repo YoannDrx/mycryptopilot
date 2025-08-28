@@ -1,21 +1,21 @@
 ---
-description: EXPLAIN how work multi-tenant model with organization
+description: Use organization-based multi-tenant architecture with proper data isolation and role management.
 globs: *.ts, *.tsx
 alwaysApply: false
 ---
 ## Context
 
 * The application defines a multi-tenant model
-* The multi-tenant model name is `Organization`
-* Every table must be linked to `Organization` and the user can be a member of it.
-* The plan and payment is always linked to the `Organization`
+* The multi-tenant model is named `Organization`
+* Every table must be linked to `Organization` and users can be members of it.
+* Plans and payments are always linked to the `Organization`
 * The organization is defined in [better-auth.prisma](mdc:prisma/schema/better-auth.prisma)
 
 ## Methods
 
 - You must always use organization for resources. Everything must be linked to an organization, not a user.
 
-- To get an organization, you can use `getCurrentOrg` or `getRequiredCurrentOrg` function, or their cached versions `getRequiredCurrentOrgCache`.
+- To get an organization, you can use `getCurrentOrg` or `getRequiredCurrentOrg` functions, or their cached version `getRequiredCurrentOrgCache`.
 
 ```ts
 import { getCurrentOrg, getRequiredCurrentOrg } from "@/lib/organizations/get-org";
@@ -28,7 +28,7 @@ const org = await getRequiredCurrentOrg();
 const org = await getRequiredCurrentOrgCache();
 ```
 
-The `cache` version avoids making the request multiple times.
+The cached version avoids making multiple database requests.
 
 ## Rules
 

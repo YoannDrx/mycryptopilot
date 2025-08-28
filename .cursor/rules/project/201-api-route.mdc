@@ -1,12 +1,12 @@
 ---
-description: EXPLAIN how to use API Route in our project
+description: Use next-zod-route to create safe API routes with authentication and validation.
 globs: **/route.ts
 ---
 ## Context
 
-* API Route in NextJS enable developer to create API Endpoint to make GET / POST / PATCH / PUT / DELETE request
-* We use `next-zod-route` to create safe-route.
-* A safe-route is a route that verify the permission of the user, that parse params, body and query.
+* API Routes in Next.js enable developers to create API endpoints for GET / POST / PATCH / PUT / DELETE requests
+* We use `next-zod-route` to create safe routes.
+* Safe routes verify user permissions and parse params, body, and query parameters.
 
 ## Example 1 : Org Route
 
@@ -44,7 +44,7 @@ export const POST = orgRoute
   });
 ```
 
-Our application use [204-organization.mdc](mdc:.cursor/rules/project/204-organization.mdc) to handle persmission
+Our application uses [204-organization.mdc](mdc:.cursor/rules/project/204-organization.mdc) to handle permissions
 
 ## Rules
 
@@ -60,7 +60,7 @@ Our application use [204-organization.mdc](mdc:.cursor/rules/project/204-organiz
 
 ## Error
 
-`Error` is not catched and sent to the client by default. If you want the client to retrieve the error you must use `ZodRouteError` :
+Errors are not caught and sent to the client by default. If you want the client to retrieve errors, you must use `ZodRouteError`:
 
 ```tsx
 import { orgRoute, ZodRouteError } from "@/lib/zod-route";

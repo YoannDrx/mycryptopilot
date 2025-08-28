@@ -1,8 +1,8 @@
 ---
-description: How create and add toast on our application
+description: Display toast notifications using Sonner for user feedback and status messages.
 globs: *.ts, *.tsx
 ---
-If you need to use "toast", use the following example :
+Use toast notifications with the following examples:
 
 ```ts
 import { toast } from "sonner";

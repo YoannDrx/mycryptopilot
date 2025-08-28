@@ -1,12 +1,12 @@
 ---
-description: 
+description: Core TypeScript/React coding standards and performance guidelines.
 globs: 
 alwaysApply: true
 ---
 - Write concise, technical TypeScript code using functional and declarative programming patterns.
 - Avoid classes; prefer iteration and modularization over code duplication.
 - Use descriptive variable names with auxiliary verbs (e.g., `isLoading`, `hasError`).
-- Structure files into: exported component, subcomponents, helpers, static content, and types.
+- Structure files as: exported component, subcomponents, helpers, static content, and types.
 
 ## syntax-and-formatting
 
@@ -51,4 +51,4 @@ alwaysApply: true
 
 ## Terminal
 
-- AWLAYS use `pnpm`
+- ALWAYS use `pnpm`

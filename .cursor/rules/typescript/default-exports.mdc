@@ -1,5 +1,5 @@
 ---
-description:
+description: Use named exports instead of default exports to maintain clear import/export patterns and avoid naming confusion.
 globs:
 alwaysApply: true
 ---

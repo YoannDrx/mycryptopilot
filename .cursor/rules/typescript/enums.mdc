@@ -1,5 +1,5 @@
 ---
-description: When creating an enum in TypeScript
+description: Use const objects with 'as const' instead of TypeScript enums to avoid runtime overhead and unexpected behavior.
 globs:
 alwaysApply: false
 ---

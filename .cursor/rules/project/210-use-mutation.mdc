@@ -1,12 +1,12 @@
 ---
-description: How to use useMutation is my application
+description: Use useMutation with TanStack Query to handle server actions and API mutations with proper error handling.
 globs: *.tsx
 ---
-## Usage with server-action
+## Usage with Server Actions
 
-`Server-action` is method that finish with "action" suffix.
+Server actions are methods that end with an "Action" suffix.
 
-You can use it like this :
+Use it as follows:
 
 ```tsx
 import { resolveActionResult } from "@/lib/actions/actions-utils";

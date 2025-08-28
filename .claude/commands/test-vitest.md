@@ -1,5 +1,5 @@
 ---
-description: Create unit tests using Vitest and React Testing Library
+description: Use this to create unit tests for React components using Vitest and React Testing Library for testing component logic and user interactions without database dependencies.
 ---
 
 # Vitest Unit Testing
@@ -30,10 +30,10 @@ describe("ComponentName", () => {
 
 ## Instructions
 
-1. Create test file in `__tests__` directory
-2. Import component and setup utility
+1. Create test file in the `__tests__` directory
+2. Import the component and setup utility
 3. Use `screen` for element queries
 4. Use `user` for interactions
 5. Run `pnpm test:ci <filename>` to verify
 
-Create a test for: $ARGUMENTS
+Create the test for: $ARGUMENTS

@@ -1,12 +1,12 @@
 ---
-description: Everytime you use a library or a tool that have documentation.
+description: Always fetch up-to-date library documentation using Context7 MCP before implementing or using any external tools.
 globs: 
 alwaysApply: false
 ---
 ## Context
 
-Context7 is a MCP that help YOU to have the Context about a library. You can use their tools to have the documentation about any librairie you want to use.
+Context7 is an MCP that helps you get contextual information about libraries by providing access to their up-to-date documentation.
 
 ## Rules
 
-You AWLAYS SHOULD get the documentation of a tool before starting using it to have good answer. Most of your data is not up-to-date. You NEED to use the MCP Context7 to get the documentation.
+Always retrieve library documentation before implementation to ensure accurate usage patterns, as built-in knowledge may be outdated.

@@ -1,10 +1,10 @@
 ---
-description: PLAN to refactor React 19 Ref
+description: Refactor React components to use React 19's native ref prop instead of forwardRef.
 globs: *.tsx
 alwaysApply: false
 ---
 ## Context
-React 19 is out and `forwardRef` is now longer needed to use `ref` in any React components. We can now just pass `ref` props :
+React 19 eliminates the need for `forwardRef` when passing ref to components. We can now directly use `ref` as a prop:
 
 ```tsx
 const MyButton = ({ ref, ...props }: ComponentProps<"button">) => {
@@ -14,7 +14,7 @@ const MyButton = ({ ref, ...props }: ComponentProps<"button">) => {
 
 ## Goal
 
-You need to refactor a component **that was using `forwardRef`** to use the new `ref` props.
+Refactor components that currently use `forwardRef` to use React 19's native `ref` prop.
 
 
 ## Example

@@ -1,5 +1,5 @@
 ---
-description: Explore codebase, create implementation plan, code, and test following EPCT workflow
+description: Follow the Explore, Plan, Code, Test workflow to systematically implement features with proper planning and validation.
 ---
 
 # Explore, Plan, Code, Test Workflow
@@ -9,11 +9,11 @@ Please follow the "Explore, Plan, Code, Test" workflow when you start.
 
 ## Explore
 
-First, use parallel subagents to find and read all files that may be useful for implementing the ticket, either as examples or as edit targets. The subagents should return relevant file paths, and any other info that may be useful.
+First, use parallel subagents to find and read all files that may be useful for implementing the ticket, either as examples or as edit targets. The subagents should return relevant file paths and any other useful information.
 
 ## Plan
 
-Next, think hard and write up a detailed implementation plan. Don't forget to include tests, lookbook components, and documentation. Use your judgement as to what is necessary, given the standards of this repo.
+Next, think carefully and write up a detailed implementation plan. Don't forget to include tests, lookbook components, and documentation. Use your judgment as to what is necessary, given the standards of this repo.
 
 If there are things you are not sure about, use parallel subagents to do some web research. They should only return useful information, no noise.
 
@@ -21,20 +21,20 @@ If there are things you still do not understand or questions you have for the us
 
 ## Code
 
-When you have a thorough implementation plan, you are ready to start writing code. Follow the style of the existing codebase (e.g. we prefer clearly named variables and methods to extensive comments). Make sure to run our autoformatting script when you're done, and fix linter warnings that seem reasonable to you.
+When you have a thorough implementation plan, you are ready to start writing code. Follow the style of the existing codebase (e.g., we prefer clearly named variables and methods to extensive comments). Make sure to run our autoformatting script when you're done, and fix linter warnings that seem reasonable to you.
 
 ### Important
 
-- You code ALWAYS stay on the SCOPE of the changes. Do not changes anything else. Keep stuck to your task and goal.
-- Do not comments your code.
+- Your code should ALWAYS stay within the SCOPE of the changes. Do not change anything else. Stay focused on your task and goal.
+- Do not add comments to your code.
 
 ## Test
 
-Use parallel subagents to run tests, and make sure they all pass.
+Use parallel subagents to run tests and make sure they all pass.
 
 If your changes touch the UX in a major way, use the browser to make sure that everything works correctly. Make a list of what to test for, and use a subagent for this step.
 
-If your testing shows problems, go back to the planning stage and think ultrahard.
+If your testing shows problems, go back to the planning stage and think carefully.
 
 ## Write up your work
 

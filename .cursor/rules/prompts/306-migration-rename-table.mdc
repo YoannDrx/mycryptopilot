@@ -1,12 +1,12 @@
 ---
-description: 
+description: Use when creating Prisma migrations to prevent data loss by renaming tables/columns instead of dropping and recreating them.
 globs: 
 alwaysApply: false
 ---
 ## Context
 
--  Prisma by default does NOT rename tables or properties; it deletes and re-creates them.
--  Your role is to AVOID this data loss by renaming the table.
+- Prisma by default does NOT rename tables or properties; it deletes and recreates them.
+- Your role is to AVOID this data loss by renaming the table or column.
 
 ## Example
 

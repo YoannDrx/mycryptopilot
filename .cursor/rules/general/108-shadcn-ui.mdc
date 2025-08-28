@@ -1,14 +1,14 @@
 ---
-description: How use Shadcn/UI to add styles to our applications
+description: Use Shadcn/UI components with Tailwind CSS for consistent styling across the application.
 globs: *.tsx, *.ts
 alwaysApply: false
 ---
 ## Context
 
-* We use Shadcn/UI to style our application.
+* Use Shadcn/UI component library for consistent, accessible UI components.
 
 ## Rules
 
-- You must use Shadcn UI for components.
-- You must use Tailwind CSS for styling.
-- You must install any ShadcnUI missing component with `pnpm dlx shadcn@latest add <component-name />`
+- Use Shadcn/UI components for all UI elements.
+- Use Tailwind CSS for custom styling.
+- Install missing Shadcn/UI components with `pnpm dlx shadcn@latest add <component-name>`.

@@ -1,5 +1,5 @@
 ---
-description: ENFORCE README.md standards to ensure comprehensive project documentation
+description: Standards for comprehensive README.md documentation with proper structure and formatting.
 globs: **/README.md
 ---
 
@@ -102,7 +102,7 @@ pnpm install
 pnpm dev
 ```
 
-@View full documentation
+View full documentation
 </example>
 
 <example type="invalid">

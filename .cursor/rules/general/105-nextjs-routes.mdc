@@ -1,23 +1,22 @@
 ---
-description: EXPLAIN how to create and use routing file in NextJS
+description: Create and use Next.js routing files (page, layout, error, loading) for app structure.
 globs: *.tsx,page.tsx,layout.tsx,loading.tsx,error.tsx,not-found.tsx
 alwaysApply: false
 ---
 ## Context
 
-* NextJS is a framework that handle route for us.
-* Here is exactly how to create and handle route in our application.
-* We can only handle route in `app` directory
+* Next.js handles routing through file-based routing in the `app` directory.
+* Use specific file names to create pages, layouts, error boundaries, and loading states.
 
 ## `page.tsx`
 
-The template for page is located in [npag.code-snippets](mdc:.vscode/npag.code-snippets) and define a page. You can also use [npagl.code-snippets](mdc:.vscode/npagl.code-snippets) for having a default layout. Here is how page work :
+Use page.tsx files to define individual pages in your application.
 
 * `/app/users/page.tsx` will route in `/users`
 
-The params is ASYNC and you must use [next.ts](mdc:src/types/next.ts) to use the params with PageParams.
+Always await params and searchParams in Next.js 15 and use PageParams type.
 
-Exemple :
+Example:
 
 ```tsx
 import type { PageParams } from "@/types/next";
@@ -39,7 +38,7 @@ export default async function RoutePage(props: PageParams<{ userId: string }>) {
 
 ## `layout.tsx`
 
-The template for the layout is located in [nlay.code-snippets](mdc:.vscode/nlay.code-snippets) and define the layout that will be applied to every child of a route.
+Use layout.tsx files to wrap child routes with shared UI components and logic.
 
 * `/app/users/layout.tsx` will take a children and every route will have the layout applied, exemple :
 
@@ -47,19 +46,17 @@ The template for the layout is located in [nlay.code-snippets](mdc:.vscode/nlay.
 * `/users`
 * `/users/dashboard/test`
 
-The params is ASYNC and you must use [next.ts](mdc:src/types/next.ts) to use the params with LayoutParams.
+Always await params in layouts and use LayoutParams type.
 
 ## `error.tsx`
 
-The template can be found in [nerr.code-snippets](mdc:.vscode/nerr.code-snippets) and define the Error page. When a child routes get an error, the `error` will be displayed. It's the nearest error in the tree that will be displayed. It's a good practice to always add an error.
+Use error.tsx files to handle errors in child routes with error boundaries.
 
 * `/app/users/error.tsx` will show an error for every route that didn't have a nearest error, children of `/users`
 
 ## `loading.tsx`
 
-The template can be found in [nloa.code-snippets](mdc:.vscode/nloa.code-snippets) and define the Loading page. 
-
-When a child is a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) and wait, the `loading.tsx` page will be displayed.
+Use loading.tsx files to show loading states while server components are rendering.
 
 * `/app/users/loading.tsx` will show a loader for every route that didn't have a nearest loading, children of `/users`
 

@@ -1,5 +1,5 @@
 ---
-description: Create a new resource with full CRUD functionality
+description: Use this to create a complete new resource including database schema, navigation menu, and CRUD pages following the project's architecture patterns.
 ---
 
 # New Resource Creation
@@ -13,7 +13,7 @@ Create a new resource with complete CRUD functionality including database schema
 
 2. **Add Navigation**
    - Update `app/orgs/[orgSlug]/(navigation)/_navigation/org-navigation.links.ts`
-   - Add menu item for the new resource
+   - Add a menu item for the new resource
 
 3. **Create Resource Page**
    - Use `src/components/ui/card.tsx` and `src/components/ui/table.tsx`
@@ -32,4 +32,4 @@ Create a new resource with complete CRUD functionality including database schema
 - Server components for performance
 - Query state for filtering
 
-Create a new resource for: $ARGUMENTS
+Create the new resource for: $ARGUMENTS

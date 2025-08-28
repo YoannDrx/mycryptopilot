@@ -1,15 +1,15 @@
 ---
-description: EXPLAIN how NextJS 15 backend methods work.
+description: Use Next.js 15 backend methods for server-side operations like headers and cookies.
 globs: *.ts,*.tsx
 alwaysApply: false
 ---
 ## Context
 
-* NextJS 15 give us backend methods we should use.
+* Next.js 15 provides backend methods for server-side operations.
 
-## Header
+## Headers
 
-Enable you to get the header of the request.
+Use to access request headers in server components and API routes.
 
 ```tsx
 import { headers } from 'next/headers'
@@ -21,9 +21,9 @@ export default async function Page() {
 ```
 
 
-## Cookie
+## Cookies
 
-Enable you to get the cookie of the request.
+Use to read and set cookies in server components and API routes.
 
 ```tsx
 import { cookies } from 'next/headers'

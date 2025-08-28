@@ -1,17 +1,17 @@
 ---
-description: EXPLAIN how to create and USE server action with next-safe-action library
+description: Create and use server actions with next-safe-action library for authenticated database mutations.
 globs: *.ts, *.tsx
 ---
 ## Context
 
-* Server Actions are a way to execute server-side code (like database mutations) without API endpoints. It's a React abstraction to handle server-side code.
-* We use `next-safe-action` to handle authentication, security, and to verify the data we receive.
+* Server Actions execute server-side code (like database mutations) without API endpoints, using React's abstraction for server-side code.
+* We use `next-safe-action` to handle authentication, security, and data validation.
 
 ## Usage
 
-1. Create server action files
+### 1. Create server action files
 
-We use `server-action-name.action.ts` convention to easily recognize server actions.
+Use the `server-action-name.action.ts` naming convention to easily identify server actions.
 
 ```ts
 // All server actions must start with "use server" to inform Next.js that this method must be executed on the server
@@ -52,9 +52,9 @@ export const demoAction = orgAction
   });
 ```
 
-2. Use the server action in a client component
+### 2. Use the server action in a client component
 
-In any client component we can use Server Actions like the following example:
+Use Server Actions in client components as shown in the following example:
 
 ```tsx
 import { demoAction } from "./server-action-name.action";
@@ -76,15 +76,15 @@ export const Form = () => {
 
 ## Rules
 
-- Always suffix server actions with "Action" like "updateUserAction" or "createSubscriberAction"
-- Use `inputSchema` instead of `schema` for validation
+- Always suffix server actions with "Action" (e.g., "updateUserAction", "createSubscriberAction")
+- Use `inputSchema` instead of `schema` for input validation
 - Always include necessary imports (z, prisma, etc.)
 
 ## Available actions
 
-* `action`: for general actions without any authentication
-* `authAction`: for actions that need to be authenticated
-* `orgAction`: for actions that need to be authenticated and relative to organization
+* `action`: For general actions without authentication
+* `authAction`: For actions that require user authentication
+* `orgAction`: For actions that require authentication and organization context
 
 ## Files
 

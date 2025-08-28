@@ -5,11 +5,11 @@ alwaysApply: false
 ---
 ## Context
 
-* Metadata in Next.js enables users to add `title`, `description`, and other SEO information directly inside the metadata.
+* Metadata in Next.js enables adding title, description, and other SEO information directly to pages and layouts.
 
 ## How to use metadata?
 
-For each page we want to add metadata, we will create a utility like this in [metadata.ts](mdc:src/lib/metadata.ts):
+For pages requiring metadata, create a utility function in [metadata.ts](mdc:src/lib/metadata.ts):
 
 ```ts
 import { unstable_cache as cache } from "next/cache";
@@ -38,7 +38,7 @@ export const orgMetadata = cache(
 );
 ```
 
-When it's done, we can use it like this inside a `layout.tsx` or a `page.tsx`:
+Once created, use it inside a `layout.tsx` or `page.tsx` file:
 
 ```ts
 import type { LayoutParams } from "@/types/next";
@@ -52,11 +52,11 @@ export async function generateMetadata(
 }
 ```
 
-Important: we mainly use this inside the `layout` so we can use the Next.js methods to add other data inside the metadata.
+Important: use this mainly inside the `layout` to leverage Next.js methods for adding additional data to the metadata.
 
 ## Usage sub-page metadata
 
-Imagine we are on a page `/users/userId/product` and the page `users` already has metadata and we just want to add "- Product" to the title. We can use this method:
+When on a page `/users/userId/product` where the `users` page already has metadata and you want to add "- Product" to the title, use this method:
 
 ```ts
 import { combineWithParentMetadata } from "@/lib/metadata";
@@ -67,4 +67,4 @@ export const generateMetadata = combineWithParentMetadata({
 });
 ```
 
-It will use the current metadata title and add information to it. All other metadata will replace the previous one.
+It will use the current metadata title and append information to it while replacing all other metadata.

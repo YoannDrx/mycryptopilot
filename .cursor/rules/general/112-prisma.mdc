@@ -1,15 +1,15 @@
 ---
-description: EXPLAIN how to use PRISMA in a CLEAN and EFFICIENT way
+description: Use Prisma ORM efficiently with proper query organization and type safety.
 globs: *.ts, *.tsx
 ---
 ## Context
 
 * We use Prisma as an ORM
-* Prisma use PostgreSQL to work
+* Prisma uses PostgreSQL as the database
 
 ## Usage with small queries
 
-For small query, only used in one place, you can get the data from a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) like this : 
+For small queries used in only one place, fetch data directly from a [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) like this: 
 
 ```tsx
 export default async function EditProfilePage() {
@@ -32,9 +32,9 @@ export default async function EditProfilePage() {
 
 ## Usage with big and reusable queries
 
-When we talk about big query, that involve some frontend logic AND when the return type of the query is used in many component, you must always create this query under /lib/prisma folder.
+For complex queries involving frontend logic OR when the return type is used across multiple components, create the query under /lib/prisma folder.
 
-Exemple with a query about organization : 
+Example with an organization query: 
 
 ```tsx
 import type { OrganizationMembershipRole, Prisma, User } from "@/generated/prisma";
@@ -95,6 +95,6 @@ export type OrganizationViewType = NonNullable<
 
 ## Rules
 
-* When use a type in props params, always consider using query return type to be automaticly updated when we change the query. (here `OrganizationViewType`)
+* When using a type in component props, always use query return types to ensure automatic updates when queries change (e.g., `OrganizationViewType`).
 
 

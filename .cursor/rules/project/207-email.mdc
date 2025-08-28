@@ -1,22 +1,21 @@
 ---
-description: EXPLAIN how to create email template and how to use them
+description: Create and send email templates using React Email and Resend for transactional emails.
 globs: 
 alwaysApply: false
 ---
 ## Context
 
-* We use React-Email and Resend to send email.
-* We use Resend to send this email
+* We use React Email for creating email templates and Resend for sending emails.
 
 ## Create email
 
-Go in the folder `/emails` to create an email, you can follow the example of [magic-link-email.email.tsx](mdc:emails/magic-link-email.email.tsx) `<EmailLayout />` will define the default beautiful layout for an email.
+Create email templates in the `/emails` folder, following the example of [magic-link-email.email.tsx](mdc:emails/magic-link-email.email.tsx) where `<EmailLayout />` provides the default email layout.
 
 ## Use email
 
-Use the utility `sendEmail` when you need to send an email.
+Use the `sendEmail` utility function to send emails.
 
-Exemple: 
+Example: 
 
 ```ts
 import { sendEmail } from "@/lib/mail/sendEmail";
@@ -31,14 +30,14 @@ const result = await sendEmail({
 });
 ```
 
-* to : email adresse of the recipient
-* subject : subject of the email
-* react : React component, you must never instanciate it with `<MagicLinkMail>` but always with object props
-* text : the plain text of the email to improve delivrability
+* to: Email address of the recipient
+* subject: Subject of the email
+* react: React component, never instantiate with JSX `<MagicLinkMail>` but always with object props `MagicLinkMail({})`
+* text: Plain text version of the email to improve deliverability
 
 ## Markdown Email
 
-For a better maintability as I do on [auth.ts](mdc:src/lib/auth.ts) I will use MarkdownEmail : 
+For better maintainability, use MarkdownEmail as shown in [auth.ts](mdc:src/lib/auth.ts): 
 
 ```ts
 import MarkdownEmail from "@email/markdown.email";

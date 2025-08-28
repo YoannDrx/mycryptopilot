@@ -5,15 +5,15 @@ alwaysApply: false
 ---
 ## Context
 
-- Our application handles permissions with Better Auth file [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts)
-- Permissions are based on roles
-- We have utility methods to test permissions 
+- The application handles permissions using Better Auth in [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts)
+- Permissions are based on user roles
+- Utility methods are available to test permissions 
 
-## Test permissions server-side only
+## Testing permissions (server-side only)
 
 See [101-client-components.mdc](mdc:.cursor/rules/general/101-client-components.mdc) and [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) for component-specific rules.
 
-To test permissions, we can use the `hasPermission` method:
+To test permissions, use the `hasPermission` method:
 
 ```tsx
 import { hasPermission } from "@/lib/auth/auth-org";

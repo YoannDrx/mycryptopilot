@@ -1,5 +1,5 @@
 ---
-description: Safely rename database tables/columns to avoid data loss
+description: Use this to safely rename database tables or columns without data loss by replacing Prisma's destructive DROP/ADD operations with RENAME operations.
 ---
 
 # Database Migration Rename
@@ -8,7 +8,7 @@ Safely rename database tables or columns using Prisma migrations to avoid data l
 
 ## Context
 
-Prisma by default does NOT rename tables or properties; it deletes and re-creates them. This command helps avoid data loss by properly renaming instead.
+By default, Prisma does NOT rename tables or properties; it deletes and re-creates them. This command helps avoid data loss by properly renaming instead.
 
 ## Problem
 
@@ -36,4 +36,4 @@ ALTER TABLE "Post" RENAME COLUMN "content" TO "markdown";
 3. Test the migration on a backup database first
 4. Apply the migration with `pnpm prisma migrate deploy`
 
-Fix migration for: $ARGUMENTS
+Fix the migration for: $ARGUMENTS

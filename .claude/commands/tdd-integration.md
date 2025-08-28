@@ -1,5 +1,5 @@
 ---
-description: Create components using TDD with full integration tests
+description: Use this to build React components with Test-Driven Development approach using Playwright integration tests that include database and real functionality.
 ---
 
 # TDD Integration Component Development
@@ -8,18 +8,18 @@ Create React components with full integration testing using TDD principles.
 
 ## Context
 
-- Create components following TDD principles
+- Build components following TDD principles
 - Full integration tests with database and real functionality
-- Write integration tests FIRST, then implement
+- Write integration tests FIRST, then implement the component
 
 ## Workflow
 
 1. **Research** - Read existing code that needs to be edited
 2. **Plan** - Define component location, name, and functionality
-3. **Create test file** in `e2e/` folder
-4. **Create component** and page in correct folder following project rules
+3. **Create test file** in the `e2e/` folder
+4. **Create component** and page in the correct folder following project rules
 5. **Run tests** with `pnpm test:e2e:ci -g "test-name"`
-6. **Iterate** - Fix component until tests pass
+6. **Iterate** - Fix the component until tests pass
 
 ## Debug Tips
 
@@ -34,4 +34,4 @@ Create React components with full integration testing using TDD principles.
 - Use Prisma for database operations
 - Follow authentication patterns from `e2e/utils/auth-test.ts`
 
-Create an integration test for: $ARGUMENTS
+Create the integration test for: $ARGUMENTS

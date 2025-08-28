@@ -1,12 +1,12 @@
 ---
-description: 
+description: Comprehensive naming conventions for consistent code style across files, functions, classes, and variables.
 globs: 
 alwaysApply: true
 ---
 ## Context
 - Apply these naming conventions to all code elements including files, folders, functions, classes, interfaces, types, enums, etc.
-- These conventions ensure code consistency, improve readability, and reduce cognitive load
-- Follow these guidelines for all new code and when refactoring existing code
+- These conventions ensure code consistency, improve readability, and reduce cognitive load.
+- Follow these guidelines for all new code and when refactoring existing code.
 
 ## Requirements
 
@@ -29,7 +29,7 @@ alwaysApply: true
 - **Constants/Data Files**: `SCREAMING_SNAKE_CASE.ts` (e.g., `DEFAULT_RESUME_TEMPLATE.ts`)
 - **Server Action Files** : `kebab-case.action.ts` (e.g., `user.action.ts`)
 - **Zustand Store Files** : `kebab-case.store.ts` (e.g., `user.store.ts`)
-- **Zod Shema Files** : `kebab-case.schema.ts` (e.g., `user.schema.ts`)
+- **Zod Schema Files** : `kebab-case.schema.ts` (e.g., `user.schema.ts`)
 
 
 #### Folders
@@ -81,7 +81,7 @@ alwaysApply: true
 - **Higher-Order Components**: `withPascalCase` (e.g., `withAuthentication`)
 
 ### Zod Schema
-- **Schema name** : `PascaleCaseSchema` (e.g., `NameSchema`)
+- **Schema name** : `PascalCaseSchema` (e.g., `NameSchema`)
 
 ### 4. CSS & Styling
 
