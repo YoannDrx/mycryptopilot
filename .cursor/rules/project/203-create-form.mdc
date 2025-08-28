@@ -1,11 +1,11 @@
 ---
-description: Create a form using NextJS / React Hook Form / Server Actions.
+description: Create forms using Next.js with React Hook Form, Shadcn/UI components, and server actions.
 globs: *.tsx
 ---
 ## Context
 
-* Creating a form should always use Shadcn/UI [input.tsx](mdc:src/components/ui/input.tsx) and [label.tsx](mdc:src/components/ui/label.tsx) and [form.tsx](mdc:src/components/ui/form.tsx)
-* We must always use [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc) or [201-api-route.mdc](mdc:.cursor/rules/project/201-api-route.mdc) to handle the action and [210-use-mutation.mdc](mdc:.cursor/rules/project/210-use-mutation.mdc)
+* Forms should always use Shadcn/UI components: [input.tsx](mdc:src/components/ui/input.tsx), [label.tsx](mdc:src/components/ui/label.tsx), and [form.tsx](mdc:src/components/ui/form.tsx)
+* Always use [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc) or [201-api-route.mdc](mdc:.cursor/rules/project/201-api-route.mdc) to handle actions with [210-use-mutation.mdc](mdc:.cursor/rules/project/210-use-mutation.mdc)
 
 ## Example
 
@@ -69,9 +69,9 @@ export const Form = () => {
 };
 ```
 
-Then you can create an server-action follow [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc)
+Create server actions following [208-server-actions.mdc](mdc:.cursor/rules/project/208-server-actions.mdc)
 
-Please use the following files :
+Use the following files:
 
 * [form.tsx](mdc:src/components/ui/form.tsx)
 * [actions-utils.ts](mdc:src/lib/actions/actions-utils.ts)
