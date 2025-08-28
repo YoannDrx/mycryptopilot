@@ -1,15 +1,15 @@
 ---
-description: 
+description: How to handle page metadata and SEO optimization in Next.js pages and layouts.
 globs: page.tsx,layout.tsx
 alwaysApply: false
 ---
 ## Context
 
-* Metadata in NextJS enabled user to add `title`, `description` or other stuff directly inside the metadata
+* Metadata in Next.js enables users to add `title`, `description`, and other SEO information directly inside the metadata.
 
-## How use metadata ?
+## How to use metadata?
 
-For each page we want to add metadata, we will create a utility like this in [metadata.ts](mdc:src/lib/metadata.ts) :
+For each page we want to add metadata, we will create a utility like this in [metadata.ts](mdc:src/lib/metadata.ts):
 
 ```ts
 import { unstable_cache as cache } from "next/cache";
@@ -38,7 +38,7 @@ export const orgMetadata = cache(
 );
 ```
 
-When it's done, we can use it like this inside a `layout.tsx` or a `page.tsx`.
+When it's done, we can use it like this inside a `layout.tsx` or a `page.tsx`:
 
 ```ts
 import type { LayoutParams } from "@/types/next";
@@ -52,11 +52,11 @@ export async function generateMetadata(
 }
 ```
 
-Important : we mainly use this inside the `layout` so we can use the next methods to add other data inside the metadata.
+Important: we mainly use this inside the `layout` so we can use the Next.js methods to add other data inside the metadata.
 
 ## Usage sub-page metadata
 
-Imagine we are on a page /users/userId/product and the page `users` already has metadata and we just want to add "- Product" on the title. We can use this method :
+Imagine we are on a page `/users/userId/product` and the page `users` already has metadata and we just want to add "- Product" to the title. We can use this method:
 
 ```ts
 import { combineWithParentMetadata } from "@/lib/metadata";
@@ -67,4 +67,4 @@ export const generateMetadata = combineWithParentMetadata({
 });
 ```
 
-It will use the current metadata title and add information on it. All other metadata will erase the previous one.
+It will use the current metadata title and add information to it. All other metadata will replace the previous one.

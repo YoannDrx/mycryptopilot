@@ -5,29 +5,34 @@ alwaysApply: false
 ---
 ## Context
 
-* The application define a multi-tenant model
+* The application defines a multi-tenant model
 * The multi-tenant model name is `Organization`
 * Every table must be linked to `Organization` and the user can be a member of it.
-* The plan and payment is always link to the `Organization`
-* The orgainzation is defined in [better-auth.prisma](mdc:prisma/schema/better-auth.prisma)
+* The plan and payment is always linked to the `Organization`
+* The organization is defined in [better-auth.prisma](mdc:prisma/schema/better-auth.prisma)
 
 ## Methods
 
-- You muse always use organization for resources. Everything must be linked to an organization, not a user.
+- You must always use organization for resources. Everything must be linked to an organization, not a user.
 
-- To get an organization, you can use `getCurrentOrgCache` or `getRequiredCurrentOrgCache` function.
+- To get an organization, you can use `getCurrentOrg` or `getRequiredCurrentOrg` function, or their cached versions `getRequiredCurrentOrgCache`.
 
 ```ts
-import { getCurrentOrgCache } from "@/lib/react/cache";
+import { getCurrentOrg, getRequiredCurrentOrg } from "@/lib/organizations/get-org";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 
-const org = await getCurrentOrgCache();
+const org = await getCurrentOrg();
+// or for required (throws if not found)
+const org = await getRequiredCurrentOrg();
+// or cached version
+const org = await getRequiredCurrentOrgCache();
 ```
 
-The `cache` version avoid to make the request multiple time.
+The `cache` version avoids making the request multiple times.
 
 ## Rules
 
-You must always include the organization inside Prisma query to avoid getting data from other organization :
+You must always include the organization inside Prisma queries to avoid getting data from other organizations:
 
 ```ts
 const org = await getRequiredCurrentOrgCache();
@@ -40,23 +45,23 @@ const tags = await prisma.tag.findMany({
 });
 ```
 
-## Subscribtion
+## Subscription
 
-The subscribtion is inside the current org :
+The subscription is inside the current org:
 
 ```ts
-import { getPlanLimits } from "@/lib/auth-plans";
+import { getPlanLimits } from "@/lib/auth/stripe/auth-plans";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 
 const org = await getRequiredCurrentOrgCache();
 const subscription = org.subscription;
 
 // Get the plan limit
-const maxMembers = getPlanLimits(org.subscription?.plan ?? "basic").members;
+const maxMembers = getPlanLimits(org.subscription?.plan ?? "free").members;
 ```
 
 ## Roles
 
-The roles is defined in [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts) with the permissions.
+The roles are defined in [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts) with the permissions.
 
 

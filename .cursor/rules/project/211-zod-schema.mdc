@@ -1,29 +1,28 @@
 ---
-description: ENFORE rules 
+description: Define naming conventions and best practices for Zod schemas and type extraction.
 globs: *.store.ts, *.ts
 ---
+
 ## Context
 
-* Zod Schema is used to parse data for Form, API Endpoint and other stuff. You must always follow the rules.
+- Zod schemas are used to parse data for forms, API endpoints, and other validation needs. You must always follow the naming rules.
 
 ## Naming rules
 
-All Schema must start with uppercase and be suffixed by `Schema` :
+All schemas must start with uppercase and be suffixed with `Schema`:
 
-* UserSchema
-* CreateUserSchema
-* UpdateUserSchema
+- `UserSchema`
+- `CreateUserSchema`
+- `UpdateUserSchema`
 
 ## Extract types
 
-To extract type, with use `z.infer` :
+To extract types, we use `z.infer`:
 
 ```ts
-export type UpdateUserSchemaType = z.infer<
-  typeof UpdateUserSchema
->;
+export type UpdateUserSchemaType = z.infer<typeof UpdateUserSchema>;
 ```
 
-The name is always : NameOfSchemaType
+The name is always: `NameOfSchemaType`
 
 `Type` is the suffix.

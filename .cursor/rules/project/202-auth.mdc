@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 ## Context
 
-* We use NextAuth to handle authentification in our application.
+* We use Better Auth to handle authentication in our application.
 * Our application create helper to simplify the usage of retreiving the user.
 
 ## Example Server Side
@@ -13,7 +13,7 @@ alwaysApply: false
 To get the current user, you must use `auth` function :
 
 ```ts
-import { getUser } from "@/lib/auth/helper";
+import { getUser, getRequiredUser } from "@/lib/auth/auth-user";
 
 // user is optional
 const user = await getUser();
@@ -21,7 +21,7 @@ const user = await getUser();
 const user = await getRequiredUser();
 ```
 
-`requiredAuth` will throw an `unauthorized` method that will be catch by `unauthorized.tsx`. You can check [105-nextjs-routes.mdc](mdc:.cursor/rules/general/105-nextjs-routes.mdc)
+`getRequiredUser` will throw an `unauthorized` method that will be catch by `unauthorized.tsx`. You can check [105-nextjs-routes.mdc](mdc:.cursor/rules/general/105-nextjs-routes.mdc)
 
 ## Exemple Client Side
 

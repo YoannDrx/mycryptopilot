@@ -1,18 +1,18 @@
 ---
-description: Everytime you want to use "Toast"
-globs: 
+description: How to display toast notifications from client and server components.
+globs: *.tsx, *.ts
 alwaysApply: false
 ---
 ## Context
 
-Toast is a little notification that appear in the corner of our application.
+Toast is a small notification that appears in the corner of our application.
 
 ## Rules
 
-There is 2 kinds of toast trigger : 
+There are 2 kinds of toast triggers:
 
-* [server-toast.tsx](mdc:src/lib/server-toast.tsx)
-* `toast` 
+* [server-toast.tsx](mdc:src/lib/server-toast.tsx) for server-side toasts
+* `toast` for client-side toasts 
 
 ### Client Toast
 
@@ -28,7 +28,7 @@ function MyComponent() {
 
 ### Server Toast
 
-* Only available in API Route or Server Component
+* Only available in API routes or server actions
 
 ```tsx
 import { serverToast } from "@/lib/server-toast";
@@ -41,6 +41,6 @@ export const updateProject = orgAction
   })
   .inputSchema(updateProjectSchema)
   .action(async ({ parsedInput: input, ctx }) => {
-    serverToast("Hello", "error")
+    serverToast("Hello", "error");
   });
 ```

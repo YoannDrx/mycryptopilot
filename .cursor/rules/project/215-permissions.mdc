@@ -1,17 +1,19 @@
 ---
-description: 
-globs: 
+description: Define how to handle role-based permissions and authorization in server components.
+globs: *.tsx, *.ts
 alwaysApply: false
 ---
 ## Context
 
-- Our applications handle permissions with BetterAuth file [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts)
-- Permissions is based on roles
+- Our application handles permissions with Better Auth file [auth-permissions.ts](mdc:src/lib/auth/auth-permissions.ts)
+- Permissions are based on roles
 - We have utility methods to test permissions 
 
-## Test permissions server-side only in [101-client-components.mdc](mdc:.cursor/rules/general/101-client-components.mdc) and [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc)
+## Test permissions server-side only
 
-To do that, we can use `hasPermission` method :
+See [101-client-components.mdc](mdc:.cursor/rules/general/101-client-components.mdc) and [107-server-components.mdc](mdc:.cursor/rules/general/107-server-components.mdc) for component-specific rules.
+
+To test permissions, we can use the `hasPermission` method:
 
 ```tsx
 import { hasPermission } from "@/lib/auth/auth-org";

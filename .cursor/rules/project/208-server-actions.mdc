@@ -4,38 +4,42 @@ globs: *.ts, *.tsx
 ---
 ## Context
 
-* Server Action is a way to execute server-side code like to mutate database etc... but without API endpoint. It's a React abstraction to handle the server-code.
-* We use `next-safe-action` to handle authentification, security and to verify the data we received
+* Server Actions are a way to execute server-side code (like database mutations) without API endpoints. It's a React abstraction to handle server-side code.
+* We use `next-safe-action` to handle authentication, security, and to verify the data we receive.
 
 ## Usage
 
-1. Create a server action files
+1. Create server action files
 
-We use `server-action-name.action.ts` converntion to easily reconize server-action.
+We use `server-action-name.action.ts` convention to easily recognize server actions.
 
 ```ts
-// All server action must start with "use server" to inform NextJS that this method must be executed on the server
+// All server actions must start with "use server" to inform Next.js that this method must be executed on the server
 "use server";
 
-// orgAction is a utility from the library "next-safe-action" that handle middleware to verify the permission of the user.
-// use `authAction` for not-org-related actions.
+import { z } from "zod";
 import { orgAction } from "@/lib/actions/safe-actions";
+import { prisma } from "@/lib/prisma";
+
+// orgAction is a utility from the library "next-safe-action" that handles middleware to verify the permissions of the user.
+// Use `authAction` for non-org-related actions.
 
 const Schema = z.object({
   name: z.string(),
   schema: z.string(),
-})
+});
 
-// Server action must ALWAYS be suffix by "Action" like "deleteUserAction"
+// Server actions must ALWAYS be suffixed with "Action" like "deleteUserAction"
 export const demoAction = orgAction
-  // We can limit the action to a specific role
+  // We can limit the action to specific roles
   .metadata({
-    roles: ["OWNER", "ADMIN"],
+    roles: ["admin", "owner"],
+    permissions: { databases: ["create"] },
   })
   // The schema is used to validate the input of the action
-  .schema(Schema)
+  .inputSchema(Schema)
   .action(async ({ parsedInput: input, ctx }) => {
-    // we can do async code here
+    // We can do async code here
     const database = await prisma.database.create({
       data: {
         name: input.name,
@@ -50,7 +54,7 @@ export const demoAction = orgAction
 
 2. Use the server action in a client component
 
-In any client component we can use Server Action like the following example :
+In any client component we can use Server Actions like the following example:
 
 ```tsx
 import { demoAction } from "./server-action-name.action";
@@ -72,13 +76,15 @@ export const Form = () => {
 
 ## Rules
 
-- Always suffix server action with "Action" like "updateUserAction" or "createSubscriberAction"
+- Always suffix server actions with "Action" like "updateUserAction" or "createSubscriberAction"
+- Use `inputSchema` instead of `schema` for validation
+- Always include necessary imports (z, prisma, etc.)
 
 ## Available actions
 
-* action : for general action without any authentification
-* authAction : for action that need to be authentificated
-* orgAction : for action that need to be authentificated and relative to organization
+* `action`: for general actions without any authentication
+* `authAction`: for actions that need to be authenticated
+* `orgAction`: for actions that need to be authenticated and relative to organization
 
 ## Files
 
