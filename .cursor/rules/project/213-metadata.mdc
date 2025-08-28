@@ -52,11 +52,11 @@ export async function generateMetadata(
 }
 ```
 
-Important: use this mainly inside the `layout` to leverage Next.js methods for adding additional data to the metadata.
+Important: use this primarily in `layout` files to leverage Next.js methods for adding additional metadata.
 
 ## Usage sub-page metadata
 
-When on a page `/users/userId/product` where the `users` page already has metadata and you want to add "- Product" to the title, use this method:
+For sub-pages like `/users/userId/product` where the parent `users` page already has metadata and you want to append "- Product" to the title, use this method:
 
 ```ts
 import { combineWithParentMetadata } from "@/lib/metadata";
@@ -67,4 +67,4 @@ export const generateMetadata = combineWithParentMetadata({
 });
 ```
 
-It will use the current metadata title and append information to it while replacing all other metadata.
+This combines the current metadata title with additional information while replacing other metadata fields.
