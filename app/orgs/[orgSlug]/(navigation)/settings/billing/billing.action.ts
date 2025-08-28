@@ -1,7 +1,8 @@
 "use server";
 
-import { ActionError, orgAction } from "@/lib/actions/safe-actions";
+import { orgAction } from "@/lib/actions/safe-actions";
 import { hasPermission } from "@/lib/auth/auth-org";
+import { ActionError } from "@/lib/errors/action-error";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { stripe } from "@/lib/stripe";

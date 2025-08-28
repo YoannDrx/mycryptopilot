@@ -1,6 +1,7 @@
 "use server";
 
-import { ActionError, orgAction } from "@/lib/actions/safe-actions";
+import { orgAction } from "@/lib/actions/safe-actions";
+import { ActionError } from "@/lib/errors/action-error";
 import { fileAdapter } from "@/lib/files/placeholder-adapter";
 import { z } from "zod";
 

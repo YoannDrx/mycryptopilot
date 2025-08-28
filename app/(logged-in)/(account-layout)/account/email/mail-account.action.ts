@@ -1,6 +1,7 @@
 "use server";
 
-import { ActionError, authAction } from "@/lib/actions/safe-actions";
+import { authAction } from "@/lib/actions/safe-actions";
+import { ActionError } from "@/lib/errors/action-error";
 import { logger } from "@/lib/logger";
 import { resend } from "@/lib/mail/resend";
 import { prisma } from "@/lib/prisma";
