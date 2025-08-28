@@ -1,6 +1,7 @@
 import { getUser } from "@/lib/auth/auth-user";
+import { ZodRouteError } from "@/lib/errors/zod-route-error";
 import { getCurrentOrg } from "@/lib/organizations/get-org";
-import { authRoute, orgRoute, route, ZodRouteError } from "@/lib/zod-route";
+import { authRoute, orgRoute, route } from "@/lib/zod-route";
 import { describe, expect, it, vi } from "vitest";
 
 describe("zod-route", () => {
