@@ -31,7 +31,7 @@ export default function OrgBreadcrumb() {
         <BreadcrumbSeparator />
         {paths.slice(2).map((path, index) => {
           const isLast = index === paths.slice(2).length - 1;
-          const currentPath = `/${paths.slice(0, index - 1).join("/")}`;
+          const currentPath = `/${paths.slice(0, index + 3).join("/")}`;
 
           const displayName = path;
 
