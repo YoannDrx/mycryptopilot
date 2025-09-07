@@ -1,11 +1,11 @@
 "use client";
 
+import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
-import { getCallbackUrl } from "@/lib/auth-utils";
+import { getCallbackUrl } from "@/lib/auth/auth-utils";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { LoadingButton } from "@/components/ui/loading-button";
 
 export default function OtpVerificationPage() {
   const searchParams = useSearchParams();

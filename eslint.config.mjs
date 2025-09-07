@@ -151,6 +151,7 @@ export default [
       "**/worker.js",
       "src/generated",
       ".claude",
+      ".conductor",
     ],
   },
 ];
