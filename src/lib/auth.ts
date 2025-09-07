@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { admin, magicLink, organization } from "better-auth/plugins";
+import { admin, emailOTP, organization } from "better-auth/plugins";
 import { ac, roles } from "./auth/auth-permissions";
 
 import { sendEmail } from "@/lib/mail/send-email";
@@ -38,6 +38,10 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   baseURL: getServerUrl(),
+  session: {
+    expiresIn: 60 * 60 * 24 * 20, // 20 days
+    updateAge: 60 * 60 * 24 * 7, // Refresh session every 7 days
+  },
   databaseHooks: {
     user: {
       create: {
@@ -185,19 +189,19 @@ export const auth = betterAuth({
         });
       },
     }),
-    magicLink({
-      sendMagicLink: async ({ email, url }) => {
+    emailOTP({
+      sendVerificationOTP: async ({ email, otp }) => {
         await sendEmail({
           to: email,
-          subject: "Sign in to your account",
+          subject: `Your code to sign in to ${SiteConfig.title} ${otp}`,
           html: MarkdownEmail({
-            preview: `Magic link to login ${SiteConfig.title}`,
+            preview: `Your code to sign in to ${SiteConfig.title}`,
             markdown: `
             Hello,
 
-            You requested a magic link to sign in to your account.
+            Your code to sign in: **${otp}**
 
-            [Click here to sign in](${url})
+            [Or click here to sign in automatically](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
             `,
           }),
         });

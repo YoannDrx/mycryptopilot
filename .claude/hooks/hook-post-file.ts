@@ -101,28 +101,21 @@ async function main() {
     log("Prettier failed:", prettierResult.stderr);
   }
 
-  // 2. ESLint --fix et récupération des erreurs restantes
-  log("Running ESLint --fix and checking for remaining errors");
+  // 2. ESLint --fix
+  log("Running ESLint --fix");
   await runCommand(["bun", "x", "eslint", "--fix", filePath]);
 
-  // 3. ESLint check pour récupérer les erreurs restantes (après --fix)
-  log("Checking remaining ESLint errors");
-  const eslintCheckResult = await runCommand(["bun", "x", "eslint", filePath]);
+  // 3. Run ESLint check and TypeScript check in parallel
+  log("Running ESLint and TypeScript checks in parallel");
+  const [eslintCheckResult, tscResult] = await Promise.all([
+    runCommand(["bun", "x", "eslint", filePath]),
+    runCommand(["bun", "x", "tsc", "--noEmit", "--pretty", "false"]),
+  ]);
 
   const eslintErrors = (
     eslintCheckResult.stdout + eslintCheckResult.stderr
   ).trim();
 
-  // 3. Collecter les erreurs TypeScript
-  log("Checking TypeScript errors");
-  const tscResult = await runCommand([
-    "bun",
-    "x",
-    "tsc",
-    "--noEmit",
-    "--pretty",
-    "false",
-  ]);
   const tsErrors = tscResult.stderr
     .split("\n")
     .filter((line) => line.includes(filePath))
