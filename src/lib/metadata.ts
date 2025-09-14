@@ -1,4 +1,3 @@
-import type { PageParams } from "@/types/next";
 import type { Metadata, ResolvingMetadata } from "next";
 import { unstable_cache as cache } from "next/cache";
 import { prisma } from "./prisma";
@@ -13,7 +12,13 @@ import { prisma } from "./prisma";
  */
 export const combineWithParentMetadata =
   (metadata: Metadata) =>
-  async (_: PageParams, parent: ResolvingMetadata): Promise<Metadata> => {
+  async (
+    _: {
+      params: Promise<Record<string, string>>;
+      searchParams?: Promise<Record<string, string | string[] | undefined>>;
+    },
+    parent: ResolvingMetadata,
+  ): Promise<Metadata> => {
     const parentMetadata = await parent;
     return {
       ...metadata,

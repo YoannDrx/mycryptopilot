@@ -65,7 +65,10 @@ export function SubscribersChart() {
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <ChartTooltip
+              cursor={false}
+              content={(props) => <ChartTooltipContent {...props} />}
+            />
             <defs>
               <linearGradient id="2023" x1="0" y1="0" x2="0" y2="1">
                 <stop

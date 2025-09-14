@@ -1,4 +1,3 @@
-import type { PageParams } from "@/types/next";
 import fm from "front-matter";
 import fs from "fs/promises";
 import path from "path";
@@ -80,7 +79,7 @@ export const getPostsTags = async () => {
   return Array.from(tags);
 };
 
-export type PostParams = PageParams<{ slug: string }>;
+export type PostParams = PageProps<"/posts/[slug]">;
 
 export const getCurrentPost = async (slug: string) => {
   const posts = await getPosts();

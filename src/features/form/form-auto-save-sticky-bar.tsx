@@ -61,7 +61,7 @@ export const FormAutoSaveStickyBar = (props: FormAutoSaveStickyBarProps) => {
               Changes have been made. Save now!
             </Typography>
             {props.cancelLabel && (
-              <Button variant="secondary" onClick={onCancel}>
+              <Button variant="secondary" onClick={onCancel} type="button">
                 {props.cancelLabel}
               </Button>
             )}

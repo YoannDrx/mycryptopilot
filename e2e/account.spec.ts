@@ -53,7 +53,13 @@ test.describe("account", () => {
 
     await page.getByRole("button", { name: "Yes, Delete My Account" }).click();
     await page.waitForURL(/\/auth\/goodbye/, { timeout: 10000 });
-    await expect(page.getByText("Account Deleted")).toBeVisible();
+    await expect(
+      page
+        .locator('div[data-slot="card-header"]', {
+          hasText: "Account Deleted",
+        })
+        .first(),
+    ).toBeVisible();
 
     const user = await prisma.user.findUnique({
       where: {

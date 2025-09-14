@@ -7,16 +7,11 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { hasPermission } from "@/lib/auth/auth-org";
-import type { PageParams } from "@/types/next";
 import Link from "next/link";
 import InformationCards from "./information-cards";
 import { SubscribersChart } from "./subscribers-charts";
 
-export default async function RoutePage(
-  props: PageParams<{
-    orgSlug: string;
-  }>,
-) {
+export default async function RoutePage(props: PageProps<"/orgs/[orgSlug]">) {
   const params = await props.params;
 
   return (

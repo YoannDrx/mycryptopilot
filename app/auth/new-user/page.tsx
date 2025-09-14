@@ -8,7 +8,6 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { SiteConfig } from "@/site-config";
-import type { PageParams } from "@/types/next";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -22,7 +21,7 @@ export const metadata: Metadata = {
 /**
  * This page is show when a user login. You can add an onboarding process here.
  */
-export default async function NewUserPage(props: PageParams) {
+export default async function NewUserPage(props: PageProps<"/auth/new-user">) {
   const searchParams = await props.searchParams;
   const callbackUrl =
     typeof searchParams.callbackUrl === "string"

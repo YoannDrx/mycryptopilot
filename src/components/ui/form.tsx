@@ -23,7 +23,7 @@ import {
   type FieldPath,
   type FieldValues,
 } from "react-hook-form";
-import type { TypeOf, ZodSchema } from "zod";
+import type * as z from "zod";
 
 export type FormProps<T extends FieldValues> = Omit<
   React.ComponentProps<"form">,
@@ -209,20 +209,25 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-type UseZodFormProps<Z extends ZodSchema> = Exclude<
-  UseFormProps<TypeOf<Z>>,
-  "resolver"
-> & {
+type UseZodFormProps<
+  Input extends FieldValues,
+  Output extends FieldValues,
+  Z extends z.ZodType<Output, Input>,
+> = Exclude<UseFormProps<z.output<Z>>, "resolver"> & {
   schema: Z;
 };
 
-const useZodForm = <Z extends ZodSchema>({
+const useZodForm = <
+  Input extends FieldValues,
+  Output extends FieldValues,
+  Z extends z.ZodType<Output, Input>,
+>({
   schema,
   ...formProps
-}: UseZodFormProps<Z>) =>
+}: UseZodFormProps<Input, Output, Z>) =>
   useForm({
     ...formProps,
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
   });
 
 export {

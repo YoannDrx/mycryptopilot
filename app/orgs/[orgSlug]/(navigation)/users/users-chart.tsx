@@ -67,7 +67,9 @@ export function UsersChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
+              content={(props) => (
+                <ChartTooltipContent {...props} indicator="dot" />
+              )}
             />
             <Area
               dataKey="mobile"

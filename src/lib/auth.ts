@@ -191,6 +191,7 @@ export const auth = betterAuth({
     }),
     emailOTP({
       sendVerificationOTP: async ({ email, otp }) => {
+        logger.debug("Sending OTP", { email, otp });
         await sendEmail({
           to: email,
           subject: `Your code to sign in to ${SiteConfig.title} ${otp}`,

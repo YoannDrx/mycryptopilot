@@ -27,8 +27,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const EmailFormSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
+
+type EmailFormType = z.infer<typeof EmailFormSchema>;
 
 export function ForgetPasswordPage() {
   const router = useRouter();
@@ -38,7 +40,7 @@ export function ForgetPasswordPage() {
   });
 
   const forgetPasswordMutation = useMutation({
-    mutationFn: async (values: { email: string }) => {
+    mutationFn: async (values: EmailFormType) => {
       return unwrapSafePromise(
         authClient.forgetPassword({
           email: values.email,
@@ -54,7 +56,7 @@ export function ForgetPasswordPage() {
     },
   });
 
-  function onSubmitEmail(values: z.infer<typeof EmailFormSchema>) {
+  function onSubmitEmail(values: EmailFormType) {
     forgetPasswordMutation.mutate(values);
   }
 

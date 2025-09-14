@@ -15,7 +15,7 @@ import { setup } from "../test/setup";
 
 const mockSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
-  email: z.string().email("Please enter a valid email"),
+  email: z.email("Please enter a valid email"),
 });
 
 type FormValues = z.infer<typeof mockSchema>;

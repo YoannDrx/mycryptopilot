@@ -1,5 +1,4 @@
 import { Typography } from "@/components/nowts/typography";
-import { NotifyNowts } from "@/features/nowts/notify-nowts";
 import { Layout, LayoutContent } from "@/features/page/layout";
 import { SiteConfig } from "@/site-config";
 import type { Metadata } from "next";
@@ -25,9 +24,6 @@ export default function page() {
           <MDXRemote source={markdown} />
         </LayoutContent>
       </Layout>
-
-      {/* Notify NOWTS during build only */}
-      <NotifyNowts />
     </div>
   );
 }

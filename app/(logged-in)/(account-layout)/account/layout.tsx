@@ -7,11 +7,10 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { auth } from "@/lib/auth";
-import type { LayoutParams } from "@/types/next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export default async function RouteLayout(props: LayoutParams) {
+export default async function RouteLayout(props: LayoutProps<"/account">) {
   return (
     <Layout>
       <LayoutHeader>

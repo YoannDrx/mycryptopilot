@@ -1,6 +1,5 @@
 import { Layout, LayoutContent } from "@/features/page/layout";
 import { combineWithParentMetadata } from "@/lib/metadata";
-import type { LayoutParams } from "@/types/next";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Settings",
@@ -8,7 +7,7 @@ export const generateMetadata = combineWithParentMetadata({
 });
 
 export default async function RouteLayout(
-  props: LayoutParams<{ productId: string; orgSlug: string }>,
+  props: LayoutProps<"/orgs/[orgSlug]">,
 ) {
   return (
     <Layout size="lg">

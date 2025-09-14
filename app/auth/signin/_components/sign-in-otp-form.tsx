@@ -166,7 +166,11 @@ const OtpEmailForm = (props: {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input placeholder="john@doe.com" {...field} />
+              <Input
+                data-testid="otp-email-input"
+                placeholder="john@doe.com"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

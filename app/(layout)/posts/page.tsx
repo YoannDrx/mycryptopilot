@@ -10,7 +10,6 @@ import {
 import { PostCard } from "@/features/posts/post-card";
 import { getPosts, getPostsTags } from "@/features/posts/post-manager";
 import { SiteConfig } from "@/site-config";
-import type { PageParams } from "@/types/next";
 import { FileQuestion } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -27,7 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RoutePage(props: PageParams) {
+export default async function RoutePage(props: PageProps<"/posts">) {
   const tags = await getPostsTags();
   const posts = await getPosts();
 

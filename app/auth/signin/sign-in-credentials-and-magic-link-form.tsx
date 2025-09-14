@@ -10,7 +10,7 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
 }) => {
   const [isUsingCredentials, setIsUsingCredentials] = useLocalStorage(
     "sign-in-with-credentials",
-    true,
+    false,
   );
 
   if (!isUsingCredentials) {

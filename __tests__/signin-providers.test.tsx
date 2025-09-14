@@ -20,9 +20,6 @@ describe("SignInCredentialsAndMagicLinkForm", () => {
   beforeEach(() => {
     vi.resetAllMocks();
 
-    // Set default localStorage state for sign-in-with-credentials
-    window.localStorage.setItem("sign-in-with-credentials", "true");
-
     // Mock window.location
     Object.defineProperty(window, "location", {
       value: {
@@ -45,6 +42,8 @@ describe("SignInCredentialsAndMagicLinkForm", () => {
   });
 
   it("should render email and password fields in credentials mode", async () => {
+    window.localStorage.setItem("sign-in-with-credentials", "true");
+
     setup(<SignInCredentialsAndMagicLinkForm />);
 
     // Email field should always be present
@@ -59,24 +58,26 @@ describe("SignInCredentialsAndMagicLinkForm", () => {
     ).toBeInTheDocument();
 
     // Should have a link to switch to magic link
-    expect(screen.getByText(/login with magic link/i)).toBeInTheDocument();
+    expect(screen.getByText(/login with OTP/i)).toBeInTheDocument();
   });
 
   it("should switch to magic link mode when clicking the link", async () => {
+    window.localStorage.setItem("sign-in-with-credentials", "true");
+
     const { user } = setup(<SignInCredentialsAndMagicLinkForm />);
 
     // Initially in credentials mode
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
 
     // Click to switch to magic link mode
-    await user.click(screen.getByText(/login with magic link/i));
+    await user.click(screen.getByText(/login with OTP/i));
 
     // Password field should not be visible anymore
     expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
 
     // Submit button text should change
     expect(
-      screen.getByRole("button", { name: /sign in with magic link/i }),
+      screen.getByRole("button", { name: /sign in/i }),
     ).toBeInTheDocument();
 
     // Should have a link to switch back to credentials mode
@@ -84,6 +85,8 @@ describe("SignInCredentialsAndMagicLinkForm", () => {
   });
 
   it("should submit with credentials and redirect on success", async () => {
+    window.localStorage.setItem("sign-in-with-credentials", "true");
+
     const { user } = setup(
       <SignInCredentialsAndMagicLinkForm callbackUrl="/dashboard" />,
     );
@@ -105,36 +108,33 @@ describe("SignInCredentialsAndMagicLinkForm", () => {
     });
 
     // Check if redirect happened
-    expect(window.location.href).toBe("http://localhost:3000/dashboard");
+    expect(window.location.href).toBe("/dashboard");
   });
 
   it("should submit with magic link and redirect to verify page", async () => {
     const { user } = setup(<SignInCredentialsAndMagicLinkForm />);
 
-    // Switch to magic link mode
-    await user.click(screen.getByText(/login with magic link/i));
-
     // Fill in the form
-    await user.type(screen.getByLabelText(/email/i), "test@example.com");
+    await user.type(screen.getByTestId("otp-email-input"), "test@example.com");
 
     // Submit the form
-    await user.click(
-      screen.getByRole("button", { name: /sign in with magic link/i }),
-    );
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     // Check if auth client was called with correct params
     await waitFor(() => {
-      expect(authClient.signIn.magicLink).toHaveBeenCalledWith({
+      expect(authClient.emailOtp.sendVerificationOtp).toHaveBeenCalledWith({
+        type: "sign-in",
         email: "test@example.com",
-        callbackURL: "/orgs",
       });
     });
 
     // Check if redirect happened to verify page
-    expect(window.location.href).toBe("http://localhost:3000/auth/verify");
+    expect(window.location.href).toBe("http://localhost:3000/auth/signin");
   });
 
   it("should show error message on failed sign in", async () => {
+    window.localStorage.setItem("sign-in-with-credentials", "true");
+
     // Mock error response
     vi.mocked(authClient.signIn.email).mockResolvedValue({
       data: null,

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
-import { createTestAccount } from "./utils/auth-test";
+import { createTestAccount, signInAccount } from "./utils/auth-test";
 
 test("password reset flow", async ({ page }) => {
   // 1. Create a test account
@@ -53,21 +53,19 @@ test("password reset flow", async ({ page }) => {
   // 8. Set a new password
   const newPassword = faker.internet.password({ length: 12, memorable: true });
   await page.locator('input[name="password"]').fill(newPassword);
+  await page.pause();
   await page.getByRole("button", { name: /reset password/i }).click();
 
-  // 9. Should be redirected to sign in page
   await page.waitForURL(/\/auth\/signin/, { timeout: 10000 });
 
-  // 10. Try to sign in with the new password
-  await page.getByLabel("Email").fill(userData.email);
-  await page.locator('input[name="password"]').fill(newPassword);
-  await page
-    .getByRole("button", { name: /sign in/i })
-    .first()
-    .click();
-
-  // 11. Should be redirected to the organization page
-  await page.waitForURL(/\/orgs\/.*/, { timeout: 10000 });
+  await signInAccount({
+    page,
+    userData: {
+      email: userData.email,
+      password: newPassword,
+    },
+    callbackURL: "/orgs",
+  });
 
   // Clean up - delete the test user
   const user = await prisma.user.findUnique({

@@ -81,11 +81,11 @@ export function ResetPasswordPage({ token }: { token: string }) {
           Enter your new password below
         </CardDescription>
       </CardHeader>
-      <CardFooter className="border-t pt-6">
+      <CardFooter className="w-full border-t pt-6">
         <Form
           form={passwordForm}
           onSubmit={onSubmitPassword}
-          className="space-y-4"
+          className="w-full space-y-4"
         >
           <FormField
             control={passwordForm.control}

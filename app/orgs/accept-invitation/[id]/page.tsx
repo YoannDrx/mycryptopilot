@@ -11,12 +11,13 @@ import {
 import { auth, SocialProviders } from "@/lib/auth";
 import { getUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
-import type { PageParams } from "@/types/next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignInProviders } from "../../../auth/signin/sign-in-providers";
 
-export default async function RoutePage(props: PageParams<{ id: string }>) {
+export default async function RoutePage(
+  props: PageProps<"/orgs/accept-invitation/[id]">,
+) {
   const params = await props.params;
   const user = await getUser();
 

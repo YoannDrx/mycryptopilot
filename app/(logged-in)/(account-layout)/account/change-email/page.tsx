@@ -29,6 +29,8 @@ const ChangeEmailFormSchema = z.object({
   newEmail: z.string().email("Please enter a valid email address"),
 });
 
+type ChangeEmailFormType = z.infer<typeof ChangeEmailFormSchema>;
+
 export default function ChangeEmailPage() {
   const router = useRouter();
   const session = useSession();
@@ -41,7 +43,7 @@ export default function ChangeEmailPage() {
   });
 
   const changeEmailMutation = useMutation({
-    mutationFn: async (values: { newEmail: string }) => {
+    mutationFn: async (values: ChangeEmailFormType) => {
       return unwrapSafePromise(
         authClient.changeEmail({
           newEmail: values.newEmail,
@@ -57,7 +59,7 @@ export default function ChangeEmailPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof ChangeEmailFormSchema>) {
+  function onSubmit(values: ChangeEmailFormType) {
     changeEmailMutation.mutate(values);
   }
 

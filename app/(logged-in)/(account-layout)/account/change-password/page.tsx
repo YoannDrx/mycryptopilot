@@ -41,6 +41,8 @@ const ChangePasswordFormSchema = z
     path: ["confirmPassword"],
   });
 
+type ChangePasswordFormType = z.infer<typeof ChangePasswordFormSchema>;
+
 export default function ChangePasswordPage() {
   const router = useRouter();
 
@@ -55,7 +57,7 @@ export default function ChangePasswordPage() {
   });
 
   const changePasswordMutation = useMutation({
-    mutationFn: async (values: z.infer<typeof ChangePasswordFormSchema>) => {
+    mutationFn: async (values: ChangePasswordFormType) => {
       return unwrapSafePromise(
         authClient.changePassword({
           currentPassword: values.currentPassword,
@@ -73,7 +75,7 @@ export default function ChangePasswordPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof ChangePasswordFormSchema>) {
+  function onSubmit(values: ChangePasswordFormType) {
     changePasswordMutation.mutate(values);
   }
 

@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type PageParams } from "@/types/next";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { getDocs } from "./doc-manager";
@@ -17,7 +16,7 @@ export const metadata = {
     "Everything you need to know about using Lumail for your email marketing",
 };
 
-export default async function DocsPage(props: PageParams) {
+export default async function DocsPage(props: PageProps<"/docs">) {
   const docs = await getDocs();
 
   const sortedDocs = [...docs].sort((a, b) => {

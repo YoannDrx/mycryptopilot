@@ -9,7 +9,6 @@ import {
 import { hasPermission } from "@/lib/auth/auth-org";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { serverToast } from "@/lib/server-toast";
-import type { PageParams } from "@/types/next";
 import { ClientOrg } from "./client-org";
 import { DonutChart } from "./donuts-chart";
 import { UsersChart } from "./users-chart";
@@ -19,7 +18,9 @@ export const generateMetadata = combineWithParentMetadata({
   description: "Manage leads",
 });
 
-export default async function RoutePage(props: PageParams) {
+export default async function RoutePage(
+  props: PageProps<"/orgs/[orgSlug]/users">,
+) {
   return (
     <Layout size="lg">
       <LayoutHeader>

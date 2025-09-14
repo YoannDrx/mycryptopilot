@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/card";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
-import type { PageParams } from "@/types/next";
 import { OrganizationDangerForm } from "./org-danger-form";
 import { OrganizationDeleteDialog } from "./organization-delete-dialog";
 
@@ -16,7 +15,9 @@ export const generateMetadata = combineWithParentMetadata({
   description: "Delete your organization.",
 });
 
-export default async function RoutePage(props: PageParams) {
+export default async function RoutePage(
+  props: PageProps<"/orgs/[orgSlug]/settings/danger">,
+) {
   const org = await getRequiredCurrentOrgCache({
     permissions: {
       organization: ["delete"],

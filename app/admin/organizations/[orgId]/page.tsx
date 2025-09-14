@@ -9,7 +9,6 @@ import {
 } from "@/features/page/layout";
 import { getRequiredAdmin } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
-import type { PageParams } from "@/types/next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,7 +17,7 @@ import { OrganizationPayments } from "./_components/organization-payments";
 import { OrganizationSubscription } from "./_components/organization-subscription";
 
 export default async function OrganizationDetailPage(
-  props: PageParams<{ orgId: string }>,
+  props: PageProps<"/admin/organizations/[orgId]">,
 ) {
   await getRequiredAdmin();
   const params = await props.params;

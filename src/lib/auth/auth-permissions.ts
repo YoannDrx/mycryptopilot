@@ -19,28 +19,12 @@ export const AuthPermissionSchema = z.object(
   Object.fromEntries(
     Object.entries(statement).map(([key, actions]) => [
       key,
-      z
-        .array(z.enum([...actions] as unknown as [string, ...string[]]))
-        .optional(),
+      z.array(z.enum([...actions] as [string, ...string[]])).optional(),
     ]),
-  ) as unknown as {
-    [K in keyof typeof statement]: z.ZodOptional<
-      z.ZodArray<
-        z.ZodEnum<
-          [
-            ...((typeof statement)[K] extends readonly (infer T)[]
-              ? T extends string
-                ? (typeof statement)[K] extends readonly [string, ...string[]]
-                  ? (typeof statement)[K]
-                  : never
-                : never
-              : never),
-          ]
-        >
-      >
-    >;
-  },
-);
+  ),
+) as z.ZodType<{
+  [K in keyof typeof statement]?: (typeof statement)[K][number][];
+}>;
 
 export type AuthPermission = z.infer<typeof AuthPermissionSchema>;
 

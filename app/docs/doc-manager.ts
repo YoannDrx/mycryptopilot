@@ -1,5 +1,4 @@
 import { logger } from "@/lib/logger";
-import type { PageParams } from "@/types/next";
 import fm from "front-matter";
 import fs from "fs/promises";
 import path from "path";
@@ -28,7 +27,7 @@ export type DocType = {
   content: string;
 };
 
-export type DocParams = PageParams<{ slug: string }>;
+export type DocParams = PageProps<"/docs/[slug]">;
 
 export async function getDocs(tags?: string[]) {
   try {

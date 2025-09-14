@@ -41,9 +41,17 @@ export async function createTestAccount(options: {
   // Wait for navigation to complete - we should be redirected to the callback URL
   if (options.callbackURL) {
     await options.page.waitForLoadState("networkidle");
-    await options.page.waitForURL(new RegExp(options.callbackURL), {
-      timeout: 30000,
-    });
+    // Extract pathname from callbackURL and match it regardless of domain
+    const callbackPath = new URL(options.callbackURL, "http://localhost")
+      .pathname;
+    await options.page.waitForURL(
+      new RegExp(
+        `^[^/]*//[^/]*${callbackPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
+      ),
+      {
+        timeout: 30000,
+      },
+    );
   }
 
   if (options.admin) {
@@ -86,6 +94,9 @@ export async function signInAccount(options: {
     `/auth/signin${callbackURL ? `?callbackUrl=${callbackURL}` : ""}`,
   );
 
+  // Click on the "Use password" button
+  await page.getByRole("button", { name: /use password/i }).click();
+
   // Fill out the form
   await page.getByLabel("Email").fill(userData.email);
   await page.locator('input[name="password"]').fill(userData.password);
@@ -99,7 +110,14 @@ export async function signInAccount(options: {
   // Wait for navigation to complete if a callback URL is provided
   if (callbackURL) {
     try {
-      await page.waitForURL(new RegExp(callbackURL), { timeout: 30000 });
+      // Extract pathname from callbackURL and match it regardless of domain
+      const callbackPath = new URL(callbackURL, "http://localhost").pathname;
+      await page.waitForURL(
+        new RegExp(
+          `^[^/]*//[^/]*${callbackPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
+        ),
+        { timeout: 30000 },
+      );
     } catch (error) {
       logger.error("Error waiting for navigation to complete", error);
     }
