@@ -108,7 +108,7 @@ export default async function RoutePage(props: PostParams) {
       <Separator />
       <LayoutContent>
         <ServerMdx
-          className="prose dark:prose-invert lg:prose-lg xl:prose-xl mb-8"
+          className="typography lg:prose-lg xl:prose-xl mb-8"
           source={post.content}
         />
       </LayoutContent>

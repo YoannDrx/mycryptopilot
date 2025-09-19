@@ -50,10 +50,7 @@ export default async function RoutePage(props: DocParams) {
 
   return (
     <div className="flex max-w-full flex-1 flex-row gap-4 lg:gap-12">
-      <ServerMdx
-        className="prose dark:prose-invert lg:prose-lg mx-auto flex-2"
-        source={doc.content}
-      />
+      <ServerMdx className="typography mx-auto flex-2" source={doc.content} />
 
       {doc.attributes.examples && exampleLanguages.length > 0 ? (
         <div className="sticky top-8 flex h-fit w-full max-w-md flex-1 flex-col gap-2 overflow-auto">
@@ -80,7 +77,7 @@ export default async function RoutePage(props: DocParams) {
                   <div className="bg-muted/20 rounded-md p-1">
                     <ServerMdx
                       source={`\`\`\`${lang}\n${code}\n\`\`\``}
-                      className="prose dark:prose-invert prose-sm"
+                      className="typography prose-sm"
                     />
                   </div>
                 </TabsContent>

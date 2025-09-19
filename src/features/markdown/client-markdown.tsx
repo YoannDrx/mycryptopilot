@@ -12,7 +12,7 @@ export const ClientMarkdown = ({
   ...props
 }: ClientMarkdownProps) => {
   return (
-    <Markdown className={cn("prose dark:prose-invert", className)} {...props}>
+    <Markdown className={cn("typography", className)} {...props}>
       {children}
     </Markdown>
   );

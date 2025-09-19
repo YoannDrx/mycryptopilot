@@ -32,7 +32,7 @@ export default async function DocsPage(props: PageProps<"/docs">) {
   return (
     <div className="grid flex-1 gap-6 sm:grid-cols-2">
       {sortedDocs.map((doc) => (
-        <Card key={doc.slug} className="h-fit overflow-hidden pt-0">
+        <Card key={doc.slug} className="h-fit overflow-hidden">
           {doc.attributes.coverUrl && (
             <div
               className="h-36 bg-cover bg-center"

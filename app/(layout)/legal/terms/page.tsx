@@ -20,7 +20,7 @@ export default function page() {
         <Typography variant="h1">Terms</Typography>
       </div>
       <Layout>
-        <LayoutContent className="prose dark:prose-invert m-auto mb-8">
+        <LayoutContent className="typography m-auto mb-8">
           <MDXRemote source={markdown} />
         </LayoutContent>
       </Layout>
