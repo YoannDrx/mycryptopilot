@@ -4,7 +4,8 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import type { ComponentPropsWithRef, ElementType, ForwardedRef } from "react";
 
-import React, { forwardRef } from "react";
+import type React from "react";
+import { forwardRef } from "react";
 
 // Source : https://www.totaltypescript.com/pass-component-as-prop-react
 type FixedForwardRef = <T, P = {}>(

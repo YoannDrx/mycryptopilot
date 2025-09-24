@@ -1,7 +1,8 @@
 import { Typography } from "@/components/nowts/typography";
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
-import React, { useRef, useState } from "react";
+import type React from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 type DragAndDropProps = {

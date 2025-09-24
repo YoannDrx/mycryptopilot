@@ -2,7 +2,7 @@ import { fixupConfigRules } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
 import pluginJs from "@eslint/js";
 import hooksPlugin from "eslint-plugin-react-hooks";
-import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
+import pluginReact from "eslint-plugin-react";
 // Plugin doesn't support TailwindV4
 // FYI : https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/325
 // import tailwind from "eslint-plugin-tailwindcss";
@@ -29,10 +29,15 @@ export default [
   // Typescript
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
-  // Tailwind
-  // ...tailwind.configs["flat/recommended"],
-  // React
-  ...fixupConfigRules(pluginReactConfig),
+  pluginReact.configs.flat.recommended, // This is not a plugin object, but a shareable config object
+  pluginReact.configs.flat["jsx-runtime"], // Add this if you are using React 17+
+  {
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
+  },
   {
     plugins: {
       "react-hooks": hooksPlugin,
