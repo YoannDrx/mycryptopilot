@@ -8,7 +8,10 @@ import { useMutation } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useLastUsedProviderStore } from "./last-used-provider.store";
 
-const ProviderData: Record<string, { icon: ReactNode; name: string }> = {
+const ProviderData: Record<
+  "github" | "google" | "discord",
+  { icon: ReactNode; name: string; colorClass?: string }
+> = {
   github: {
     icon: <Logo name="github" size={16} />,
     name: "Github",
@@ -17,10 +20,16 @@ const ProviderData: Record<string, { icon: ReactNode; name: string }> = {
     icon: <Logo name="google" size={16} />,
     name: "Google",
   },
+  discord: {
+    icon: <Logo name="discord" size={16} />,
+    name: "Discord",
+    colorClass:
+      "border-[#5865F2] bg-[#5865F2] text-white hover:bg-[#4752C4] dark:border-[#5865F2]",
+  },
 };
 
 type ProviderButtonProps = {
-  providerId: "github" | "google";
+  providerId: "github" | "google" | "discord";
   callbackUrl?: string;
 };
 
@@ -58,6 +67,7 @@ export const ProviderButton = (props: ProviderButtonProps) => {
             data.name === "Google",
           "border bg-black text-white hover:bg-gray-950 dark:border-neutral-700":
             data.name === "Github",
+          [data.colorClass ?? ""]: data.colorClass,
         })}
         size="lg"
         onClick={() => {

@@ -1,8 +1,6 @@
-import { auth } from "@/lib/auth";
 import { getUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 /**
@@ -35,14 +33,6 @@ export const GET = async () => {
   if (!member?.organization.id) {
     return NextResponse.redirect(`${getServerUrl()}/orgs/new`);
   }
-
-  // Set The active organization in the session
-  await auth.api.setActiveOrganization({
-    body: {
-      organizationId: member.organization.id,
-    },
-    headers: await headers(),
-  });
 
   return NextResponse.redirect(
     `${getServerUrl()}/orgs/${member.organization.slug}`,

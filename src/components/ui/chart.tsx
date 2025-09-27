@@ -87,8 +87,13 @@ function ChartContainer({
     typeof RechartsPrimitive.ResponsiveContainer
   >["children"];
 }) {
-  const uniqueId = React.useId();
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
+  // Use a stable ID for server-side rendering to avoid hydration mismatches
+  const uniqueId = React.useMemo(() => {
+    if (id) return id;
+    // Generate a stable ID using timestamp for consistency
+    return `chart-${Date.now()}`;
+  }, [id]);
+  const chartId = uniqueId;
 
   return (
     <ChartContext.Provider value={{ config }}>

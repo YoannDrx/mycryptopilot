@@ -33,6 +33,14 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
   };
 }
 
+if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
+  SocialProviders.discord = {
+    clientId: env.DISCORD_CLIENT_ID,
+    clientSecret: env.DISCORD_CLIENT_SECRET,
+    prompt: "consent",
+  };
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -56,11 +64,76 @@ export const auth = betterAuth({
                 slug: generateSlug(emailName), // required
                 logo: `${getServerUrl()}/images/org-logo.png`,
                 userId: user.id,
-                keepCurrentActiveOrganization: false,
               },
             });
           } catch (err) {
             logger.error("Failed to create org", { err });
+          }
+        },
+      },
+    },
+    account: {
+      create: {
+        after: async (account, _req) => {
+          try {
+            // Update user avatar when connecting with social provider
+            const user = await prisma.user.findUnique({
+              where: { id: account.userId },
+            });
+
+            if (user && !user.image) {
+              let avatarUrl = null;
+
+              // Extract avatar URL from provider-specific data
+              if (account.providerId === "github" && account.accountId) {
+                // GitHub stores the username in account.accountId
+                avatarUrl = `https://github.com/${account.accountId}.png`;
+              } else if (account.providerId === "google") {
+                // For Google, check if we have avatar data in the idToken or other fields
+                // The idToken might contain the picture URL
+                if (account.idToken) {
+                  try {
+                    const decodedToken = JSON.parse(
+                      Buffer.from(
+                        account.idToken.split(".")[1],
+                        "base64",
+                      ).toString(),
+                    );
+                    avatarUrl = decodedToken.picture;
+                  } catch {
+                    // If we can't decode the token, try using accountId as fallback
+                    avatarUrl = account.accountId;
+                  }
+                } else {
+                  avatarUrl = account.accountId;
+                }
+              } else if (account.providerId === "discord") {
+                // For Discord, we need to construct the avatar URL using the user ID and avatar hash
+                // The format is: https://cdn.discordapp.com/avatars/{userId}/{avatar}.png
+                if (account.accountId && account.id) {
+                  // accountId might contain the Discord user ID, id might contain avatar hash
+                  avatarUrl = `https://cdn.discordapp.com/avatars/${account.accountId}/${account.id}.png`;
+                } else {
+                  avatarUrl = account.accountId;
+                }
+              }
+
+              if (avatarUrl) {
+                await prisma.user.update({
+                  where: { id: account.userId },
+                  data: { image: avatarUrl },
+                });
+                logger.info("Updated user avatar from social provider", {
+                  userId: account.userId,
+                  provider: account.providerId,
+                  avatarUrl,
+                });
+              }
+            }
+          } catch (error) {
+            logger.error("Failed to update user avatar from social provider", {
+              error,
+            });
           }
         },
       },

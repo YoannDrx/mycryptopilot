@@ -32,6 +32,7 @@ import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { AuthProviderBadge } from "./auth-provider-badge";
 import type { ProfileFormType } from "./edit-profile.schema";
 import { ProfileFormSchema } from "./edit-profile.schema";
 
@@ -146,6 +147,20 @@ export const EditProfileCardForm = ({
                 )}
               </Label>
               <Typography>{defaultValues.email}</Typography>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>Connected with</Label>
+              <div className="flex items-center gap-2">
+                <AuthProviderBadge
+                  userId={defaultValues.id}
+                  onProviderChange={(_providerId, avatarUrl) => {
+                    if (avatarUrl) {
+                      form.setValue("image", avatarUrl);
+                    }
+                  }}
+                />
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex gap-2">

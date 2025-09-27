@@ -1,35 +1,55 @@
 export const SiteConfig = {
-  title: "NOW.TS",
-  description: "Collect and showcase powerful video and text testimonials",
-  prodUrl: "https://demo.nowts.app",
-  appId: "nowts",
-  domain: "demo.nowts.app",
+  title: "MyCryptoPilot",
+  description:
+    "Copilote de trading crypto intelligent avec analyse temps réel et signaux risk-first",
+  prodUrl: "https://mycryptopilot.app",
+  appId: "mycryptopilot",
+  domain: "mycryptopilot.app",
   appIcon: "/images/icon.png",
   company: {
-    name: "NOW.TS LLC",
-    address: "421 Rue de Paris, France", // Remove if not needed
+    name: "MyCryptoPilot SAS",
+    address: "421 Rue de Paris, France",
   },
   brand: {
-    primary: "#007291", // You can adjust this to your brand color
+    primary: "#F59E0B", // Amber pour l'univers crypto
+    secondary: "#10B981", // Emerald pour le vert (profit)
+    danger: "#EF4444", // Red pour les risques
   },
   team: {
-    image: "https://melvynx.com/images/me/twitter-en.jpg",
-    website: "https://melvynx.com",
-    twitter: "https://twitter.com/melvyn_me",
-    name: "Melvynx",
+    image: "https://mycryptopilot.app/images/team/default.jpg",
+    website: "https://mycryptopilot.app",
+    twitter: "https://twitter.com/mycryptopilot",
+    name: "MyCryptoPilot Team",
   },
   features: {
     /**
-     * If enable, you need to specify the logic of upload here : src/features/images/uploadImageAction.tsx
-     * You can use Vercel Blob Storage : https://vercel.com/docs/storage/vercel-blob
-     * Or you can use Cloudflare R2 : https://mlv.sh/cloudflare-r2-tutorial
-     * Or you can use AWS S3 : https://mlv.sh/aws-s3-tutorial
+     * Activation des fonctionnalités crypto
      */
-    enableImageUpload: false as boolean,
+    enableCryptoPayments: true as boolean,
+    enableDiscordBot: true as boolean,
+    enableRealTimeSignals: true as boolean,
+    enableTradingDashboard: true as boolean,
     /**
-     * If enable, the user will be redirected to `/orgs` when he visits the landing page at `/`
-     * The logic is located in middleware.ts
+     * Si activé, l'utilisateur sera redirigé vers `/dashboard` lors de sa visite sur la page d'accueil
+     * La logique est située dans middleware.ts
      */
     enableLandingRedirection: true as boolean,
+    /**
+     * Configuration des réseaux crypto supportés
+     */
+    supportedNetworks: ["base", "tron", "polygon", "ethereum"] as const,
+    /**
+     * Configuration des exchanges supportés
+     */
+    supportedExchanges: ["binance", "bybit", "okx", "bitget"] as const,
+    /**
+     * Configuration Discord
+     */
+    discord: {
+      serverId: process.env.DISCORD_SERVER_ID,
+      premiumRoleId: process.env.DISCORD_PREMIUM_ROLE_ID,
+      ultraRoleId: process.env.DISCORD_ULTRA_ROLE_ID,
+      traderRoleId: process.env.DISCORD_TRADER_ROLE_ID,
+    },
   },
 };
