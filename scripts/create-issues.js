@@ -261,6 +261,617 @@ Then le bot assigne le rôle Pro automatiquement`,
     labels: ['user-story', 'phase-1', 'discord'],
   },
   // Ajouter les autres user stories ici...
+  {
+    number: '04',
+    title: 'Génération d\'Adresses Crypto',
+    userStory: `En tant qu'utilisateur souhaitant souscrire
+Je veux recevoir une adresse crypto unique pour mon paiement
+Afin de pouvoir payer mon abonnement en crypto`,
+    scope: `**In scope** :
+- Commande /upgrade fonctionnelle
+- Génération d'adresse unique par utilisateur/réseau
+- Support de USDC (Base) et USDT (TRON)
+- Affichage du montant exact et des instructions
+- QR code généré pour chaque adresse
+
+**Out of scope** :
+- Gestion des multi-signatures
+- Support de réseaux exotiques`,
+    dependencies: `- **APIs** : Discord Bot API
+- **Rôles** : User, Admin
+- **Schémas** : CryptoAddress, Subscription
+- **Flags** : feature_crypto_payments`,
+    design: `**Schémas** :
+\`\`\`prisma
+model CryptoAddress {
+  id            String   @id @default(cuid())
+  subscriptionId String
+  subscription  Subscription @relation(fields: [subscriptionId], references: [id])
+  network       CryptoNetwork
+  address       String   @unique
+  derivationPath String?
+  isActive      Boolean  @default(true)
+}
+\`\`\`
+
+**DTOs** : CryptoAddressDTO, PaymentRequestDTO
+**Permission model** : Role-based access control`,
+    telemetry: `**Logs clés** :
+- Address generated for user
+- Payment request created
+- QR code generated
+
+**Métriques Prometheus** :
+- crypto_addresses_generated_total
+- payment_requests_created_total
+- address_generation_duration_seconds`,
+    security: `**ACL** : User can only access their own addresses
+**Rate-limit** : 1 address generation per minute per user
+**Idempotence** : Same address returned for same user/network`,
+    acceptanceCriteria: `**Scenario 1: Génération adresse USDC**
+Given un utilisateur exécute /upgrade USDC
+When le bot traite la commande
+Then une adresse unique Base USDC est générée
+
+**Scenario 2: Réutilisation adresse**
+Given un utilisateur demande une deuxième adresse pour le même réseau
+When le bot traite la demande
+Then la même adresse existante est retournée`,
+    tests: `#### Tests Unitaires
+- [ ] Address generation logic
+- [ ] QR code generation
+- [ ] Network validation
+
+#### Tests d'Intégration
+- [ ] Discord command integration
+- [ ] Database storage
+- [ ] Address uniqueness
+
+#### Tests E2E
+- [ ] Full /upgrade flow
+- [ ] QR code display
+- [ ] Multiple networks`,
+    testData: `**Adresses** : 0x742d..., TR7NH...
+**Montants** : 39, 59, 99, 149 USDC/USDT
+**IDs** : user_test_001, sub_test_001
+**Canaux Discord** : DM, #upgrade`,
+    dod: `- [ ] Commande /upgrade fonctionnelle
+- [ ] Génération d'adresses unique par réseau
+- [ ] QR code générés correctement
+- [ ] Instructions de paiement claires
+- [ ] Tests multi-réseaux passants
+- [ ] Documentation API générée`,
+    estimation: 'Moyenne - 2 jours/homme',
+    risks: 'Risque moyen - gestion des clés et adresses',
+    labels: ['user-story', 'phase-2', 'crypto-payments'],
+  },
+  {
+    number: '05',
+    title: 'Watcher On-Chain',
+    userStory: `En tant que système de paiement
+Je veux surveiller les transactions blockchain en temps réel
+Afin de valider automatiquement les paiements d'abonnements`,
+    scope: `**In scope** :
+- Watcher WebSocket pour Base (USDC)
+- Watcher WebSocket/gRPC pour TRON (USDT)
+- Détection des transactions vers les adresses monitorées
+- Validation des montants avec tolérance (±5%)
+- Système de confirmations par réseau
+
+**Out of scope** :
+- Support d'autres réseaux (Polygon, Ethereum mainnet)
+- Analyse avancée des transactions`,
+    dependencies: `- **APIs** : Base RPC, TRON gRPC
+- **Rôles** : System
+- **Schémas** : Payment, Transaction
+- **Flags** : feature_watchers_enabled`,
+    design: `**Schémas** :
+\`\`\`prisma
+model Payment {
+  id          String        @id @default(cuid())
+  userId      String
+  addressId   String?
+  network     CryptoNetwork
+  amount      Decimal       @db.Decimal(18, 8)
+  currency    String
+  txHash      String        @unique
+  confirmations Int         @default(0)
+  status      PaymentStatus
+}
+\`\`\`
+
+**DTOs** : TransactionDTO, PaymentConfirmationDTO
+**Permission model** : System-only access`,
+    telemetry: `**Logs clés** :
+- Transaction detected
+- Payment confirmed
+- Payment validation failed
+
+**Métriques Prometheus** :
+- blockchain_transactions_detected_total
+- payment_confirmations_total
+- watcher_latency_seconds`,
+    security: `**ACL** : System service only
+**Rate-limit** : Blockchain API rate limits
+**Idempotence** : Transaction processing idempotency`,
+    acceptanceCriteria: `**Scenario 1: Détection transaction Base**
+Given un paiement USDC est envoyé à une adresse monitorée
+When la transaction est détectée
+Then un enregistrement Payment est créé avec statut PENDING
+
+**Scenario 2: Confirmation transaction**
+Given une transaction atteint le nombre de confirmations requis
+When le watcher traite la confirmation
+Then le statut Payment est mis à jour CONFIRMED`,
+    tests: `#### Tests Unitaires
+- [ ] Transaction parsing
+- [ ] Amount validation
+- [ ] Confirmation counting
+
+#### Tests d'Intégration
+- [ ] WebSocket connection
+- [ ] Database updates
+- [ ] Error handling
+
+#### Tests E2E
+- [ ] Full payment flow testnet
+- [ ] Multiple confirmations
+- [ ] Amount validation`,
+    testData: `**Adresses** : 0x742d... (testnet)
+**Montants** : 39.0, 59.0 USDC
+**IDs** : tx_test_001, payment_test_001
+**Canaux Discord** : N/A`,
+    dod: `- [ ] Watcher Base fonctionnel
+- [ ] Watcher TRON fonctionnel
+- [ ] Système de confirmations opérationnel
+- [ ] Validation des montants avec tolérance
+- [ ] Gestion des erreurs réseau
+- [ ] Performance monitoring en place`,
+    estimation: 'Complexe - 4 jours/homme',
+    risks: 'Risque élevé - dépendances blockchain externes',
+    labels: ['user-story', 'phase-2', 'blockchain'],
+  },
+  {
+    number: '06',
+    title: 'Gestion des Abonnements',
+    userStory: `En tant que système d'abonnement
+Je veux créditer automatiquement l'accès aux utilisateurs payants
+Afin de leur donner accès aux fonctionnalités premium`,
+    scope: `**In scope** :
+- Calcul automatique de la durée d'accès (30 jours par paiement standard)
+- Gestion des prorata pour sous-paiements
+- Crédits pour surpaiements
+- Assignation automatique des rôles Discord
+- Notifications de confirmation et expiration
+
+**Out of scope** :
+- Gestion des remboursements
+- Plans d'abonnement complexes (familiaux, etc.)`,
+    dependencies: `- **APIs** : Discord Bot API
+- **Rôles** : User, Admin, System
+- **Schémas** : Subscription, Payment, User
+- **Flags** : feature_subscription_management`,
+    design: `**Schémas** :
+\`\`\`prisma
+model Subscription {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  plan      UserPlan
+  status    SubscriptionStatus
+  startedAt DateTime    @default(now())
+  expiresAt DateTime
+  network   CryptoNetwork
+}
+\`\`\`
+
+**DTOs** : SubscriptionDTO, AccessGrantDTO
+**Permission model** : Role-based access control`,
+    telemetry: `**Logs clés** :
+- Subscription activated
+- Subscription extended
+- Role assigned
+- Subscription expired
+
+**Métriques Prometheus** :
+- subscriptions_activated_total
+- subscriptions_extended_total
+- role_assignments_total
+- subscription_expiry_events_total`,
+    security: `**ACL** : Admin can manage all subscriptions
+**Rate-limit** : Discord API rate limits
+**Idempotence** : Role assignment idempotency`,
+    acceptanceCriteria: `**Scenario 1: Activation abonnement**
+Given un paiement est confirmé
+When le système traite le paiement
+Then l'abonnement est activé pour 30 jours
+
+**Scenario 2: Extension abonnement**
+Given un utilisateur avec abonnement actif paie à nouveau
+When le paiement est traité
+Then la date d'expiration est prolongée`,
+    tests: `#### Tests Unitaires
+- [ ] Access duration calculation
+- [ ] Prorata calculation
+- [ ] Credit management
+
+#### Tests d'Intégration
+- [ ] Discord role assignment
+- [ ] Database updates
+- [ ] Notification sending
+
+#### Tests E2E
+- [ ] Full subscription flow
+- [ ] Role verification
+- [ ] Expiration handling`,
+    testData: `**Adresses** : N/A
+**Montants** : 39, 59, 99, 149
+**IDs** : sub_test_001, user_test_001
+**Canaux Discord** : #general, DM`,
+    dod: `- [ ] Calcul durée d'accès fonctionnel
+- [ ] Gestion prorata opérationnelle
+- [ ] Assignation rôles automatique
+- [ ] Système de notifications en place
+- [ ] Gestion des crédits pour surpaiements
+- [ ] Tests de cycle de vie abonnement`,
+    estimation: 'Moyenne - 3 jours/homme',
+    risks: 'Risque moyen - gestion des états et synchronisation',
+    labels: ['user-story', 'phase-2', 'subscription'],
+  },
+  {
+    number: '07',
+    title: 'Notifications de Paiement',
+    userStory: `En tant qu'utilisateur
+Je veux être notifié lorsque mon paiement est reçu
+Afin de confirmer que mon abonnement est actif`,
+    scope: `**In scope** :
+- DM Discord de confirmation immédiate
+- Email de confirmation (optionnel)
+- Affichage de la date d'expiration
+- Instructions pour les renouvellements
+- Notifications de rappel avant expiration
+
+**Out of scope** :
+- Notifications SMS
+- Notifications mobile push`,
+    dependencies: `- **APIs** : Discord Bot API, Email API
+- **Rôles** : User, System
+- **Schémas** : Notification, User
+- **Flags** : feature_notifications_enabled`,
+    design: `**Schémas** :
+\`\`\`prisma
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  channel   NotificationChannel
+  status    NotificationStatus
+  content   String
+  sentAt    DateTime?
+  readAt    DateTime?
+}
+\`\`\`
+
+**DTOs** : NotificationDTO, PaymentConfirmationDTO
+**Permission model** : User can manage their notifications`,
+    telemetry: `**Logs clés** :
+- Payment confirmation sent
+- Expiration reminder sent
+- Notification delivery failed
+
+**Métriques Prometheus** :
+- notifications_sent_total
+- notifications_failed_total
+- notification_delivery_latency_seconds`,
+    security: `**ACL** : Users can only access their notifications
+**Rate-limit** : 10 notifications per hour per user
+**Idempotence** : Notification deduplication`,
+    acceptanceCriteria: `**Scenario 1: Confirmation paiement**
+Given un paiement est confirmé
+When le système traite la confirmation
+Then une notification DM est envoyée à l'utilisateur
+
+**Scenario 2: Rappel expiration**
+Given un abonnement expire dans 3 jours
+When le job de rappel s'exécute
+Then une notification de rappel est envoyée`,
+    tests: `#### Tests Unitaires
+- [ ] Notification formatting
+- [ ] Channel selection
+- [ ] Template rendering
+
+#### Tests d'Intégration
+- [ ] Discord DM delivery
+- [ ] Email delivery
+- [ ] Database updates
+
+#### Tests E2E
+- [ ] Full notification flow
+- [ ] Multiple channels
+- [ ] Error scenarios`,
+    testData: `**Adresses** : N/A
+**Montants** : N/A
+**IDs** : user_test_001, notif_test_001
+**Canaux Discord** : DM`,
+    dod: `- [ ] Notifications DM fonctionnelles
+- [ ] Notifications email fonctionnelles
+- [ ] Système de rappels expiration en place
+- [ ] Templates de notification validés
+- [ ] Gestion des erreurs de livraison
+- [ ] Performance monitoring des notifications`,
+    estimation: 'Simple - 2 jours/homme',
+    risks: 'Risque faible - principalement de l'intégration',
+    labels: ['user-story', 'phase-2', 'notifications'],
+  },
+  {
+    number: '08',
+    title: 'Ingestion Données Marché',
+    userStory: `En tant que système d'analyse
+Je veux recevoir les données marché en temps réel
+Afin de détecter les opportunités de trading`,
+    scope: `**In scope** :
+- Connexion WebSocket aux exchanges (Binance, Bybit, OKX, Bitget)
+- Abonnement aux streams: trades, order book, funding, OI
+- Système de reconnexion automatique
+- Gestion des limites de rate
+- Stockage temporaire des données pour analyse
+
+**Out of scope** :
+- Support d'exchanges supplémentaires
+- Analyse avancée des données`,
+    dependencies: `- **APIs** : Binance API, Bybit API, OKX API, Bitget API
+- **Rôles** : System
+- **Schémas** : MarketData, ExchangeConnection
+- **Flags** : feature_market_data_enabled`,
+    design: `**Schémas** :
+\`\`\`prisma
+model MarketData {
+  id          String      @id @default(cuid())
+  exchange    String
+  symbol      String
+  dataType    MarketDataType
+  data        Json
+  timestamp   DateTime    @default(now())
+  receivedAt  DateTime    @default(now())
+}
+\`\`\`
+
+**DTOs** : TradeDTO, OrderBookDTO, FundingRateDTO
+**Permission model** : System-only access`,
+    telemetry: `**Logs clés** :
+- WebSocket connection established
+- Market data received
+- Connection lost/reconnected
+- Rate limit hit
+
+**Métriques Prometheus** :
+- market_data_messages_received_total
+- websocket_connections_total
+- market_data_ingestion_latency_seconds
+- rate_limit_events_total`,
+    security: `**ACL** : System service only
+**Rate-limit** : Exchange API rate limits
+**Idempotence** : Data deduplication`,
+    acceptanceCriteria: `**Scenario 1: Connexion Binance**
+Given le système démarre
+When il se connecte à Binance WebSocket
+Then la connexion est établie et les données sont reçues
+
+**Scenario 2: Reconnexion automatique**
+Given une connexion WebSocket est perdue
+When le système détecte la déconnexion
+Then il tente de se reconnecter automatiquement`,
+    tests: `#### Tests Unitaires
+- [ ] WebSocket connection logic
+- [ ] Data parsing
+- [ ] Rate limit handling
+
+#### Tests d'Intégration
+- [ ] Exchange API integration
+- [ ] Data storage
+- [ ] Reconnection logic
+
+#### Tests E2E
+- [ ] Full data ingestion flow
+- [ ] Multiple exchanges
+- [ ] Error scenarios`,
+    testData: `**Adresses** : N/A
+**Montants** : N/A
+**IDs** : conn_test_001, data_test_001
+**Canaux Discord** : N/A`,
+    dod: `- [ ] Connexions WebSocket aux 4 exchanges
+- [ ] Système de reconnexion automatique
+- [ ] Gestion des rate limits fonctionnelle
+- [ ] Stockage temporaire des données
+- [ ] Monitoring des connexions en place
+- [ ] Performance benchmarks atteints`,
+    estimation: 'Complexe - 5 jours/homme',
+    risks: 'Risque élevé - multiples dépendances externes',
+    labels: ['user-story', 'phase-3', 'market-data'],
+  },
+  {
+    number: '09',
+    title: 'Détection de Signaux',
+    userStory: `En tant qu'analyste de trading
+Je veux détecter automatiquement les setups de trading
+Afin de générer des signaux pertinents`,
+    scope: `**In scope** :
+- Détecteur de funding flips
+- Détecteur de OI spikes anormaux
+- Détecteur de sweep de niveaux HTF
+- Détecteur de cassures de structure
+- Filtres de qualité (liquidité, spread, volume)
+
+**Out of scope** :
+- Détection de patterns avancés (harmoniques, etc.)
+- Machine learning pour la prédiction`,
+    dependencies: `- **APIs** : Market data API
+- **Rôles** : System, Analyst
+- **Schémas** : Signal, DetectionRule
+- **Flags** : feature_signal_detection`,
+    design: `**Schémas** :
+\`\`\`prisma
+model Signal {
+  id          String      @id @default(cuid())
+  symbol      String
+  instrumentType InstrumentType
+  bias        SignalBias
+  confidence  Float
+  detection   Json        // Détails de la détection
+  createdAt   DateTime    @default(now())
+  expiresAt   DateTime
+  status      SignalStatus
+}
+\`\`\`
+
+**DTOs** : SignalDTO, DetectionResultDTO
+**Permission model** : System-generated, Analyst-reviewed`,
+    telemetry: `**Logs clés** :
+- Signal detected
+- Signal validated
+- Signal filtered out
+- Confidence score calculated
+
+**Métriques Prometheus** :
+- signals_detected_total
+- signals_validated_total
+- signal_confidence_score
+- detection_latency_seconds`,
+    security: `**ACL** : System service only
+**Rate-limit** : Internal rate limiting
+**Idempotence** : Signal deduplication`,
+    acceptanceCriteria: `**Scenario 1: Détection funding flip**
+Given un financement rate passe de négatif à positif
+When le détecteur analyse les données
+Then un signal de funding flip est généré
+
+**Scenario 2: Filtre qualité**
+Given un signal est détecté avec liquidité insuffisante
+When le filtre qualité s'exécute
+Then le signal est rejeté`,
+    tests: `#### Tests Unitaires
+- [ ] Detection algorithms
+- [ ] Quality filters
+- [ ] Confidence scoring
+
+#### Tests d'Intégration
+- [ ] Market data integration
+- [ ] Signal generation
+- [ ] Quality filtering
+
+#### Tests E2E
+- [ ] Full detection pipeline
+- [ ] Multiple signal types
+- [ ] Quality scenarios`,
+    testData: `**Adresses** : N/A
+**Montants** : N/A
+**IDs** : signal_test_001, detect_test_001
+**Canaux Discord** : N/A`,
+    dod: `- [ ] 4 détecteurs principaux opérationnels
+- [ ] Système de filtres qualité fonctionnel
+- [ ] Scoring de confiance implémenté
+- [ ] Gestion du TTL des signaux
+- [ ] Logs de détection complets
+- [ ] Performance benchmarks atteints`,
+    estimation: 'Complexe - 6 jours/homme',
+    risks: 'Risque élevé - complexité algorithmique',
+    labels: ['user-story', 'phase-3', 'signal-detection'],
+  },
+  {
+    number: '10',
+    title: 'Génération de Cartes de Trading',
+    userStory: `En tant que système de signal
+Je veux générer des cartes de trading structurées
+Afin de présenter les informations clairement aux utilisateurs`,
+    scope: `**In scope** :
+- Format de carte structuré avec tous les champs requis
+- Calcul automatique de la taille de position (risk-based)
+- Suggestions de levier selon la liquidité
+- TTL (Time-To-Live) pour chaque signal
+- Génération d'ID unique et hash pour traçabilité
+
+**Out of scope** :
+- Cartes personnalisées par utilisateur
+- Analyses techniques avancées sur les cartes`,
+    dependencies: `- **APIs** : Signal API, Risk API
+- **Rôles** : System, RiskEngine
+- **Schémas** : TradingCard, RiskCalculation
+- **Flags** : feature_trading_cards`,
+    design: `**Schémas** :
+\`\`\`prisma
+model TradingCard {
+  id          String      @id @default(cuid())
+  signalId    String
+  signal      Signal      @relation(fields: [signalId], references: [id])
+  symbol      String
+  instrumentType InstrumentType
+  bias        SignalBias
+  entryZone   Json        // Zone d'entrée [min, max]
+  invalidation Float
+  takeProfits Json        // Array de TP
+  risk        Json        // Calculs de risque
+  confidence  Float
+  ttlSec      Int
+  createdAt   DateTime    @default(now())
+  hash        String      @unique
+}
+\`\`\`
+
+**DTOs** : TradingCardDTO, RiskCalculationDTO
+**Permission model** : System-generated, user-accessible`,
+    telemetry: `**Logs clés** :
+- Trading card generated
+- Risk calculation performed
+- Hash generated
+- Card expired
+
+**Métriques Prometheus** :
+- trading_cards_generated_total
+- risk_calculations_total
+- card_generation_latency_seconds
+- card_expiry_events_total`,
+    security: `**ACL** : Users can access their cards
+**Rate-limit** : Card generation rate limiting
+**Idempotence** : Same inputs = same hash`,
+    acceptanceCriteria: `**Scenario 1: Génération carte**
+Given un signal valide est détecté
+When le système génère la carte
+Then une carte structurée est créée avec tous les champs
+
+**Scenario 2: Calcul taille position**
+Given une carte est générée
+When le calcul de risque s'exécute
+Then la taille de position est calculée selon le % de risque`,
+    tests: `#### Tests Unitaires
+- [ ] Card formatting
+- [ ] Risk calculations
+- [ ] Hash generation
+- [ ] TTL management
+
+#### Tests d'Intégration
+- [ ] Signal integration
+- [ ] Risk engine integration
+- [ ] Data validation
+
+#### Tests E2E
+- [ ] Full card generation flow
+- [ ] Multiple scenarios
+- [ ] Hash consistency`,
+    testData: `**Adresses** : N/A
+**Montants** : N/A
+**IDs** : card_test_001, signal_test_001
+**Canaux Discord** : N/A`,
+    dod: `- [ ] Format de carte structuré validé
+- [ ] Calculs de risque fonctionnels
+- [ ] Génération de hash consistante
+- [ ] Système de TTL opérationnel
+- [ ] Validation des cartes générées
+- [ ] Documentation du format complète`,
+    estimation: 'Moyenne - 3 jours/homme',
+    risks: 'Risque moyen - calculs financiers complexes',
+    labels: ['user-story', 'phase-3', 'trading-cards'],
+  },
 ];
 
 async function createIssue(story) {
