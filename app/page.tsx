@@ -38,21 +38,21 @@ export default function HomePage() {
         reviews={[
           {
             image: "https://i.pravatar.cc/300?u=a1",
-            name: "Sophie",
-            review: `Threader **has completely transformed the way I manage my social media** content. The ability to schedule posts and use AI for content suggestions has saved me hours each week.`,
-            role: "Digital Marketer",
+            name: "Mark",
+            review: `MyCryptoPilot **has completely transformed my crypto trading approach**. The risk-first signals and real-time analysis helped me increase my profits by 40% in 3 months.`,
+            role: "Crypto Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=a2",
-            name: "Alex",
-            review: `Using Threader has significantly boosted my online engagement. **The analytics tool helps me understand what works**, allowing me to refine my strategy and grow my follower base.`,
-            role: "Social Media Influencer",
+            name: "Leah",
+            review: `MyCryptoPilot's automated trading is incredible. **I can sleep peacefully** knowing the bot manages my positions according to my strategies with stop-loss and take-profit.`,
+            role: "Investor",
           },
           {
             image: "https://i.pravatar.cc/300?u=a3",
-            name: "Jordan",
-            review: `The ease of scheduling and the AI-generated content features are game-changers. **Threader's user-friendly interface** makes it perfect for anyone looking to enhance their online presence.`,
-            role: "Entrepreneur",
+            name: "Thomas",
+            review: `The multi-exchange connection is amazing. **I can trade on Binance and Bybit simultaneously** from a single interface. The Discord bot keeps me informed in real-time.`,
+            role: "Day Trader",
           },
         ]}
       />
@@ -61,19 +61,20 @@ export default function HomePage() {
 
       <ReviewSingle
         image="https://i.pravatar.cc/300?u=5"
-        name="Michel"
-        review={`Threader **has completely transformed** the way I manage my social media content. The ability to schedule posts and use AI for content suggestions **has saved me hours each week.**`}
-        role="Digital Marketer"
-        compagnyImage="https://1000logos.net/wp-content/uploads/2017/03/McDonalds-Logo-2003.png"
+        name="Sophie"
+        review={`MyCryptoPilot **has revolutionized my crypto trading approach**. The technical analysis and automated signals **have multiplied my returns by 3 in 6 months.**`}
+        role="Professional Trader"
+        compagnyImage="https://1000logos.net/wp-content/uploads/2021/05/JP-Morgan-Chase-logo.png"
         key={1}
       />
 
       <FeaturesSection
         features={[
           {
-            badge: "⏰ Schedule",
-            title: "Schedule your post",
-            description: "Schedule your post on the Threader in a few clicks.",
+            badge: "📊 Real-time Analysis",
+            title: "Real-time Market Analysis",
+            description:
+              "Continuous monitoring of prices, volumes and technical indicators across all major exchanges.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -86,10 +87,10 @@ export default function HomePage() {
             ),
           },
           {
-            badge: "📅 Calendar",
-            title: "See what you scheduled",
+            badge: "🚦 Risk-First Signals",
+            title: "Intelligent Trading Signals",
             description:
-              "With the calendar view, you can see what you scheduled and when.",
+              "Signal generation based on risk analysis and market opportunities assessment.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -101,10 +102,10 @@ export default function HomePage() {
             ),
           },
           {
-            badge: "👁️ Preview",
-            title: "Preview your post",
+            badge: "🤖 Automated Trading",
+            title: "Automated Strategies",
             description:
-              "Preview your post before scheduling it to see how it will look like.",
+              "Automatic execution of your trading strategies with advanced risk management.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -117,10 +118,10 @@ export default function HomePage() {
             ),
           },
           {
-            badge: "🔄 Repost",
-            title: "Schedule repost",
+            badge: "💎 Multi-Exchange",
+            title: "Multi-Exchange Support",
             description:
-              "Automatically repost your post after a certain amount of time.",
+              "Connect Binance, Bybit, OKX and Bitget to trade across all platforms.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -146,39 +147,39 @@ export default function HomePage() {
       <FAQSection
         faq={[
           {
-            question: "What is Threader?",
+            question: "What is MyCryptoPilot?",
             answer:
-              "Threader is an innovative platform designed to help you write, schedule, and publish content to your account with the assistance of AI, enhancing your business's online presence.",
+              "MyCryptoPilot is an intelligent crypto trading copilot that provides real-time market analysis, risk-based trading signals and automated strategies to optimize your trading performance.",
           },
           {
-            question: "How does AI Content Generation work?",
+            question: "How do trading signals work?",
             answer:
-              "Our AI Content Generation feature leverages the power of artificial intelligence to create unique and engaging content for your Threads, making content creation easier and more efficient.",
+              "Our trading signals use advanced market analysis, technical indicators and a 'risk-first' approach to identify the best investment opportunities with optimal risk management.",
           },
           {
-            question: "Can I schedule my threads in advance?",
+            question: "Which exchanges are supported?",
             answer:
-              "Yes, with Threader, you can schedule your threads for a specific time, allowing you to maintain a consistent online presence without the need to manually post every day.",
+              "MyCryptoPilot supports major crypto exchanges: Binance, Bybit, OKX and Bitget. You can connect multiple accounts and trade simultaneously across multiple platforms.",
           },
           {
-            question: "What is the Now.TS project?",
+            question: "Can I automate my trading strategies?",
             answer:
-              "Now.TS is a new project announced on our platform that enables users to create professional Next.js applications in days, streamlining the development process.",
+              "Yes, our platform allows you to create and automatically execute trading strategies with custom conditions, stop-loss and take-profit for complete trade management.",
           },
           {
-            question: "How can I get more followers?",
+            question: "Which crypto networks are supported?",
             answer:
-              "To gain more followers, focus on creating content related to Next.js, as our analysis shows it's highly engaging. Utilize our research tools to understand trends and improve your content strategy.",
+              "We support major blockchain networks: Base, Tron, Polygon and Ethereum. You can trade assets on these networks with optimized transaction fees.",
           },
           {
-            question: "What are the benefits of posting with Threader?",
+            question: "Is automated trading safe?",
             answer:
-              "Posting with Threader allows you to schedule posts, avoid daily manual postings, track your scheduled content easily, and maintain consistency in your online activity.",
+              "Security is our priority. All exchange connections are secured with API keys, and we use advanced protection mechanisms with loss limits and security checks.",
           },
           {
-            question: "What pricing plans does Threader offer?",
+            question: "What are the benefits of the Discord bot?",
             answer:
-              "Threader offers two pricing plans: THREADER FREE, perfect for tiny creators, allowing you to schedule 1 post in advance; and THREADER PREMIUM, ideal for content creators, offering unlimited scheduling, post previews, and auto-reposting features.",
+              "Our Discord bot provides you with real-time alerts, trading signals directly on your server, and allows you to manage some operations from Discord for a simplified trading experience.",
           },
         ]}
       />
@@ -189,73 +190,73 @@ export default function HomePage() {
         reviews={[
           {
             image: "https://i.pravatar.cc/300?u=b1",
-            name: "Eva",
+            name: "Anthony",
             review:
-              "Since I started using Threader, my content creation process has been streamlined. The AI suggestions are spot on, helping me to connect better with my audience. Highly recommend for anyone looking to elevate their content game.",
-            role: "Content Creator",
+              "Since I started using MyCryptoPilot, my trading performance has skyrocketed. The risk-first signals have saved me from several major losses. Recommended for any serious trader.",
+            role: "Crypto Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b2",
-            name: "Lucas",
+            name: "Camille",
             review:
-              "Threader's scheduling feature is a lifesaver. It allows me to plan my content calendar efficiently, ensuring I never miss posting on the optimal days and times. Fantastic tool for social media managers.",
-            role: "Social Media Manager",
+              "MyCryptoPilot's dashboard is exceptional. I can monitor all my trades in real-time on Binance and Bybit. An essential tool for day trading.",
+            role: "Day Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b3",
-            name: "Mia",
+            name: "Julian",
             review:
-              "The analytics provided by Threader are invaluable. They've given me insights into what my audience loves, helping me double my engagement rate in just a few months.",
-            role: "Digital Marketer",
+              "The technical analysis provided by MyCryptoPilot is invaluable. It allowed me to double my success rate in just a few months.",
+            role: "Technical Analyst",
           },
           {
             image: "https://i.pravatar.cc/300?u=b4",
-            name: "Noah",
+            name: "Emily",
             review:
-              "I was skeptical about AI-generated content, but Threader changed my mind. The content feels personal and has significantly increased my interaction rates.",
-            role: "Blogger",
+              "I was skeptical about automated trading, but MyCryptoPilot changed my mind. The bot executes my strategies perfectly with impeccable risk management.",
+            role: "Investor",
           },
           {
             image: "https://i.pravatar.cc/300?u=b5",
-            name: "Isabella",
+            name: "Nicholas",
             review:
-              "Threader's user interface is incredibly user-friendly. I was able to onboard my team in no time, and we've seen a marked improvement in our social media performance.",
-            role: "Team Leader",
+              "MyCryptoPilot's interface is incredibly intuitive. I was able to onboard my entire team in record time, and our trading performance has significantly improved.",
+            role: "Trading Team Lead",
           },
           {
             image: "https://i.pravatar.cc/300?u=b6",
-            name: "Oliver",
+            name: "Marie",
             review:
-              "Auto-reposting with Threader is a feature I didn't know I needed. It's great for getting more mileage out of your best content without any extra effort.",
-            role: "Freelancer",
+              "The Discord bot is a feature I didn't know about. It's great for receiving real-time alerts and managing some operations directly from Discord.",
+            role: "Freelance Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b7",
-            name: "Sophia",
+            name: "David",
             review:
-              "Joining the Threader community has opened up networking opportunities with fellow content creators. It's more than just a tool; it's a platform for growth.",
-            role: "Influencer",
+              "Joining the MyCryptoPilot community opened up networking opportunities with other traders. It's more than a tool, it's a growth ecosystem.",
+            role: "Crypto Influencer",
           },
           {
             image: "https://i.pravatar.cc/300?u=b8",
-            name: "Elijah",
+            name: "Laura",
             review:
-              "The calendar view in Threader helps me visualize my content strategy for the entire month. It's been a game changer for my planning process.",
-            role: "Strategist",
+              "The multi-exchange view in MyCryptoPilot helps me visualize my entire portfolio. It's been a game-changer for my investment strategy.",
+            role: "Crypto Strategist",
           },
           {
             image: "https://i.pravatar.cc/300?u=b9",
-            name: "Charlotte",
+            name: "Peter",
             review:
-              "I appreciate the flexibility in Threader's pricing plans. It's accessible for creators at any stage of their journey, from beginners to established influencers.",
-            role: "Entrepreneur",
+              "I appreciate the flexibility of MyCryptoPilot's pricing plans. It's accessible for traders at all levels, from beginners to professional traders.",
+            role: "Crypto Entrepreneur",
           },
           {
             image: "https://i.pravatar.cc/300?u=b10",
-            name: "James",
+            name: "Chloe",
             review:
-              "The customer support team at Threader is fantastic. They've been quick to respond and helpful with any questions I've had. Great service overall.",
-            role: "Customer",
+              "MyCryptoPilot's support team is fantastic. They were quick to respond and helpful with all my questions. Exceptional customer service.",
+            role: "Premium Customer",
           },
         ]}
       />

@@ -16,9 +16,9 @@ export const Hero = () => {
               variant="h1"
               className="text-5xl font-semibold tracking-tight text-balance sm:text-7xl lg:text-7xl"
             >
-              Write the best content and Grow your{" "}
+              Intelligent Crypto Trading Copilot to{" "}
               <span className="relative inline-block">
-                <span>business</span>
+                <span>maximize your profits</span>
                 <CircleSvg className="fill-primary absolute inset-0" />
               </span>
             </Typography>
@@ -26,8 +26,8 @@ export const Hero = () => {
               variant="large"
               className="text-muted-foreground mt-8 text-lg font-medium text-pretty sm:text-xl/8"
             >
-              Build for Thread, create, schedule and publish your content to
-              your account with AI.
+              Real-time analysis, risk-first signals and automated trading
+              strategies for crypto markets.
             </Typography>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Link

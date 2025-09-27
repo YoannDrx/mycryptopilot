@@ -20,10 +20,10 @@ export const CTAImageSection = () => {
           variant="h2"
           className="text-center text-5xl font-extrabold"
         >
-          Start getting a lot of followers
+          Start maximizing your trading profits
         </Typography>
         <Typography className="text-center font-bold">
-          By posting every day with Threader !
+          With automated trading and AI-powered signals from MyCryptoPilot !
         </Typography>
         <Link href="#pricing" className={buttonVariants({ size: "lg" })}>
           Get started

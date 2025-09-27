@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { contactSupportAction } from "@/features/contact/support/contact-support.action";
 import { ContactSupportSchema } from "@/features/contact/support/contact-support.schema";
-import { env } from "@/lib/env";
 import { serverToast } from "@/lib/server-toast";
 import { SiteConfig } from "@/site-config";
 import { Building2, Mail, MessageSquare } from "lucide-react";
@@ -15,12 +14,19 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: `Contact ${SiteConfig.title}`,
   description:
-    "Get in touch with the NOW.TS team. We're here to help with any questions about testimonial collection, platform features, or technical support.",
-  keywords: ["contact", "support", "help", "testimonials", "questions"],
+    "Get in touch with the MyCryptoPilot team. We're here to help with any questions about crypto trading, platform features, or technical support.",
+  keywords: [
+    "contact",
+    "support",
+    "help",
+    "crypto trading",
+    "automation",
+    "signals",
+  ],
   openGraph: {
     title: `Contact ${SiteConfig.title}`,
     description:
-      "Get in touch with the NOW.TS team. We're here to help with any questions about testimonial collection, platform features, or technical support.",
+      "Get in touch with the MyCryptoPilot team. We're here to help with any questions about crypto trading, platform features, or technical support.",
     url: `${SiteConfig.prodUrl}/contact`,
     type: "website",
   },
@@ -40,15 +46,15 @@ export default function ContactPage() {
               variant="h1"
               className="text-foreground text-4xl font-semibold tracking-tight text-pretty sm:text-5xl"
             >
-              Get in touch
+              Let's talk trading
             </Typography>
             <Typography
               variant="p"
               className="text-muted-foreground mt-6 text-lg/8"
             >
-              Have questions about NOW.TS? Need help with testimonial collection
-              or want to share feedback? I'm here to help and always excited to
-              hear from our community.
+              Have questions about MyCryptoPilot? Need help with automated
+              trading setup or want to share feedback? We're here to help and
+              always excited to connect with fellow crypto enthusiasts.
             </Typography>
             <dl className="text-muted-foreground mt-10 flex flex-col gap-4 text-base/7">
               <div className="flex gap-x-4">
@@ -71,10 +77,10 @@ export default function ContactPage() {
                 </dt>
                 <dd>
                   <a
-                    href="mailto:melvyn@nowts.com"
+                    href="mailto:hello@mycryptopilot.app"
                     className="hover:text-foreground transition-colors"
                   >
-                    {env.NEXT_PUBLIC_EMAIL_CONTACT}
+                    hello@mycryptopilot.app
                   </a>
                 </dd>
               </div>
@@ -87,9 +93,9 @@ export default function ContactPage() {
                   />
                 </dt>
                 <dd>
-                  Usually respond within 24 hours
+                  Usually respond within 2 hours during trading hours
                   <br />
-                  Monday - Friday, 9 AM - 6 PM ICT
+                  Monday - Friday, 9 AM - 9 PM CET
                 </dd>
               </div>
             </dl>

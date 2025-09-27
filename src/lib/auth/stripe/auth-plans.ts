@@ -65,16 +65,17 @@ export const AUTH_PLANS: AppAuthPlan[] = [
   {
     name: "free",
     description:
-      "Perfect for individuals and small projects with essential features",
+      "Perfect for getting started in crypto trading with essential features",
     limits: DEFAULT_LIMIT,
     price: 0,
-    currency: "USD",
+    currency: "EUR",
     yearlyPrice: 0,
   },
   {
     name: "pro",
     isPopular: true,
-    description: "Ideal for growing teams with advanced collaboration needs",
+    description:
+      "Ideal for active traders with advanced signals and automated trading",
     priceId: process.env.STRIPE_PRO_PLAN_ID ?? "",
     annualDiscountPriceId: process.env.STRIPE_PRO_YEARLY_PLAN_ID ?? "",
     limits: {
@@ -98,15 +99,15 @@ export const AUTH_PLANS: AppAuthPlan[] = [
       },
     },
 
-    price: 49,
-    yearlyPrice: 400,
+    price: 89,
+    yearlyPrice: 899,
     currency: "USD",
   },
   {
     name: "ultra",
     isPopular: false,
     description:
-      "Enterprise-grade solution for large teams with complex requirements",
+      "Enterprise solution for institutions and professional traders with VIP access",
     priceId: process.env.STRIPE_ULTRA_PLAN_ID ?? "",
     annualDiscountPriceId: process.env.STRIPE_ULTRA_YEARLY_PLAN_ID ?? "",
     limits: {
@@ -117,8 +118,8 @@ export const AUTH_PLANS: AppAuthPlan[] = [
     freeTrial: {
       days: 14,
     },
-    price: 100,
-    yearlyPrice: 1000,
+    price: 249,
+    yearlyPrice: 2249,
     currency: "USD",
   },
 ];
@@ -135,19 +136,19 @@ export const LIMITS_CONFIG: Record<
   projects: {
     icon: FolderArchive,
     getLabel: (value: number) =>
-      `${value} ${value === 1 ? "Project" : "Projects"}`,
-    description: "Create and manage projects",
+      `${value} ${value === 1 ? "Stratégie" : "Stratégies"} de trading`,
+    description: "Créez et gérez vos stratégies de trading",
   },
   storage: {
     icon: HardDrive,
-    getLabel: (value: number) => `${value} GB Storage`,
-    description: "Cloud storage for your files",
+    getLabel: (value: number) => `${value} GB de données`,
+    description: "Stockage pour vos données et analyses",
   },
   members: {
     icon: Users,
     getLabel: (value: number) =>
-      `${value} Team ${value === 1 ? "Member" : "Members"}`,
-    description: "Invite team members to collaborate",
+      `${value} ${value === 1 ? "Membre" : "Membres"} d'équipe`,
+    description: "Invitez des membres pour collaborer",
   },
 };
 
@@ -156,32 +157,42 @@ export const ADDITIONAL_FEATURES = {
   free: [
     {
       icon: Shield,
-      label: "Basic Security",
-      description: "Standard protection for your data",
+      label: "Sécurité de base",
+      description: "Protection standard pour vos données",
     },
   ],
   pro: [
     {
       icon: Zap,
-      label: "Priority Support",
-      description: "Get help when you need it most",
+      label: "Signaux Premium",
+      description: "Accès aux signaux de trading avancés",
     },
     {
       icon: HeadphonesIcon,
-      label: "24/7 Customer Service",
-      description: "Round-the-clock assistance",
+      label: "Support 24/7",
+      description: "Assistance continue pour vos trades",
     },
     {
       icon: Clock,
-      label: "Advanced Analytics",
-      description: "Detailed insights and reporting",
+      label: "Analyses en temps réel",
+      description: "Analyse technique et fondamentale en direct",
     },
   ],
   ultra: [
     {
       icon: Zap,
-      label: "Priority Support",
-      description: "Get help when you need it most",
+      label: "Support VIP",
+      description: "Support prioritaire avec account manager dédié",
+    },
+    {
+      icon: Clock,
+      label: "API complète",
+      description: "Accès API complet pour l'intégration",
+    },
+    {
+      icon: Shield,
+      label: "Sécurité renforcée",
+      description: "Mesures de sécurité enterprise",
     },
   ],
 };
