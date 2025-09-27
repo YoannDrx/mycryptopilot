@@ -1,0 +1,128 @@
+name: Bug Report
+description: Signaler un bug dans le projet MyCryptoPilot
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Bug Report MyCryptoPilot
+
+        Merci de signaler les bugs pour nous aider à améliorer MyCryptoPilot.
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Description du bug
+      description: "Décrivez clairement le bug rencontré"
+      placeholder: "Décrire le bug en détail..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Étapes pour reproduire
+      description: "Étapes précises pour reproduire le bug"
+      placeholder: |
+        1. Aller à '...'
+        2. Cliquer sur '....'
+        3. Faire défiler jusqu'à '....'
+        4. Voir l'erreur
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Comportement attendu
+      description: "Ce qui devrait se produire normalement"
+      placeholder: "Décrire le comportement attendu..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Comportement actuel
+      description: "Ce qui se produit réellement"
+      placeholder: "Décrire le comportement observé..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Sévérité
+      description: "Impact du bug sur le système"
+      options:
+        - "Critique - Le système est inutilisable"
+        - "Majeur - Fonctionnalité majeure affectée"
+        - "Mineur - Fonctionnalité mineure affectée"
+        - "Cosmétique - Problème d'UI/UX"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Composant affecté
+      description: "Composant où le bug a été détecté"
+      options:
+        - "Frontend (Next.js)"
+        - "Backend API"
+        - "Discord Bot"
+        - "Database"
+        - "Crypto Watchers"
+        - "Signal Processing"
+        - "Infrastructure"
+        - "Autre"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environnement
+      description: "Configuration où le bug a été détecté"
+      placeholder: |
+        - OS: [ex. iOS]
+        - Navigateur: [ex. chrome, safari]
+        - Version: [ex. 22]
+        - Environnement: [ex. production, staging, local]
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: "Ajoutez des screenshots pour aider à expliquer le problème"
+      placeholder: "Glissez-déposez des images ici..."
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs pertinents
+      description: "Ajoutez les logs d'erreur ou de débogage pertinents"
+      placeholder: "```log\nLogs ici...\n```"
+      render: shell
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Contexte additionnel
+      description: "Toute autre information pertinente"
+      placeholder: "Ajoutez tout autre contexte sur le problème ici..."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: "J'ai cherché dans les issues existantes"
+          required: false
+        - label: "J'ai testé sur la dernière version"
+          required: false
+        - label: "J'ai essayé de reproduire le bug"
+          required: false

@@ -1,0 +1,94 @@
+name: Feature Request
+description: Proposer une nouvelle fonctionnalité pour MyCryptoPilot
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Feature Request MyCryptoPilot
+
+        Merci de proposer des idées pour améliorer MyCryptoPilot !
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Description de la fonctionnalité
+      description: "Décrivez clairement la fonctionnalité proposée"
+      placeholder: "Décrire la fonctionnalité en détail..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-solved
+    attributes:
+      label: Problème résolu
+      description: "Quel problème cette fonctionnalité résout-elle ?"
+      placeholder: "Décrire le problème et comment cette fonctionnalité le résout..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Solution proposée
+      description: "Comment voyez-vous cette fonctionnalité implémentée ?"
+      placeholder: "Décrire la solution technique ou l'approche proposée..."
+
+  - type: textarea
+    id: user-benefit
+    attributes:
+      label: Bénéfices utilisateur
+      description: "Quels sont les bénéfices pour les utilisateurs ?"
+      placeholder: "Décrire les bénéfices pour les différentes catégories d'utilisateurs..."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorité
+      description: "Niveau de priorité estimé"
+      options:
+        - "Haute - Impact business majeur"
+        - "Moyenne - Amélioration significative"
+        - "Basse - Nice to have"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Effort estimé
+      description: "Effort de développement estimé"
+      options:
+        - "Faible - Quelques jours"
+        - "Moyen - 1-2 semaines"
+        - "Élevé - Plusieurs semaines"
+        - "Inconnu - À évaluer"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considérées
+      description: "Quelles autres solutions avez-vous considérées ?"
+      placeholder: "Décrire les alternatives envisagées et pourquoi elles ont été rejetées..."
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Contexte additionnel
+      description: "Toute autre information pertinente"
+      placeholder: "Ajoutez des dessins, exemples, ou autre contexte ici..."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: "J'ai vérifié que cette fonctionnalité n'existe pas déjà"
+          required: false
+        - label: "J'ai cherché dans les issues existantes"
+          required: false
+        - label: "Je comprends que cette feature peut être rejetée"
+          required: false

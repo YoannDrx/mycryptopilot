@@ -31,7 +31,8 @@
     "better-auth:migrate": "pnpm dlx @better-auth/cli generate --output prisma/schema/better-auth.prisma",
     "prisma:seed": "NODE_ENV=development prisma db seed",
     "prisma:migrate": "pnpm prisma migrate dev",
-    "prisma:generate": "pnpm prism generate"
+    "prisma:generate": "pnpm prism generate",
+    "create-issues": "node scripts/create-issues.js"
   },
   "prisma": {
     "seed": "pnpm tsx prisma/seed.ts"
@@ -122,6 +123,7 @@
     "@eslint/js": "^9.35.0",
     "@faker-js/faker": "^10.0.0",
     "@next/eslint-plugin-next": "^15.5.2",
+    "@octokit/rest": "^22.0.0",
     "@playwright/test": "^1.55.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",

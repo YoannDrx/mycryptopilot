@@ -1,0 +1,202 @@
+name: User Story MyCryptoPilot
+description: Template pour les user stories du projet MyCryptoPilot
+title: "[US] "
+labels: ["user-story", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # User Story MyCryptoPilot
+
+        Merci d'utiliser ce template pour créer les user stories du projet.
+        Référez-vous au fichier [USER_STORY_TEMPLATE.md](../USER_STORY_TEMPLATE.md) pour les guidelines complètes.
+
+  - type: input
+    id: us-number
+    attributes:
+      label: Numéro US
+      description: "Ex: 01, 02, 03... (suivre la séquence existante)"
+      placeholder: "XX"
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: Titre clair et concis
+      description: "Titre qui résume la fonctionnalité"
+      placeholder: "Ex: Génération d'adresses crypto"
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: "Format: En tant que [rôle], Je veux [capacité], Afin de [valeur]"
+      placeholder: |
+        En tant que [rôle]
+        Je veux [capacité]
+        Afin de [valeur]
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Portée (In/Out scope)
+      description: "Délimiter clairement ce qui est inclus et exclu"
+      placeholder: |
+        **In scope** :
+        -
+
+        **Out of scope** :
+        -
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dépendances
+      description: "APIs, rôles, schémas, flags nécessaires"
+      placeholder: |
+        - **APIs** :
+        - **Rôles** :
+        - **Schémas** :
+        - **Flags** :
+    validations:
+      required: true
+
+  - type: textarea
+    id: design
+    attributes:
+      label: Design Notes
+      description: "Schémas, DTOs, permission model"
+      placeholder: "Décrire les schémas de base de données, DTOs, modèles de permissions..."
+
+  - type: textarea
+    id: telemetry
+    attributes:
+      label: Telemetry
+      description: "Logs clés et métriques Prometheus à exposer"
+      placeholder: |
+        **Logs clés** :
+        **Métriques Prometheus** :
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Sécurité
+      description: "ACL, rate-limit, idempotence"
+      placeholder: |
+        **ACL** :
+        **Rate-limit** :
+        **Idempotence** :
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Critères d'Acceptation (BDD)
+      description: "Scénarios Given/When/Then"
+      placeholder: |
+        **Scenario 1: [Nom du scénario]**
+        Given [contexte initial]
+        When [action]
+        Then [résultat attendu]
+
+        **Scenario 2: [Nom du scénario]**
+        Given [contexte initial]
+        When [action]
+        Then [résultat attendu]
+
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests
+      description: "Tests unitaires, d'intégration, E2E prévus"
+      placeholder: |
+        #### Tests Unitaires
+        - [ ]
+
+        #### Tests d'Intégration
+        - [ ]
+
+        #### Tests E2E
+        - [ ]
+
+  - type: textarea
+    id: test-data
+    attributes:
+      label: Données de Test
+      description: "Adresses, montants, IDs, canaux Discord pour les tests"
+      placeholder: |
+        **Adresses** :
+        **Montants** :
+        **IDs** :
+        **Canaux Discord** :
+
+  - type: textarea
+    id: dod
+    attributes:
+      label: DoD Spécifique
+      description: "Checklist spécifique à cette user story"
+      placeholder: |
+        - [ ]
+        - [ ]
+        - [ ]
+        - [ ]
+
+  - type: input
+    id: estimation
+    attributes:
+      label: Estimation
+      description: "Complexité et charge en jours/homme"
+      placeholder: "Ex: Moyenne - 3 jours/homme"
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risques
+      description: "Risques identifiés et stratégies de mitigation"
+      placeholder: "Décrire les risques potentiels..."
+
+  - type: checkboxes
+    id: dor-checklist
+    attributes:
+      label: Definition of Ready (DoR) Checklist
+      description: "L'US est prête pour le développement quand tous ces points sont cochés"
+      options:
+        - label: "Problème clair : Valeur utilisateur explicite en 1 phrase"
+          required: false
+        - label: "Portée définie : In scope/Out scope explicite"
+          required: false
+        - label: "Dépendances identifiées : APIs, clés, rôles, schémas"
+          required: false
+        - label: "Métriques définies : Logs et métriques à exposer"
+          required: false
+        - label: "Critères BDD listés et testables"
+          required: false
+        - label: "Estimation ≤ 3-5 jours homme"
+          required: false
+
+  - type: checkboxes
+    id: global-dod
+    attributes:
+      label: Definition of Done (DoD) Global
+      description: "Ces points s'appliquent à TOUTES les user stories"
+      options:
+        - label: "Code, tests unitaires (≥80%), tests d'intégration verts"
+          required: false
+        - label: "Logs structurés + métriques Prometheus exposées"
+          required: false
+        - label: "Alertes créées si applicable"
+          required: false
+        - label: "Documentation : README + runbook + notes de sécurité"
+          required: false
+        - label: "Demo steps reproductibles (5 étapes max)"
+          required: false
+        - label: "Feature flag/rollout si risque prod"
+          required: false
+        - label: "0 P0/P1 lints, 0 secrets en clair, SAST vert"
+          required: false
