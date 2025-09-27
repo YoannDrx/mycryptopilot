@@ -34,7 +34,12 @@ export const DisconnectProviderDialog = ({
 
   return (
     <div className="flex justify-end gap-2">
-      <Button variant="outline" onClick={() => {}}>
+      <Button
+        variant="outline"
+        onClick={() => {
+          // Empty function - dialog closing should be handled by parent
+        }}
+      >
         Cancel
       </Button>
       <LoadingButton
