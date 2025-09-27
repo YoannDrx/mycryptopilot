@@ -32,7 +32,8 @@
     "prisma:seed": "NODE_ENV=development prisma db seed",
     "prisma:migrate": "pnpm prisma migrate dev",
     "prisma:generate": "pnpm prism generate",
-    "create-issues": "node scripts/create-issues.js"
+    "create-issues": "node scripts/create-issues.js",
+    "create-issues:gh": "node scripts/create-issues-gh.js"
   },
   "prisma": {
     "seed": "pnpm tsx prisma/seed.ts"
