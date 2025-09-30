@@ -1,7 +1,12 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { admin, emailOTP, organization } from "better-auth/plugins";
+import {
+  admin,
+  emailOTP,
+  lastLoginMethod,
+  organization,
+} from "better-auth/plugins";
 import { ac, roles } from "./auth/auth-permissions";
 
 import { sendEmail } from "@/lib/mail/send-email";
@@ -14,7 +19,6 @@ import { logger } from "./logger";
 import { prisma } from "./prisma";
 import { getServerUrl } from "./server-url";
 import { stripe } from "./stripe";
-
 type SocialProvidersType = Parameters<typeof betterAuth>[0]["socialProviders"];
 
 export const SocialProviders: SocialProvidersType = {};
@@ -209,6 +213,7 @@ export const auth = betterAuth({
       },
     }),
     admin({}),
+    lastLoginMethod({}),
     // Warning: always last plugin
     nextCookies(),
   ],

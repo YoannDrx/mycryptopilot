@@ -1,24 +1,18 @@
 "use client";
 
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
 
 export type AuthProvider = "github" | "google";
 
-type LastUsedProviderState = {
-  lastUsedProvider: AuthProvider | null;
-  setLastUsedProvider: (provider: AuthProvider) => void;
-};
-
-export const useLastUsedProviderStore = create<LastUsedProviderState>()(
-  persist(
-    (set) => ({
-      lastUsedProvider: null,
-      setLastUsedProvider: (provider: AuthProvider) =>
-        set({ lastUsedProvider: provider }),
-    }),
-    {
-      name: "last-used-provider",
+export const useIsLastUsedProvider = (provider: AuthProvider) => {
+  const { data } = useQuery({
+    queryFn: () => {
+      return authClient.isLastUsedLoginMethod(provider);
     },
-  ),
-);
+    queryKey: ["lastUsedProvider", provider],
+    staleTime: Infinity,
+  });
+
+  return data ?? false;
+};

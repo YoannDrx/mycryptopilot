@@ -6,7 +6,7 @@ import { getCallbackUrl } from "@/lib/auth/auth-utils";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { useLastUsedProviderStore } from "./last-used-provider.store";
+import { useIsLastUsedProvider } from "./last-used-provider.store";
 
 const ProviderData: Record<string, { icon: ReactNode; name: string }> = {
   github: {
@@ -25,7 +25,7 @@ type ProviderButtonProps = {
 };
 
 export const ProviderButton = (props: ProviderButtonProps) => {
-  const { lastUsedProvider } = useLastUsedProviderStore();
+  const isLastUsed = useIsLastUsedProvider(props.providerId);
 
   const githubSignInMutation = useMutation({
     mutationFn: async () => {
@@ -39,7 +39,6 @@ export const ProviderButton = (props: ProviderButtonProps) => {
   });
 
   const data = ProviderData[props.providerId];
-  const isLastUsed = lastUsedProvider === props.providerId;
 
   return (
     <div className="relative w-full">

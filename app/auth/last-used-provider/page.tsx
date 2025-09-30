@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 import type { AuthProvider } from "../signin/last-used-provider.store";
-import { useLastUsedProviderStore } from "../signin/last-used-provider.store";
+import { useIsLastUsedProvider } from "../signin/last-used-provider.store";
 
 export default function LastUsedProviderPage() {
   return (
@@ -21,7 +21,7 @@ export default function LastUsedProviderPage() {
 }
 
 const LastUsedProvider = () => {
-  const { lastUsedProvider, setLastUsedProvider } = useLastUsedProviderStore();
+  const { lastUsedProvider, setLastUsedProvider } = useIsLastUsedProvider();
   const searchParams = useSearchParams();
   const router = useRouter();
 
