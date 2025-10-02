@@ -4,9 +4,8 @@ import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
 import { getCallbackUrl } from "@/lib/auth/auth-utils";
 import { cn } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { useIsLastUsedProvider } from "./last-used-provider.store";
 
 const ProviderData: Record<string, { icon: ReactNode; name: string }> = {
   github: {
@@ -25,20 +24,27 @@ type ProviderButtonProps = {
 };
 
 export const ProviderButton = (props: ProviderButtonProps) => {
-  const isLastUsed = useIsLastUsedProvider(props.providerId);
+  const { data: lastUsedProvider } = useQuery({
+    queryKey: ["lastUsedLoginMethod"],
+    queryFn: () => {
+      return authClient.getLastUsedLoginMethod();
+    },
+    initialData: undefined,
+    staleTime: Infinity,
+  });
 
   const githubSignInMutation = useMutation({
     mutationFn: async () => {
       await authClient.signIn.social({
         provider: props.providerId,
-        callbackURL: getCallbackUrl(
-          `/auth/last-used-provider?provider=${props.providerId}&callbackUrl=${props.callbackUrl ?? "/account"}`,
-        ),
+        callbackURL: getCallbackUrl(props.callbackUrl ?? "/account"),
       });
     },
   });
 
   const data = ProviderData[props.providerId];
+
+  const isLastUsed = lastUsedProvider === props.providerId;
 
   return (
     <div className="relative w-full">
