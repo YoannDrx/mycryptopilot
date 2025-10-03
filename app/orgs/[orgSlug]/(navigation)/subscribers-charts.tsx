@@ -48,7 +48,11 @@ export function SubscribersChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="h-64 w-full" config={chartConfig}>
+        <ChartContainer
+          id="subscribers-chart"
+          className="h-64 w-full"
+          config={chartConfig}
+        >
           <AreaChart
             accessibilityLayer
             data={chartData}

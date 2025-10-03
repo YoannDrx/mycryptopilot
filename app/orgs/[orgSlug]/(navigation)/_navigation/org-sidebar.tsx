@@ -24,7 +24,6 @@ import type { AuthOrganization } from "@/lib/auth/auth-type";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import type { PropsWithChildren } from "react";
-import { useEffect, useState } from "react";
 import { OrgCommand } from "./org-command";
 import { getOrganizationNavigation } from "./org-navigation.links";
 import { OrgsSelect } from "./orgs-select";
@@ -43,37 +42,39 @@ export function OrgSidebar({
 
   return (
     <Sidebar variant="inset">
-      <SidebarHeader className="flex flex-col gap-2">
-        <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
-        <OrgCommand orgSlug={slug} roles={roles} />
-      </SidebarHeader>
-      <SidebarContent>
-        {links.map((link) => (
-          <ItemCollapsing
-            defaultOpenStartPath={link.defaultOpenStartPath}
-            key={link.title}
-          >
-            <SidebarGroup key={link.title}>
-              <SidebarGroupLabel asChild>
-                <CollapsibleTrigger>
-                  {link.title}
-                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarNavigationMenu link={link} />
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </ItemCollapsing>
-        ))}
-      </SidebarContent>
-      <SidebarFooter className="flex flex-col gap-2">
-        <UpgradeCard />
-        <ContactFeedbackPopover />
-        <SidebarUserButton />
-      </SidebarFooter>
+      <div suppressHydrationWarning>
+        <SidebarHeader className="flex flex-col gap-2">
+          <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
+          <OrgCommand orgSlug={slug} roles={roles} />
+        </SidebarHeader>
+        <SidebarContent>
+          {links.map((link) => (
+            <ItemCollapsing
+              defaultOpenStartPath={link.defaultOpenStartPath}
+              key={link.title}
+            >
+              <SidebarGroup key={link.title}>
+                <SidebarGroupLabel asChild>
+                  <CollapsibleTrigger>
+                    {link.title}
+                    <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  </CollapsibleTrigger>
+                </SidebarGroupLabel>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarNavigationMenu link={link} />
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </ItemCollapsing>
+          ))}
+        </SidebarContent>
+        <SidebarFooter className="flex flex-col gap-2">
+          <UpgradeCard />
+          <ContactFeedbackPopover />
+          <SidebarUserButton />
+        </SidebarFooter>
+      </div>
       <SidebarRail />
     </Sidebar>
   );
@@ -82,25 +83,14 @@ export function OrgSidebar({
 const ItemCollapsing = (
   props: PropsWithChildren<{ defaultOpenStartPath?: string }>,
 ) => {
-  const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   const isOpen = props.defaultOpenStartPath
     ? pathname.startsWith(props.defaultOpenStartPath)
     : true;
 
-  useEffect(() => {
-    if (isOpen) {
-      setOpen(isOpen);
-    }
-  }, [isOpen]);
   return (
-    <Collapsible
-      defaultOpen={isOpen}
-      onOpenChange={setOpen}
-      open={open}
-      className="group/collapsible"
-    >
+    <Collapsible defaultOpen={isOpen} className="group/collapsible">
       {props.children}
     </Collapsible>
   );
