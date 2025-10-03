@@ -8,6 +8,7 @@ import {
 } from "@/features/page/layout";
 import { hasPermission } from "@/lib/auth/auth-org";
 import Link from "next/link";
+import { Suspense } from "react";
 import InformationCards from "./information-cards";
 import { SubscribersChart } from "./subscribers-charts";
 
@@ -33,7 +34,9 @@ export default async function RoutePage(props: PageProps<"/orgs/[orgSlug]">) {
       </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-8">
         <InformationCards />
-        <SubscribersChart />
+        <Suspense fallback={<div className="h-64" />}>
+          <SubscribersChart />
+        </Suspense>
       </LayoutContent>
     </Layout>
   );
