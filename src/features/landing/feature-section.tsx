@@ -18,16 +18,16 @@ export const FeaturesSection = ({
         <div className="flex flex-col items-center gap-2">
           <Badge>The features you NEED.</Badge>
           <Typography variant="h2" className="m-auto max-w-xl text-center">
-            More than a post schedulure, we will help you <u>grow</u>.
+            More than signals, we help you become a <u>better trader</u>.
           </Typography>
           <Typography
             variant="muted"
             className="m-auto max-w-lg text-center text-base"
           >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates,
-            consequuntur! Similique, nulla placeat in expedita omnis ab error
-            eaque esse a doloremque, iusto libero eligendi, animi minus
-            architecto. Modi, consectetur?
+            MyCryptoPilot isn't just about copying trades. We provide the tools,
+            education and community to help you understand market dynamics,
+            manage risk properly, and build a sustainable trading strategy for
+            long-term success.
           </Typography>
         </div>
         {features.map((f, i) => {

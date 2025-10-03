@@ -7,11 +7,12 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import {
   BarChart3,
-  Calendar,
-  CalendarCheck,
+  BookOpen,
+  Calculator,
   CheckCircle,
-  Sparkles,
-  X,
+  Target,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import type { Variants } from "motion/react";
 import { motion } from "motion/react";
@@ -48,27 +49,34 @@ const Skeleton1 = () => {
       whileHover="animate"
       className="flex h-full flex-col gap-2"
     >
-      <motion.div className="border-border bg-background flex flex-row items-start gap-2 rounded-2xl border p-3">
-        <img
-          alt="avatar"
-          src="https://melvynx.com/_next/image?url=%2Fimages%2Fmy-face.png&w=828&q=75"
-          className="size-6 shrink-0 rounded-full"
-        />
-        <div>
-          <p className="text-xs text-neutral-500">
-            Create a Thread to announce Now.ts
-          </p>
+      <motion.div className="border-border bg-background flex flex-col gap-2 rounded-2xl border p-4">
+        <div className="flex items-center justify-between">
+          <Typography variant="small" className="font-semibold">
+            BTC/USDT PERP
+          </Typography>
+          <span className="bg-primary/10 text-primary rounded-full px-2 py-1 text-xs font-medium">
+            LONG
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <p className="text-muted-foreground">Entry</p>
+            <p className="font-semibold text-green-500">$42,150</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">TP1</p>
+            <p className="font-semibold text-green-500">$43,200</p>
+          </div>
         </div>
       </motion.div>
       <motion.div
         variants={variants}
-        className="border-border bg-background flex flex-row items-start justify-end gap-2 rounded-2xl border p-3"
+        className="border-border bg-background flex flex-col gap-1 rounded-2xl border p-3"
       >
-        <p className="text-xs text-neutral-500">
-          Today I announced my new project, Now.TS, the perfect way to create
-          professional Next.js application in days.
+        <p className="text-xs font-medium">Risk: 2/5 • Confidence: 78%</p>
+        <p className="text-muted-foreground text-xs">
+          Bullish formation + key support
         </p>
-        <div className="size-6 shrink-0 rounded-full bg-gradient-to-r from-pink-500 to-violet-500" />
       </motion.div>
     </motion.div>
   );
@@ -88,13 +96,13 @@ const Skeleton2 = () => {
       <motion.div>
         <Alert variant="default" className="">
           <Loader size={20} />
-          <AlertTitle>Schedule your threads...</AlertTitle>
+          <AlertTitle>Calculating position sizing...</AlertTitle>
         </Alert>
       </motion.div>
       <motion.div variants={variants}>
         <Alert variant="success" className="">
           <CheckCircle size={20} />
-          <AlertTitle>Your threads are now scheduled for 7:00 AM</AlertTitle>
+          <AlertTitle>Recommended size: $850 (2% risk, R:R 1:3)</AlertTitle>
         </Alert>
       </motion.div>
     </motion.div>
@@ -162,28 +170,27 @@ const Skeleton4 = () => {
         variants={first}
         className="border-border bg-background flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border p-4"
       >
-        <Typography variant="large">+123 followers</Typography>
-        <Typography variant={"muted"}>In the last 30 days</Typography>
+        <Typography variant="large">58%</Typography>
+        <Typography variant={"muted"}>Win Rate</Typography>
         <Typography variant={"muted"} className="text-green-500">
-          +12%
+          +4% this month
         </Typography>
       </motion.div>
       <motion.div className="border-border bg-background flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border p-4">
-        <Typography variant="large">+1.4 M Views</Typography>
-        <Typography variant={"muted"}>In the last 30 days</Typography>
+        <Typography variant="large">2.4</Typography>
+        <Typography variant={"muted"}>Payoff Ratio</Typography>
         <Typography variant={"muted"} className="text-green-500">
-          +21%
+          Excellent
         </Typography>
       </motion.div>
       <motion.div
         variants={second}
         className="border-border bg-background flex h-full w-1/3 flex-col items-center justify-center rounded-2xl border p-4"
       >
-        <Typography variant="large">1244 likes</Typography>
-        <Typography variant="large">766 replis</Typography>
-        <Typography variant={"muted"}>In the last 30 days</Typography>
+        <Typography variant="large">-12%</Typography>
+        <Typography variant={"muted"}>Max Drawdown</Typography>
         <Typography variant={"muted"} className="text-green-500">
-          +12%
+          Controlled risk
         </Typography>
       </motion.div>
     </motion.div>
@@ -224,41 +231,31 @@ const Skeleton5 = () => {
     >
       <motion.div
         variants={variants}
-        className="border-border bg-background flex flex-row items-start gap-2 rounded-2xl border p-3"
+        className="border-border bg-background flex flex-row items-center gap-3 rounded-2xl border p-3"
       >
-        <img
-          src="https://melvynx.com/_next/image?url=%2Fimages%2Fmy-face.png&w=828&q=75"
-          alt="avatar"
-          height="100"
-          width="100"
-          className="size-10 rounded-full"
-        />
-        <p className="text-xs text-neutral-500">
-          What I need to do to get more followers ?
-        </p>
+        <div className="bg-primary/10 flex size-10 shrink-0 items-center justify-center rounded-full">
+          <TrendingUp className="text-primary size-5" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold">CryptoMaster_BTC</p>
+          <p className="text-muted-foreground text-xs">
+            Win Rate: 62% • 847 followers
+          </p>
+        </div>
       </motion.div>
       <motion.div
         variants={variantsSecond}
-        className="border-border bg-background flex flex-row items-start justify-end gap-2 rounded-2xl border p-3"
+        className="border-border bg-background flex flex-row items-center gap-3 rounded-2xl border p-3"
       >
-        <div>
-          <p className="text-xs text-neutral-500">Searching...</p>
-          <motion.p
-            className="text-xs text-neutral-500"
-            variants={{
-              initial: {
-                opacity: 0,
-              },
-              animate: {
-                opacity: 1,
-              },
-            }}
-          >
-            Based on the Threads activity of the past 30 days, you should focus
-            creating content on Next.js
-          </motion.p>
+        <div className="bg-primary/10 flex size-10 shrink-0 items-center justify-center rounded-full">
+          <TrendingUp className="text-primary size-5" />
         </div>
-        <div className="size-6 shrink-0 rounded-full bg-gradient-to-r from-pink-500 to-violet-500" />
+        <div className="flex-1">
+          <p className="text-sm font-semibold">AltcoinPro_Trading</p>
+          <p className="text-muted-foreground text-xs">
+            Win Rate: 59% • 623 followers
+          </p>
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -266,43 +263,47 @@ const Skeleton5 = () => {
 
 const items = [
   {
-    title: "AI Content Generation",
+    title: "Signal Cards",
     description: (
       <span className="text-sm">
-        Experience the power of AI in generating unique content.
+        Receive structured trading signals with entry, take-profit, stop-loss
+        and detailed rationales.
       </span>
     ),
     header: <Skeleton1 />,
     className: "md:col-span-1",
-    icon: <Sparkles size={20} />,
+    icon: <Target size={20} />,
   },
   {
-    title: "Schedule with ease",
+    title: "Risk Console",
     description: (
       <span className="text-sm">
-        We help you schedule your threads with ease.
+        Automatically calculate the ideal position size based on your capital
+        and risk tolerance.
       </span>
     ),
     header: <Skeleton2 />,
     className: "md:col-span-1",
-    icon: <Calendar size={20} />,
+    icon: <Calculator size={20} />,
   },
   {
-    title: "Calendar View",
+    title: "Trading Journal",
     description: (
       <span className="text-sm">
-        See what you have planned for the day with our calendar view.
+        Track your performance, identify mistakes and improve your strategy over
+        time.
       </span>
     ),
     header: <Skeleton3 />,
     className: "md:col-span-1",
-    icon: <CalendarCheck size={20} />,
+    icon: <BookOpen size={20} />,
   },
   {
-    title: "Threads Analysis",
+    title: "Transparent Stats",
     description: (
       <span className="text-sm">
-        Understand your threads with our powerful analytics.
+        View the real win rate, payoff ratio and max drawdown of each verified
+        trader.
       </span>
     ),
     header: <Skeleton4 />,
@@ -311,14 +312,15 @@ const items = [
   },
 
   {
-    title: "See what works",
+    title: "Traders Marketplace",
     description: (
       <span className="text-sm">
-        Understand the hype and trends with our powerful research tools.
+        Discover and follow the best verified crypto traders based on your risk
+        criteria.
       </span>
     ),
     header: <Skeleton5 />,
     className: "md:col-span-1",
-    icon: <X className="size-4 text-neutral-500" />,
+    icon: <Users size={20} />,
   },
 ];

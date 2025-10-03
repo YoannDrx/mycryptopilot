@@ -65,7 +65,7 @@ export const AUTH_PLANS: AppAuthPlan[] = [
   {
     name: "free",
     description:
-      "Perfect for individuals and small projects with essential features",
+      "Perfect for beginners testing crypto signals with essential features",
     limits: DEFAULT_LIMIT,
     price: 0,
     currency: "USD",
@@ -74,7 +74,8 @@ export const AUTH_PLANS: AppAuthPlan[] = [
   {
     name: "pro",
     isPopular: true,
-    description: "Ideal for growing teams with advanced collaboration needs",
+    description:
+      "Ideal for serious traders with multiple strategies and advanced tools",
     priceId: process.env.STRIPE_PRO_PLAN_ID ?? "",
     annualDiscountPriceId: process.env.STRIPE_PRO_YEARLY_PLAN_ID ?? "",
     limits: {
@@ -106,7 +107,7 @@ export const AUTH_PLANS: AppAuthPlan[] = [
     name: "ultra",
     isPopular: false,
     description:
-      "Enterprise-grade solution for large teams with complex requirements",
+      "Professional-grade solution for full-time traders with unlimited access",
     priceId: process.env.STRIPE_ULTRA_PLAN_ID ?? "",
     annualDiscountPriceId: process.env.STRIPE_ULTRA_YEARLY_PLAN_ID ?? "",
     limits: {
@@ -135,19 +136,19 @@ export const LIMITS_CONFIG: Record<
   projects: {
     icon: FolderArchive,
     getLabel: (value: number) =>
-      `${value} ${value === 1 ? "Project" : "Projects"}`,
-    description: "Create and manage projects",
+      `${value} ${value === 1 ? "Signal" : "Signals"}/day`,
+    description: "Trading signals received daily",
   },
   storage: {
     icon: HardDrive,
-    getLabel: (value: number) => `${value} GB Storage`,
-    description: "Cloud storage for your files",
+    getLabel: (value: number) => `${value} Traders to Follow`,
+    description: "Follow multiple verified traders",
   },
   members: {
     icon: Users,
     getLabel: (value: number) =>
-      `${value} Team ${value === 1 ? "Member" : "Members"}`,
-    description: "Invite team members to collaborate",
+      `${value === 1 ? "Basic" : value === 3 ? "Standard" : "Premium"} Screener`,
+    description: "Market screener refresh rate",
   },
 };
 
@@ -156,32 +157,37 @@ export const ADDITIONAL_FEATURES = {
   free: [
     {
       icon: Shield,
-      label: "Basic Security",
-      description: "Standard protection for your data",
+      label: "Blurred Premium Signals",
+      description: "See teasers of premium signals",
     },
   ],
   pro: [
     {
       icon: Zap,
-      label: "Priority Support",
-      description: "Get help when you need it most",
+      label: "Risk Console",
+      description: "Calculate optimal position sizing",
     },
     {
       icon: HeadphonesIcon,
-      label: "24/7 Customer Service",
-      description: "Round-the-clock assistance",
+      label: "Trading Journal",
+      description: "Track and analyze your trades",
     },
     {
       icon: Clock,
-      label: "Advanced Analytics",
-      description: "Detailed insights and reporting",
+      label: "Priority Support",
+      description: "Get help when you need it most",
     },
   ],
   ultra: [
     {
       icon: Zap,
-      label: "Priority Support",
-      description: "Get help when you need it most",
+      label: "Custom Alerts",
+      description: "Set personalized signal notifications",
+    },
+    {
+      icon: Clock,
+      label: "Advanced Filters",
+      description: "Filter signals by risk, pair, strategy",
     },
   ],
 };

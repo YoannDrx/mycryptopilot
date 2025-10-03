@@ -14,14 +14,15 @@ export function CTASectionCard() {
           as="h2"
           className="text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl"
         >
-          Boost your productivity today
+          Protect your capital today
         </Typography>
         <Typography className="mx-auto mt-6 max-w-xl text-lg/8 text-pretty text-gray-300">
-          Create an account and start posting today.
+          Join 400+ traders using MyCryptoPilot to trade with a risk-first
+          approach.
         </Typography>
         <div className="mt-10 flex items-center justify-center gap-x-6">
           <Link href="#pricing" className={buttonVariants({ size: "lg" })}>
-            Get started
+            View plans
           </Link>
 
           <Link

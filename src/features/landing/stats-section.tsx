@@ -12,24 +12,24 @@ type StatProps = {
 
 const stats: StatProps[] = [
   {
-    number: 476,
-    suffix: "K",
-    text: "Threads scheduled every month.",
+    number: 2.8,
+    suffix: "K+",
+    text: "Trading signals sent every month",
   },
   {
-    number: 1.44,
-    suffix: "K",
-    text: "Users that use our platform.",
+    number: 58,
+    suffix: "%",
+    text: "Average win rate of our verified traders",
   },
   {
-    number: 1.5,
-    suffix: "M+",
-    text: "Interactions with posts created by our users.",
+    number: 12,
+    suffix: "",
+    text: "Active and verified professional traders",
   },
   {
-    number: 192,
-    suffix: "K",
-    text: "Users impacted by our published posts.",
+    number: 420,
+    suffix: "+",
+    text: "Traders who trust us",
   },
 ];
 
