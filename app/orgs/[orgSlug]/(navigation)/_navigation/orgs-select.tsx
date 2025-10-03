@@ -60,21 +60,21 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
                 const href = `/orgs/${org.slug}`;
 
                 return (
-                  <DropdownMenuItem key={org.slug} asChild>
-                    {/* Need to perform a FULL Reload when switching organization */}
-                    <a
-                      href={href}
-                      key={org.slug}
-                      className="inline-flex w-full items-center gap-2"
-                    >
-                      <Avatar className="size-6">
-                        <AvatarFallback>
-                          {org.name.slice(0, 1).toUpperCase()}
-                        </AvatarFallback>
-                        {org.logo ? <AvatarImage src={org.logo} /> : null}
-                      </Avatar>
-                      <span className="line-clamp-1 text-left">{org.name}</span>
-                    </a>
+                  <DropdownMenuItem
+                    key={org.slug}
+                    onClick={() => {
+                      // Use Next.js navigation to avoid hydration issues
+                      router.push(href);
+                    }}
+                    className="inline-flex w-full items-center gap-2"
+                  >
+                    <Avatar className="size-6">
+                      <AvatarFallback>
+                        {org.name.slice(0, 1).toUpperCase()}
+                      </AvatarFallback>
+                      {org.logo ? <AvatarImage src={org.logo} /> : null}
+                    </Avatar>
+                    <span className="line-clamp-1 text-left">{org.name}</span>
                   </DropdownMenuItem>
                 );
               })}

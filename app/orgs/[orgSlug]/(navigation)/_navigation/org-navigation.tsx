@@ -16,7 +16,7 @@ export async function OrgNavigation({ children }: PropsWithChildren) {
   const userOrganizations = await getUsersOrgs();
 
   return (
-    <SidebarProvider>
+    <SidebarProvider key={org.slug}>
       <OrgSidebar
         slug={org.slug}
         roles={org.memberRoles}
