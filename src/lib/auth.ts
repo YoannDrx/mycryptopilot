@@ -33,6 +33,14 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
   };
 }
 
+if (env.DISCORD_CLIENT_ID && env.DISCORD_CLIENT_SECRET) {
+  SocialProviders.discord = {
+    clientId: env.DISCORD_CLIENT_ID,
+    clientSecret: env.DISCORD_CLIENT_SECRET,
+    prompt: "consent",
+  };
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",

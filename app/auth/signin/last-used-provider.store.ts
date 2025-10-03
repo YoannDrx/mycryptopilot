@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type AuthProvider = "github" | "google";
+export type AuthProvider = "github" | "google" | "discord";
 
 type LastUsedProviderState = {
   lastUsedProvider: AuthProvider | null;
