@@ -56,8 +56,6 @@ export const OrgsSelect = (props: OrganizationsSelectProps) => {
             {props.orgs
               .filter((org) => org.slug !== props.currentOrgSlug)
               .map((org) => {
-                if (typeof window === "undefined") return null;
-
                 // Do not replace current URL to avoid 404
                 const href = `/orgs/${org.slug}`;
 
