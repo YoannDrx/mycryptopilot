@@ -8,7 +8,7 @@ export const CTAImageSection = () => {
     <div
       style={{
         backgroundImage:
-          "url(https://images.unsplash.com/photo-1707680639756-d37ea04572a9?q=80&w=2973&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
+          "url(https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=2000&auto=format&fit=crop)",
         backgroundSize: "cover",
       }}
     >
@@ -20,13 +20,14 @@ export const CTAImageSection = () => {
           variant="h2"
           className="text-center text-5xl font-extrabold"
         >
-          Start getting a lot of followers
+          Stop trading blindly
         </Typography>
         <Typography className="text-center font-bold">
-          By posting every day with Threader !
+          Follow verified traders and protect your capital with a risk-first
+          approach
         </Typography>
         <Link href="#pricing" className={buttonVariants({ size: "lg" })}>
-          Get started
+          Start for free
         </Link>
       </SectionLayout>
     </div>
