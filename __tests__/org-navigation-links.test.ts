@@ -32,9 +32,10 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Only Menu group is present
-    expect(result).toHaveLength(1);
+    // Menu and Trader groups are present (no Account group for members)
+    expect(result).toHaveLength(2);
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
+    expect(result[1].links).toHaveLength(ORGANIZATION_LINKS[1].links.length);
   });
 
   it("should filter links based on user roles - admin", () => {
@@ -43,12 +44,13 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Admin can access Menu links
+    // Admin can access Menu, Trader, and Account groups
+    expect(result).toHaveLength(3);
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
 
     // Admin can access Settings, Members, Billing (not Danger Zone)
-    const settingsGroup = result[1];
-    const allowedLinks = settingsGroup.links;
+    const accountGroup = result[2];
+    const allowedLinks = accountGroup.links;
     expect(allowedLinks.map((link) => link.label)).toContain("Settings");
     expect(allowedLinks.map((link) => link.label)).toContain("Members");
     expect(allowedLinks.map((link) => link.label)).toContain("Billing");
@@ -61,11 +63,12 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Owner can access all links
+    // Owner can access all links (Menu, Trader, and Account with all sub-links)
+    expect(result).toHaveLength(3);
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
-    const settingsGroup = result[1];
-    const allowedLinks = settingsGroup.links;
-    expect(allowedLinks.length).toEqual(ORGANIZATION_LINKS[1].links.length);
+    const accountGroup = result[2];
+    const allowedLinks = accountGroup.links;
+    expect(allowedLinks.length).toEqual(ORGANIZATION_LINKS[2].links.length);
     expect(allowedLinks.map((link) => link.label)).toContain("Settings");
     expect(allowedLinks.map((link) => link.label)).toContain("Members");
     expect(allowedLinks.map((link) => link.label)).toContain("Billing");
@@ -78,8 +81,9 @@ describe("getOrganizationNavigation", () => {
 
     const result = getOrganizationNavigation(slug, userRoles);
 
-    // Only Menu group is present
-    expect(result).toHaveLength(1);
+    // Menu and Trader groups are present (no Account group without roles)
+    expect(result).toHaveLength(2);
     expect(result[0].links).toHaveLength(ORGANIZATION_LINKS[0].links.length);
+    expect(result[1].links).toHaveLength(ORGANIZATION_LINKS[1].links.length);
   });
 });
