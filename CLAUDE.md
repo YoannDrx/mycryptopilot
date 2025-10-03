@@ -2,9 +2,40 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## About the project <NAME>
+## About the project MyCryptoPilot
 
-If you read this, ask question about the project to fill this part. You need to describe what is the purpose of the project, main feature and goals.
+**MyCryptoPilot** est une plateforme de trading crypto "risk-first" permettant aux utilisateurs de suivre des traders vérifiés et recevoir des signaux de trading en temps réel.
+
+### Concept
+
+- **Pour les Users (Followers)**: Suivre des traders professionnels, recevoir leurs signaux de trading, gérer un journal de trading, utiliser la console de risque
+- **Pour les Traders**: Publier des signaux de trading, obtenir des followers, se faire vérifier, gagner des revenus
+- **Paiement**: Crypto uniquement (USDC sur Base, USDT sur Tron) avec support pro-rata
+
+### Goals
+
+1. Permettre aux traders professionnels de monétiser leur expertise
+2. Donner accès à des signaux de qualité aux traders débutants
+3. Offrir des outils de gestion du risque (console de risque, journal)
+4. Créer une marketplace de traders vérifiés avec transparence
+
+### Architecture Spécifique MyCryptoPilot
+
+- **1 Organization = 1 User**: Simplifié par rapport au template NOW.TS multi-tenant
+- **Crypto Payments**: Remplacement de Stripe par système de paiement crypto (Base/Tron)
+- **Trading Cards**: Format JSON structuré pour les signaux de trading
+- **Plans**: Free (5 signaux/jour), Pro (50 signaux/jour), Ultra (illimité)
+
+### État Actuel (Octobre 2025)
+
+⚠️ **Le projet est en phase de développement MVP**:
+- ✅ Infrastructure complète (Next.js, Prisma, Better Auth, UI)
+- ✅ Schéma DB crypto trading complet
+- ✅ UI/UX moderne avec Shadcn/UI
+- ⚠️ Crypto payment system structure créée mais non fonctionnel (placeholders)
+- ❌ Core features manquantes: création signaux, feed signaux, follow traders
+
+**Voir ANALYSIS.md pour analyse complète et détaillée du projet.**
 
 ## Development Commands
 
@@ -61,14 +92,32 @@ If you read this, ask question about the project to fill this part. You need to 
 - `e2e/` - End-to-end tests
 - `__tests__/` - Unit tests
 
-### Key Features
+### Key Features (NOW.TS Inherited)
 
-- **Multi-tenant Organizations**: Full organization management with roles and permissions
-- **Authentication**: Email/password, magic links, OAuth (GitHub, Google)
-- **Billing**: Stripe subscriptions with plan management
+- **Multi-tenant Organizations**: Full organization management with roles and permissions (simplifié 1:1 pour MyCryptoPilot)
+- **Authentication**: Email/password, magic links, OAuth (GitHub, Google, Discord)
+- **Billing**: Stripe subscriptions (legacy) + Crypto payments (nouveau)
 - **Dialog System**: Global dialog manager for modals and confirmations
 - **Forms**: React Hook Form with Zod validation and server actions
 - **Email System**: Transactional emails with React Email
+
+### Key Features (MyCryptoPilot Specific)
+
+- **Crypto Payments**: USDC (Base) et USDT (Tron) avec support pro-rata
+- **Trader Profiles**: Profils traders avec stats (winrate, payoff, followers)
+- **Trading Signals**: Signaux de trading avec format JSON structuré (trading cards)
+- **Follow System**: Système follow/unfollow avec limites par plan
+- **Trading Journal**: Journal personnel pour tracker performances (à implémenter)
+- **Risk Console**: Calculateurs position sizing et risk/reward (à implémenter)
+- **Marketplace**: Découverte et recherche de traders vérifiés
+
+### MyCryptoPilot Plans
+
+| Plan | Prix/mois | Signaux/jour | Traders | Screener | Features |
+|------|-----------|--------------|---------|----------|----------|
+| Free | $0 | 5 | 1 | 5min | Teasers floutés |
+| Pro | $49 | 50 | 5 | 1min | Console risque, Journal |
+| Ultra | $99 | ∞ | ∞ | 5sec | Alertes custom, Filtres avancés |
 
 ## Code Conventions
 
@@ -146,14 +195,27 @@ If you read this, ask question about the project to fill this part. You need to 
 
 ## Important Files
 
-- `src/lib/auth.ts` - Authentication configuration
+### Core (NOW.TS)
+- `src/lib/auth/auth-config-setup.ts` - Authentication configuration
 - `src/features/dialog-manager/` - Global dialog system
 - `src/lib/actions/actions-utils.ts` - Server action utilities
 - `src/components/ui/form.tsx` - Form components
-- `prisma/schema.prisma` - Database schema
 - `src/site-config.ts` - Site configuration
 - `src/lib/actions/safe-actions.ts` - All Server Action SHOULD use this logic
 - `src/lib/zod-route.ts` - All Next.js route (inside the folder `/app/api` and name `route.ts`) SHOULD use this logic
+
+### Database
+- `prisma/schema/schema.prisma` - Main database schema (MyCryptoPilot models)
+- `prisma/schema/better-auth.prisma` - Better Auth schema (with MyCryptoPilot extensions)
+
+### MyCryptoPilot Specific
+- `src/lib/crypto/mycryptopilot-plans.ts` - Plans configuration (Free, Pro, Ultra)
+- `src/lib/crypto/address-generator.ts` - Crypto address generation (HD wallet) ⚠️ PLACEHOLDERS
+- `src/lib/crypto/payment-watcher.ts` - Payment monitoring (Base/Tron) ⚠️ PLACEHOLDERS
+- `app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx` - User trading dashboard
+- `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx` - Trader dashboard
+- `app/orgs/[orgSlug]/(navigation)/traders/page.tsx` - Traders marketplace
+- `app/orgs/[orgSlug]/(navigation)/pricing/page.tsx` - Pricing page
 
 ## Development Notes
 
@@ -203,3 +265,83 @@ This is **NON-NEGOTIABLE**. Do not skip this step under any circumstances. Readi
 1. Read at least 3 relevant existing files (similar functionality + imported dependencies)
 2. Understand the patterns, conventions, and API usage
 3. Only then proceed with creating/editing files
+
+## MyCryptoPilot Development Notes
+
+### Database Schema Extensions
+
+Le schéma Prisma a été étendu avec les modèles MyCryptoPilot :
+- `TraderProfile`: Profils traders avec stats JSON
+- `Signal`: Signaux de trading avec payload JSON
+- `Follow`: Relations follower ↔ trader
+- `CryptoAddress`: Adresses crypto générées (HD wallet)
+- `CryptoPayment`: Paiements crypto on-chain
+- `User` étendu avec: `userRole` (USER/TRADER/BOTH), relations vers nouveaux modèles
+
+### Crypto Payment System
+
+⚠️ **IMPORTANT**: Le système de paiement crypto est structuré mais NON FONCTIONNEL :
+- `address-generator.ts` retourne des placeholders (pas de vraie dérivation HD)
+- `payment-watcher.ts` ne fait aucun appel RPC (pas de monitoring blockchain)
+- Variables d'env requises mais non configurées: `BASE_RPC_URL`, `TRON_RPC_URL`, `CRYPTO_XPUB_BASE`, `CRYPTO_XPUB_TRON`
+
+**Pour implémenter**:
+1. Intégrer `ethers` v6 pour Base/Ethereum
+2. Intégrer `tronweb` pour Tron
+3. Générer et configurer xpub keys (HD wallet)
+4. Implémenter dérivation d'adresses réelle
+5. Implémenter appels RPC pour détecter Transfer events (USDC/USDT)
+6. Créer UI paiement avec affichage adresses + QR codes
+
+### Signal Structure
+
+Les signaux utilisent un format JSON structuré (`payloadJson`):
+```typescript
+{
+  instrumentType: "SPOT" | "PERP",
+  bias: "LONG" | "SHORT",
+  entry: number,
+  invalidation: number,
+  tps: number[],
+  leverageBand: string,
+  risk: 1-5,
+  confidence: 0-100,
+  rationales: string[],
+  regime: string,
+  managedBy: "AI" | "HUMAN",
+  version: string
+}
+```
+
+### Plans & Limits
+
+Utiliser `src/lib/crypto/mycryptopilot-plans.ts` pour :
+- Vérifier limites: `canPerformAction(plan, "tradersFollow")`
+- Calculer pro-rata: `calculateDaysGranted(amountUSD, plan)`
+- Détecter plan depuis montant: `getPlanFromAmount(amountUSD)`
+
+### TODOs Critiques
+
+18 TODOs dans le code, principalement :
+- Dashboard pages: fetch data (11 TODOs)
+- Crypto system: HD wallet + RPC calls (4 TODOs)
+- Marketplace: search/filters/pagination (3 TODOs)
+
+### Prochaines Étapes MVP
+
+**Priorité absolue** (voir ANALYSIS.md pour détails):
+1. Finir crypto payment system (4-5 jours)
+2. Créer formulaire/profil trader (2-3 jours)
+3. Créer système signaux (création + display) (5-7 jours)
+4. Implémenter follow/unfollow (2 jours)
+5. Connecter dashboards aux données (2-3 jours)
+
+Total: ~15-20 jours (1 dev full-time) pour MVP fonctionnel
+
+### Architecture Simplifiée (vs NOW.TS)
+
+NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
+- 1 Organization = 1 User (pas de vraie multi-tenant)
+- Organisation sert de "compte" pour compatibility avec Better Auth
+- Stripe legacy conservé mais non utilisé (crypto payments à la place)
+- Invitations et membres désactivés dans UI (pas utiles pour B2C)
