@@ -1,20 +1,11 @@
-"use client";
+/**
+ * MyCryptoPilot: Organization selector hidden
+ *
+ * In MyCryptoPilot, users have a single personal account (not multiple orgs).
+ * This component is kept for compatibility but returns null to hide the selector.
+ */
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
 import type { AuthOrganization } from "@/lib/auth/auth-type";
-import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 type OrganizationsSelectProps = {
@@ -23,74 +14,7 @@ type OrganizationsSelectProps = {
   orgs: AuthOrganization[];
 };
 
-export const OrgsSelect = (props: OrganizationsSelectProps) => {
-  const router = useRouter();
-  const org = props.orgs.find((org) => org.slug === props.currentOrgSlug);
-
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              data-testid="org-selector"
-              variant="default"
-              size="lg"
-            >
-              {org ? (
-                <span className="inline-flex w-full items-center gap-2">
-                  <Avatar className="size-6 object-contain">
-                    <AvatarFallback>
-                      {org.name.slice(0, 1).toUpperCase()}
-                    </AvatarFallback>
-                    {org.logo ? <AvatarImage src={org.logo} /> : null}
-                  </Avatar>
-                  <span className="line-clamp-1 text-left">{org.name}</span>
-                </span>
-              ) : (
-                <span>Open organization</span>
-              )}
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-            {props.orgs
-              .filter((org) => org.slug !== props.currentOrgSlug)
-              .map((org) => {
-                // Do not replace current URL to avoid 404
-                const href = `/orgs/${org.slug}`;
-
-                return (
-                  <DropdownMenuItem
-                    key={org.slug}
-                    onClick={() => {
-                      // Use Next.js navigation to avoid hydration issues
-                      router.push(href);
-                    }}
-                    className="inline-flex w-full items-center gap-2"
-                  >
-                    <Avatar className="size-6">
-                      <AvatarFallback>
-                        {org.name.slice(0, 1).toUpperCase()}
-                      </AvatarFallback>
-                      {org.logo ? <AvatarImage src={org.logo} /> : null}
-                    </Avatar>
-                    <span className="line-clamp-1 text-left">{org.name}</span>
-                  </DropdownMenuItem>
-                );
-              })}
-            <DropdownMenuItem
-              onClick={() => {
-                router.push("/orgs/new");
-              }}
-            >
-              <Plus className="mr-2 size-4" />
-              <span className="line-clamp-1 text-left">
-                Add a new organization
-              </span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
+export const OrgsSelect = (_props: OrganizationsSelectProps) => {
+  // MyCryptoPilot: Hide organization selector (users have single personal account)
+  return null;
 };
