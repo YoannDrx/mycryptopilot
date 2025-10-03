@@ -8,7 +8,7 @@ export const SiteConfig = {
   appIcon: "/images/icon.png",
   company: {
     name: "MyCryptoPilot",
-    address: "", // To be filled according to jurisdiction
+    address: "123 Avenue des Champs-Élysées, 75008 Paris, France",
   },
   brand: {
     primary: "#F59E0B", // Amber color for crypto theme
