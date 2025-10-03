@@ -12,6 +12,10 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
+// ============================================
+// FEEDBACK (existing)
+// ============================================
+
 model Feedback {
   id      String  @id @default(nanoid(11))
   review  Int
@@ -22,4 +26,156 @@ model Feedback {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// MYCRYPTOPILOT ENUMS
+// ============================================
+
+enum UserRole {
+  USER
+  TRADER
+  BOTH
+}
+
+enum FollowStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum CryptoNetwork {
+  BASE
+  TRON
+  POLYGON
+  ETHEREUM
+}
+
+enum InvoiceStatus {
+  OPEN
+  PAID
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+// ============================================
+// MYCRYPTOPILOT MODELS
+// ============================================
+
+model TraderProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Public information
+  displayName     String
+  bio             String?
+  priceMonthlyUSD Int      @default(0)
+
+  // Stats (calculated periodically from signals and user journals)
+  // JSON format: { winrate: number, payoff: number, maxDD: number, nTrades: number, expectancy: number }
+  statsJson       Json?
+
+  // Certification
+  verified        Boolean  @default(false)
+  verifiedAt      DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("trader_profile")
+}
+
+model CryptoAddress {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  network        CryptoNetwork
+  address        String        @unique
+  derivationPath String?       // HD wallet derivation path (for watch-only wallets)
+  isActive       Boolean       @default(true)
+
+  payments       CryptoPayment[]
+
+  createdAt      DateTime      @default(now())
+
+  @@index([userId])
+  @@map("crypto_address")
+}
+
+model Follow {
+  id        String       @id @default(cuid())
+  userId    String       // Who is following
+  user      User         @relation("UserFollows", fields: [userId], references: [id], onDelete: Cascade)
+  traderId  String       // Who is being followed
+  trader    User         @relation("TraderFollowers", fields: [traderId], references: [id], onDelete: Cascade)
+
+  status    FollowStatus @default(ACTIVE)
+  startedAt DateTime     @default(now())
+  expiresAt DateTime?    // When subscription expires (if applicable)
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([userId, traderId])
+  @@index([traderId])
+  @@map("follow")
+}
+
+model CryptoPayment {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  addressId     String?
+  address       CryptoAddress? @relation(fields: [addressId], references: [id])
+
+  network       CryptoNetwork
+  txHash        String        @unique
+  amountToken   Decimal       @db.Decimal(38, 18) // Crypto amount (high precision)
+  amountUSD     Decimal       @db.Decimal(18, 2)  // USD value at time of payment
+  currency      String        // USDC, USDT
+
+  confirmations Int           @default(0)
+  status        PaymentStatus @default(PENDING)
+  confirmedAt   DateTime?
+
+  // Plan purchased
+  plan          String        // free, pro, ultra
+  daysGranted   Int           @default(30)
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([txHash])
+  @@map("crypto_payment")
+}
+
+model Signal {
+  id          String   @id @default(cuid())
+  traderId    String
+  trader      User     @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  symbol      String   // e.g., "BTC-USDT", "SOL-USDT"
+
+  // Trading card payload (JSON)
+  // Format: { instrumentType, bias, entry, invalidation, tps, leverageBand, risk, confidence, rationales, regime, managedBy, version }
+  payloadJson Json
+
+  ttlSec      Int      // Time-to-live in seconds
+  hash        String   @unique // SHA256 hash for integrity verification
+
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime // createdAt + ttlSec
+
+  @@index([traderId])
+  @@index([createdAt])
+  @@map("signal")
 }

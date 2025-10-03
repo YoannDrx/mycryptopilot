@@ -21,6 +21,11 @@ export const env = createEnv({
     STRIPE_SECRET_KEY: z.string().min(1),
     NODE_ENV: z.enum(["development", "production", "test"]),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    // Crypto payment configuration
+    BASE_RPC_URL: z.string().url().optional(),
+    TRON_RPC_URL: z.string().url().optional(),
+    CRYPTO_XPUB_BASE: z.string().optional(),
+    CRYPTO_XPUB_TRON: z.string().optional(),
   },
   /**
    * If you add `client` environment variables, you need to add them to

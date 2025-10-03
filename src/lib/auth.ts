@@ -56,19 +56,18 @@ export const auth = betterAuth({
         after: async (user, _req) => {
           await setupResendCustomer(user);
 
-          const emailName = user.email.slice(0, 8);
           try {
             await auth.api.createOrganization({
               body: {
-                name: `${emailName}'s org`, // required
-                slug: generateSlug(emailName), // required
-                logo: `${getServerUrl()}/images/org-logo.png`,
+                name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
+                slug: generateSlug(user.id), // Use user ID for unique slug
+                logo: `${getServerUrl()}/images/account-logo.png`,
                 userId: user.id,
                 keepCurrentActiveOrganization: false,
               },
             });
           } catch (err) {
-            logger.error("Failed to create org", { err });
+            logger.error("Failed to create account", { err });
           }
         },
       },
