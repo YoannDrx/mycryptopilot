@@ -32,15 +32,25 @@ pnpm install
 
 # Setup environment variables
 cp .env.example .env.local
-# Configure your .env.local file
+# Configure your .env.local file with:
+# - DATABASE_URL (PostgreSQL)
+# - AUTH providers (GitHub, Google, Discord)
+# - RESEND_API_KEY (emails)
+# - Crypto RPC URLs (optional for crypto payments)
 
 # Setup database
-pnpm prisma:migrate
+# ⚠️ IMPORTANT: Generate and apply Prisma migrations first
+npx prisma migrate dev --name init_mycryptopilot
+# Or if migrations exist: npx prisma migrate deploy
+
+# Seed database (optional)
 pnpm prisma:seed
 
 # Start development server
 pnpm dev
 ```
+
+**⚠️ Note Importante**: Les migrations Prisma doivent être générées et appliquées avant toute utilisation. Le schéma existe mais les migrations n'ont pas encore été créées dans ce repository.
 
 ## 🛠️ Development Commands
 
@@ -75,11 +85,39 @@ pnpm dev
 
 ⚠️ **Le projet est en phase de développement MVP**:
 
-- ✅ Infrastructure complète (Next.js, Prisma, Better Auth, UI)
-- ✅ Schéma DB crypto trading complet
-- ✅ UI/UX moderne avec Shadcn/UI
-- ⚠️ Crypto payment system structure créée mais non fonctionnel (placeholders)
-- ❌ Core features manquantes: création signaux, feed signaux, follow traders
+### ✅ Infrastructure & Configuration
+- ✅ Next.js 15 + App Router configuré
+- ✅ Prisma schemas complets (TraderProfile, Signal, Follow, CryptoPayment)
+- ✅ Better Auth avec extensions User (userRole, relations)
+- ✅ Site config MyCryptoPilot (branding, couleurs, crypto networks)
+- ✅ Plans tarifaires définis (Free $0, Pro $49, Ultra $99)
+- ⚠️ **BLOQUANT**: Migrations Prisma non appliquées (à générer)
+
+### ✅ UI/UX Créées
+- ✅ Dashboard User (`/dashboard`) - UI complète avec TODOs
+- ✅ Dashboard Trader (`/dashboard/trader`) - UI complète avec TODOs
+- ✅ Marketplace Traders (`/traders`) - UI complète avec TODOs
+- ✅ Pricing Page (`/pricing`) - Fonctionnelle
+- ✅ Navigation sidebar avec liens MyCryptoPilot
+- ✅ Landing page hero adaptée
+- ⚠️ Landing sections (reviews, features) encore template "Threader"
+
+### ⚠️ Systèmes Partiels
+- ⚠️ Crypto payment system - Structure créée avec placeholders (4 TODOs)
+  - `address-generator.ts` - HD wallet à implémenter
+  - `payment-watcher.ts` - RPC calls à implémenter
+
+### ❌ Core Features Manquantes
+- ❌ Profils traders (formulaire, actions)
+- ❌ Création signaux (formulaire, validation, hash)
+- ❌ Feed signaux (affichage, filtres, pagination)
+- ❌ Follow/Unfollow system (actions, vérif limites)
+- ❌ Connexion dashboards aux données (remplacer TODOs)
+- ❌ UI paiement crypto (adresses, QR codes)
+
+**Prochaine étape critique**: Générer et appliquer migrations Prisma, puis implémenter profils traders et système de signaux.
+
+Voir `IMPLEMENTATION.md` et `ANALYSIS.md` pour détails complets.
 
 ## 📝 Documentation
 

@@ -1,7 +1,9 @@
 # MyCryptoPilot - Analyse Complète du Projet
 
-**Date**: 3 octobre 2025
-**Version**: 1.0.0
+**Date**: 4 octobre 2025
+**Version**: 2.0.0
+
+⚠️ **MISE À JOUR MAJEURE**: Documentation des UI pages créées et mise en évidence du blocage migrations Prisma.
 
 ---
 
@@ -458,42 +460,47 @@ enum InvoiceStatus {
 - `src/lib/crypto/address-generator.ts` ⚠️ (placeholders)
 - `src/lib/crypto/payment-watcher.ts` ⚠️ (placeholders)
 
-### 5. UI Dashboard & Navigation
+### 5. UI Dashboard & Navigation (🆕 Ajouté le 4 oct 2025)
 
-**Status**: ✅ UI créée, ❌ Données non connectées
+**Status**: ⚠️ UI complète, ❌ Données non connectées (TODOs présents)
+
+**Build Status**: ✅ Compile sans erreurs
 
 **Pages créées récemment**:
 
-1. **Dashboard User** (`/dashboard`)
-   - ✅ Stats cards (signaux actifs, traders suivis, plan)
-   - ✅ Alert pour suivre des traders
+1. **Dashboard User** (`/orgs/[orgSlug]/dashboard`)
+   - ✅ Stats cards (Active Signals: 0, Traders Followed: 0, Your Plan)
+   - ✅ Alert "No traders followed yet" avec lien Browse Traders
    - ✅ Tabs (Signals Feed, Trading Journal, Performance)
-   - ✅ Quick actions
-   - ❌ Fetch données réelles (TODOs présents)
+   - ✅ Quick actions buttons (non fonctionnels)
+   - ✅ Empty states avec messages appropriés
+   - ❌ 3 TODOs: Fetch followers, signals, stats (lignes 31-33)
 
-2. **Dashboard Trader** (`/dashboard/trader`)
-   - ✅ Stats trader (followers, signaux, win rate, revenue)
-   - ✅ Trader verification status card
+2. **Dashboard Trader** (`/orgs/[orgSlug]/dashboard/trader`)
+   - ✅ Stats trader (Followers: 0, Total Signals: 0, Win Rate: 0%, Monthly Revenue: $0)
+   - ✅ Verification status card "Not Verified Yet"
    - ✅ Tabs (My Signals, Performance, Revenue)
-   - ✅ Quick actions
-   - ❌ Fetch données réelles (TODOs présents)
+   - ✅ Quick actions buttons (Create Signal, View Stats, etc.)
+   - ✅ Empty states avec messages appropriés
+   - ❌ 5 TODOs: Fetch profile, signals, stats, followers, revenue (lignes 29-33)
 
-3. **Traders Marketplace** (`/traders`)
-   - ✅ Search & filters UI
-   - ✅ Stats overview cards
-   - ✅ Trader cards grid (placeholder data)
-   - ✅ Empty state UI
-   - ✅ CTA section "Become a Trader"
-   - ❌ Fetch traders from DB (TODO)
-   - ❌ Search/filter functionality (TODO)
-   - ❌ Pagination (TODO)
+3. **Traders Marketplace** (`/orgs/[orgSlug]/traders`)
+   - ✅ Search bar (UI seulement, non fonctionnel)
+   - ✅ Filters dropdown (Verified, Win Rate, Followers) - UI seulement
+   - ✅ Stats overview cards (0 traders, 0 verified, 0 signals)
+   - ✅ Trader cards grid avec placeholder vide
+   - ✅ Empty state "No traders yet" avec CTA "Become a Trader"
+   - ✅ Section CTA "Ready to share your trading signals?"
+   - ❌ 3 TODOs: Fetch traders, implement search/filters, pagination (lignes 30-32)
 
-4. **Pricing Page** (`/pricing`)
-   - ✅ 3 plans cards
-   - ✅ Features comparison
-   - ✅ FAQ section
-   - ✅ Crypto payment badges
-   - ✅ Responsive design
+4. **Pricing Page** (`/orgs/[orgSlug]/pricing`)
+   - ✅ 3 plans cards (Free, Pro ⭐ Popular, Ultra) avec prix
+   - ✅ Features list complète utilisant `MYCRYPTOPILOT_PLANS`
+   - ✅ FAQ section (4 questions) adaptée crypto
+   - ✅ Badges "USDC (Base)" et "USDT (Tron)"
+   - ✅ Responsive design avec hover effects
+   - ✅ "Most Popular" badge sur plan Pro
+   - ⚠️ Boutons "Subscribe" présents mais non connectés (pas de checkout page)
 
 **Navigation Sidebar**:
 - ✅ Ajout des liens vers nouvelles pages
@@ -1019,63 +1026,83 @@ enum InvoiceStatus {
 
 ### ⚠️ Parcours Partiellement Fonctionnels (UI OK, Data KO)
 
-#### 9. Consulter Dashboard User
+⚠️ **IMPORTANT**: Tous ces parcours nécessitent que les migrations Prisma soient appliquées d'abord.
+
+#### 9. Consulter Dashboard User (🆕 UI créée le 4 oct 2025)
 
 **Steps**:
 1. User connecté va sur `/orgs/[slug]/dashboard`
-2. Voit UI avec:
-   - Stats cards (0 signaux, 0 traders)
-   - Alert "Follow traders"
-   - Tabs (Signals, Journal, Performance)
-   - Empty states
-3. Clique boutons → Rien ne se passe (pas de données)
+2. ✅ Page se charge sans erreur (UI seulement)
+3. ✅ Voit UI avec:
+   - Stats cards (0 signaux, 0 traders suivis, plan actuel)
+   - Alert "No traders followed yet" avec lien marketplace
+   - Tabs (Signals Feed, Trading Journal, Performance)
+   - Empty states avec messages appropriés
+   - Quick actions buttons
+4. ❌ Clique boutons → Rien ne se passe (pas de navigation/actions)
+5. ❌ Aucune donnée réelle affichée (TODOs présents)
 
 **Status**: ⚠️ UI testable, fonctionnalité non testable
 
 **Blocage**:
-- Pas de fetch traders
-- Pas de fetch signals
-- Pas de stats réelles
+- ❌ Migrations Prisma non appliquées (P0)
+- ❌ Pas de fetch traders (3 TODOs lignes 31-33)
+- ❌ Pas de fetch signals
+- ❌ Pas de stats réelles
+- ❌ Pas de server actions pour boutons
 
 ---
 
-#### 10. Consulter Dashboard Trader
+#### 10. Consulter Dashboard Trader (🆕 UI créée le 4 oct 2025)
 
 **Steps**:
-1. Trader connecté va sur `/orgs/[slug]/dashboard/trader`
-2. Voit UI avec:
-   - Stats trader (tous à 0)
-   - Verification status "Not Verified"
-   - Tabs (Signals, Performance, Revenue)
-   - Empty states
-3. Clique "Create Signal" → Rien ne se passe
+1. User (supposé trader) va sur `/orgs/[slug]/dashboard/trader`
+2. ✅ Page se charge sans erreur (UI seulement)
+3. ✅ Voit UI avec:
+   - Stats trader (0 followers, 0 signaux, 0% win rate, $0 revenue)
+   - Verification status card "Not Verified Yet"
+   - Tabs (My Signals, Performance, Revenue) tous vides
+   - Empty states avec messages appropriés
+   - Quick actions (Create Signal, View Analytics, Request Verification)
+4. ❌ Clique "Create Signal" → Rien ne se passe (page non créée)
+5. ❌ Aucune donnée réelle (TODOs présents)
 
 **Status**: ⚠️ UI testable, fonctionnalité non testable
 
 **Blocage**:
-- Pas de profil trader (pas de formulaire)
-- Pas de création signal
-- Pas de données réelles
+- ❌ Migrations Prisma non appliquées (P0)
+- ❌ Pas de profil trader (pas de formulaire création)
+- ❌ Pas de page création signal
+- ❌ Pas de fetch données (5 TODOs lignes 29-33)
+- ❌ Boutons actions non connectés
 
 ---
 
-#### 11. Explorer Marketplace Traders
+#### 11. Explorer Marketplace Traders (🆕 UI créée le 4 oct 2025)
 
 **Steps**:
 1. User va sur `/orgs/[slug]/traders`
-2. Voit:
-   - Search bar (non fonctionnel)
-   - Filters (non fonctionnels)
-   - Stats "0 traders"
-   - Empty state "No traders yet"
-3. Clique "Become a Trader" → Rien ne se passe
+2. ✅ Page se charge sans erreur (UI seulement)
+3. ✅ Voit:
+   - Header "Traders Marketplace"
+   - Search bar (UI présente mais non fonctionnelle)
+   - Filters dropdown (Verified, Win Rate min, Sort by) - UI présente
+   - Stats cards "0 Traders", "0 Verified", "0 Active Signals Today"
+   - Empty state "No traders yet" avec emoji et message
+   - CTA section "Become a Trader" avec bouton "Get Started"
+4. ❌ Tape dans search bar → Rien ne se passe
+5. ❌ Sélectionne filters → Aucun effet
+6. ❌ Clique "Get Started" → Rien ne se passe (page non créée)
 
 **Status**: ⚠️ UI testable, fonctionnalité non testable
 
 **Blocage**:
-- Pas de traders dans DB
-- Pas de formulaire création profil trader
-- Pas de recherche/filtre fonctionnel
+- ❌ Migrations Prisma non appliquées (P0)
+- ❌ Pas de traders dans DB (table vide ou inexistante)
+- ❌ Pas de formulaire création profil trader
+- ❌ Pas de server action `searchTraders()` (3 TODOs lignes 30-32)
+- ❌ Search/filters non implémentés
+- ❌ Pagination non implémentée
 
 ---
 
@@ -1259,6 +1286,44 @@ enum InvoiceStatus {
 ---
 
 ## 🔴 Points Critiques et Blocages
+
+### 🚨 BLOCAGE NIVEAU 0: CRITIQUE - BLOQUE TOUT (Ajouté le 4 oct 2025)
+
+#### 0. Migrations Prisma Non Appliquées
+
+**Impact**: ⛔ **BLOQUE TOUTES LES FONCTIONNALITÉS BASE DE DONNÉES**
+
+**Problème**:
+- Schémas Prisma créés dans `prisma/schema/` ✅
+- Dossier `prisma/migrations/` inexistant ❌
+- Base de données non synchronisée avec le schéma ❌
+- Aucune table MyCryptoPilot créée en DB ❌
+
+**Symptômes**:
+- Toute requête Prisma échouera avec erreur "Table not found"
+- Impossible de créer users, traders, signals, etc.
+- Dashboard pages affichent des erreurs ou données vides
+- Tests e2e échoueront
+
+**Solution**:
+```bash
+# 1. Générer la migration initiale
+npx prisma migrate dev --name init_mycryptopilot
+
+# 2. Vérifier le statut
+npx prisma migrate status
+
+# 3. (Production) Appliquer migrations
+npx prisma migrate deploy
+```
+
+**Effort estimé**: 30 minutes (génération + test)
+
+**Dépendances**: Aucune - **DOIT ÊTRE FAIT EN PREMIER**
+
+**Priorité**: 🔴 P0 - BLOQUE TOUT LE DÉVELOPPEMENT
+
+---
 
 ### Blocage Niveau 1: CRITIQUE (Bloque Core Functionality)
 
@@ -1768,6 +1833,12 @@ Après ces 3 semaines: **Produit utilisable end-to-end** 🎉
 
 ---
 
-**Dernière mise à jour**: 3 octobre 2025
-**Analyste**: Claude (AI Assistant)
-**Version**: 1.0.0
+**Dernière mise à jour**: 4 octobre 2025
+**Analyste**: Claude Code (AI Assistant)
+**Version**: 2.0.0
+**Changements majeurs v2.0**:
+- Ajout blocage critique migrations Prisma
+- Documentation UI pages créées (dashboard, traders, pricing)
+- Correction statuts features (beaucoup passées de ✅ à ⚠️)
+- Mise à jour parcours testables avec détails UI
+- Mise à jour estimations effort

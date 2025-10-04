@@ -26,14 +26,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Trading Cards**: Format JSON structuré pour les signaux de trading
 - **Plans**: Free (5 signaux/jour), Pro (50 signaux/jour), Ultra (illimité)
 
-### État Actuel (Octobre 2025)
+### État Actuel (4 Octobre 2025)
 
 ⚠️ **Le projet est en phase de développement MVP**:
-- ✅ Infrastructure complète (Next.js, Prisma, Better Auth, UI)
-- ✅ Schéma DB crypto trading complet
-- ✅ UI/UX moderne avec Shadcn/UI
-- ⚠️ Crypto payment system structure créée mais non fonctionnel (placeholders)
-- ❌ Core features manquantes: création signaux, feed signaux, follow traders
+
+**✅ Infrastructure & Config**:
+- ✅ Next.js 15 + App Router configuré
+- ✅ Prisma schemas complets (tous modèles MyCryptoPilot créés)
+- ✅ Better Auth avec extensions User (userRole, relations)
+- ✅ Site-config MyCryptoPilot (branding, couleurs, crypto)
+- ✅ Plans tarifaires (Free/Pro/Ultra) dans `mycryptopilot-plans.ts`
+- ⚠️ **BLOQUANT**: Migrations Prisma non appliquées (dossier `migrations/` inexistant)
+
+**✅ UI Pages Créées** (🆕 depuis dernière mise à jour):
+- ✅ Dashboard User (`/dashboard`) - UI complète, 3 TODOs data
+- ✅ Dashboard Trader (`/dashboard/trader`) - UI complète, 5 TODOs data
+- ✅ Marketplace (`/traders`) - UI complète, 3 TODOs data
+- ✅ Pricing (`/pricing`) - Fonctionnelle (boutons Subscribe non connectés)
+- ✅ Navigation sidebar avec nouveaux liens
+
+**⚠️ Systèmes Partiels**:
+- ⚠️ Crypto payment - Structure créée avec 4 TODOs (placeholders HD wallet + RPC)
+- ⚠️ Landing page - Hero adapté, sections (reviews/features) encore "Threader"
+
+**❌ Core Features Manquantes**:
+- ❌ Profils traders (formulaire, actions)
+- ❌ Système signaux (création, affichage, feed)
+- ❌ Follow/Unfollow (actions, vérif limites)
+- ❌ Connexion dashboards aux données (11 TODOs total)
+- ❌ UI paiement crypto (checkout, adresses, QR codes)
+
+**🚨 Prochaine étape CRITIQUE**: Générer et appliquer migrations Prisma (`npx prisma migrate dev --name init_mycryptopilot`)
 
 **Voir ANALYSIS.md pour analyse complète et détaillée du projet.**
 
@@ -322,21 +345,70 @@ Utiliser `src/lib/crypto/mycryptopilot-plans.ts` pour :
 
 ### TODOs Critiques
 
-18 TODOs dans le code, principalement :
-- Dashboard pages: fetch data (11 TODOs)
-- Crypto system: HD wallet + RPC calls (4 TODOs)
-- Marketplace: search/filters/pagination (3 TODOs)
+**Total: 11 TODOs dans le code applicatif** (hors node_modules):
+
+**Dashboard pages** (11 TODOs) - fetch data:
+- `app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx` - 3 TODOs (lignes 31-33)
+  - Fetch user's followed traders
+  - Fetch recent signals from followed traders
+  - Fetch user's trading stats
+- `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx` - 5 TODOs (lignes 29-33)
+  - Fetch trader profile
+  - Fetch trader's signals
+  - Fetch trader's stats (winrate, payoff, etc.)
+  - Fetch followers count
+  - Fetch revenue stats
+- `app/orgs/[orgSlug]/(navigation)/traders/page.tsx` - 3 TODOs (lignes 30-32)
+  - Fetch traders from database
+  - Implement search and filters
+  - Add pagination
+
+**Crypto system** (4 TODOs) - HD wallet + RPC calls:
+- `src/lib/crypto/address-generator.ts` - 2 TODOs (lignes 137, 184)
+  - Implement HD wallet derivation (Base avec ethers.js)
+  - Implement HD wallet derivation (Tron avec tronweb)
+- `src/lib/crypto/payment-watcher.ts` - 2 TODOs (lignes 81, 120)
+  - Implement RPC calls Base/Ethereum
+  - Implement RPC calls Tron
 
 ### Prochaines Étapes MVP
 
-**Priorité absolue** (voir ANALYSIS.md pour détails):
-1. Finir crypto payment system (4-5 jours)
-2. Créer formulaire/profil trader (2-3 jours)
-3. Créer système signaux (création + display) (5-7 jours)
-4. Implémenter follow/unfollow (2 jours)
-5. Connecter dashboards aux données (2-3 jours)
+⚠️ **ÉTAPE 0 (BLOQUANT) - 30 minutes**:
+```bash
+npx prisma migrate dev --name init_mycryptopilot
+npx prisma migrate status
+```
+Sans cela, RIEN ne fonctionnera.
 
-Total: ~15-20 jours (1 dev full-time) pour MVP fonctionnel
+**Priorité P0 - Core Features** (voir ANALYSIS.md pour détails):
+1. **Profils traders** (2-3 jours)
+   - Page `/account/become-trader` avec formulaire
+   - Server actions create/update
+   - Toggle USER ↔ TRADER
+
+2. **Système signaux** (5-7 jours)
+   - Page `/dashboard/trader/signals/new`
+   - Formulaire signal + validation Zod + hash SHA256
+   - Composant `<TradingCard>` display
+   - Feed signaux avec filtres/pagination
+
+3. **Follow/Unfollow** (2 jours)
+   - Server actions follow/unfollow
+   - Vérification limites plan
+   - Boutons UI + listes
+
+4. **Connecter dashboards** (2-3 jours)
+   - Remplacer les 11 TODOs par vrais fetches
+   - Server actions pour stats
+   - Loading states + error boundaries
+
+**Total Semaine 1**: ~11-15 jours → **MVP utilisable end-to-end** ✅
+
+**Priorité P1 - Crypto Payments** (4-5 jours):
+5. **Implémenter HD wallet + RPC** (voir crypto TODOs)
+6. **UI paiement crypto** (checkout, QR codes)
+
+**Total MVP complet**: ~15-20 jours (1 dev full-time)
 
 ### Architecture Simplifiée (vs NOW.TS)
 
