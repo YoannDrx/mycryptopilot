@@ -11,32 +11,87 @@ export const PainSection = () => {
       className="flex flex-col items-center justify-center gap-4"
     >
       <div className="flex w-full flex-col items-center gap-3 lg:gap-4 xl:gap-6">
-        <Typography variant="h1">I love posting on Threads...</Typography>
-        <Typography variant="large">
-          But I loose my time going and publishing each days
+        <Typography variant="h1">
+          Trading crypto without guidance is...
         </Typography>
-        <div className="flex items-start gap-4 max-lg:flex-col">
-          <div className="flex-1 rounded-lg bg-red-500/20 p-4 lg:p-6">
-            <Typography variant="h3" className="text-red-500">
-              😞 Posting without Threader
-            </Typography>
-            <ul className="text-foreground/80 mt-4 ml-4 flex list-disc flex-col gap-2 text-lg">
-              <li>Going on Thread every day to post</li>
-              <li>Be distracted when I go on the app</li>
-              <li>Losing track of my post</li>
-              <li>Incosistent</li>
-            </ul>
+        <Typography variant="large">
+          90% of retail traders lose money. Here's why.
+        </Typography>
+        <div className="flex w-full items-start gap-6 max-lg:flex-col">
+          {/* Trading Solo Card */}
+          <div className="group relative flex-1 overflow-hidden rounded-2xl p-[2px]">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500 via-orange-500 to-red-600 opacity-75 blur-sm transition-opacity group-hover:opacity-100" />
+            <div className="bg-background relative rounded-2xl p-6 lg:p-8">
+              <div className="mb-6 flex items-center gap-3">
+                <span className="text-4xl">😞</span>
+                <Typography
+                  variant="h3"
+                  className="bg-gradient-to-br from-red-400 to-orange-500 bg-clip-text text-transparent"
+                >
+                  Trading Solo
+                </Typography>
+              </div>
+              <ul className="text-foreground/80 flex list-none flex-col gap-3 text-base">
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 text-lg text-red-500/70">✕</span>
+                  <span>Recurring losses due to lack of experience</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 text-lg text-red-500/70">✕</span>
+                  <span>FOMO and emotional decisions</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 text-lg text-red-500/70">✕</span>
+                  <span>No strategy or risk management</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 text-lg text-red-500/70">✕</span>
+                  <span>Overtrading and liquidations</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 text-lg text-red-500/70">✕</span>
+                  <span>Unable to track mistakes</span>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="flex-1 rounded-lg bg-green-500/20 p-4 lg:p-6">
-            <Typography variant="h3" className="text-green-500">
-              😎 Posting WITH Threader
-            </Typography>
-            <ul className="text-foreground/80 mt-4 ml-4 flex list-disc flex-col gap-2 text-lg">
-              <li>Schedule your post on the Threader UI</li>
-              <li>Avoiding opening the app every day</li>
-              <li>See excatly what you have scheduled</li>
-              <li>Be consistent</li>
-            </ul>
+
+          {/* Trading with MyCryptoPilot Card */}
+          <div className="group relative flex-1 overflow-hidden rounded-2xl p-[2px]">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 opacity-75 blur-sm transition-opacity group-hover:opacity-100" />
+            <div className="bg-background relative rounded-2xl p-6 lg:p-8">
+              <div className="mb-6 flex items-center gap-3">
+                <span className="text-4xl">😎</span>
+                <Typography
+                  variant="h3"
+                  className="bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+                >
+                  With MyCryptoPilot
+                </Typography>
+              </div>
+              <ul className="text-foreground/80 flex list-none flex-col gap-3 text-base">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1 text-lg">✓</span>
+                  <span>Structured signals from verified traders</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1 text-lg">✓</span>
+                  <span>Detailed rationales to understand</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1 text-lg">✓</span>
+                  <span>Risk console to protect your capital</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1 text-lg">✓</span>
+                  <span>Transparent stats (win rate, drawdown)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary mt-1 text-lg">✓</span>
+                  <span>Journal to track your progress</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -38,21 +38,21 @@ export default function HomePage() {
         reviews={[
           {
             image: "https://i.pravatar.cc/300?u=a1",
-            name: "Sophie",
-            review: `Threader **has completely transformed the way I manage my social media** content. The ability to schedule posts and use AI for content suggestions has saved me hours each week.`,
-            role: "Digital Marketer",
+            name: "Thomas D.",
+            review: `As a beginner, **structured signals saved me from major losses**. Detailed rationales teach me to understand the market rather than blindly copying. My win rate went from 35% to 52% in 4 months.`,
+            role: "Beginner Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=a2",
-            name: "Alex",
-            review: `Using Threader has significantly boosted my online engagement. **The analytics tool helps me understand what works**, allowing me to refine my strategy and grow my follower base.`,
-            role: "Social Media Influencer",
+            name: "Marie L.",
+            review: `I finally stopped overtrading thanks to the risk console. **Automatically calculating my position sizing protected my capital** during volatile phases. I trade less but better.`,
+            role: "Intermediate Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=a3",
-            name: "Jordan",
-            review: `The ease of scheduling and the AI-generated content features are game-changers. **Threader's user-friendly interface** makes it perfect for anyone looking to enhance their online presence.`,
-            role: "Entrepreneur",
+            name: "Kevin R.",
+            review: `After 2 years of solo losses, **following verified traders with transparent stats changed everything**. The trading journal made me realize my recurring mistakes. Finally profitable for 6 months.`,
+            role: "Ex-Solo Trader",
           },
         ]}
       />
@@ -61,19 +61,20 @@ export default function HomePage() {
 
       <ReviewSingle
         image="https://i.pravatar.cc/300?u=5"
-        name="Michel"
-        review={`Threader **has completely transformed** the way I manage my social media content. The ability to schedule posts and use AI for content suggestions **has saved me hours each week.**`}
-        role="Digital Marketer"
-        compagnyImage="https://1000logos.net/wp-content/uploads/2017/03/McDonalds-Logo-2003.png"
+        name="Antoine B."
+        review={`I've been trading crypto solo since 2021 with average results. **MyCryptoPilot opened my eyes to the importance of stats**: win rate isn't enough, it's the payoff ratio that matters. Signals are solid and rationales helped me improve. **Best ROI since following 2-3 verified traders.**`}
+        role="Experienced Trader"
+        compagnyImage="https://cryptologos.cc/logos/bitcoin-btc-logo.png"
         key={1}
       />
 
       <FeaturesSection
         features={[
           {
-            badge: "⏰ Schedule",
-            title: "Schedule your post",
-            description: "Schedule your post on the Threader in a few clicks.",
+            badge: "📊 Signals",
+            title: "Receive structured signals",
+            description:
+              "Each signal contains entry, TP, SL, rationales and risk level. Understand WHY to take a trade, not just WHAT to trade.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -86,10 +87,10 @@ export default function HomePage() {
             ),
           },
           {
-            badge: "📅 Calendar",
-            title: "See what you scheduled",
+            badge: "🛡️ Console",
+            title: "Protect your capital",
             description:
-              "With the calendar view, you can see what you scheduled and when.",
+              "Risk console automatically calculates ideal position size based on your capital, risk tolerance and signal's R:R ratio.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -101,10 +102,10 @@ export default function HomePage() {
             ),
           },
           {
-            badge: "👁️ Preview",
-            title: "Preview your post",
+            badge: "📖 Journal",
+            title: "Track your performance",
             description:
-              "Preview your post before scheduling it to see how it will look like.",
+              "Record every trade, analyze recurring mistakes and identify what works. Continuous improvement starts with measurement.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -117,10 +118,10 @@ export default function HomePage() {
             ),
           },
           {
-            badge: "🔄 Repost",
-            title: "Schedule repost",
+            badge: "📈 Stats",
+            title: "Choose your traders",
             description:
-              "Automatically repost your post after a certain amount of time.",
+              "View real win rate, payoff ratio and max drawdown of each verified trader. Transparent stats, no fake promises.",
             component: (
               <Image
                 src="/images/placeholder1.gif"
@@ -146,39 +147,54 @@ export default function HomePage() {
       <FAQSection
         faq={[
           {
-            question: "What is Threader?",
+            question: "What is MyCryptoPilot?",
             answer:
-              "Threader is an innovative platform designed to help you write, schedule, and publish content to your account with the assistance of AI, enhancing your business's online presence.",
+              "MyCryptoPilot is a crypto trading signals platform with a risk-first approach. We connect retail traders with verified professional traders who share their structured signals in real-time.",
           },
           {
-            question: "How does AI Content Generation work?",
+            question: "How do trading signals work?",
             answer:
-              "Our AI Content Generation feature leverages the power of artificial intelligence to create unique and engaging content for your Threads, making content creation easier and more efficient.",
+              "Each signal contains: entry price, take-profit(s), stop-loss, risk level (1-5), confidence (%), detailed rationales and market context. You get all the info to understand WHY to take the trade, not just WHAT to trade.",
           },
           {
-            question: "Can I schedule my threads in advance?",
+            question: "What is a 'risk-first' approach?",
             answer:
-              "Yes, with Threader, you can schedule your threads for a specific time, allowing you to maintain a consistent online presence without the need to manually post every day.",
+              "Risk-first means capital protection comes before profit seeking. We provide a risk console to calculate your position sizing, display traders' max drawdowns, and educate on risk/reward ratio.",
           },
           {
-            question: "What is the Now.TS project?",
+            question: "How to choose a trader to follow?",
             answer:
-              "Now.TS is a new project announced on our platform that enables users to create professional Next.js applications in days, streamlining the development process.",
+              "Check transparent stats of each trader: win rate, payoff ratio, max drawdown, number of signals sent. Choose according to your risk profile and strategy (SPOT vs PERP, timeframe, etc.).",
           },
           {
-            question: "How can I get more followers?",
+            question: "How many signals can I receive?",
             answer:
-              "To gain more followers, focus on creating content related to Next.js, as our analysis shows it's highly engaging. Utilize our research tools to understand trends and improve your content strategy.",
+              "Free Plan: 5 signals/day (1 trader). Pro Plan: 50 signals/day (5 traders). Ultra Plan: unlimited signals (unlimited traders). Premium signals are blurred for Free users.",
           },
           {
-            question: "What are the benefits of posting with Threader?",
+            question: "Can I try it for free?",
             answer:
-              "Posting with Threader allows you to schedule posts, avoid daily manual postings, track your scheduled content easily, and maintain consistency in your online activity.",
+              "Yes! The Free plan allows you to receive 5 signals per day and follow 1 verified trader. You have access to complete rationales and basic risk console. No credit card required.",
           },
           {
-            question: "What pricing plans does Threader offer?",
+            question: "How does position sizing calculation work?",
             answer:
-              "Threader offers two pricing plans: THREADER FREE, perfect for tiny creators, allowing you to schedule 1 post in advance; and THREADER PREMIUM, ideal for content creators, offering unlimited scheduling, post previews, and auto-reposting features.",
+              "The risk console takes into account your total capital, the % risk you accept (e.g. 2%), the signal's R:R ratio and automatically calculates the optimal position size to protect your capital.",
+          },
+          {
+            question: "Are traders verified?",
+            answer:
+              "Yes, all traders display transparent stats based on their real trades. We show win rate, payoff ratio and max drawdown. No fake promises or stat manipulation.",
+          },
+          {
+            question: "Can I become a trader on the platform?",
+            answer:
+              "Yes! If you have a consistent track record (min. 6 months, 50+ trades), you can request verification. Traders earn revenue when users follow them via paid plans.",
+          },
+          {
+            question: "Which cryptos and exchanges are supported?",
+            answer:
+              "We support all major exchanges (Binance, Bybit, OKX, etc.) and cover BTC, ETH and main altcoins. Signals always specify the exact pair and type (SPOT or PERPETUAL).",
           },
         ]}
       />
@@ -189,73 +205,73 @@ export default function HomePage() {
         reviews={[
           {
             image: "https://i.pravatar.cc/300?u=b1",
-            name: "Eva",
+            name: "Lea M.",
             review:
-              "Since I started using Threader, my content creation process has been streamlined. The AI suggestions are spot on, helping me to connect better with my audience. Highly recommend for anyone looking to elevate their content game.",
-            role: "Content Creator",
+              "Crypto beginner, I lost 40% of my capital in 2 months solo. Since following 2 verified traders on MyCryptoPilot, I trade with discipline and my losses are limited. The Free plan let me test risk-free.",
+            role: "Beginner Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b2",
-            name: "Lucas",
+            name: "Julian P.",
             review:
-              "Threader's scheduling feature is a lifesaver. It allows me to plan my content calendar efficiently, ensuring I never miss posting on the optimal days and times. Fantastic tool for social media managers.",
-            role: "Social Media Manager",
+              "The risk console is a game-changer. Before, I traded with positions too large. Now I systematically calculate my sizing and sleep better. My max drawdown went from -35% to -8%.",
+            role: "Intermediate Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b3",
-            name: "Mia",
+            name: "Sarah K.",
             review:
-              "The analytics provided by Threader are invaluable. They've given me insights into what my audience loves, helping me double my engagement rate in just a few months.",
-            role: "Digital Marketer",
+              "After 18 months of solo losses (-$4k), I finally found a method that works thanks to structured signals. Rationales taught me to read the market. First profitable month in 3 years of trading.",
+            role: "Ex-Losing Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b4",
-            name: "Noah",
+            name: "Max B.",
             review:
-              "I was skeptical about AI-generated content, but Threader changed my mind. The content feels personal and has significantly increased my interaction rates.",
-            role: "Blogger",
+              "What differentiates MCP from other platforms is the rationales. I don't blindly copy, I understand WHY the trader takes this setup. I progressed more in 3 months than in 2 years of YouTube.",
+            role: "Self-Taught Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b5",
-            name: "Isabella",
+            name: "Emma R.",
             review:
-              "Threader's user interface is incredibly user-friendly. I was able to onboard my team in no time, and we've seen a marked improvement in our social media performance.",
-            role: "Team Leader",
+              "I follow 3 traders with different styles: scalp, swing, SPOT only. This diversification protects me from one trader's bad streaks. The Pro plan at $49/month is well worth it.",
+            role: "Multi-Strategy Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b6",
-            name: "Oliver",
+            name: "Nick T.",
             review:
-              "Auto-reposting with Threader is a feature I didn't know I needed. It's great for getting more mileage out of your best content without any extra effort.",
-            role: "Freelancer",
+              "The integrated trading journal made me aware of my recurring mistakes: I took profits too early and let losses run. Now I respect my TP/SL.",
+            role: "Improving Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b7",
-            name: "Sophia",
+            name: "Clara D.",
             review:
-              "Joining the Threader community has opened up networking opportunities with fellow content creators. It's more than just a tool; it's a platform for growth.",
-            role: "Influencer",
+              "I tested 4 signal platforms before MCP. This is the only one where stats are transparent and verifiable. No fake screenshots or 1000%/month promises. Serious at last.",
+            role: "Skeptical Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b8",
-            name: "Elijah",
+            name: "Alex G.",
             review:
-              "The calendar view in Threader helps me visualize my content strategy for the entire month. It's been a game changer for my planning process.",
-            role: "Strategist",
+              "I traded solo since 2020 with average winrate (48%). Following pros opened my eyes to my psychological biases. I trade less but with more conviction. WR at 61% now.",
+            role: "Former Solo Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b9",
-            name: "Charlotte",
+            name: "Camille V.",
             review:
-              "I appreciate the flexibility in Threader's pricing plans. It's accessible for creators at any stage of their journey, from beginners to established influencers.",
-            role: "Entrepreneur",
+              "As a verified trader on the platform, I earn passive income by sharing my setups. Onboarding was rigorous but it filters out cowboys. Quality community.",
+            role: "MCP Verified Trader",
           },
           {
             image: "https://i.pravatar.cc/300?u=b10",
-            name: "James",
+            name: "Lucas F.",
             review:
-              "The customer support team at Threader is fantastic. They've been quick to respond and helpful with any questions I've had. Great service overall.",
-            role: "Customer",
+              "Ultra plan is expensive ($99) but if you trade seriously with 5k+ capital, it's nothing. Unlimited access + real-time screener + custom alerts. Made $2.8k profit first month.",
+            role: "Serious Trader",
           },
         ]}
       />

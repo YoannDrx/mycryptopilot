@@ -2,12 +2,16 @@ import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
 import {
+  BarChart3,
   CreditCard,
+  DollarSign,
   Home,
   Settings,
+  TrendingUp,
   TriangleAlert,
   User,
   User2,
+  Users,
 } from "lucide-react";
 
 const replaceSlug = (href: string, slug: string): string =>
@@ -51,6 +55,21 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         label: "Dashboard",
       },
       {
+        href: `${ORGANIZATION_PATH}/dashboard`,
+        Icon: BarChart3,
+        label: "Trading Dashboard",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/traders`,
+        Icon: Users,
+        label: "Traders Marketplace",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/pricing`,
+        Icon: DollarSign,
+        label: "Pricing",
+      },
+      {
         href: `${ORGANIZATION_PATH}/users`,
         Icon: User,
         label: "Users",
@@ -58,7 +77,17 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
     ],
   },
   {
-    title: "Organization",
+    title: "Trader",
+    links: [
+      {
+        href: `${ORGANIZATION_PATH}/dashboard/trader`,
+        Icon: TrendingUp,
+        label: "Trader Dashboard",
+      },
+    ],
+  },
+  {
+    title: "Account",
     defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
     links: [
       {

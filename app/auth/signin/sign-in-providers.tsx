@@ -19,18 +19,26 @@ export const SignInProviders = ({
 
   callbackUrl ??= callbackUrlParams as string;
 
+  const gridClassName =
+    providers.length <= 2
+      ? "grid grid-cols-1 gap-2 lg:grid-cols-2 lg:gap-4"
+      : "grid grid-cols-1 gap-2 lg:gap-4";
+
   return (
     <div className="flex flex-col gap-4 lg:gap-6">
       <SignInCredentialsAndMagicLinkForm callbackUrl={callbackUrl} />
       {providers.length > 0 && <Divider>or</Divider>}
 
-      <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 lg:gap-4">
+      <div className={gridClassName}>
         {/* ℹ️ Add provider you want to support here */}
         {providers.includes("github") && (
           <ProviderButton providerId="github" callbackUrl={callbackUrl} />
         )}
         {providers.includes("google") && (
           <ProviderButton providerId="google" callbackUrl={callbackUrl} />
+        )}
+        {providers.includes("discord") && (
+          <ProviderButton providerId="discord" callbackUrl={callbackUrl} />
         )}
       </div>
 

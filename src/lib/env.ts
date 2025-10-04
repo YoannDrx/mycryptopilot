@@ -13,12 +13,19 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    DISCORD_CLIENT_ID: z.string().optional(),
+    DISCORD_CLIENT_SECRET: z.string().optional(),
     RESEND_API_KEY: z.string().min(1),
     RESEND_AUDIENCE_ID: z.string().optional(),
     EMAIL_FROM: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().min(1),
     NODE_ENV: z.enum(["development", "production", "test"]),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    // Crypto payment configuration
+    BASE_RPC_URL: z.string().url().optional(),
+    TRON_RPC_URL: z.string().url().optional(),
+    CRYPTO_XPUB_BASE: z.string().optional(),
+    CRYPTO_XPUB_TRON: z.string().optional(),
   },
   /**
    * If you add `client` environment variables, you need to add them to

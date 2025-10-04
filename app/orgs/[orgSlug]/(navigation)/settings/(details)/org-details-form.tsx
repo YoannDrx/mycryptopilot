@@ -44,7 +44,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
   const mutation = useMutation({
     mutationFn: async (values: OrgDetailsFormSchemaType) => {
       if (!org?.id) {
-        throw new Error("Organization ID is required");
+        throw new Error("Account ID is required");
       }
 
       return unwrapSafePromise(
@@ -78,9 +78,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Image</CardTitle>
-          <CardDescription>
-            Add a custom image to your organization.
-          </CardDescription>
+          <CardDescription>Add a custom image to your account.</CardDescription>
         </CardHeader>
         <CardContent>
           <FormField
@@ -105,8 +103,7 @@ export const OrgDetailsForm = ({ defaultValues }: ProductFormProps) => {
         <CardHeader>
           <CardTitle>Name</CardTitle>
           <CardDescription>
-            Use your organization's name or your name if you don't have an
-            organization.
+            Your account name (displayed in the application).
           </CardDescription>
         </CardHeader>
         <CardContent>

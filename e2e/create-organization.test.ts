@@ -4,7 +4,8 @@ import { nanoid } from "nanoid";
 import { createTestAccount } from "./utils/auth-test";
 
 test.describe("Create Organization", () => {
-  test("should create a new organization after account creation", async ({
+  // MyCryptoPilot: Skipped - 1 organization = 1 user (no multi-tenant)
+  test.skip("should create a new organization after account creation", async ({
     page,
   }) => {
     // Create and login with a test account
