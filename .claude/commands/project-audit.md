@@ -1,12 +1,13 @@
+---
+description: Audit complet du projet avec mise à jour documentation + issues GitHub + rapport détaillé
+tags: project-management, documentation, github, analysis
+---
+
 # Project Audit Command
 
 Effectue un audit complet du projet MyCryptoPilot, met à jour toute la documentation et les issues GitHub, puis génère un rapport détaillé avec progress tracking et recommandations.
 
-## Metadata
-- **Nom**: `/project-audit`
-- **Description**: Audit complet du projet avec mise à jour documentation + issues GitHub + rapport détaillé
-- **Tags**: project-management, documentation, github, analysis
-- **Durée**: 5-10 minutes
+**Durée estimée**: 5-10 minutes
 
 ---
 
@@ -97,6 +98,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 **Actions**:
 
 1. **Lister toutes les issues GitHub**:
+
    ```bash
    gh issue list --repo YoannDrx/mycryptopilot --limit 100 --json number,title,state,labels
    ```
@@ -104,6 +106,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 2. **Pour CHAQUE issue, effectuer les actions suivantes**:
 
    a. **Récupérer contenu actuel**:
+
    ```bash
    gh issue view <number> --json title,body,labels,state
    ```
@@ -115,8 +118,9 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 
    c. **Mettre à jour le body de l'issue** avec sections enrichies:
 
-   ```markdown
+   ````markdown
    ## User Story
+
    [Conserver existant]
 
    ### 🔄 État Actuel (Mis à jour le <DATE>)
@@ -124,14 +128,17 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    **Status**: <✅⏳❌⚠️> <DESCRIPTION_PRECISE>
 
    **✅ Complété**:
+
    - [x] Item 1
    - [x] Item 2
 
    **❌ Manquant** ou **⏳ En cours**:
+
    - [ ] Item 1
    - [ ] Item 2
 
    **⚠️ Blocages** (si applicable):
+
    - Bloqué par: #<issue_number>
    - Raison: <description>
 
@@ -140,12 +147,15 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    ### 🔗 Dépendances
 
    **Bloque**:
+
    - #<issue_number> - <Titre>
 
    **Bloqué par**:
+
    - #<issue_number> - <Titre>
 
    **Requiert** (optionnel):
+
    - Migrations Prisma appliquées
    - Env vars configurées: <liste>
    - Packages installés: <liste>
@@ -157,11 +167,13 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    [Si applicable - sinon omettre cette section]
 
    **Env Variables**:
+
    ```bash
    # .env.local
    VARIABLE_NAME=value_example
    ANOTHER_VAR=...
    ```
+   ````
 
    **API Keys / Services externes**:
    - Service X: Obtenir clé sur <URL>
@@ -172,7 +184,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    2. Puis cela
    3. Vérifier avec: <commande>
 
-   ---
+   ***
 
    ### 🧪 Guide Test End-to-End
 
@@ -204,35 +216,40 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    - Vérifier: <checklist debugging>
    - Erreur commune: <description + solution>
 
-   ---
+   ***
 
    ### Portée
+
    [Conserver existant et ajuster si nécessaire]
 
    ### Critères d'Acceptation (BDD)
+
    [Conserver existant et compléter si incomplet]
 
    ### DoD Spécifique
+
    [Cocher items complétés avec [x]]
 
    ### Estimation
+
    [Corriger si nécessaire basé sur l'analyse]
 
-   ---
+   ***
 
    ### Prochaines Étapes
    1. <Action suivante prioritaire>
    2. <Autre action>
 
-   ---
+   ***
 
-   *Mis à jour le <DATE> par /project-audit*
-   ```
+   _Mis à jour le <DATE> par /project-audit_
+
+   ````
 
    d. **Mettre à jour via GitHub CLI**:
    ```bash
    gh issue edit <number> --body "<nouveau_contenu>"
-   ```
+   ````
 
    e. **Ajuster labels si nécessaire**:
    - Ajouter `priority-p0`, `priority-p1`, `priority-p2` selon analyse
@@ -259,6 +276,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    - Not Started (dans body: "Status: ❌")
 
 2. **Calculer pourcentage global**:
+
    ```
    Progress = (Completed + 0.5 * InProgress) / Total * 100
    ```
@@ -286,7 +304,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 
 **Format du rapport** (à afficher à l'utilisateur):
 
-```markdown
+````markdown
 # 🎯 MyCryptoPilot - Project Audit Report
 
 **Date**: <DATE_ACTUELLE>
@@ -298,6 +316,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 📊 Progress Overview
 
 ### Global Progress
+
 <PROGRESS_BAR_VISUELLE> **<XX>%**
 
 - ✅ **Completed**: <N> issues (<XX>%)
@@ -307,6 +326,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 - **Total**: <N> issues
 
 ### Progress by Phase
+
 - **Phase 1 (Base & Config)**: <PROGRESS_BAR> <XX>%
 - **Phase 2 (Crypto Payments)**: <PROGRESS_BAR> <XX>%
 - **Phase 3 (Trading Signals)**: <PROGRESS_BAR> <XX>%
@@ -315,13 +335,14 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 
 ## 📋 Status US par US
 
-| # | Titre | Status | Priority | Blocage | % Done | Estimation Reste |
-|---|-------|--------|----------|---------|--------|------------------|
-| 1 | [US-01] Branding | ⏳ In Progress | P2 | - | 80% | 0.5j |
-| 2 | [US-02] Structure DB | ⚠️ Blocked | P0 | Migrations | 90% | 0.5h |
-| ... | ... | ... | ... | ... | ... | ... |
+| #   | Titre                | Status         | Priority | Blocage    | % Done | Estimation Reste |
+| --- | -------------------- | -------------- | -------- | ---------- | ------ | ---------------- |
+| 1   | [US-01] Branding     | ⏳ In Progress | P2       | -          | 80%    | 0.5j             |
+| 2   | [US-02] Structure DB | ⚠️ Blocked     | P0       | Migrations | 90%    | 0.5h             |
+| ... | ...                  | ...            | ...      | ...        | ...    | ...              |
 
 **Légende**:
+
 - ✅ Completed
 - ⏳ In Progress
 - ⚠️ Blocked
@@ -332,6 +353,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 🧪 Features Testables End-to-End
 
 ### ✅ Fully Testable (Production Ready)
+
 1. **Authentification complète**
    - Signup/Signin email/password
    - OAuth (GitHub, Google, Discord)
@@ -343,6 +365,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    - ...
 
 ### ⚠️ Partially Testable (UI Only / Incomplete)
+
 1. **Dashboard User**
    - UI complète ✅
    - Données non connectées ❌
@@ -352,6 +375,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    - ...
 
 ### ❌ Not Testable (Blocked / Missing)
+
 1. **Création profils traders**
    - Pas de page/formulaire ❌
    - ❌ Testable: Non, feature manquante
@@ -364,6 +388,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 🚨 Blocages Critiques (P0)
 
 ### 1. 🔴 Migrations Prisma Non Appliquées
+
 - **Impact**: BLOQUE TOUT développement DB
 - **Issue**: #<number>
 - **Solution**: `npx prisma migrate dev --name init_mycryptopilot`
@@ -371,6 +396,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 - **URGENT**: À faire IMMÉDIATEMENT
 
 ### 2. 🔴 [Autre blocage P0]
+
 - ...
 
 ---
@@ -378,21 +404,25 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 📊 Breakdown par Catégorie
 
 ### Infrastructure & Config
+
 - ✅ Completed: <N> / <Total>
 - Features: Next.js, Prisma, Auth, Site Config
 - Status: <XX>% done
 
 ### Core Features (MVP)
+
 - ✅ Completed: <N> / <Total>
 - Features: Traders, Signals, Follow, Dashboards
 - Status: <XX>% done
 
 ### Crypto Payments
+
 - ✅ Completed: <N> / <Total>
 - Features: Address Gen, Watcher, UI Checkout
 - Status: <XX>% done
 
 ### Premium Features
+
 - ✅ Completed: <N> / <Total>
 - Features: Journal, Risk Console, Screeners
 - Status: <XX>% done
@@ -402,6 +432,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 🎯 Next Steps Recommandés
 
 ### 🔴 Priorité P0 (URGENT - Bloque MVP)
+
 1. **#<number> - Migrations Prisma** (30 min)
    - Générer et appliquer migrations
    - Débloquer toutes les features DB
@@ -415,6 +446,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    - ...
 
 ### 🟡 Priorité P1 (Important - MVP Core)
+
 1. **#<number> - Système Signaux** (5-7 jours)
    - Formulaire création signal
    - Composant TradingCard
@@ -424,6 +456,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    - ...
 
 ### 🟢 Priorité P2 (Nice to Have - Post-MVP)
+
 1. **#<number> - Landing Page Adaptation** (1-2 jours)
    - Adapter sections reviews/features
    - Screenshots app
@@ -438,49 +471,59 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ### 🏗️ Architecture
 
 **✅ Points Forts**:
+
 - <Observation positive 1>
 - <Observation positive 2>
 
 **⚠️ Points d'Attention**:
+
 - <Observation/conseil 1 avec justification>
 - <Observation/conseil 2 avec justification>
 
 **💡 Recommandations**:
+
 - <Conseil actionnable 1>
 - <Conseil actionnable 2>
 
 ### 🔧 Dev Process
 
 **✅ Ce qui fonctionne bien**:
+
 - <Élément positif>
 
 **⚠️ À améliorer**:
+
 - <Suggestion 1>
 - <Suggestion 2>
 
 **💡 Suggestions**:
+
 - <Conseil process dev>
 
 ### 📝 Code Quality
 
 **Analyse**:
+
 - TypeScript strict: <Oui/Non>
 - TODOs count: <N> (<catégorisation>)
 - Tests coverage: <estimation>
 - Build status: <✅❌>
 
 **Recommandations**:
+
 - <Conseil code quality 1>
 - <Conseil code quality 2>
 
 ### 🧪 Testing Strategy
 
 **État actuel**:
+
 - Unit tests: <présents/absents>
 - E2E tests: <présents/absents>
 - Coverage: <estimation>
 
 **Recommandations**:
+
 - <Conseil testing 1>
 - <Conseil testing 2>
 - Prioriser tests pour: <features critiques>
@@ -488,50 +531,60 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ### 📚 Documentation
 
 **État**:
+
 - README: <score/10>
 - ANALYSIS: <score/10>
 - CLAUDE.md: <score/10>
 - Inline comments: <score/10>
 
 **Recommandations**:
+
 - <Conseil doc 1>
 - <Conseil doc 2>
 
 ### ⚡ Performance
 
 **Observations**:
+
 - <Analyse perf si applicable>
 
 **Suggestions**:
+
 - <Conseil perf si applicable>
 
 ### 🔒 Security
 
 **Checks**:
+
 - Secrets en clair: <✅❌>
 - Env vars: <gestion correcte?>
 - Auth: <sécurisée?>
 
 **Recommandations**:
+
 - <Conseil sécurité 1>
 - <Conseil sécurité 2>
 
 ### 🎨 UX/UI
 
 **Points forts**:
+
 - <Élément UX positif>
 
 **Améliorations possibles**:
+
 - <Suggestion UX 1>
 - <Suggestion UX 2>
 
 ### 🔄 CI/CD & DevOps
 
 **État**:
+
 - CI configurée: <Oui/Non>
 - Déploiement: <status>
 
 **Suggestions**:
+
 - <Conseil DevOps>
 
 ---
@@ -541,16 +594,19 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ### Estimation Completion
 
 **Basé sur**:
+
 - Issues restantes: <N>
 - Effort total restant: <N> jours/homme
 - Vélocité estimée: <X> issues/semaine
 
 **Timeline estimée**:
+
 - MVP Core (P0+P1): <N> semaines
 - Full MVP (incl. P2): <N> semaines
 - Production Ready: <N> semaines
 
 **Hypothèses**:
+
 - 1 dev full-time
 - Pas de bloqueurs majeurs après migrations
 - Vélocité constante
@@ -560,14 +616,17 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 🎓 Key Learnings & Patterns
 
 ### Patterns Observés
+
 1. <Pattern 1 dans le code/architecture>
 2. <Pattern 2>
 
 ### Best Practices Appliquées
+
 1. <Best practice 1>
 2. <Best practice 2>
 
 ### Leçons du Projet
+
 1. <Learning 1>
 2. <Learning 2>
 
@@ -576,6 +635,7 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 ## 📎 Annexes
 
 ### Useful Commands
+
 ```bash
 # Générer migrations
 npx prisma migrate dev
@@ -589,14 +649,17 @@ pnpm test:ci
 # Build
 pnpm build
 ```
+````
 
 ### Important Files
+
 - Config: `src/site-config.ts`
 - Plans: `src/lib/crypto/mycryptopilot-plans.ts`
 - DB Schema: `prisma/schema/`
 - Env: `src/lib/env.ts`
 
 ### Links
+
 - GitHub: https://github.com/YoannDrx/mycryptopilot
 - Issues: https://github.com/YoannDrx/mycryptopilot/issues
 - Docs: See .claude/CLAUDE.md
@@ -605,8 +668,9 @@ pnpm build
 
 **🎉 Fin du Rapport**
 
-*Ce rapport a été généré automatiquement par la commande `/project-audit`.*
-*Pour toute question ou clarification, consulter les fichiers .md mis à jour ou les issues GitHub enrichies.*
+_Ce rapport a été généré automatiquement par la commande `/project-audit`._
+_Pour toute question ou clarification, consulter les fichiers .md mis à jour ou les issues GitHub enrichies._
+
 ```
 
 ---
@@ -655,3 +719,4 @@ Lorsque l'utilisateur lance `/project-audit`:
 8. Résumé: "✅ Audit terminé! Documentation mise à jour (README.md, .claude/CLAUDE.md), <N> issues GitHub enrichies."
 
 **Durée totale estimée**: 5-10 minutes selon taille du projet.
+```
