@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Dernière mise à jour**: 4 octobre 2025 (via /project-audit)
+
 ---
 
 ## 📋 Table des Matières
@@ -87,7 +89,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 **STATUT**: ⛔ **BLOQUE TOUTES LES FONCTIONNALITÉS BASE DE DONNÉES**
 
-Le schéma Prisma existe (`prisma/schema/*.prisma`) mais **aucune migration n'a été générée ni appliquée**. Le dossier `prisma/migrations/` est vide.
+Le schéma Prisma existe (`prisma/schema/*.prisma`) mais **aucune migration n'a été générée ni appliquée**. Le dossier `prisma/migrations/` n'existe même pas.
 
 **Impact**: Impossible de tester ou développer toute fonctionnalité utilisant la DB sans générer les migrations d'abord.
 
@@ -122,7 +124,7 @@ npx prisma migrate dev --name init_mycryptopilot
 
 2. **Dashboard Trader** (`app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx`)
    - ✅ UI complète: stats grid, analytics charts, recent signals table
-   - ⚠️ 5 TODOs (lignes 23-27): fetch trader data + signals réels
+   - ⚠️ 5 TODOs (lignes 29-33): fetch trader data + signals réels
 
 3. **Marketplace Traders** (`app/orgs/[orgSlug]/(navigation)/traders/page.tsx`)
    - ✅ UI complète: search bar, filters sidebar, traders grid
@@ -139,8 +141,8 @@ npx prisma migrate dev --name init_mycryptopilot
 
 **Total: 11 TODOs dans le code applicatif** (hors node_modules):
 - `app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx` - 3 TODOs (lignes 31-33)
-- `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx` - 5 TODOs (lignes 23-27)
-- `app/orgs/[orgSlug]/(navigation)/traders/page.tsx` - 3 TODOs (lignes 38-40)
+- `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx` - 5 TODOs (lignes 29-33)
+- `app/orgs/[orgSlug]/(navigation)/traders/page.tsx` - 3 TODOs (lignes 30-32)
 
 ---
 
