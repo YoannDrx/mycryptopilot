@@ -1,5 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DialogContent } from "@/components/ui/dialog";
+import {
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { InterceptDialog } from "@/components/utils/intercept-dialog";
 import { SocialProviders } from "@/lib/auth";
 import { SiteConfig } from "@/site-config";
@@ -17,11 +21,13 @@ export default function SignInDialogPage() {
                 {SiteConfig.title.substring(0, 1).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="text-lg font-semibold">{SiteConfig.title}</span>
+            <DialogTitle className="text-lg font-semibold">
+              {SiteConfig.title}
+            </DialogTitle>
           </div>
-          <p className="text-muted-foreground mt-2 text-center">
+          <DialogDescription className="text-muted-foreground mt-2 text-center">
             Please sign in to your account to continue.
-          </p>
+          </DialogDescription>
         </div>
         <SignInModal providers={Object.keys(SocialProviders ?? {})} />
       </DialogContent>

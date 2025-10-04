@@ -3,7 +3,7 @@ import { combineWithParentMetadata } from "@/lib/metadata";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Settings",
-  description: "Manage your organization settings.",
+  description: "Manage your account settings.",
 });
 
 export default async function RouteLayout(

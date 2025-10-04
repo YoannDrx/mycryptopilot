@@ -1,0 +1,331 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import {
+  BarChart3,
+  DollarSign,
+  PlusCircle,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Trader Dashboard - MyCryptoPilot",
+  description: "Manage your trading signals and track your performance",
+};
+
+export default async function TraderDashboardPage() {
+  await getRequiredCurrentOrgCache();
+
+  // TODO: Fetch trader profile
+  // TODO: Fetch trader's signals
+  // TODO: Fetch trader's stats (winrate, payoff, etc.)
+  // TODO: Fetch followers count
+  // TODO: Fetch revenue stats
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Trader Dashboard
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Create signals and manage your trading profile
+            </p>
+          </div>
+          <Button>
+            <PlusCircle className="mr-2 size-4" />
+            Create Signal
+          </Button>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Followers</CardTitle>
+              <Users className="text-muted-foreground size-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-muted-foreground text-xs">
+                +0 from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Active Signals
+              </CardTitle>
+              <BarChart3 className="text-muted-foreground size-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">0</div>
+              <p className="text-muted-foreground text-xs">
+                Published in last 7 days
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+              <TrendingUp className="text-muted-foreground size-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">--%</div>
+              <p className="text-muted-foreground text-xs">No trades yet</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+              <DollarSign className="text-muted-foreground size-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">$0</div>
+              <p className="text-muted-foreground text-xs">This month</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Trader Status Card */}
+        <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Badge variant="secondary">Trader Status</Badge>
+              Not Verified
+            </CardTitle>
+            <CardDescription>
+              Complete your profile and publish quality signals to get verified
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="outline" className="bg-background">
+                  1/3
+                </Badge>
+                <span>Complete your trader profile</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="outline" className="bg-background">
+                  0/10
+                </Badge>
+                <span>Publish 10+ quality signals</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="outline" className="bg-background">
+                  0/5
+                </Badge>
+                <span>Get 5+ followers</span>
+              </div>
+            </div>
+            <Button className="mt-4" variant="outline">
+              Complete Profile
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="signals" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="signals">My Signals</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="revenue">Revenue</TabsTrigger>
+          </TabsList>
+
+          {/* Signals Tab */}
+          <TabsContent value="signals" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Signals</CardTitle>
+                <CardDescription>
+                  Signals you've published to your followers
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
+                  <BarChart3 className="mb-4 size-12 opacity-20" />
+                  <p className="mb-2 font-medium">No signals published yet</p>
+                  <p className="text-sm">
+                    Create your first trading signal to get started
+                  </p>
+                  <Button className="mt-4">
+                    <PlusCircle className="mr-2 size-4" />
+                    Create First Signal
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Performance Tab */}
+          <TabsContent value="performance" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Performance Metrics</CardTitle>
+                  <CardDescription>Your trading track record</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="text-sm font-medium">Win Rate</span>
+                    <span className="text-2xl font-bold">--%</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="text-sm font-medium">Profit Factor</span>
+                    <span className="text-2xl font-bold">-.-</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="text-sm font-medium">Max Drawdown</span>
+                    <span className="text-2xl font-bold">--%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Total Trades</span>
+                    <span className="text-2xl font-bold">0</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Follower Growth</CardTitle>
+                  <CardDescription>Track your audience growth</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
+                    <Users className="mb-4 size-12 opacity-20" />
+                    <p className="mb-2 font-medium">No follower data yet</p>
+                    <p className="text-sm">
+                      Start publishing signals to attract followers
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Performance Chart</CardTitle>
+                  <CardDescription>Your equity curve over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
+                    <BarChart3 className="mb-4 size-12 opacity-20" />
+                    <p className="mb-2 font-medium">
+                      Not enough data to display chart
+                    </p>
+                    <p className="text-sm">
+                      Complete at least 10 trades to see your performance chart
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Revenue Tab */}
+          <TabsContent value="revenue" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader>
+                  <CardTitle>This Month</CardTitle>
+                  <CardDescription>Revenue from subscriptions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">$0.00</div>
+                  <p className="text-muted-foreground mt-2 text-sm">
+                    0 active subscribers
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Last Month</CardTitle>
+                  <CardDescription>Previous month revenue</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">$0.00</div>
+                  <p className="text-muted-foreground mt-2 text-sm">
+                    0 subscribers
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Time</CardTitle>
+                  <CardDescription>Total earnings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">$0.00</div>
+                  <p className="text-muted-foreground mt-2 text-sm">
+                    Since account creation
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-3">
+                <CardHeader>
+                  <CardTitle>Revenue History</CardTitle>
+                  <CardDescription>Monthly revenue breakdown</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
+                    <DollarSign className="mb-4 size-12 opacity-20" />
+                    <p className="mb-2 font-medium">No revenue data yet</p>
+                    <p className="text-sm">
+                      Get followers to start earning from your signals
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Manage your trading profile</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+              <PlusCircle className="size-6" />
+              <span>Create Signal</span>
+            </Button>
+            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+              <Users className="size-6" />
+              <span>View Followers</span>
+            </Button>
+            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+              <BarChart3 className="size-6" />
+              <span>Analytics</span>
+            </Button>
+            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+              <TrendingUp className="size-6" />
+              <span>Edit Profile</span>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

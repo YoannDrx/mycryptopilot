@@ -12,7 +12,7 @@ import { OrganizationDeleteDialog } from "./organization-delete-dialog";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Danger",
-  description: "Delete your organization.",
+  description: "Delete your account.",
 });
 
 export default async function RoutePage(
@@ -29,9 +29,9 @@ export default async function RoutePage(
       <OrganizationDangerForm defaultValues={org} />
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle>Delete the organization</CardTitle>
+          <CardTitle>Delete the account</CardTitle>
           <CardDescription>
-            By deleting your organization, you will lose all your data and your
+            By deleting your account, you will lose all your data and your
             subscription will be cancelled.
           </CardDescription>
           <CardDescription>No refund will be provided.</CardDescription>

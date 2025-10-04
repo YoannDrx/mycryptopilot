@@ -8,7 +8,8 @@ import {
   signOutAccount,
 } from "./utils/auth-test";
 
-test("invite and login as invited user", async ({ page }) => {
+// MyCryptoPilot: Skipped - 1 organization = 1 user (no invitations/members in B2C model)
+test.skip("invite and login as invited user", async ({ page }) => {
   // 1. Create a test account (owner)
   const ownerData = await createTestAccount({
     page,

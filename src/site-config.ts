@@ -1,35 +1,51 @@
 export const SiteConfig = {
-  title: "NOW.TS",
-  description: "Collect and showcase powerful video and text testimonials",
-  prodUrl: "https://demo.nowts.app",
-  appId: "nowts",
-  domain: "demo.nowts.app",
+  title: "MyCryptoPilot",
+  description:
+    "Signaux de trading crypto risk-first. Analyse temps réel, plans explicables, console de risque.",
+  prodUrl: "https://mycryptopilot.app",
+  appId: "mycryptopilot",
+  domain: "mycryptopilot.app",
   appIcon: "/images/icon.png",
   company: {
-    name: "NOW.TS LLC",
-    address: "421 Rue de Paris, France", // Remove if not needed
+    name: "MyCryptoPilot",
+    address: "123 Avenue des Champs-Élysées, 75008 Paris, France",
   },
   brand: {
-    primary: "#007291", // You can adjust this to your brand color
+    primary: "#F59E0B", // Amber color for crypto theme
   },
   team: {
-    image: "https://melvynx.com/images/me/twitter-en.jpg",
-    website: "https://melvynx.com",
-    twitter: "https://twitter.com/melvyn_me",
-    name: "Melvynx",
+    image: "/images/team.jpg",
+    website: "https://mycryptopilot.app",
+    twitter: "https://twitter.com/mycryptopilot",
+    name: "MyCryptoPilot Team",
   },
   features: {
     /**
-     * If enable, you need to specify the logic of upload here : src/features/images/uploadImageAction.tsx
-     * You can use Vercel Blob Storage : https://vercel.com/docs/storage/vercel-blob
-     * Or you can use Cloudflare R2 : https://mlv.sh/cloudflare-r2-tutorial
-     * Or you can use AWS S3 : https://mlv.sh/aws-s3-tutorial
+     * Image upload enabled for trader profile pictures and logos
      */
-    enableImageUpload: false as boolean,
+    enableImageUpload: true as boolean,
     /**
-     * If enable, the user will be redirected to `/orgs` when he visits the landing page at `/`
-     * The logic is located in middleware.ts
+     * Keep landing page visible - users need to see pricing and features before signing up
      */
-    enableLandingRedirection: true as boolean,
+    enableLandingRedirection: false as boolean,
   },
-};
+  /**
+   * Crypto payment networks configuration
+   */
+  crypto: {
+    networks: {
+      base: {
+        name: "Base",
+        currency: "USDC",
+        confirmations: 1,
+        explorerUrl: "https://basescan.org",
+      },
+      tron: {
+        name: "Tron",
+        currency: "USDT",
+        confirmations: 2,
+        explorerUrl: "https://tronscan.org",
+      },
+    },
+  },
+} as const;
