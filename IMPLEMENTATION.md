@@ -6,14 +6,36 @@ Ce document récapitule l'adaptation de la boilerplate now.ts pour créer MyCryp
 
 ---
 
-## ✅ Phase 1 Complétée : Base de données & Configuration (3 oct 2025)
+## ⚠️ Phase 1 Partiellement Complétée : Base de données & Configuration (4 oct 2025)
+
+### ⚠️ IMPORTANT - Migrations Prisma
+
+**BLOCAGE CRITIQUE** : Les schémas Prisma ont été créés mais **aucune migration n'a été générée ni appliquée**.
+
+**État actuel** :
+- ✅ Schémas définis dans `prisma/schema/`
+- ❌ Dossier `prisma/migrations/` inexistant
+- ❌ Base de données non synchronisée avec le schéma
+
+**Actions requises** :
+```bash
+# Générer la migration initiale
+npx prisma migrate dev --name init_mycryptopilot
+
+# Ou en production
+npx prisma migrate deploy
+```
+
+**⚠️ Sans ces migrations, aucune fonctionnalité base de données ne fonctionnera.**
+
+---
 
 ### 1. Schéma Prisma MyCryptoPilot
 
 **Fichiers modifiés/créés :**
 - ✅ `prisma/schema/schema.prisma` - Modèles MyCryptoPilot (TraderProfile, CryptoAddress, Follow, Signal, CryptoPayment)
 - ✅ `prisma/schema/better-auth.prisma` - Extension du modèle User avec les champs MyCryptoPilot
-- ✅ Migration appliquée : `20251003143237_add_mycryptopilot_models`
+- ❌ Migration à générer : Pas encore appliquée (voir warning ci-dessus)
 
 **Nouveaux modèles créés :**
 
@@ -51,12 +73,22 @@ Le modèle `User` de better-auth a été étendu avec :
 - ✅ Couleur principale : `#F59E0B` (Amber - thème crypto)
 - ✅ `enableLandingRedirection: false` (garder la landing visible)
 - ✅ `enableImageUpload: true` (pour photos traders)
-- ✅ Ajout de la config crypto :
+- ✅ Ajout de la config crypto avec explorateurs :
   ```ts
   crypto: {
     networks: {
-      base: { name: "Base", currency: "USDC", confirmations: 1 },
-      tron: { name: "Tron", currency: "USDT", confirmations: 2 },
+      base: {
+        name: "Base",
+        currency: "USDC",
+        confirmations: 1,
+        explorerUrl: "https://basescan.org"
+      },
+      tron: {
+        name: "Tron",
+        currency: "USDT",
+        confirmations: 2,
+        explorerUrl: "https://tronscan.org"
+      },
     }
   }
   ```
@@ -188,20 +220,223 @@ CRYPTO_XPUB_TRON=xpub... (watch-only Tron wallet)
 
 ---
 
-## 🔄 Phase 3 à venir : Adaptation UI
+## ✅ Phase 2.5 Complétée : UI Pages & Navigation (4 oct 2025)
 
-### Tâches restantes
+### Pages Dashboard Créées
 
-#### 1. Adaptation UI
+**Status** : ✅ UI complète, ❌ Données non connectées (TODOs présents)
 
-**Pages à modifier/créer :**
-- ⏳ Masquer `orgs-select.tsx` (retourner null)
-- ⏳ Désactiver `/orgs/[orgSlug]/settings/members` (redirection)
-- ⏳ Renommer "Organization" → "Account" dans les settings
-- ⏳ Créer `/pricing` avec paiement crypto (USDC/USDT)
-- ⏳ Créer `/dashboard` (User) : signaux, journal, stats
-- ⏳ Créer `/dashboard/trader` : créer signaux, stats, revenue
-- ⏳ Créer `/traders` : marketplace publique
+#### 1. Dashboard User (`/orgs/[orgSlug]/dashboard`)
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx`
+
+**Fonctionnalités UI** :
+- ✅ Stats cards (Active Signals, Traders Followed, Your Plan)
+- ✅ Alert pour suivre des traders
+- ✅ Tabs : Signals Feed, Trading Journal, Performance
+- ✅ Quick actions buttons
+- ✅ Empty states avec messages appropriés
+
+**TODOs restants** :
+- ❌ `TODO: Fetch user's followed traders` (ligne 31)
+- ❌ `TODO: Fetch recent signals from followed traders` (ligne 32)
+- ❌ `TODO: Fetch user's trading stats` (ligne 33)
+
+#### 2. Dashboard Trader (`/orgs/[orgSlug]/dashboard/trader`)
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx`
+
+**Fonctionnalités UI** :
+- ✅ Stats trader (Followers, Signals, Win Rate, Revenue)
+- ✅ Verification status card
+- ✅ Tabs : My Signals, Performance, Revenue
+- ✅ Quick actions buttons
+- ✅ Empty states
+
+**TODOs restants** :
+- ❌ `TODO: Fetch trader profile` (ligne 29)
+- ❌ `TODO: Fetch trader's signals` (ligne 30)
+- ❌ `TODO: Fetch trader's stats` (ligne 31)
+- ❌ `TODO: Fetch followers count` (ligne 32)
+- ❌ `TODO: Fetch revenue stats` (ligne 33)
+
+#### 3. Marketplace Traders (`/orgs/[orgSlug]/traders`)
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/traders/page.tsx`
+
+**Fonctionnalités UI** :
+- ✅ Search bar (UI seulement)
+- ✅ Filters (Verified, Win Rate, Followers) - UI seulement
+- ✅ Stats overview cards
+- ✅ Trader cards grid (placeholder data)
+- ✅ Empty state UI
+- ✅ CTA "Become a Trader"
+
+**TODOs restants** :
+- ❌ `TODO: Fetch traders from database` (ligne 30)
+- ❌ `TODO: Implement search and filters` (ligne 31)
+- ❌ `TODO: Add pagination` (ligne 32)
+
+#### 4. Pricing Page (`/orgs/[orgSlug]/pricing`)
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/pricing/page.tsx`
+
+**Fonctionnalités** :
+- ✅ 3 plans cards (Free, Pro, Ultra) avec toutes les features
+- ✅ Utilise `MYCRYPTOPILOT_PLANS` depuis `mycryptopilot-plans.ts`
+- ✅ Features comparison complète
+- ✅ FAQ section (4 questions)
+- ✅ Badges crypto payment (USDC Base, USDT Tron)
+- ✅ Responsive design
+- ✅ "Most Popular" badge sur plan Pro
+- ⚠️ Boutons "Subscribe" non connectés (pas de UI paiement crypto encore)
+
+### Navigation Sidebar Mise à Jour
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/_navigation/org-navigation.links.ts`
+
+**Nouveaux liens ajoutés** :
+```typescript
+{
+  title: "Menu",
+  links: [
+    { href: "/dashboard", Icon: BarChart3, label: "Trading Dashboard" }, // ✅ NEW
+    { href: "/traders", Icon: Users, label: "Traders Marketplace" },     // ✅ NEW
+    { href: "/pricing", Icon: DollarSign, label: "Pricing" },            // ✅ NEW
+    // ... existing links
+  ]
+},
+{
+  title: "Trader", // ✅ NEW GROUP
+  links: [
+    { href: "/dashboard/trader", Icon: TrendingUp, label: "Trader Dashboard" },
+  ]
+}
+```
+
+### Landing Page Adaptation
+
+**Status** : ⚠️ Partiellement adapté
+
+**Fichier** : `app/page.tsx` + `src/features/landing/`
+
+**Adaptations faites** :
+- ✅ Hero section : "Crypto Trading Signals Risk-First"
+- ✅ CTA buttons adaptés
+- ✅ Metadata MyCryptoPilot
+
+**Sections non adaptées** (encore template "Threader") :
+- ❌ Reviews section - Témoignages non pertinents pour crypto
+- ❌ Features section - Fonctionnalités non adaptées
+- ❌ Bento grid - Exemples "Threader"
+- ❌ Images placeholder - Pas de screenshots de l'app
+- ❌ Stats section - Chiffres non représentatifs
+
+---
+
+## 🔄 Phase 3 à venir : Features Core Manquantes
+
+### ⚠️ BLOCAGE CRITIQUE : Migrations Prisma
+
+**Avant toute fonctionnalité** :
+```bash
+npx prisma migrate dev --name init_mycryptopilot
+npx prisma db seed  # Si seed existe
+```
+
+### Tâches Critiques (MVP)
+
+#### 1. Profils Traders (PRIORITÉ P0)
+
+**Status** : ❌ Pas commencé
+
+**Fonctionnalités manquantes** :
+- ⏳ Page `/account/become-trader` avec formulaire
+- ⏳ Formulaire création profil (displayName, bio, priceMonthlyUSD)
+- ⏳ Server action `createTraderProfile()`
+- ⏳ Server action `updateTraderProfile()`
+- ⏳ Validation Zod schema
+- ⏳ Upload avatar trader
+- ⏳ Toggle USER ↔ TRADER ↔ BOTH dans settings
+
+**Estimation** : 2-3 jours
+
+#### 2. Système de Signaux (PRIORITÉ P0)
+
+**Status** : ❌ Pas commencé
+
+**Fonctionnalités manquantes** :
+- ⏳ Page `/dashboard/trader/signals/new`
+- ⏳ Formulaire signal complet avec validation Zod
+- ⏳ Server action `createSignal()` avec hash SHA256
+- ⏳ Composant `<TradingCard>` pour affichage signal
+- ⏳ Feed signaux dans `/dashboard` avec filtres
+- ⏳ Pagination et sorting
+- ⏳ TTL (time-to-live) management
+- ⏳ Signal expiration handling
+
+**Estimation** : 5-7 jours
+
+#### 3. Système Follow/Unfollow (PRIORITÉ P0)
+
+**Status** : ❌ Pas commencé
+
+**Fonctionnalités manquantes** :
+- ⏳ Server action `followTrader(userId, traderId)`
+- ⏳ Server action `unfollowTrader(followId)`
+- ⏳ Vérification limites plan (1 Free, 5 Pro, ∞ Ultra)
+- ⏳ Bouton "Follow" sur profil trader
+- ⏳ Bouton "Unfollow"
+- ⏳ Liste "Following" dans settings
+- ⏳ Liste "Followers" pour trader
+- ⏳ Gestion expiration follow
+
+**Estimation** : 2 jours
+
+#### 4. UI Paiement Crypto (PRIORITÉ P1)
+
+**Status** : ❌ Pas commencé (dépend de US-04 et US-05)
+
+**Fonctionnalités manquantes** :
+- ⏳ Page `/pricing/checkout` avec sélection plan
+- ⏳ Affichage adresses crypto (USDC Base + USDT Tron)
+- ⏳ Génération QR codes pour paiement
+- ⏳ Polling status paiement en temps réel
+- ⏳ Confirmation page après paiement
+- ⏳ Historique paiements crypto
+- ⏳ Admin UI pour gérer paiements crypto
+
+**Estimation** : 3-4 jours
+
+#### 5. Connecter Dashboard aux Données
+
+**Status** : ⏳ UI créée, données manquantes
+
+**Fonctionnalités manquantes** :
+- ⏳ Server action `getUserStats()` - dashboard user
+- ⏳ Server action `getTraderStats()` - dashboard trader
+- ⏳ Server action `getFollowedTraders()` - dashboard user
+- ⏳ Server action `getTraderSignals()` - dashboard trader
+- ⏳ Server action `searchTraders()` - marketplace
+- ⏳ Loading states et Suspense
+- ⏳ Error boundaries
+
+**Estimation** : 2-3 jours
+
+### Tâches Secondaires (Post-MVP)
+
+#### 6. Adaptation Landing Page
+
+**Status** : ⏳ Hero adapté, sections non adaptées
+
+**À adapter** :
+- ⏳ Reviews section - Témoignages crypto traders
+- ⏳ Features section - Features MyCryptoPilot
+- ⏳ Bento grid - Screenshots app
+- ⏳ Images placeholder - Vraies images
+- ⏳ Stats section - Vrais chiffres
+
+**Estimation** : 1-2 jours
 
 ---
 
@@ -247,30 +482,117 @@ Le projet utilise Prisma 6 avec multi-schema (`prisma.config.ts` pointe vers le 
 
 ## 🚀 Prochaines étapes recommandées
 
-### Semaine 1 (Finaliser crypto billing) ✅ EN COURS
-1. ✅ Implémenter `address-generator.ts` (structure HD wallet xpub)
-2. ✅ Implémenter `payment-watcher.ts` (structure RPC Base + Tron)
-3. ⏳ Compléter implémentation HD wallet (ethers.js + tronweb)
-4. ⏳ Compléter implémentation RPC watcher (queries on-chain)
-5. ⏳ Tester en testnet (Base Sepolia, Tron Nile)
-6. ✅ Configurer les variables d'environnement (ajoutées dans env.ts)
+### ⚠️ ÉTAPE 0 : Migrations Database (BLOQUANT - 1h)
 
-### Semaine 2 (UI - Phase 3)
-7. Masquer sélecteur d'orgs (`orgs-select.tsx → return null`)
-8. Désactiver page Members (redirection vers `/dashboard/settings`)
-9. Renommer "Organization" → "Account" dans l'UI
-10. Créer page `/pricing` avec cartes crypto (USDC Base + USDT Tron)
+**CRITIQUE** : Avant tout développement, appliquer les migrations :
 
-### Semaine 3-4 (Dashboards)
-11. Dashboard User (`/dashboard`) : feed signaux, journal, stats
-12. Dashboard Trader (`/dashboard/trader`) : créer signaux, stats, revenue
-13. Marketplace (`/traders`) : liste traders avec stats
+```bash
+# 1. Générer migration initiale
+npx prisma migrate dev --name init_mycryptopilot
 
-### Semaine 4-5 (Features métier)
-14. Système de signaux (création, hash, TTL)
-15. Système de suivi (Follow)
-16. Ingestion données marché (WebSocket exchanges)
-17. Détection de signaux (microstructure, dérivés)
+# 2. Vérifier que tout est synchronisé
+npx prisma migrate status
+
+# 3. (Optionnel) Créer seed pour données de test
+npx prisma db seed
+```
+
+**Sans cela, AUCUNE fonctionnalité base de données ne fonctionnera.**
+
+---
+
+### Semaine 1 : MVP Core (15-20 jours)
+
+#### Jour 1-3 : Profils Traders
+1. ⏳ Créer page `/account/become-trader`
+2. ⏳ Formulaire création profil (displayName, bio, price)
+3. ⏳ Server actions create/update
+4. ⏳ Upload avatar trader
+5. ⏳ Toggle USER ↔ TRADER
+
+**Livrable** : Users peuvent devenir traders ✅
+
+#### Jour 4-10 : Système Signaux
+1. ⏳ Page `/dashboard/trader/signals/new`
+2. ⏳ Formulaire signal complet (symbol, bias, entry, TPs, etc.)
+3. ⏳ Validation Zod + hash SHA256
+4. ⏳ Server action `createSignal()`
+5. ⏳ Composant `<TradingCard>` pour display
+6. ⏳ Feed signaux dans `/dashboard`
+7. ⏳ Filtres et pagination
+
+**Livrable** : Traders peuvent publier, users peuvent voir signaux ✅
+
+#### Jour 11-12 : Follow System
+1. ⏳ Server actions follow/unfollow
+2. ⏳ Vérification limites plan
+3. ⏳ Boutons Follow/Unfollow
+4. ⏳ Listes Following/Followers
+
+**Livrable** : Users peuvent suivre traders ✅
+
+#### Jour 13-15 : Connecter Dashboards
+1. ⏳ Remplacer TODOs par vrais fetches
+2. ⏳ Server actions pour stats
+3. ⏳ Loading states + Suspense
+4. ⏳ Error boundaries
+
+**Livrable** : Dashboards fonctionnels avec vraies données ✅
+
+**🎉 Fin Semaine 1 : MVP utilisable end-to-end**
+
+---
+
+### Semaine 2 : Crypto Payments (4-5 jours)
+
+#### Jour 1-2 : HD Wallet Implementation
+1. ⏳ Intégrer ethers.js pour Base
+2. ⏳ Intégrer tronweb pour Tron
+3. ⏳ Configurer xpub keys (testnet)
+4. ⏳ Implémenter dérivation réelle dans `address-generator.ts`
+
+#### Jour 3-4 : RPC Watcher
+1. ⏳ Implémenter appels RPC Base (USDC Transfer events)
+2. ⏳ Implémenter appels RPC Tron (USDT TRC-20)
+3. ⏳ Tester en testnet (Base Sepolia, Tron Shasta)
+
+#### Jour 5 : UI Paiement
+1. ⏳ Page `/pricing/checkout`
+2. ⏳ Affichage adresses + QR codes
+3. ⏳ Polling status paiement
+4. ⏳ Confirmation page
+
+**Livrable** : Paiements crypto fonctionnels ✅
+
+---
+
+### Semaine 3 : Features Premium (facultatif)
+
+#### Trading Journal (4-5 jours)
+1. ⏳ Modèle DB `Trade`
+2. ⏳ Formulaire ajout trade
+3. ⏳ Calculs stats (winrate, payoff)
+4. ⏳ Equity curve chart
+
+#### Risk Console (3-4 jours)
+1. ⏳ Page `/dashboard/risk`
+2. ⏳ Calculateurs position size, R:R
+3. ⏳ Portfolio risk view
+
+#### Screeners (5-6 jours)
+1. ⏳ Intégration API market data
+2. ⏳ Tableaux avec filters/sort
+3. ⏳ Refresh intervals par plan
+
+---
+
+### Semaine 4 : Polish (facultatif)
+
+1. ⏳ Adapter landing page (reviews, features, images)
+2. ⏳ Notifications system
+3. ⏳ Trader verification system
+4. ⏳ Admin UI crypto payments
+5. ⏳ Tests e2e Playwright
 
 ---
 
@@ -334,6 +656,6 @@ CRYPTO_XPUB_TRON=xpub... (watch-only wallet)
 
 ---
 
-**Date de dernière mise à jour :** 3 octobre 2025 (Phase 2 complétée)
+**Date de dernière mise à jour :** 4 octobre 2025 (Phase 2.5 complétée - UI pages créées)
 **Auteur :** Claude Code
-**Version :** 1.1
+**Version :** 2.0
