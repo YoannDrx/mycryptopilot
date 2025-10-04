@@ -50,7 +50,7 @@ pnpm prisma:seed
 pnpm dev
 ```
 
-**⚠️ Note Importante**: Les migrations Prisma doivent être générées et appliquées avant toute utilisation. Le schéma existe mais les migrations n'ont pas encore été créées dans ce repository.
+**⚠️ Note Importante**: Les migrations Prisma doivent être générées et appliquées avant toute utilisation.
 
 ## 🛠️ Development Commands
 
@@ -81,47 +81,9 @@ pnpm dev
 | Pro   | $49       | 50           | 5       | 1min     |
 | Ultra | $99       | ∞            | ∞       | 5sec     |
 
-## 📊 État Actuel (Octobre 2025)
-
-⚠️ **Le projet est en phase de développement MVP**:
-
-### ✅ Infrastructure & Configuration
-- ✅ Next.js 15 + App Router configuré
-- ✅ Prisma schemas complets (TraderProfile, Signal, Follow, CryptoPayment)
-- ✅ Better Auth avec extensions User (userRole, relations)
-- ✅ Site config MyCryptoPilot (branding, couleurs, crypto networks)
-- ✅ Plans tarifaires définis (Free $0, Pro $49, Ultra $99)
-- ⚠️ **BLOQUANT**: Migrations Prisma non appliquées (à générer)
-
-### ✅ UI/UX Créées
-- ✅ Dashboard User (`/dashboard`) - UI complète avec TODOs
-- ✅ Dashboard Trader (`/dashboard/trader`) - UI complète avec TODOs
-- ✅ Marketplace Traders (`/traders`) - UI complète avec TODOs
-- ✅ Pricing Page (`/pricing`) - Fonctionnelle
-- ✅ Navigation sidebar avec liens MyCryptoPilot
-- ✅ Landing page hero adaptée
-- ⚠️ Landing sections (reviews, features) encore template "Threader"
-
-### ⚠️ Systèmes Partiels
-- ⚠️ Crypto payment system - Structure créée avec placeholders (4 TODOs)
-  - `address-generator.ts` - HD wallet à implémenter
-  - `payment-watcher.ts` - RPC calls à implémenter
-
-### ❌ Core Features Manquantes
-- ❌ Profils traders (formulaire, actions)
-- ❌ Création signaux (formulaire, validation, hash)
-- ❌ Feed signaux (affichage, filtres, pagination)
-- ❌ Follow/Unfollow system (actions, vérif limites)
-- ❌ Connexion dashboards aux données (remplacer TODOs)
-- ❌ UI paiement crypto (adresses, QR codes)
-
-**Prochaine étape critique**: Générer et appliquer migrations Prisma, puis implémenter profils traders et système de signaux.
-
-Voir `IMPLEMENTATION.md` et `ANALYSIS.md` pour détails complets.
-
 ## 📝 Documentation
 
-Pour plus d'informations sur l'architecture et les conventions de code, voir `.claude/CLAUDE.md`.
+Pour plus d'informations sur l'architecture, l'état du développement et les conventions de code, voir `.claude/CLAUDE.md`.
 
 ## 🔗 Git Remotes
 
