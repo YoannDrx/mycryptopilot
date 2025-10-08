@@ -33,29 +33,25 @@ jobs:
       # Core
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
       DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
+      BETTER_AUTH_SECRET: "test-secret-key-for-ci-testing-only-not-production"
       BETTER_AUTH_URL: "http://localhost:3000"
       NODE_ENV: "production"
-      # Email
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      EMAIL_FROM: "MyCryptoPilot <contact@mycryptopilot.app>"
-      NEXT_PUBLIC_EMAIL_CONTACT: "contact@mycryptopilot.app"
-      # Stripe
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-      STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID }}
-      STRIPE_PRO_YEARLY_PLAN_ID: ${{ secrets.STRIPE_PRO_YEARLY_PLAN_ID }}
-      STRIPE_ULTRA_PLAN_ID: ${{ secrets.STRIPE_ULTRA_PLAN_ID }}
-      STRIPE_ULTRA_YEARLY_PLAN_ID: ${{ secrets.STRIPE_ULTRA_YEARLY_PLAN_ID }}
-      # OAuth
-      GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
-      GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      # Analytics
-      NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
-      NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+      # Email (optional)
+      RESEND_API_KEY: ""
+      EMAIL_FROM: "test@mycryptopilot.app"
+      NEXT_PUBLIC_EMAIL_CONTACT: "test@mycryptopilot.app"
+      # Stripe (legacy - not used, but required by env.ts)
+      STRIPE_SECRET_KEY: ""
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ""
+      STRIPE_WEBHOOK_SECRET: ""
+      # OAuth (optional for CI)
+      GITHUB_CLIENT_ID: ""
+      GITHUB_CLIENT_SECRET: ""
+      GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_SECRET: ""
+      # Analytics (optional)
+      NEXT_PUBLIC_POSTHOG_KEY: ""
+      NEXT_PUBLIC_POSTHOG_HOST: ""
       # Playwright specific
       PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000"
       HEADLESS: "true"
