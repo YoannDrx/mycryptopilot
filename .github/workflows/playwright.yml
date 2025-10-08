@@ -31,15 +31,15 @@ jobs:
     # Common environment variables for all steps
     env:
       # Core
-      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/nowts_test"
-      DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/nowts_test"
-      BETTER_AUTH_SECRET: "test-secret-key-for-ci-testing-only-not-production"
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
+      DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
       BETTER_AUTH_URL: "http://localhost:3000"
       NODE_ENV: "production"
       # Email
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      EMAIL_FROM: "NowTS <contact@nowts.app>"
-      NEXT_PUBLIC_EMAIL_CONTACT: "contact@nowts.app"
+      EMAIL_FROM: "MyCryptoPilot <contact@mycryptopilot.app>"
+      NEXT_PUBLIC_EMAIL_CONTACT: "contact@mycryptopilot.app"
       # Stripe
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
@@ -68,7 +68,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
-          POSTGRES_DB: nowts_test
+          POSTGRES_DB: mycryptopilot_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
