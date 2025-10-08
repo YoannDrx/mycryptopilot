@@ -15,10 +15,10 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     DISCORD_CLIENT_ID: z.string().optional(),
     DISCORD_CLIENT_SECRET: z.string().optional(),
-    RESEND_API_KEY: z.string().optional(),
+    RESEND_API_KEY: z.string().min(1),
     RESEND_AUDIENCE_ID: z.string().optional(),
-    EMAIL_FROM: z.string().optional(),
-    STRIPE_SECRET_KEY: z.string().optional(), // Legacy - non utilisé (MyCryptoPilot utilise crypto payments)
+    EMAIL_FROM: z.string().min(1),
+    STRIPE_SECRET_KEY: z.string().min(1),
     NODE_ENV: z.enum(["development", "production", "test"]),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
     // Crypto payment configuration
@@ -32,8 +32,8 @@ export const env = createEnv({
    * `experimental__runtimeEnv` as well.
    */
   client: {
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(), // Legacy - non utilisé
-    NEXT_PUBLIC_EMAIL_CONTACT: z.string().optional(),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_EMAIL_CONTACT: z.string().min(1),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
