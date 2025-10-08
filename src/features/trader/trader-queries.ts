@@ -108,3 +108,80 @@ export const listTraderProfiles = async (params?: {
     },
   });
 };
+
+/**
+ * Recherche et filtre des traders pour la marketplace
+ */
+export const searchTraders = async (params?: {
+  search?: string;
+  verified?: boolean;
+  sortBy?: "winrate" | "followers" | "signals" | "recent";
+  cursor?: string;
+  limit?: number;
+}) => {
+  const { search, verified, cursor, limit = 12 } = params ?? {};
+
+  // Construire les conditions where
+  const where: {
+    verified?: boolean;
+    OR?: {
+      displayName?: { contains: string; mode: "insensitive" };
+      bio?: { contains: string; mode: "insensitive" };
+    }[];
+  } = {};
+
+  if (verified !== undefined) {
+    where.verified = verified;
+  }
+
+  if (search && search.trim().length > 0) {
+    where.OR = [
+      {
+        displayName: {
+          contains: search.trim(),
+          mode: "insensitive" as const,
+        },
+      },
+      {
+        bio: {
+          contains: search.trim(),
+          mode: "insensitive" as const,
+        },
+      },
+    ];
+  }
+
+  // Définir le tri
+  // Note: Trier par JSON (statsJson) ou par relations n'est pas supporté par Prisma
+  // Pour le MVP, on trie toujours par date de création
+  // En production, il faudrait des colonnes séparées pour winrate, etc.
+  const orderBy = { createdAt: "desc" as const };
+
+  const traders = await prisma.traderProfile.findMany({
+    where,
+    take: limit + 1, // +1 pour savoir s'il y a une page suivante
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { id: cursor } : undefined,
+    orderBy,
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+    },
+  });
+
+  // Séparer les résultats et le curseur pour la page suivante
+  const hasNextPage = traders.length > limit;
+  const items = hasNextPage ? traders.slice(0, -1) : traders;
+  const nextCursor = hasNextPage ? items[items.length - 1]?.id : undefined;
+
+  return {
+    items,
+    nextCursor,
+    hasNextPage,
+  };
+};
