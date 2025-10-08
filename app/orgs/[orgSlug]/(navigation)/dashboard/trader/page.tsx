@@ -9,6 +9,10 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import { getRequiredUser } from "@/lib/auth/auth-user";
+import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
+import { countActiveSignalsByTrader, countTotalSignalsByTrader } from "@/features/signal/signal-queries";
+import { prisma } from "@/lib/prisma";
 import {
   BarChart3,
   DollarSign,
@@ -17,6 +21,9 @@ import {
   Users,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { TraderSignalsList } from "./_components/trader-signals-list";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Trader Dashboard - MyCryptoPilot",
@@ -25,12 +32,34 @@ export const metadata: Metadata = {
 
 export default async function TraderDashboardPage() {
   await getRequiredCurrentOrgCache();
+  const user = await getRequiredUser();
 
-  // TODO: Fetch trader profile
-  // TODO: Fetch trader's signals
-  // TODO: Fetch trader's stats (winrate, payoff, etc.)
-  // TODO: Fetch followers count
-  // TODO: Fetch revenue stats
+  // Fetch trader profile
+  const traderProfile = await getTraderProfileByUserId(user.id);
+
+  if (!traderProfile) {
+    // Redirect to become trader page if no profile
+    redirect("/account/become-trader");
+  }
+
+  // Fetch followers count
+  const followersCount = await prisma.follow.count({
+    where: {
+      traderId: user.id,
+      status: "ACTIVE",
+    },
+  });
+
+  // Fetch signals count
+  const activeSignalsCount = await countActiveSignalsByTrader(user.id);
+  const totalSignalsCount = await countTotalSignalsByTrader(user.id);
+
+  // Fetch trader stats from profile
+  const stats = traderProfile.statsJson as {
+    winrate?: number;
+    payoff?: number;
+    totalSignals?: number;
+  } | null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -45,9 +74,11 @@ export default async function TraderDashboardPage() {
               Create signals and manage your trading profile
             </p>
           </div>
-          <Button>
-            <PlusCircle className="mr-2 size-4" />
-            Create Signal
+          <Button asChild>
+            <Link href="/dashboard/trader/signals/new">
+              <PlusCircle className="mr-2 size-4" />
+              Create Signal
+            </Link>
           </Button>
         </div>
 
@@ -59,9 +90,9 @@ export default async function TraderDashboardPage() {
               <Users className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{followersCount}</div>
               <p className="text-muted-foreground text-xs">
-                +0 from last month
+                {followersCount === 0 ? "No followers yet" : "Growing your audience"}
               </p>
             </CardContent>
           </Card>
@@ -74,9 +105,9 @@ export default async function TraderDashboardPage() {
               <BarChart3 className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{activeSignalsCount}</div>
               <p className="text-muted-foreground text-xs">
-                Published in last 7 days
+                {totalSignalsCount} total published
               </p>
             </CardContent>
           </Card>
@@ -87,8 +118,12 @@ export default async function TraderDashboardPage() {
               <TrendingUp className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">--%</div>
-              <p className="text-muted-foreground text-xs">No trades yet</p>
+              <div className="text-2xl font-bold">
+                {stats?.winrate ? `${stats.winrate.toFixed(1)}%` : "--%"}
+              </div>
+              <p className="text-muted-foreground text-xs">
+                {stats?.winrate ? "Based on closed signals" : "No data yet"}
+              </p>
             </CardContent>
           </Card>
 
@@ -152,27 +187,7 @@ export default async function TraderDashboardPage() {
 
           {/* Signals Tab */}
           <TabsContent value="signals" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Signals</CardTitle>
-                <CardDescription>
-                  Signals you've published to your followers
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
-                  <BarChart3 className="mb-4 size-12 opacity-20" />
-                  <p className="mb-2 font-medium">No signals published yet</p>
-                  <p className="text-sm">
-                    Create your first trading signal to get started
-                  </p>
-                  <Button className="mt-4">
-                    <PlusCircle className="mr-2 size-4" />
-                    Create First Signal
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <TraderSignalsList traderId={user.id} />
           </TabsContent>
 
           {/* Performance Tab */}
