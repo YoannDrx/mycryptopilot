@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import { getRequiredUser } from "@/lib/auth/auth-user";
 import {
   AlertCircle,
   ArrowUpRight,
@@ -19,6 +20,8 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SignalsFeed } from "./_components/signals-feed";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Dashboard - MyCryptoPilot",
@@ -27,10 +30,40 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const org = await getRequiredCurrentOrgCache();
+  const user = await getRequiredUser();
 
-  // TODO: Fetch user's followed traders
-  // TODO: Fetch recent signals from followed traders
-  // TODO: Fetch user's trading stats
+  // Fetch user's followed traders count
+  const followedTradersCount = await prisma.follow.count({
+    where: {
+      userId: user.id,
+      status: "ACTIVE",
+    },
+  });
+
+  // Fetch active signals count from followed traders
+  const follows = await prisma.follow.findMany({
+    where: {
+      userId: user.id,
+      status: "ACTIVE",
+    },
+    select: {
+      traderId: true,
+    },
+  });
+
+  let activeSignalsCount = 0;
+  if (follows.length > 0) {
+    activeSignalsCount = await prisma.signal.count({
+      where: {
+        traderId: {
+          in: follows.map((f) => f.traderId),
+        },
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+    });
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -59,7 +92,7 @@ export default async function DashboardPage() {
               <BarChart3 className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{activeSignalsCount}</div>
               <p className="text-muted-foreground text-xs">
                 From traders you follow
               </p>
@@ -74,9 +107,11 @@ export default async function DashboardPage() {
               <TrendingUp className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{followedTradersCount}</div>
               <p className="text-muted-foreground text-xs">
-                Start following traders to see signals
+                {followedTradersCount === 0
+                  ? "Start following traders to see signals"
+                  : `Receiving signals from ${followedTradersCount} trader${followedTradersCount > 1 ? "s" : ""}`}
               </p>
             </CardContent>
           </Card>
@@ -100,20 +135,22 @@ export default async function DashboardPage() {
         </div>
 
         {/* No Traders Followed Alert */}
-        <Alert>
-          <AlertCircle className="size-4" />
-          <AlertTitle>No traders followed yet</AlertTitle>
-          <AlertDescription>
-            Start by exploring our marketplace and following traders that match
-            your trading style. You'll see their signals here.
-            <Button variant="link" className="ml-2 p-0" asChild>
-              <Link href="/traders">
-                Browse Traders
-                <ArrowUpRight className="ml-1 size-3" />
-              </Link>
-            </Button>
-          </AlertDescription>
-        </Alert>
+        {followedTradersCount === 0 && (
+          <Alert>
+            <AlertCircle className="size-4" />
+            <AlertTitle>No traders followed yet</AlertTitle>
+            <AlertDescription>
+              Start by exploring our marketplace and following traders that match
+              your trading style. You'll see their signals here.
+              <Button variant="link" className="ml-2 p-0" asChild>
+                <Link href="/traders">
+                  Browse Traders
+                  <ArrowUpRight className="ml-1 size-3" />
+                </Link>
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="signals" className="space-y-4">
@@ -125,23 +162,7 @@ export default async function DashboardPage() {
 
           {/* Signals Tab */}
           <TabsContent value="signals" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Signals</CardTitle>
-                <CardDescription>
-                  Trading signals from traders you follow
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
-                  <BarChart3 className="mb-4 size-12 opacity-20" />
-                  <p className="mb-2 font-medium">No signals available</p>
-                  <p className="text-sm">
-                    Follow traders to start receiving trading signals
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <SignalsFeed userId={user.id} />
           </TabsContent>
 
           {/* Journal Tab */}
