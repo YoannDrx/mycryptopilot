@@ -6,7 +6,7 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { hasPermission } from "@/lib/auth/auth-org";
+import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 import InformationCards from "./information-cards";
 import { SubscribersChart } from "./subscribers-charts";
@@ -17,19 +17,16 @@ export default async function RoutePage(props: PageProps<"/orgs/[orgSlug]">) {
   return (
     <Layout size="lg">
       <LayoutHeader>
-        <LayoutTitle>Dashboard</LayoutTitle>
+        <LayoutTitle>Platform Overview</LayoutTitle>
       </LayoutHeader>
       <LayoutActions>
-        {(await hasPermission({
-          member: ["create"],
-        })) ? (
-          <Link
-            href={`/orgs/${params.orgSlug}/settings/members`}
-            className={buttonVariants({ variant: "outline" })}
-          >
-            Invite member
-          </Link>
-        ) : null}
+        <Link
+          href={`/orgs/${params.orgSlug}/traders`}
+          className={buttonVariants({ variant: "outline" })}
+        >
+          <TrendingUp className="mr-2 size-4" />
+          Browse Traders
+        </Link>
       </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-8">
         <InformationCards />
