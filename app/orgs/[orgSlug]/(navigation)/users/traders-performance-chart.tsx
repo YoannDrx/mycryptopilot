@@ -19,40 +19,36 @@ import {
 } from "@/components/ui/chart";
 
 const chartData = [
-  { month: "January", signals: 186, active: 142 },
-  { month: "February", signals: 305, active: 234 },
-  { month: "March", signals: 237, active: 189 },
-  { month: "April", signals: 273, active: 208 },
-  { month: "May", signals: 309, active: 241 },
-  { month: "June", signals: 342, active: 278 },
+  { month: "January", longSignals: 128, shortSignals: 58 },
+  { month: "February", longSignals: 187, shortSignals: 118 },
+  { month: "March", longSignals: 149, shortSignals: 88 },
+  { month: "April", longSignals: 165, shortSignals: 108 },
+  { month: "May", longSignals: 198, shortSignals: 111 },
+  { month: "June", longSignals: 221, shortSignals: 121 },
 ];
 
 const chartConfig = {
-  signals: {
-    label: "Total Signals",
+  longSignals: {
+    label: "Long Signals",
     color: "hsl(270, 80%, 60%)", // Purple gradient - lighter
   },
-  active: {
-    label: "Active Signals",
+  shortSignals: {
+    label: "Short Signals",
     color: "hsl(280, 70%, 45%)", // Purple gradient - darker
   },
 } satisfies ChartConfig;
 
-export function SubscribersChart() {
+export function TradersPerformanceChart() {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Trading Signals Activity</CardTitle>
+        <CardTitle>Signals Distribution</CardTitle>
         <CardDescription>
-          Showing total and active signals for the last 6 months
+          Long vs Short signals for the last 6 months
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          id="signals-chart"
-          className="h-64 w-full"
-          config={chartConfig}
-        >
+        <ChartContainer config={chartConfig}>
           <AreaChart
             accessibilityLayer
             data={chartData}
@@ -71,48 +67,24 @@ export function SubscribersChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={(props) => <ChartTooltipContent {...props} />}
+              content={(props) => (
+                <ChartTooltipContent {...props} indicator="dot" />
+              )}
             />
-            <defs>
-              <linearGradient id="fillSignals" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-signals)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-signals)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillActive" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-active)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-active)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
             <Area
-              dataKey="active"
+              dataKey="shortSignals"
               type="natural"
-              fill="url(#fillActive)"
+              fill="var(--color-shortSignals)"
               fillOpacity={0.4}
-              stroke="var(--color-active)"
+              stroke="var(--color-shortSignals)"
               stackId="a"
             />
             <Area
-              dataKey="signals"
+              dataKey="longSignals"
               type="natural"
-              fill="url(#fillSignals)"
+              fill="var(--color-longSignals)"
               fillOpacity={0.4}
-              stroke="var(--color-signals)"
+              stroke="var(--color-longSignals)"
               stackId="a"
             />
           </AreaChart>
@@ -122,7 +94,7 @@ export function SubscribersChart() {
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up by 18.2% this month <TrendingUp className="size-4" />
+              Trending up by 15.3% this month <TrendingUp className="size-4" />
             </div>
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
               January - June 2025

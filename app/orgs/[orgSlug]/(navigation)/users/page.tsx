@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Layout,
   LayoutActions,
@@ -6,51 +6,43 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { hasPermission } from "@/lib/auth/auth-org";
 import { combineWithParentMetadata } from "@/lib/metadata";
-import { serverToast } from "@/lib/server-toast";
-import { ClientOrg } from "./client-org";
-import { DonutChart } from "./donuts-chart";
-import { UsersChart } from "./users-chart";
+import { BarChart3 } from "lucide-react";
+import Link from "next/link";
+import { TradersStatsCard } from "./traders-stats-card";
+import { SignalsByAssetChart } from "./signals-by-asset-chart";
+import { TradersPerformanceChart } from "./traders-performance-chart";
 
 export const generateMetadata = combineWithParentMetadata({
-  title: "Users",
-  description: "Manage leads",
+  title: "Analytics",
+  description: "Trading analytics and platform statistics",
 });
 
 export default async function RoutePage(
   props: PageProps<"/orgs/[orgSlug]/users">,
 ) {
+  const params = await props.params;
+
   return (
     <Layout size="lg">
       <LayoutHeader>
-        <LayoutTitle>Videos</LayoutTitle>
+        <LayoutTitle>Platform Analytics</LayoutTitle>
       </LayoutHeader>
       <LayoutActions className="flex gap-2">
-        {(await hasPermission({ users: ["delete"] })) && (
-          <Button variant="outline">Delete</Button>
-        )}
-        {(await hasPermission({ users: ["create"] })) && (
-          <form>
-            <Button
-              formAction={async () => {
-                "use server";
-
-                await serverToast("Important information", "error");
-              }}
-              variant="default"
-            >
-              Create
-            </Button>
-          </form>
-        )}
+        <Link
+          href={`/orgs/${params.orgSlug}/dashboard`}
+          className={buttonVariants({ variant: "outline" })}
+        >
+          <BarChart3 className="mr-2 size-4" />
+          Back to Dashboard
+        </Link>
       </LayoutActions>
       <LayoutContent className="flex flex-col gap-4 lg:gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
-          <UsersChart />
-          <ClientOrg />
+          <TradersPerformanceChart />
+          <TradersStatsCard />
         </div>
-        <DonutChart />
+        <SignalsByAssetChart />
       </LayoutContent>
     </Layout>
   );
