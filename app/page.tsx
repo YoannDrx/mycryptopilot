@@ -77,12 +77,11 @@ export default function HomePage() {
               "Each signal contains entry, TP, SL, rationales and risk level. Understand WHY to take a trade, not just WHAT to trade.",
             component: (
               <Image
-                src="/images/placeholder1.gif"
-                alt=""
-                width={200}
-                height={100}
-                className="h-auto w-full object-cover"
-                unoptimized
+                src="/images/trading-dashboard.png"
+                alt="Trading Dashboard"
+                width={800}
+                height={600}
+                className="h-auto w-full rounded-lg object-cover"
               />
             ),
           },
@@ -93,11 +92,11 @@ export default function HomePage() {
               "Risk console automatically calculates ideal position size based on your capital, risk tolerance and signal's R:R ratio.",
             component: (
               <Image
-                src="/images/placeholder1.gif"
-                alt=""
-                width={200}
-                height={100}
-                className="h-auto w-full object-cover"
+                src="/images/plateform-analytics.png"
+                alt="Platform Analytics"
+                width={800}
+                height={600}
+                className="h-auto w-full rounded-lg object-cover"
               />
             ),
           },
@@ -108,12 +107,11 @@ export default function HomePage() {
               "Record every trade, analyze recurring mistakes and identify what works. Continuous improvement starts with measurement.",
             component: (
               <Image
-                src="/images/placeholder1.gif"
-                alt=""
-                width={200}
-                height={100}
-                className="h-auto w-full object-cover"
-                unoptimized
+                src="/images/plateform-overview.png"
+                alt="Platform Overview"
+                width={800}
+                height={600}
+                className="h-auto w-full rounded-lg object-cover"
               />
             ),
           },
@@ -124,12 +122,11 @@ export default function HomePage() {
               "View real win rate, payoff ratio and max drawdown of each verified trader. Transparent stats, no fake promises.",
             component: (
               <Image
-                src="/images/placeholder1.gif"
-                alt=""
-                width={200}
-                height={100}
-                className="h-auto w-full object-cover"
-                unoptimized
+                src="/images/pricing.png"
+                alt="Pricing Plans"
+                width={800}
+                height={600}
+                className="h-auto w-full rounded-lg object-cover"
               />
             ),
           },
