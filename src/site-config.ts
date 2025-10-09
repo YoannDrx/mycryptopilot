@@ -39,12 +39,16 @@ export const SiteConfig = {
         currency: "USDC",
         confirmations: 1,
         explorerUrl: "https://basescan.org",
+        // Official USDC contract on Base
+        contractAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       },
       tron: {
         name: "Tron",
         currency: "USDT",
         confirmations: 2,
         explorerUrl: "https://tronscan.org",
+        // Official USDT TRC-20 contract on Tron
+        contractAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
       },
     },
   },
