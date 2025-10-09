@@ -13,10 +13,10 @@
  * Add these values to your .env.local file.
  */
 
+/* eslint-disable no-console */
 import { Wallet, HDNodeWallet } from "ethers";
 import { HDKey } from "@scure/bip32";
 import { mnemonicToSeedSync } from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english";
 
 console.log("🔐 Generating Testnet XPUB Keys\n");
 console.log(
