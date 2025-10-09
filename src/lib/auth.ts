@@ -76,6 +76,42 @@ export const auth = betterAuth({
         },
       },
     },
+    account: {
+      create: {
+        after: async (account) => {
+          // Si l'utilisateur se connecte via Discord OAuth, sauvegarder son Discord ID
+          if (account.providerId === "discord" && account.accountId) {
+            try {
+              await prisma.user.update({
+                where: { id: account.userId },
+                data: { discordId: account.accountId },
+              });
+
+              logger.info(
+                `Discord ID ${account.accountId} automatically linked to user ${account.userId}`,
+              );
+
+              // Assigner le rôle Discord automatiquement
+              const { assignRoleToUser } = await import("./discord/roles");
+              const user = await prisma.user.findUnique({
+                where: { id: account.userId },
+                select: { planName: true },
+              });
+
+              if (user) {
+                const planName = (user.planName ?? "free") as "free" | "pro" | "ultra";
+                await assignRoleToUser(account.accountId, planName);
+                logger.info(
+                  `Assigned Discord role ${planName.toUpperCase()} to user ${account.userId}`,
+                );
+              }
+            } catch (err) {
+              logger.error("Failed to save Discord ID or assign role", { err });
+            }
+          }
+        },
+      },
+    },
   },
   advanced: {
     cookiePrefix: SiteConfig.appId,

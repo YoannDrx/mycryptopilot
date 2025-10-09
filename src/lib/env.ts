@@ -26,6 +26,10 @@ export const env = createEnv({
     TRON_RPC_URL: z.string().url().optional(),
     CRYPTO_XPUB_BASE: z.string().optional(),
     CRYPTO_XPUB_TRON: z.string().optional(),
+    // Discord Bot configuration
+    DISCORD_BOT_TOKEN: z.string().optional(),
+    DISCORD_GUILD_ID: z.string().optional(),
+    DISCORD_BOT_ENABLED: z.enum(["true", "false"]).optional().default("false"),
   },
   /**
    * If you add `client` environment variables, you need to add them to
