@@ -4,6 +4,8 @@ import { authAction } from "@/lib/actions/safe-actions";
 import { ActionError } from "@/lib/errors/action-error";
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
+import { notifyNewSignal } from "@/lib/discord/webhook";
+import { logger } from "@/lib/logger";
 import { checkUserHasTraderProfile } from "../trader/trader-queries";
 import { signalHashExists } from "./signal-queries";
 import { CreateSignalSchema } from "./signal.schema";
@@ -94,6 +96,15 @@ export const createSignalAction = authAction
         },
       },
     });
+
+    // Notifier Discord (ne pas bloquer en cas d'erreur)
+    try {
+      await notifyNewSignal(signal);
+      logger.info(`Discord notification sent for signal ${signal.id}`);
+    } catch (error) {
+      logger.error(`Failed to send Discord notification for signal ${signal.id}:`, error);
+      // Ne pas throw d'erreur car le signal a été créé avec succès
+    }
 
     return signal;
   });

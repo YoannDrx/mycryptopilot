@@ -27,13 +27,19 @@ model User {
   // MyCryptoPilot Extensions
   // IMPORTANT: These fields are manually added and will be preserved during migrations
   // If you regenerate this file with @better-auth/cli, you must re-add these fields
-  userRole        UserRole        @default(USER)
-  traderProfile   TraderProfile?
-  cryptoAddresses CryptoAddress[]
-  cryptoPayments  CryptoPayment[]
-  follows         Follow[]        @relation("UserFollows")
-  followers       Follow[]        @relation("TraderFollowers")
-  signals         Signal[]
+  userRole         UserRole        @default(USER)
+  planName         String?         // "free", "pro", "ultra"
+  planExpiresAt    DateTime?       // Date d'expiration du plan payant
+  dailySignalsUsed Int             @default(0) // Nombre de signaux consultés aujourd'hui
+  lastSignalReset  DateTime        @default(now()) // Dernière réinitialisation du compteur quotidien
+  discordId        String?         @unique // Discord User ID for bot integration
+
+  traderProfile    TraderProfile?
+  cryptoAddresses  CryptoAddress[]
+  cryptoPayments   CryptoPayment[]
+  follows          Follow[]        @relation("UserFollows")
+  followers        Follow[]        @relation("TraderFollowers")
+  signals          Signal[]
 
   @@unique([email])
   @@map("user")

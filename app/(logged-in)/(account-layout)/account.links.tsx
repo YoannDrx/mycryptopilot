@@ -1,5 +1,5 @@
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
-import { AlertCircle, Mail, User2 } from "lucide-react";
+import { AlertCircle, Mail, MessageSquare, User2 } from "lucide-react";
 
 export const getAccountNavigation = (): NavigationGroup[] => {
   return ACCOUNT_LINKS;
@@ -18,6 +18,11 @@ const ACCOUNT_LINKS: NavigationGroup[] = [
         href: "/account/email",
         Icon: Mail,
         label: "Mail",
+      },
+      {
+        href: "/account/discord",
+        Icon: MessageSquare,
+        label: "Discord",
       },
       {
         href: "/account/danger",
