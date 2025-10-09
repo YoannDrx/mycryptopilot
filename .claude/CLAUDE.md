@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 4 octobre 2025 (via /project-audit)
+**Dernière mise à jour**: 9 octobre 2025
 
 ---
 
@@ -85,20 +85,31 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ## État actuel du développement
 
-### 🚨 BLOCAGE CRITIQUE: Migrations Prisma
+### ✅ Base de Données: Opérationnelle
 
-**STATUT**: ⛔ **BLOQUE TOUTES LES FONCTIONNALITÉS BASE DE DONNÉES**
+**STATUT**: ✅ **MIGRATIONS APPLIQUÉES ET DB FONCTIONNELLE**
 
-Le schéma Prisma existe (`prisma/schema/*.prisma`) mais **aucune migration n'a été générée ni appliquée**. Le dossier `prisma/migrations/` n'existe même pas.
+Les schémas Prisma sont configurés et les migrations ont été appliquées avec succès :
+- ✅ 4 migrations existantes dans `prisma/schema/migrations/`
+- ✅ Migration MyCryptoPilot (`20251003143237_add_mycryptopilot_models`) appliquée
+- ✅ Client Prisma généré dans `src/generated/prisma`
+- ✅ Tous les modèles accessibles (TraderProfile, Signal, Follow, CryptoAddress, CryptoPayment)
+- ✅ Enums fonctionnels (UserRole, CryptoNetwork, PaymentStatus, etc.)
 
-**Impact**: Impossible de tester ou développer toute fonctionnalité utilisant la DB sans générer les migrations d'abord.
-
-**Solution**:
+**Test DB**: Un script de test est disponible dans `scripts/test-db.ts` :
 ```bash
-npx prisma migrate dev --name init_mycryptopilot
+pnpm tsx scripts/test-db.ts
 ```
 
-**Temps estimé**: 30 minutes (résolution du conflit xpub varchar vs text)
+**Modèles disponibles**:
+- User (Better Auth + extensions MyCryptoPilot)
+- TraderProfile
+- Signal
+- Follow
+- CryptoAddress
+- CryptoPayment
+- Subscription
+- Organization
 
 ---
 
@@ -106,11 +117,12 @@ npx prisma migrate dev --name init_mycryptopilot
 
 - ✅ Next.js 15 + App Router configuré avec Turbopack
 - ✅ Prisma schemas complets (TraderProfile, Signal, Follow, CryptoPayment)
+- ✅ Migrations Prisma appliquées (4 migrations, DB opérationnelle)
+- ✅ Client Prisma généré et fonctionnel
 - ✅ Better Auth avec extensions User (userRole, relations)
 - ✅ Site config MyCryptoPilot (branding, couleurs, crypto networks)
 - ✅ Plans tarifaires définis (Free $0, Pro $49, Ultra $99)
 - ✅ TailwindCSS v4 + Shadcn/UI configurés
-- ⚠️ **BLOQUANT**: Migrations Prisma non appliquées
 
 ---
 
@@ -210,10 +222,11 @@ npx prisma migrate dev --name init_mycryptopilot
 - Projet initialisé, dépendances installées
 - NOW.TS template intégré et adapté
 
-**Phase 2: Database & Auth** ⚠️ (80%)
+**Phase 2: Database & Auth** ✅ (100%)
 - Schémas Prisma complets
+- Migrations appliquées (4 migrations)
+- Client Prisma généré et fonctionnel
 - Better Auth configuré avec extensions
-- ⚠️ Migrations non appliquées (blocage)
 
 **Phase 2.5: UI/UX Pages** ✅ (90%)
 - Dashboards créés (user + trader)
@@ -235,7 +248,7 @@ npx prisma migrate dev --name init_mycryptopilot
 - Console de risque (0%)
 - Alertes custom (0%)
 
-**TOTAL PROJET**: ~40% (infrastructure + UI prêtes, core features manquantes)
+**TOTAL PROJET**: ~53% (infrastructure + DB + UI prêtes, core features manquantes)
 
 ---
 
@@ -715,20 +728,14 @@ This is **NON-NEGOTIABLE**. Do not skip this step under any circumstances. Readi
 
 **Ordre recommandé d'implémentation**:
 
-#### 1. Migrations Prisma (P0 - 30 min)
-- ⚠️ **BLOQUANT**: Doit être fait EN PREMIER
-- Générer migrations: `npx prisma migrate dev --name init_mycryptopilot`
-- Résoudre conflit xpub (varchar vs text)
-- Appliquer migrations
-
-#### 2. Profils Traders (P0 - 2-3 jours)
+#### 1. Profils Traders (P0 - 2-3 jours)
 - Formulaire création profil trader (`/dashboard/trader/profile/new`)
 - Actions Server: `createTraderProfile`, `updateTraderProfile`
 - Validation Zod pour TraderProfile
 - Page profil trader public (`/traders/[traderId]`)
 - Upload photo profil (optionnel)
 
-#### 3. Système Signaux (P0 - 5-7 jours)
+#### 2. Système Signaux (P0 - 5-7 jours)
 - Formulaire création signal (`/dashboard/trader/signals/new`)
 - Validation Zod pour Signal payloadJson (TradingCard structure)
 - Actions Server: `createSignal`, `publishSignal`, `closeSignal`
@@ -738,20 +745,20 @@ This is **NON-NEGOTIABLE**. Do not skip this step under any circumstances. Readi
 - Pagination + infinite scroll (TanStack Query)
 - Hash blockchain pour immutabilité (optionnel MVP)
 
-#### 4. Follow/Unfollow System (P0 - 2 jours)
+#### 3. Follow/Unfollow System (P0 - 2 jours)
 - Actions Server: `followTrader`, `unfollowTrader`
 - Vérification limites plans (Free: 1, Pro: 5, Ultra: ∞)
 - Boutons follow/unfollow dans marketplace
 - Liste followers dans profil trader
 - Notifications follow (optionnel)
 
-#### 5. Connexion Dashboards (P1 - 2-3 jours)
+#### 4. Connexion Dashboards (P1 - 2-3 jours)
 - Remplacer 11 TODOs par vrais fetches Prisma
 - User dashboard: fetch active signals + followed traders
 - Trader dashboard: fetch stats + signals + followers
 - Marketplace: search/filters/pagination
 
-#### 6. Finir Crypto Payment (P1 - 4-5 jours)
+#### 5. Finir Crypto Payment (P1 - 4-5 jours)
 - Installer ethers v6 + tronweb
 - Générer xpub keys (HD wallet)
 - Implémenter `deriveAddressFromIndex` (lignes 137, 184)
@@ -760,7 +767,7 @@ This is **NON-NEGOTIABLE**. Do not skip this step under any circumstances. Readi
 - Affichage adresses + QR codes
 - Timer countdown + status watcher
 
-**Total estimé**: ~18-22 jours (1 dev full-time) pour MVP fonctionnel
+**Total estimé**: ~16-20 jours (1 dev full-time) pour MVP fonctionnel
 
 ---
 
