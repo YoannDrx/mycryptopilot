@@ -83,7 +83,13 @@ export function SignalsByAssetChart() {
             >
               <Label
                 content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                  if (
+                    viewBox &&
+                    "cx" in viewBox &&
+                    "cy" in viewBox &&
+                    viewBox.cx != null &&
+                    viewBox.cy != null
+                  ) {
                     return (
                       <text
                         x={viewBox.cx}
@@ -100,7 +106,7 @@ export function SignalsByAssetChart() {
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy ?? 0) + 24}
+                          y={viewBox.cy + 24}
                           className="fill-muted-foreground"
                         >
                           Total Signals
