@@ -63,21 +63,42 @@ export const auth = betterAuth({
             logger.error("Failed to setup Resend customer", { err });
           });
 
-          // Create organization (must complete for user to access the app)
-          try {
-            await auth.api.createOrganization({
-              body: {
-                name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
-                slug: generateSlug(user.id), // Use user ID for unique slug
-                logo: `${getServerUrl()}/images/account-logo.png`,
-                userId: user.id,
-                keepCurrentActiveOrganization: false,
-              },
-            });
-          } catch (err) {
-            logger.error("Failed to create account", { err });
-            // Re-throw to prevent user from being created without an organization
-            throw new Error("Failed to create account organization");
+          // Create organization with retry (critical but should not block user creation)
+          // Better Auth hooks should never throw - log errors instead
+          const maxRetries = 3;
+           
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+              // eslint-disable-next-line no-await-in-loop
+              await auth.api.createOrganization({
+                body: {
+                  name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
+                  slug: generateSlug(user.id), // Use user ID for unique slug
+                  logo: `${getServerUrl()}/images/account-logo.png`,
+                  userId: user.id,
+                  keepCurrentActiveOrganization: false,
+                },
+              });
+              logger.info(`Organization created for user ${user.id}`);
+              break; // Success, exit loop
+            } catch (err) {
+              logger.error(
+                `Failed to create organization for user ${user.id} (attempt ${attempt}/${maxRetries})`,
+                { err },
+              );
+              if (attempt < maxRetries) {
+                // Wait before retry (exponential backoff)
+                // eslint-disable-next-line no-await-in-loop
+                await new Promise((resolve) =>
+                  setTimeout(resolve, 100 * Math.pow(2, attempt)),
+                );
+              } else {
+                // Last attempt failed - log critical error but don't throw
+                logger.error(
+                  `CRITICAL: Failed to create organization after ${maxRetries} attempts for user ${user.id}`,
+                );
+              }
+            }
           }
         },
       },
