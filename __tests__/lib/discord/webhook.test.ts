@@ -18,6 +18,7 @@ describe("Discord Webhook", () => {
           rationales: ["Strong support level", "Bullish divergence"],
         },
         trader: {
+          id: "trader-123",
           name: "John Doe",
           traderProfile: {
             displayName: "CryptoMaster",
@@ -27,7 +28,7 @@ describe("Discord Webhook", () => {
 
       expect(signal.id).toBe("test-signal-123");
       expect(signal.symbol).toBe("BTC-USDT");
-      expect(signal.trader.traderProfile?.displayName).toBe("CryptoMaster");
+      expect(signal.trader.traderProfile.displayName).toBe("CryptoMaster");
     });
 
     it("should handle signal with minimal fields", () => {
@@ -37,13 +38,15 @@ describe("Discord Webhook", () => {
         createdAt: new Date("2025-10-09T12:00:00Z"),
         payloadJson: {},
         trader: {
+          id: "trader-456",
           name: "Jane Smith",
+          traderProfile: null,
         },
       };
 
       expect(signal.id).toBe("test-signal-456");
       expect(signal.symbol).toBe("ETH-USDT");
-      expect(signal.trader.traderProfile).toBeUndefined();
+      expect(signal.trader.traderProfile).toBeNull();
     });
   });
 
