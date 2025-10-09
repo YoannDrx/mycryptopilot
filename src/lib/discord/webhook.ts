@@ -200,7 +200,7 @@ export async function notifyNewSignal(signal: {
       await Promise.allSettled(
         followers
           .filter((f) => f.user.discordId) // Seulement ceux qui ont lié leur Discord
-          .map((follower) =>
+          .map(async (follower) =>
             notifyFollowerNewSignal(follower.user.discordId!, signal),
           ),
       );
