@@ -60,50 +60,68 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 
 ---
 
-### 📝 Phase 2: Update Documentation Files
+### 📝 Phase 2: Update All Documentation Files
 
-**Objectif**: Synchroniser toute la documentation avec l'état réel du projet.
+**Objectif**: Synchroniser toute la documentation avec l'état réel du projet en lisant TOUS les fichiers .md.
 
 **Actions**:
 
-1. **Lire les fichiers .md du projet**:
-   - Utilise `Glob` pour trouver tous les `*.md` (README, CLAUDE, autres)
+1. **Scanner TOUS les fichiers .md du projet**:
+   - Utilise `Glob` pour trouver récursivement tous les `**/*.md` (y compris sous-dossiers)
    - Lire chaque fichier complètement
+   - Identifier les fichiers nécessitant une mise à jour
 
 2. **Mettre à jour chaque fichier .md**:
-   - **README.md**:
-     - Section "Documentation" renvoyant vers CLAUDE.md
-     - Section "Installation" avec warnings si nécessaire (ex: migrations)
-     - Garder le contenu minimal et vitrine publique
-     - Mettre à jour date si nécessaire
 
-   - **.claude/CLAUDE.md**:
-     - Section "État Actuel du développement" synchronisée
-     - Progression globale du projet mise à jour
-     - TODOs critiques listés avec lignes
-     - Parcours testables documentés
-     - Blocages critiques
-     - Prochaines étapes MVP
-     - Mettre à jour date
+   a. **README.md** (racine projet):
+      - Section "Documentation" renvoyant vers CLAUDE.md
+      - Section "Installation" avec warnings si nécessaire (ex: migrations)
+      - Garder le contenu minimal et vitrine publique
+      - Mettre à jour date si nécessaire
+      - Vérifier cohérence avec état réel du projet
 
-3. **Synchroniser dates**:
+   b. **.claude/CLAUDE.md** (FICHIER PRINCIPAL - Support dev):
+      - ⚠️ **PRIORITÉ ABSOLUE** - C'est le fichier de référence pour tout le développement
+      - Lire complètement le fichier actuel
+      - Section "État Actuel du développement" synchronisée avec découvertes de la Phase 1
+      - Progression globale du projet mise à jour (avec %)
+      - TODOs critiques listés avec fichiers et lignes précises
+      - Parcours testables documentés (✅ ⚠️ ❌)
+      - Blocages critiques identifiés (migrations, env vars, etc.)
+      - Section "Prochaines étapes MVP" mise à jour avec priorités P0/P1/P2
+      - Mettre à jour TOUTES les dates dans le fichier
+      - Vérifier cohérence de toutes les sections avec l'état réel
+
+   c. **Autres fichiers .md trouvés**:
+      - Pour chaque fichier .md trouvé (docs/, src/, features/, etc.):
+        - Lire le contenu
+        - Vérifier si le contenu est à jour (dates, TODOs, statuts)
+        - Mettre à jour si nécessaire
+        - Exemples : TRADING_CARDS.md, XPUB_GENERATION.md, etc.
+
+3. **Synchroniser toutes les dates**:
    - Utiliser date actuelle (format: "X octobre 2025")
+   - Remplacer les anciennes dates dans tous les fichiers .md
 
 ---
 
-### 🔖 Phase 3: GitHub Issues Deep Update
+### 🔖 Phase 3: GitHub Issues Deep Analysis & Update
 
-**Objectif**: Enrichir chaque issue GitHub avec informations actionnables et guides pratiques.
+**Objectif**: Parcourir TOUTES les issues (ouvertes ET fermées), vérifier leur statut réel, et réouvrir celles qui ne sont pas complètes.
 
 **Actions**:
 
-1. **Lister toutes les issues GitHub**:
+1. **Lister TOUTES les issues GitHub (open + closed)**:
 
    ```bash
-   gh issue list --repo YoannDrx/mycryptopilot --limit 100 --json number,title,state,labels
+   # Lister toutes les issues ouvertes
+   gh issue list --repo YoannDrx/mycryptopilot --state open --limit 100 --json number,title,state,labels
+
+   # Lister toutes les issues fermées
+   gh issue list --repo YoannDrx/mycryptopilot --state closed --limit 100 --json number,title,state,labels
    ```
 
-2. **Pour CHAQUE issue, effectuer les actions suivantes**:
+2. **Pour CHAQUE issue (ouverte OU fermée), effectuer les actions suivantes**:
 
    a. **Récupérer contenu actuel**:
 
@@ -111,12 +129,25 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
    gh issue view <number> --json title,body,labels,state
    ```
 
-   b. **Analyser statut réel de l'issue**:
-   - Lire code/fichiers concernés
-   - Déterminer: ✅ Completed, ⏳ In Progress, ❌ Not Started, ⚠️ Blocked
-   - Identifier ce qui est fait vs manquant
+   b. **Analyser PROFONDÉMENT le statut réel de l'issue**:
+   - **Lire les fichiers/code mentionnés dans l'issue**
+   - **Rechercher dans le codebase** les features liées à l'issue
+   - **Vérifier existence** des actions, queries, components, pages mentionnés
+   - **Compter les TODOs** restants dans les fichiers concernés
+   - **Tester mentalement** le parcours end-to-end décrit
+   - Déterminer statut RÉEL: ✅ Completed, ⏳ In Progress, ❌ Not Started, ⚠️ Blocked
+   - **Identifier précisément** ce qui est fait vs ce qui manque
 
-   c. **Mettre à jour le body de l'issue** avec sections enrichies:
+   c. **Décision critique pour issues FERMÉES**:
+   - ⚠️ **Si l'issue est CLOSED mais PAS 100% complète**:
+     - **RÉOUVRIR l'issue** avec `gh issue reopen <number>`
+     - Ajouter commentaire expliquant pourquoi réouverte
+     - Lister précisément ce qui reste à faire
+   - ✅ **Si l'issue est CLOSED et vraiment 100% complète**:
+     - Laisser fermée
+     - Optionnellement ajouter commentaire de confirmation
+
+   d. **Mettre à jour le body de l'issue** avec sections enrichies:
 
    ````markdown
    ## User Story
@@ -246,12 +277,12 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 
    ````
 
-   d. **Mettre à jour via GitHub CLI**:
+   e. **Mettre à jour via GitHub CLI**:
    ```bash
    gh issue edit <number> --body "<nouveau_contenu>"
    ````
 
-   e. **Ajuster labels si nécessaire**:
+   f. **Ajuster labels si nécessaire**:
    - Ajouter `priority-p0`, `priority-p1`, `priority-p2` selon analyse
    - Ajouter `blocked` si bloquée
    - Ajouter `in-progress` si en cours
@@ -264,16 +295,17 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 
 ### 📊 Phase 4: Calculate Progress
 
-**Objectif**: Calculer précisément l'avancement du projet.
+**Objectif**: Calculer précisément l'avancement du projet basé sur l'analyse complète des issues.
 
 **Actions**:
 
-1. **Compter les issues par statut**:
-   - Total issues
-   - Completed (state: closed OU dans body: "Status: ✅")
-   - In Progress (dans body: "Status: ⏳")
-   - Blocked (dans body: "Status: ⚠️")
-   - Not Started (dans body: "Status: ❌")
+1. **Compter les issues par statut RÉEL**:
+   - Total issues (open + closed après réouvertures)
+   - Completed (state: closed ET vraiment 100% complète selon analyse Phase 3)
+   - In Progress (state: open ET dans body: "Status: ⏳")
+   - Blocked (state: open ET dans body: "Status: ⚠️")
+   - Not Started (state: open ET dans body: "Status: ❌")
+   - Reopened (issues réouvertes pendant l'audit)
 
 2. **Calculer pourcentage global**:
 
@@ -330,6 +362,22 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 - **Phase 1 (Base & Config)**: <PROGRESS_BAR> <XX>%
 - **Phase 2 (Crypto Payments)**: <PROGRESS_BAR> <XX>%
 - **Phase 3 (Trading Signals)**: <PROGRESS_BAR> <XX>%
+
+### 🔄 Issues Réouvertes Pendant l'Audit
+
+[Si aucune issue réouverte, omettre cette section]
+
+⚠️ **<N> issues ont été réouvertes** car elles étaient marquées comme fermées mais n'étaient pas 100% complètes :
+
+- **#<number> - <Titre>**
+  - **Raison réouverture**: <explication>
+  - **Ce qui reste à faire**: <liste précise>
+  - **Estimation**: <temps>
+
+- **#<number> - <Titre>**
+  - ...
+
+✅ **<N> issues fermées ont été vérifiées** et confirmées comme vraiment complètes.
 
 ---
 
@@ -711,12 +759,14 @@ Lorsque l'utilisateur lance `/project-audit`:
 
 1. Afficher: "🔍 Démarrage audit complet du projet..."
 2. Exécuter Phase 1 (afficher progress: "Phase 1/5: Code Analysis...")
-3. Exécuter Phase 2 (afficher progress: "Phase 2/5: Updating docs...")
-4. Exécuter Phase 3 (afficher progress: "Phase 3/5: Updating GitHub issues..." avec compteur)
+3. Exécuter Phase 2 (afficher progress: "Phase 2/5: Updating ALL documentation files...")
+4. Exécuter Phase 3 (afficher progress: "Phase 3/5: Analyzing ALL GitHub issues (open + closed)..." avec compteur)
+   - Afficher: "Analyzing issue #X..."
+   - Si réouverture: Afficher "⚠️ Reopening issue #X (not complete)"
 5. Exécuter Phase 4 (afficher progress: "Phase 4/5: Calculating progress...")
-6. Exécuter Phase 5 (afficher: "Phase 5/5: Generating report...")
+6. Exécuter Phase 5 (afficher: "Phase 5/5: Generating comprehensive report...")
 7. Afficher le rapport complet final
-8. Résumé: "✅ Audit terminé! Documentation mise à jour (README.md, .claude/CLAUDE.md), <N> issues GitHub enrichies."
+8. Résumé: "✅ Audit terminé! Documentation mise à jour (<N> fichiers .md), <N> issues GitHub analysées, <N> issues réouvertes, <N> issues enrichies."
 
-**Durée totale estimée**: 5-10 minutes selon taille du projet.
+**Durée totale estimée**: 5-15 minutes selon taille du projet et nombre d'issues.
 ```
