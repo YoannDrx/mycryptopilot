@@ -58,8 +58,12 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user, _req) => {
-          await setupResendCustomer(user);
+          // Setup Resend customer (non-blocking)
+          void setupResendCustomer(user).catch((err) => {
+            logger.error("Failed to setup Resend customer", { err });
+          });
 
+          // Create organization (must complete for user to access the app)
           try {
             await auth.api.createOrganization({
               body: {
@@ -72,6 +76,8 @@ export const auth = betterAuth({
             });
           } catch (err) {
             logger.error("Failed to create account", { err });
+            // Re-throw to prevent user from being created without an organization
+            throw new Error("Failed to create account organization");
           }
         },
       },

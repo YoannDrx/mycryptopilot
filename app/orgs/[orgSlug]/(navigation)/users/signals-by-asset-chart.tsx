@@ -83,30 +83,26 @@ export function SignalsByAssetChart() {
             >
               <Label
                 content={({ viewBox }) => {
-                  if (
-                    viewBox &&
-                    "cx" in viewBox &&
-                    "cy" in viewBox &&
-                    viewBox.cx != null &&
-                    viewBox.cy != null
-                  ) {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    const cx = viewBox.cx as number;
+                    const cy = viewBox.cy as number;
                     return (
                       <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
+                        x={cx}
+                        y={cy}
                         textAnchor="middle"
                         dominantBaseline="middle"
                       >
                         <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
+                          x={cx}
+                          y={cy}
                           className="fill-foreground text-3xl font-bold"
                         >
                           {totalSignals.toLocaleString()}
                         </tspan>
                         <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy + 24}
+                          x={cx}
+                          y={cy + 24}
                           className="fill-muted-foreground"
                         >
                           Total Signals
