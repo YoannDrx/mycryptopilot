@@ -2,6 +2,10 @@ import type { CryptoNetwork } from "@/generated/prisma";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { HDNodeWallet } from "ethers";
+import { HDKey } from "@scure/bip32";
+import { keccak_256 } from "@noble/hashes/sha3.js";
+import bs58check from "bs58check";
 
 /**
  * HD Wallet Address Generator
@@ -124,7 +128,7 @@ export async function generateCryptoAddress(
  * @returns Promise<{ address: string, derivationPath: string }>
  */
 async function deriveBaseAddress(
-  userId: string,
+  _userId: string,
 ): Promise<{ address: string; derivationPath: string }> {
   // Get next available index by counting existing Base addresses
   const count = await prisma.cryptoAddress.count({
@@ -134,28 +138,38 @@ async function deriveBaseAddress(
   const index = count;
   const derivationPath = `m/44'/60'/0'/0/${index}`;
 
-  // TODO: Implement actual HD wallet derivation using ethers.js or web3.js
-  // For now, this is a placeholder. In production, you would:
-  // 1. Parse the xpub using HDKey or similar library
-  // 2. Derive the child key at the given path
+  // HD wallet derivation using ethers.js
+  // 1. Parse the xpub (extended public key)
+  // 2. Derive the child key at the given path (0/0/{index})
   // 3. Generate the Ethereum address from the derived public key
-  //
-  // Example with ethers.js:
-  // const hdNode = HDNodeWallet.fromExtendedKey(env.CRYPTO_XPUB_BASE!);
-  // const wallet = hdNode.derivePath(`0/0/${index}`);
-  // const address = wallet.address;
+  try {
+    const xpub = env.CRYPTO_XPUB_BASE;
+    if (!xpub) {
+      throw new Error("CRYPTO_XPUB_BASE is not configured");
+    }
 
-  const address = `0x_PLACEHOLDER_BASE_${userId}_${index}`;
+    const hdNode = HDNodeWallet.fromExtendedKey(xpub);
+    // Note: xpub already includes m/44'/60'/0' path, so we derive from there
+    const wallet = hdNode.derivePath(`0/${index}`);
+    const address = wallet.address;
 
-  logger.warn(
-    "Using placeholder Base address - implement HD wallet derivation",
-    {
+    logger.info("Derived Base address from HD wallet", {
       derivationPath,
       index,
-    },
-  );
+      address,
+    });
 
-  return { address, derivationPath };
+    return { address, derivationPath };
+  } catch (error) {
+    logger.error("Failed to derive Base address from HD wallet", {
+      error,
+      derivationPath,
+      index,
+    });
+    throw new Error(
+      `Failed to derive Base address: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
 }
 
 /**
@@ -171,7 +185,7 @@ async function deriveBaseAddress(
  * @returns Promise<{ address: string, derivationPath: string }>
  */
 async function deriveTronAddress(
-  userId: string,
+  _userId: string,
 ): Promise<{ address: string; derivationPath: string }> {
   // Get next available index by counting existing Tron addresses
   const count = await prisma.cryptoAddress.count({
@@ -181,27 +195,57 @@ async function deriveTronAddress(
   const index = count;
   const derivationPath = `m/44'/195'/0'/0/${index}`;
 
-  // TODO: Implement actual HD wallet derivation using tronweb
-  // For now, this is a placeholder. In production, you would:
-  // 1. Parse the xpub using appropriate Tron library
-  // 2. Derive the child key at the given path
+  // HD wallet derivation for Tron
+  // 1. Parse the xpub using @scure/bip32
+  // 2. Derive the child key at the given path (0/{index})
   // 3. Generate the Tron address (T...) from the derived public key
-  //
-  // Example with tronweb:
-  // const hdNode = tronWeb.utils.accounts.generateAccountWithMnemonic();
-  // const address = hdNode.address;
+  try {
+    const xpub = env.CRYPTO_XPUB_TRON;
+    if (!xpub) {
+      throw new Error("CRYPTO_XPUB_TRON is not configured");
+    }
 
-  const address = `T_PLACEHOLDER_TRON_${userId}_${index}`;
+    const hdKey = HDKey.fromExtendedKey(xpub);
+    // Note: xpub already includes m/44'/195'/0' path, so we derive from there
+    const child = hdKey.derive(`m/0/${index}`);
 
-  logger.warn(
-    "Using placeholder Tron address - implement HD wallet derivation",
-    {
+    if (!child.publicKey) {
+      throw new Error("Failed to derive public key from Tron xpub");
+    }
+
+    // Convert public key to Tron address
+    // 1. Hash public key (remove first byte 0x04 for uncompressed key)
+    const pubKeyWithoutPrefix = child.publicKey.slice(1);
+    const hash = keccak_256(pubKeyWithoutPrefix);
+
+    // 2. Take last 20 bytes
+    const addressBytes = hash.slice(-20);
+
+    // 3. Add Tron mainnet prefix (0x41)
+    const addressWithPrefix = new Uint8Array(21);
+    addressWithPrefix[0] = 0x41;
+    addressWithPrefix.set(addressBytes, 1);
+
+    // 4. Encode in base58check
+    const address = bs58check.encode(Buffer.from(addressWithPrefix));
+
+    logger.info("Derived Tron address from HD wallet", {
       derivationPath,
       index,
-    },
-  );
+      address,
+    });
 
-  return { address, derivationPath };
+    return { address, derivationPath };
+  } catch (error) {
+    logger.error("Failed to derive Tron address from HD wallet", {
+      error,
+      derivationPath,
+      index,
+    });
+    throw new Error(
+      `Failed to derive Tron address: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
 }
 
 /**
