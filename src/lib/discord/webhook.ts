@@ -18,6 +18,7 @@ export async function notifyNewSignal(signal: {
   createdAt: Date;
   payloadJson: unknown;
   trader: {
+    id: string;
     name: string;
     traderProfile?: {
       displayName: string;
@@ -184,7 +185,7 @@ export async function notifyNewSignal(signal: {
       // Récupérer tous les followers de ce trader avec leur discordId
       const followers = await prisma.follow.findMany({
         where: {
-          traderId: signal.trader.id ?? "",
+          traderId: signal.trader.id,
           status: "ACTIVE",
         },
         include: {
@@ -197,12 +198,15 @@ export async function notifyNewSignal(signal: {
       });
 
       // Envoyer un DM à chaque follower (en parallèle pour performance)
+      const followersWithDiscord = followers.filter(
+        (f): f is typeof f & { user: { discordId: string } } =>
+          !!f.user.discordId,
+      );
+
       await Promise.allSettled(
-        followers
-          .filter((f) => f.user.discordId) // Seulement ceux qui ont lié leur Discord
-          .map(async (follower) =>
-            notifyFollowerNewSignal(follower.user.discordId!, signal),
-          ),
+        followersWithDiscord.map(async (follower) =>
+          notifyFollowerNewSignal(follower.user.discordId, signal),
+        ),
       );
 
       logger.info(

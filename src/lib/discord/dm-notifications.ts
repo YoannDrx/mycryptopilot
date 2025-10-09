@@ -10,7 +10,10 @@ import { logger } from "../logger";
  * @param embed - Embed à envoyer
  * @returns true si le message a été envoyé avec succès
  */
-async function sendDM(discordUserId: string, embed: EmbedBuilder): Promise<boolean> {
+async function sendDM(
+  discordUserId: string,
+  embed: EmbedBuilder,
+): Promise<boolean> {
   const client = discordBot.getClient();
 
   if (!client) {
@@ -20,12 +23,6 @@ async function sendDM(discordUserId: string, embed: EmbedBuilder): Promise<boole
 
   try {
     const user = await client.users.fetch(discordUserId);
-
-    if (!user) {
-      logger.error(`Discord user not found: ${discordUserId}`);
-      return false;
-    }
-
     await user.send({ embeds: [embed] });
 
     logger.info(`✅ DM sent to ${user.tag}`);
@@ -276,8 +273,14 @@ export async function notifyPlanUpdated(
     ultra: "🚀",
   };
 
-  const color = planColors[newPlan as keyof typeof planColors] ?? 0x6b7280;
-  const emoji = planEmojis[newPlan as keyof typeof planEmojis] ?? "🆓";
+  const color =
+    newPlan in planColors
+      ? planColors[newPlan as keyof typeof planColors]
+      : 0x6b7280;
+  const emoji =
+    newPlan in planEmojis
+      ? planEmojis[newPlan as keyof typeof planEmojis]
+      : "🆓";
 
   const expirationText = expiresAt
     ? `\n📅 Expire le: ${new Date(expiresAt).toLocaleDateString("fr-FR", {

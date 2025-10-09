@@ -22,6 +22,12 @@ import { logger } from "@/lib/logger";
 export const linkDiscordAction = authAction
   .inputSchema(LinkDiscordSchema)
   .action(async ({ parsedInput: { discordId }, ctx: { user } }) => {
+    // Récupérer l'utilisateur complet avec discordId
+    const currentUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { discordId: true },
+    });
+
     // Vérifier que ce Discord ID n'est pas déjà utilisé
     const existingUser = await prisma.user.findUnique({
       where: { discordId },
@@ -34,7 +40,7 @@ export const linkDiscordAction = authAction
     }
 
     // Si l'utilisateur a déjà ce Discord ID, ne rien faire
-    if (user.discordId === discordId) {
+    if (currentUser?.discordId === discordId) {
       return {
         success: true,
         message: "Discord account already linked",
@@ -92,11 +98,17 @@ export const linkDiscordAction = authAction
 export const unlinkDiscordAction = authAction
   .inputSchema(UnlinkDiscordSchema)
   .action(async ({ ctx: { user } }) => {
-    if (!user.discordId) {
+    // Récupérer l'utilisateur complet avec discordId
+    const currentUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { discordId: true },
+    });
+
+    if (!currentUser?.discordId) {
       throw new ActionError("No Discord account linked");
     }
 
-    const discordId = user.discordId;
+    const discordId = currentUser.discordId;
 
     // Retirer le Discord ID de l'utilisateur
     await prisma.user.update({
@@ -135,10 +147,6 @@ export const unlinkDiscordAction = authAction
 export const updateDiscordRoleAction = authAction
   .inputSchema(z.object({}))
   .action(async ({ ctx: { user } }) => {
-    if (!user.discordId) {
-      throw new ActionError("No Discord account linked");
-    }
-
     // Récupérer le plan actuel de l'utilisateur
     const userData = await prisma.user.findUnique({
       where: { id: user.id },
@@ -148,14 +156,14 @@ export const updateDiscordRoleAction = authAction
       },
     });
 
-    if (!userData) {
-      throw new ActionError("User not found");
+    if (!userData?.discordId) {
+      throw new ActionError("No Discord account linked");
     }
 
     const planName = (userData.planName ?? "free") as MyCryptoPilotPlanName;
 
     // Assigner le rôle Discord correspondant
-    const roleAssigned = await assignRoleToUser(userData.discordId!, planName);
+    const roleAssigned = await assignRoleToUser(userData.discordId, planName);
 
     if (!roleAssigned) {
       throw new ActionError("Failed to update Discord role");
