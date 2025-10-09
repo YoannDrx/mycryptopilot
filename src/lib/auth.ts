@@ -91,22 +91,32 @@ export const auth = betterAuth({
                 `Discord ID ${account.accountId} automatically linked to user ${account.userId}`,
               );
 
-              // Assigner le rôle Discord automatiquement
-              const { assignRoleToUser } = await import("./discord/roles");
-              const user = await prisma.user.findUnique({
-                where: { id: account.userId },
-                select: { planName: true },
-              });
+              // Assigner le rôle Discord automatiquement (non-bloquant)
+              // Ne pas bloquer si Discord n'est pas configuré (environnement de test)
+              if (env.DISCORD_BOT_TOKEN && env.DISCORD_GUILD_ID) {
+                const { assignRoleToUser } = await import("./discord/roles");
+                const user = await prisma.user.findUnique({
+                  where: { id: account.userId },
+                  select: { planName: true },
+                });
 
-              if (user) {
-                const planName = (user.planName ?? "free") as "free" | "pro" | "ultra";
-                await assignRoleToUser(account.accountId, planName);
-                logger.info(
-                  `Assigned Discord role ${planName.toUpperCase()} to user ${account.userId}`,
-                );
+                if (user) {
+                  const planName = (user.planName ?? "free") as
+                    | "free"
+                    | "pro"
+                    | "ultra";
+                  // Exécuter de manière non-bloquante pour éviter de ralentir l'auth
+                  void assignRoleToUser(account.accountId, planName).then(
+                    () => {
+                      logger.info(
+                        `Assigned Discord role ${planName.toUpperCase()} to user ${account.userId}`,
+                      );
+                    },
+                  );
+                }
               }
             } catch (err) {
-              logger.error("Failed to save Discord ID or assign role", { err });
+              logger.error("Failed to save Discord ID", { err });
             }
           }
         },
