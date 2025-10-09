@@ -20,7 +20,7 @@ const ROLE_HIERARCHY = {
  * Permissions par défaut pour chaque rôle
  * Les rôles supérieurs héritent des permissions inférieures
  */
-const ROLE_PERMISSIONS = {
+const _ROLE_PERMISSIONS = {
   FREE: {
     ViewChannel: true, // Voir les channels publics
     SendMessages: true, // Envoyer des messages
@@ -55,6 +55,8 @@ export async function ensureRolesExist(guild: Guild): Promise<void> {
     "ULTRA",
   ];
 
+  // Création/mise à jour séquentielle pour respecter la hiérarchie
+
   for (const planKey of rolesInOrder) {
     const roleName = DISCORD_CONFIG.roles[planKey];
     const existingRole = guild.roles.cache.find((r) => r.name === roleName);
@@ -65,6 +67,7 @@ export async function ensureRolesExist(guild: Guild): Promise<void> {
       // Calculer la position du rôle (plus élevé = plus de pouvoir)
       const position = ROLE_HIERARCHY[planKey];
 
+      // eslint-disable-next-line no-await-in-loop
       await guild.roles.create({
         name: roleName,
         color: DISCORD_CONFIG.roleColors[planKey],
@@ -74,11 +77,14 @@ export async function ensureRolesExist(guild: Guild): Promise<void> {
         mentionable: false, // Pas mentionnable par défaut (éviter spam)
       });
 
-      logger.info(`✅ Role created: ${roleName} (hierarchy level: ${position})`);
+      logger.info(
+        `✅ Role created: ${roleName} (hierarchy level: ${position})`,
+      );
     } else {
       // Mettre à jour la position si nécessaire
       const expectedPosition = ROLE_HIERARCHY[planKey] + 1;
       if (existingRole.position !== expectedPosition) {
+        // eslint-disable-next-line no-await-in-loop
         await existingRole.setPosition(expectedPosition);
         logger.info(`Updated position for role: ${roleName}`);
       }
@@ -123,13 +129,11 @@ export async function assignRoleToUser(
     // Récupérer le membre Discord
     const member = await guild.members.fetch(discordUserId);
 
-    if (!member) {
-      logger.error(`Discord member not found: ${discordUserId}`);
-      return false;
-    }
-
     // Mapper le plan vers le nom du rôle
-    const planKeyMap: Record<MyCryptoPilotPlanName, keyof typeof DISCORD_CONFIG.roles> = {
+    const planKeyMap: Record<
+      MyCryptoPilotPlanName,
+      keyof typeof DISCORD_CONFIG.roles
+    > = {
       free: "FREE",
       pro: "PRO",
       ultra: "ULTRA",
@@ -148,9 +152,11 @@ export async function assignRoleToUser(
 
     // Retirer tous les autres rôles MyCryptoPilot
     const allMyCryptoPilotRoles = Object.values(DISCORD_CONFIG.roles);
+
     for (const otherRoleName of allMyCryptoPilotRoles) {
       const otherRole = guild.roles.cache.find((r) => r.name === otherRoleName);
       if (otherRole && member.roles.cache.has(otherRole.id)) {
+        // eslint-disable-next-line no-await-in-loop
         await member.roles.remove(otherRole);
         logger.info(`Removed role ${otherRoleName} from ${member.user.tag}`);
       }
@@ -193,16 +199,13 @@ export async function removeAllRolesFromUser(
 
     const member = await guild.members.fetch(discordUserId);
 
-    if (!member) {
-      logger.error(`Discord member not found: ${discordUserId}`);
-      return false;
-    }
-
     // Retirer tous les rôles MyCryptoPilot
     const allMyCryptoPilotRoles = Object.values(DISCORD_CONFIG.roles);
+     
     for (const roleName of allMyCryptoPilotRoles) {
       const role = guild.roles.cache.find((r) => r.name === roleName);
       if (role && member.roles.cache.has(role.id)) {
+        // eslint-disable-next-line no-await-in-loop
         await member.roles.remove(role);
         logger.info(`Removed role ${roleName} from ${member.user.tag}`);
       }

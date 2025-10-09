@@ -177,7 +177,7 @@ export async function handleFollowCommand(
       embeds: [embed],
       ephemeral: true,
     });
-  } catch (error) {
+  } catch {
     const embed = new EmbedBuilder()
       .setColor(0xef4444) // Red
       .setTitle("❌ Erreur")

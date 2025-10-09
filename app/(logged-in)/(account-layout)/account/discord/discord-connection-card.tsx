@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { linkDiscordAction, unlinkDiscordAction } from "@/features/user/user.action";
+import { unlinkDiscordAction } from "@/features/user/user.action";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 
@@ -39,7 +39,7 @@ export const DiscordConnectionCard = ({
         provider: "discord",
         callbackURL: "/account/discord",
       });
-    } catch (error) {
+    } catch {
       toast.error("Failed to connect Discord");
       setIsConnecting(false);
     }
@@ -49,8 +49,8 @@ export const DiscordConnectionCard = ({
     mutationFn: async () => {
       const result = await unlinkDiscordAction({});
 
-      if (!result?.data?.success) {
-        throw new Error(result?.serverError ?? "Failed to unlink Discord");
+      if (!result.data?.success) {
+        throw new Error(result.serverError ?? "Failed to unlink Discord");
       }
 
       return result.data;
