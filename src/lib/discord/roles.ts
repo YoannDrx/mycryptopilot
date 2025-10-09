@@ -49,7 +49,7 @@ export async function ensureRolesExist(guild: Guild): Promise<void> {
   logger.info("Ensuring Discord roles exist with hierarchy...");
 
   // Créer les rôles dans l'ordre de hiérarchie (du plus bas au plus haut)
-  const rolesInOrder: Array<keyof typeof DISCORD_CONFIG.roles> = [
+  const rolesInOrder: (keyof typeof DISCORD_CONFIG.roles)[] = [
     "FREE",
     "PRO",
     "ULTRA",
