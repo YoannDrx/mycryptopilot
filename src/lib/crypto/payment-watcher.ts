@@ -3,6 +3,8 @@ import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
+import { Contract, JsonRpcProvider } from "ethers";
+import TronWeb from "tronweb";
 import {
   calculateDaysGranted,
   getPlanFromAmount,
@@ -78,29 +80,70 @@ async function checkBaseAddress(address: string): Promise<PaymentDetection[]> {
     return [];
   }
 
-  // TODO: Implement actual Base/Ethereum RPC calls using ethers.js
-  // For now, this is a placeholder. In production, you would:
-  // 1. Connect to Base RPC endpoint
-  // 2. Query USDC token contract for Transfer events to this address
-  // 3. Get transaction details and confirmations
-  // 4. Return array of detected payments
-  //
-  // Example with ethers.js:
-  // const provider = new JsonRpcProvider(env.BASE_RPC_URL);
-  // const usdcContract = new Contract(USDC_BASE_ADDRESS, USDC_ABI, provider);
-  // const filter = usdcContract.filters.Transfer(null, address);
-  // const events = await usdcContract.queryFilter(filter);
-  // const currentBlock = await provider.getBlockNumber();
-  // return events.map(event => ({...}));
+  try {
+    // Connect to Base RPC
+    const provider = new JsonRpcProvider(env.BASE_RPC_URL);
+    const currentBlock = await provider.getBlockNumber();
 
-  logger.warn(
-    "Using placeholder Base payment detection - implement RPC calls",
-    {
+    // USDC contract on Base
+    const usdcAddress = SiteConfig.crypto.networks.base.contractAddress;
+
+    // ERC-20 Transfer event ABI
+    const usdcAbi = [
+      "event Transfer(address indexed from, address indexed to, uint256 value)",
+    ];
+
+    const usdcContract = new Contract(usdcAddress, usdcAbi, provider);
+
+    // Query Transfer events to this address
+    // Look back 1000 blocks (approx 30 minutes on Base at 2s/block)
+    const fromBlock = Math.max(0, currentBlock - 1000);
+    const filter = usdcContract.filters.Transfer(null, address);
+    const events = await usdcContract.queryFilter(filter, fromBlock, "latest");
+
+    logger.info("Base RPC check completed", {
       address,
-    },
-  );
+      eventsFound: events.length,
+      fromBlock,
+      currentBlock,
+    });
 
-  return [];
+    // Map events to PaymentDetection format
+    const payments: PaymentDetection[] = await Promise.all(
+      events.map(async (event) => {
+        const tx = await event.getTransaction();
+        const receipt = await event.getTransactionReceipt();
+
+        // Extract value from event (handle both Log and EventLog types)
+        const value =
+          "args" in event && event.args[2] ? event.args[2] : BigInt(0);
+
+        // USDC has 6 decimals
+        const amountToken = Number(value) / 1e6;
+
+        // For simplicity, assume 1 USDC = 1 USD (close enough for payment detection)
+        const amountUSD = amountToken;
+
+        const confirmations = currentBlock - receipt.blockNumber;
+
+        return {
+          txHash: tx.hash,
+          network: "BASE" as CryptoNetwork,
+          address,
+          amountToken,
+          amountUSD,
+          currency: "USDC",
+          confirmations,
+          timestamp: new Date(),
+        };
+      }),
+    );
+
+    return payments;
+  } catch (error) {
+    logger.error("Error checking Base address", { address, error });
+    return [];
+  }
 }
 
 /**
@@ -117,30 +160,132 @@ async function checkTronAddress(address: string): Promise<PaymentDetection[]> {
     return [];
   }
 
-  // TODO: Implement actual Tron RPC calls using tronweb
-  // For now, this is a placeholder. In production, you would:
-  // 1. Connect to Tron RPC endpoint (TronGrid API)
-  // 2. Query USDT TRC-20 contract transfers to this address
-  // 3. Get transaction details and confirmations
-  // 4. Return array of detected payments
-  //
-  // Example with tronweb:
-  // const tronWeb = new TronWeb({ fullHost: env.TRON_RPC_URL });
-  // const contract = await tronWeb.contract().at(USDT_TRON_ADDRESS);
-  // const events = await contract.getPastEvents('Transfer', {
-  //   filters: { to: address },
-  //   fromBlock: 0,
-  //   toBlock: 'latest'
-  // });
+  try {
+    // Connect to Tron network
+    // @ts-expect-error - TronWeb types are incorrect, constructor accepts string
+    const tronWeb = new TronWeb(env.TRON_RPC_URL);
 
-  logger.warn(
-    "Using placeholder Tron payment detection - implement RPC calls",
-    {
+    // USDT TRC-20 contract on Tron
+    const usdtAddress = SiteConfig.crypto.networks.tron.contractAddress;
+
+    // Get current block number
+    const currentBlock = await tronWeb.trx.getCurrentBlock();
+    const currentBlockNumber = currentBlock.block_header.raw_data.number;
+
+    // Query transactions to this address
+    // TronGrid API: get transactions related to this address
+    // Note: TronGrid has specific endpoints for TRC-20 transfers
+    const transactions = await tronWeb.trx.getTransactionsRelated(
       address,
-    },
-  );
+      "all",
+      30, // limit to last 30 transactions
+      0, // offset
+    );
 
-  return [];
+    logger.info("Tron RPC check completed", {
+      address,
+      transactionsFound: transactions.length,
+      currentBlockNumber,
+    });
+
+    // Filter for USDT transfers to this address
+    // Process all transactions in parallel to avoid await-in-loop
+    const paymentPromises = transactions.map(async (tx: unknown) => {
+      try {
+        // Type guard for transaction structure
+        if (
+          !tx ||
+          typeof tx !== "object" ||
+          !("raw_data" in tx) ||
+          !("txID" in tx)
+        ) {
+          return null;
+        }
+
+        const txData = tx as {
+          txID: string;
+          raw_data?: {
+            contract?: {
+              type?: string;
+              parameter?: {
+                value?: { contract_address?: string; data?: string };
+              };
+            }[];
+          };
+        };
+
+        // Check if this is a TRC-20 transfer to our address
+        if (txData.raw_data?.contract?.[0]?.type === "TriggerSmartContract") {
+          const contract = txData.raw_data.contract[0];
+          const parameter = contract.parameter?.value;
+
+          if (!parameter) {
+            return null;
+          }
+
+          // Check if it's the USDT contract
+          if (
+            parameter.contract_address &&
+            tronWeb.address.fromHex(parameter.contract_address) === usdtAddress
+          ) {
+            // Decode the data to get transfer details
+            // TRC-20 transfer data format: transfer(address,uint256)
+            const data = parameter.data;
+
+            if (data?.startsWith("a9059cbb")) {
+              // transfer() function signature
+              // Extract recipient address (next 64 chars) and amount (last 64 chars)
+              const recipient = `41${data.substring(32, 72)}`; // Add Tron prefix
+              const recipientAddress = tronWeb.address.fromHex(recipient);
+
+              if (recipientAddress === address) {
+                // This is a transfer to our address
+                const amountHex = data.substring(72);
+                const amountToken = parseInt(amountHex, 16) / 1e6; // USDT has 6 decimals
+
+                // Get transaction info for confirmations
+                const txInfo = await tronWeb.trx.getTransactionInfo(
+                  txData.txID,
+                );
+                const txBlockNumber = txInfo.blockNumber;
+                const confirmations = currentBlockNumber - txBlockNumber;
+
+                return {
+                  txHash: txData.txID,
+                  network: "TRON" as CryptoNetwork,
+                  address,
+                  amountToken,
+                  amountUSD: amountToken, // Assume 1 USDT = 1 USD
+                  currency: "USDT",
+                  confirmations,
+                  timestamp: new Date(txInfo.blockTimeStamp),
+                };
+              }
+            }
+          }
+        }
+      } catch (txError) {
+        logger.error("Error processing Tron transaction", {
+          txId:
+            typeof tx === "object" && tx && "txID" in tx
+              ? (tx as { txID: string }).txID
+              : "unknown",
+          error: txError,
+        });
+      }
+      return null;
+    });
+
+    const allPayments = await Promise.all(paymentPromises);
+    const payments = allPayments.filter(
+      (p: PaymentDetection | null): p is PaymentDetection => p !== null,
+    );
+
+    return payments;
+  } catch (error) {
+    logger.error("Error checking Tron address", { address, error });
+    return [];
+  }
 }
 
 /**

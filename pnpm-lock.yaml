@@ -138,7 +138,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       ethers:
-        specifier: ^6.15.0
+        specifier: ^6
         version: 6.15.0
       front-matter:
         specifier: ^4.0.2
