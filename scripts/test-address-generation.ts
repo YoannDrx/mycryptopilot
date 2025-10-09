@@ -11,6 +11,7 @@
  *   npx tsx scripts/test-address-generation.ts
  */
 
+/* eslint-disable no-console */
 // Load environment variables from .env.local
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
@@ -152,4 +153,4 @@ async function runTests() {
   }
 }
 
-runTests();
+void runTests();

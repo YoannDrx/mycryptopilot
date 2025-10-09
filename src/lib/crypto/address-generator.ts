@@ -128,7 +128,7 @@ export async function generateCryptoAddress(
  * @returns Promise<{ address: string, derivationPath: string }>
  */
 async function deriveBaseAddress(
-  userId: string,
+  _userId: string,
 ): Promise<{ address: string; derivationPath: string }> {
   // Get next available index by counting existing Base addresses
   const count = await prisma.cryptoAddress.count({
@@ -143,7 +143,12 @@ async function deriveBaseAddress(
   // 2. Derive the child key at the given path (0/0/{index})
   // 3. Generate the Ethereum address from the derived public key
   try {
-    const hdNode = HDNodeWallet.fromExtendedKey(env.CRYPTO_XPUB_BASE!);
+    const xpub = env.CRYPTO_XPUB_BASE;
+    if (!xpub) {
+      throw new Error("CRYPTO_XPUB_BASE is not configured");
+    }
+
+    const hdNode = HDNodeWallet.fromExtendedKey(xpub);
     // Note: xpub already includes m/44'/60'/0' path, so we derive from there
     const wallet = hdNode.derivePath(`0/${index}`);
     const address = wallet.address;
@@ -180,7 +185,7 @@ async function deriveBaseAddress(
  * @returns Promise<{ address: string, derivationPath: string }>
  */
 async function deriveTronAddress(
-  userId: string,
+  _userId: string,
 ): Promise<{ address: string; derivationPath: string }> {
   // Get next available index by counting existing Tron addresses
   const count = await prisma.cryptoAddress.count({
@@ -195,7 +200,12 @@ async function deriveTronAddress(
   // 2. Derive the child key at the given path (0/{index})
   // 3. Generate the Tron address (T...) from the derived public key
   try {
-    const hdKey = HDKey.fromExtendedKey(env.CRYPTO_XPUB_TRON!);
+    const xpub = env.CRYPTO_XPUB_TRON;
+    if (!xpub) {
+      throw new Error("CRYPTO_XPUB_TRON is not configured");
+    }
+
+    const hdKey = HDKey.fromExtendedKey(xpub);
     // Note: xpub already includes m/44'/195'/0' path, so we derive from there
     const child = hdKey.derive(`m/0/${index}`);
 
