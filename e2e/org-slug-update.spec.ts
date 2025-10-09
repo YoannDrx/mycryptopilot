@@ -9,7 +9,9 @@ test("update organization slug", async ({ page }) => {
 
   await page.waitForURL(/\/orgs\/[^/]+$/);
 
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Platform Overview" }),
+  ).toBeVisible();
 
   // Extract organization slug from URL
   const currentUrl = page.url();
