@@ -9,6 +9,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
+    BETTER_AUTH_URL: z.string().url().optional(),
+    BETTER_AUTH_SECRET: z.string().min(1),
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
@@ -19,7 +21,9 @@ export const env = createEnv({
     RESEND_AUDIENCE_ID: z.string().optional(),
     EMAIL_FROM: z.string().min(1),
     STRIPE_SECRET_KEY: z.string().min(1),
-    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
     // Crypto payment configuration
     BASE_RPC_URL: z.string().url().optional(),
