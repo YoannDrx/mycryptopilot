@@ -1,5 +1,4 @@
 import { Client, GatewayIntentBits, REST, Routes } from "discord.js";
-import { env } from "../env";
 import { logger } from "../logger";
 import { DISCORD_CONFIG } from "./config";
 import { registerCommands } from "./commands/register-commands";
@@ -58,7 +57,7 @@ class DiscordBot {
       });
 
       // Événement: Bot prêt
-      this.client.once("ready", (client) => {
+      this.client.once("clientReady", (client) => {
         logger.info(`Discord bot logged in as ${client.user.tag}`);
       });
 
@@ -77,7 +76,12 @@ class DiscordBot {
       });
 
       // Connexion au bot
-      await this.client.login(env.DISCORD_BOT_TOKEN);
+      // Read directly from process.env to get live values (important for standalone script)
+      const token = process.env.DISCORD_BOT_TOKEN;
+      if (!token) {
+        throw new Error("DISCORD_BOT_TOKEN not found in environment");
+      }
+      await this.client.login(token);
 
       // Enregistrer les commandes slash
       await this.registerSlashCommands();
@@ -116,7 +120,11 @@ class DiscordBot {
    * Enregistrer les commandes slash sur Discord
    */
   private async registerSlashCommands(): Promise<void> {
-    if (!env.DISCORD_BOT_TOKEN || !env.DISCORD_GUILD_ID) {
+    // Read directly from process.env to get live values (important for standalone script)
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const guildId = process.env.DISCORD_GUILD_ID;
+
+    if (!token || !guildId) {
       logger.warn(
         "Missing DISCORD_BOT_TOKEN or DISCORD_GUILD_ID. Skipping command registration.",
       );
@@ -124,7 +132,7 @@ class DiscordBot {
     }
 
     try {
-      const rest = new REST({ version: "10" }).setToken(env.DISCORD_BOT_TOKEN);
+      const rest = new REST({ version: "10" }).setToken(token);
 
       const commands = registerCommands();
 
@@ -133,10 +141,7 @@ class DiscordBot {
       // Enregistrer les commandes pour la guilde (développement)
       // En production, utiliser Routes.applicationCommands(clientId) pour global
       await rest.put(
-        Routes.applicationGuildCommands(
-          this.client?.user?.id ?? "",
-          env.DISCORD_GUILD_ID,
-        ),
+        Routes.applicationGuildCommands(this.client?.user?.id ?? "", guildId),
         { body: commands },
       );
 

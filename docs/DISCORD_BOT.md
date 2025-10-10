@@ -189,6 +189,261 @@ Utilise `Ctrl+C` pour arrêter le bot gracieusement.
 
 ---
 
+## 🌐 Déploiement en Production
+
+### ⚠️ Important : Vercel ne peut PAS héberger le bot Discord
+
+**Pourquoi ?**
+- **Vercel = Serverless** : Pas de long-running processes
+- **Timeout** : 10s (Hobby) / 60s (Pro) max par requête
+- **Bot Discord** : Doit rester connecté **24/7** via WebSocket Gateway
+- **Incompatibilité** : Un bot Discord standalone ne peut pas tourner sur Vercel
+
+### Architecture recommandée
+
+Séparer l'infrastructure en deux parties :
+
+```
+┌─────────────────────────────────────────┐
+│  VERCEL (Next.js App)                   │
+│  - Interface web                        │
+│  - API routes                           │
+│  - Authentification                     │
+│  - Dashboard                            │
+│  URL: https://mycryptopilot.com         │
+└─────────────────────────────────────────┘
+              ↕ (Même DB Neon)
+┌─────────────────────────────────────────┐
+│  SERVEUR SÉPARÉ (Discord Bot)           │
+│  - Railway / Render / Fly.io            │
+│  - Bot Discord 24/7                     │
+│  - Script: start-discord-bot.ts         │
+│  - Partage la DB Neon (production)      │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### Option 1 : Railway (Recommandé ⭐)
+
+**Avantages** :
+- ✅ Setup ultra-simple (5 minutes)
+- ✅ ~$5/mois (usage-based)
+- ✅ Support natif Node.js
+- ✅ Auto-restart si crash
+- ✅ Logs en temps réel
+- ✅ CLI et Dashboard intuitifs
+
+**Setup** :
+
+```bash
+# 1. Installer Railway CLI
+npm i -g @railway/cli
+
+# 2. Login
+railway login
+
+# 3. Créer un nouveau projet
+railway init
+
+# 4. Créer un service pour le bot
+railway service create discord-bot
+
+# 5. Configurer les variables d'environnement (voir section suivante)
+railway variables set DISCORD_BOT_TOKEN="your_token"
+railway variables set DISCORD_GUILD_ID="your_guild_id"
+railway variables set DISCORD_BOT_ENABLED="true"
+railway variables set DATABASE_URL="your_neon_production_url"
+railway variables set BETTER_AUTH_SECRET="your_production_secret"
+
+# 6. Créer un nixpacks.toml pour configurer le build
+cat > nixpacks.toml << 'EOF'
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+[phases.install]
+cmds = ["corepack enable", "pnpm install --frozen-lockfile"]
+
+[start]
+cmd = "pnpm discord-bot"
+EOF
+
+# 7. Déployer
+railway up
+```
+
+**Configuration du projet Railway** :
+
+1. Dans le Dashboard Railway :
+   - Aller dans **Settings**
+   - **Build Command** : `pnpm install`
+   - **Start Command** : `pnpm discord-bot`
+   - **Node Version** : 22
+
+2. Variables d'environnement (à configurer dans l'UI) :
+   - `DISCORD_BOT_TOKEN`
+   - `DISCORD_GUILD_ID`
+   - `DISCORD_BOT_ENABLED=true`
+   - `DATABASE_URL` (Neon production)
+   - `BETTER_AUTH_SECRET` (même que Vercel)
+
+---
+
+### Option 2 : Render
+
+**Avantages** :
+- ✅ Free tier disponible
+- ✅ Interface simple
+
+**Inconvénients** :
+- ⚠️ Free tier : bot s'endort après 15min d'inactivité
+- 💰 $7/mois pour service actif 24/7
+
+**Setup** :
+
+1. Aller sur [Render Dashboard](https://dashboard.render.com/)
+2. Cliquer sur **"New +"** → **"Web Service"**
+3. Connecter ton repo GitHub
+4. Configurer :
+   - **Name** : `mycryptopilot-discord-bot`
+   - **Environment** : `Node`
+   - **Build Command** : `pnpm install`
+   - **Start Command** : `pnpm discord-bot`
+   - **Plan** : Starter ($7/mois) ou Free (avec limitations)
+5. Ajouter les variables d'environnement (voir section suivante)
+6. Cliquer sur **"Create Web Service"**
+
+---
+
+### Option 3 : Fly.io
+
+**Avantages** :
+- ✅ Free tier généreux (3 machines gratuites)
+- ✅ Très performant
+
+**Inconvénients** :
+- ⚠️ Setup plus technique (Dockerfile requis)
+
+**Setup** :
+
+```bash
+# 1. Installer flyctl
+curl -L https://fly.io/install.sh | sh
+
+# 2. Login
+flyctl auth login
+
+# 3. Créer l'app
+flyctl launch
+
+# 4. Créer un Dockerfile (si pas déjà présent)
+cat > Dockerfile << 'EOF'
+FROM node:22-alpine
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
+COPY . .
+CMD ["pnpm", "discord-bot"]
+EOF
+
+# 5. Configurer les variables
+flyctl secrets set DISCORD_BOT_TOKEN="your_token"
+flyctl secrets set DISCORD_GUILD_ID="your_guild_id"
+flyctl secrets set DISCORD_BOT_ENABLED="true"
+flyctl secrets set DATABASE_URL="your_neon_production_url"
+flyctl secrets set BETTER_AUTH_SECRET="your_production_secret"
+
+# 6. Déployer
+flyctl deploy
+```
+
+---
+
+### Variables d'environnement pour la Production
+
+Quelle que soit la plateforme choisie, configure ces variables :
+
+| Variable | Description | Exemple |
+|----------|-------------|---------|
+| `DISCORD_BOT_TOKEN` | Token du bot Discord | `MTIzNDU2Nzg5MDEyMzQ1Njc4OQ...` |
+| `DISCORD_GUILD_ID` | ID du serveur Discord | `1234567890123456789` |
+| `DISCORD_BOT_ENABLED` | Active le bot | `true` |
+| `DATABASE_URL` | URL Neon production (pooler) | `postgresql://neondb_owner:***@ep-proud-term-abutee8y-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require` |
+| `BETTER_AUTH_SECRET` | Secret Better Auth (même que Vercel) | `your-production-secret-32-chars` |
+| `NODE_ENV` | Environnement | `production` |
+
+**⚠️ IMPORTANT** : Utilise la **même `DATABASE_URL`** que ton app Vercel pour que le bot puisse accéder aux données utilisateurs !
+
+---
+
+### GitHub Actions (OPTIONNEL - Non recommandé)
+
+GitHub Actions peut faire tourner le bot, mais ce n'est **pas recommandé** pour la production car :
+- ❌ Limité à 2000 minutes/mois (free tier)
+- ❌ Pas de restart automatique si le workflow se termine
+- ❌ Pas fait pour les long-running processes
+
+**Uniquement pour tests** :
+
+```yaml
+# .github/workflows/discord-bot-deploy.yml
+name: Discord Bot Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - run: pnpm install
+      - run: pnpm discord-bot
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          DISCORD_BOT_ENABLED: true
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+```
+
+---
+
+### Monitoring & Logs
+
+Quel que soit le service choisi, configure des alertes :
+
+**Railway** :
+```bash
+# Voir les logs en temps réel
+railway logs
+
+# Redémarrer le service
+railway restart
+```
+
+**Render** :
+- Dashboard → Logs (temps réel)
+- Configure des **Health Checks** (optionnel)
+
+**Fly.io** :
+```bash
+# Voir les logs
+flyctl logs
+
+# Status de l'app
+flyctl status
+```
+
+---
+
 ## Architecture
 
 ### Structure des fichiers

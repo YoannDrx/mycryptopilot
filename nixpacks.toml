@@ -1,0 +1,35 @@
+# ==============================================================================
+# Railway Nixpacks Configuration
+# ==============================================================================
+# This file configures how Railway builds and starts the Discord bot
+# See: https://nixpacks.com/docs/configuration/file
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Setup Phase - Install Node.js 22
+# ------------------------------------------------------------------------------
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
+# ------------------------------------------------------------------------------
+# Install Phase - Install dependencies with pnpm
+# ------------------------------------------------------------------------------
+[phases.install]
+cmds = [
+  "corepack enable",                      # Enable corepack for pnpm
+  "pnpm install --frozen-lockfile"        # Install dependencies (production + dev for prisma)
+]
+
+# ------------------------------------------------------------------------------
+# Build Phase - Generate Prisma Client
+# ------------------------------------------------------------------------------
+[phases.build]
+cmds = [
+  "pnpm prisma generate"                  # Generate Prisma client from schema
+]
+
+# ------------------------------------------------------------------------------
+# Start Phase - Run Discord Bot
+# ------------------------------------------------------------------------------
+[start]
+cmd = "NODE_ENV=production tsx scripts/start-discord-bot.ts"
