@@ -5,11 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
 import { Contract, JsonRpcProvider } from "ethers";
 import TronWeb from "tronweb";
-import {
-  calculateDaysGranted,
-  getPlanFromAmount,
-  type MyCryptoPilotPlanName,
-} from "./mycryptopilot-plans";
+import { calculateDaysGranted, getPlanFromAmount } from "./mycryptopilot-plans";
 import { activateSubscription } from "@/lib/subscription/subscription-manager";
 
 /**
