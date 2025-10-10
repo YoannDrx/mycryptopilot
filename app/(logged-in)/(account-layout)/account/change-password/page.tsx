@@ -71,7 +71,10 @@ export default function ChangePasswordPage() {
     },
     onSuccess: () => {
       toast.success("Password changed successfully");
-      router.push("/account");
+      // Wait for toast to be visible before navigating
+      setTimeout(() => {
+        router.push("/account");
+      }, 1000);
     },
   });
 
