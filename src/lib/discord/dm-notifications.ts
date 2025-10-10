@@ -309,3 +309,104 @@ export async function notifyPlanUpdated(
 
   return sendDM(discordUserId, embed);
 }
+
+/**
+ * Notifier un utilisateur en DM que son abonnement expire bientôt
+ *
+ * @param discordUserId - Discord User ID
+ * @param planName - Plan actuel ("free", "pro", "ultra")
+ * @param daysLeft - Nombre de jours restants
+ * @param expiresAt - Date d'expiration
+ * @returns true si le message a été envoyé avec succès
+ */
+export async function notifyExpirationReminder(
+  discordUserId: string,
+  planName: string,
+  daysLeft: number,
+  expiresAt: Date,
+): Promise<boolean> {
+  const planDisplayName =
+    planName === "pro" ? "Pro" : planName === "ultra" ? "Ultra" : "Free";
+
+  const urgencyText =
+    daysLeft === 3 ? "dans 3 jours" : daysLeft === 1 ? "demain" : "bientôt";
+
+  const urgencyColor = daysLeft === 1 ? 0xef4444 : 0xf59e0b; // Red if 1 day, Amber if 3 days
+
+  const embed = new EmbedBuilder()
+    .setColor(urgencyColor)
+    .setTitle(`⏰ Ton abonnement ${planDisplayName} expire ${urgencyText}`)
+    .setDescription(
+      `Ton abonnement **${planDisplayName}** expire le **${expiresAt.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}**.\n\n` +
+        `**Il te reste ${daysLeft} jour${daysLeft > 1 ? "s" : ""} pour renouveler** et continuer à profiter de tes avantages ! 🚀`,
+    )
+    .addFields(
+      {
+        name: "⚠️ Que se passe-t-il après expiration ?",
+        value:
+          `Si tu ne renouvelles pas avant l'expiration :\n` +
+          `• Ton compte sera downgraded vers le plan **Free**\n` +
+          `• Tu perdras l'accès aux fonctionnalités premium\n` +
+          `• Tes données seront conservées (tu peux upgrader à tout moment)`,
+        inline: false,
+      },
+      {
+        name: "🔄 Comment renouveler ?",
+        value: `Visite notre [page de pricing](${SiteConfig.prodUrl}/pricing) et effectue un paiement en crypto (USDC ou USDT)`,
+        inline: false,
+      },
+    )
+    .setFooter({
+      text: `${SiteConfig.title}`,
+    })
+    .setTimestamp();
+
+  return sendDM(discordUserId, embed);
+}
+
+/**
+ * Notifier un utilisateur en DM que son abonnement a expiré et qu'il a été downgraded vers FREE
+ *
+ * @param discordUserId - Discord User ID
+ * @param oldPlan - Ancien plan ("pro", "ultra")
+ * @returns true si le message a été envoyé avec succès
+ */
+export async function notifyDowngradeToFree(
+  discordUserId: string,
+  oldPlan: string,
+): Promise<boolean> {
+  const planDisplayName = oldPlan === "pro" ? "Pro" : "Ultra";
+
+  const embed = new EmbedBuilder()
+    .setColor(0x6b7280) // Gray
+    .setTitle(`ℹ️ Ton abonnement ${planDisplayName} a expiré`)
+    .setDescription(
+      `Ton abonnement **${planDisplayName}** a expiré. Ton compte a été automatiquement downgraded vers le plan **Free**.\n\n` +
+        `Tu peux continuer à utiliser ${SiteConfig.title} avec les fonctionnalités suivantes :`,
+    )
+    .addFields(
+      {
+        name: "🆓 Plan Free",
+        value:
+          `• 5 signaux par jour\n` +
+          `• 1 trader à suivre\n` +
+          `• Screener avec refresh toutes les 5 minutes`,
+        inline: false,
+      },
+      {
+        name: "🔄 Reprendre un abonnement",
+        value:
+          `Tu peux upgrader à tout moment vers un plan payant pour récupérer l'accès aux fonctionnalités premium :\n\n` +
+          `💎 **Plan Pro - 49$/mois** : 50 signaux/jour, 5 traders\n` +
+          `🚀 **Plan Ultra - 99$/mois** : Signaux illimités, traders illimités\n\n` +
+          `[Voir les plans](${SiteConfig.prodUrl}/pricing)`,
+        inline: false,
+      },
+    )
+    .setFooter({
+      text: `${SiteConfig.title} - Merci d'avoir utilisé ${planDisplayName} ! 🙏`,
+    })
+    .setTimestamp();
+
+  return sendDM(discordUserId, embed);
+}
