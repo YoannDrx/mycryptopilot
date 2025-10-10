@@ -2,6 +2,7 @@ import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/mail/send-email";
 import { assignRoleToUser } from "@/lib/discord/roles";
+import { notifyPlanUpdated } from "@/lib/discord/dm-notifications";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
@@ -170,6 +171,22 @@ export async function activateSubscription(
         })
         .catch((err) => {
           logger.error("Error assigning Discord role", { userId, err });
+        });
+
+      // 5.1 Envoyer DM Discord de confirmation (non-bloquant)
+      void notifyPlanUpdated(user.discordId, plan, periodEnd)
+        .then((success) => {
+          if (success) {
+            logger.info(`Discord DM sent to user ${userId} for plan update`);
+          } else {
+            logger.warn(`Failed to send Discord DM to user ${userId}`);
+          }
+        })
+        .catch((err) => {
+          logger.error("Error sending Discord DM notification", {
+            userId,
+            err,
+          });
         });
     } else {
       logger.info("User has no Discord ID, skipping role assignment", {
