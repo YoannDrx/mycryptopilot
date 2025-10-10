@@ -58,6 +58,23 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user, _req) => {
+          // Initialize user with FREE plan (MyCryptoPilot default)
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                planName: "free",
+                // planExpiresAt is null for free plan (no expiration)
+              },
+            });
+            logger.info(`User ${user.id} initialized with FREE plan`);
+          } catch (err) {
+            logger.error("Failed to initialize user plan", {
+              err,
+              userId: user.id,
+            });
+          }
+
           // Setup Resend customer (non-blocking)
           void setupResendCustomer(user).catch((err) => {
             logger.error("Failed to setup Resend customer", { err });
@@ -66,7 +83,7 @@ export const auth = betterAuth({
           // Create organization with retry (critical but should not block user creation)
           // Better Auth hooks should never throw - log errors instead
           const maxRetries = 3;
-           
+
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
               // eslint-disable-next-line no-await-in-loop

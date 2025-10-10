@@ -71,6 +71,14 @@ jobs:
         run: pnpm install
         env:
           CI: true
+      - name: Generate Prisma Client
+        run: pnpm prisma generate
+        env:
+          CI: true
+      - name: Generate Next.js types
+        run: pnpm type:generate
+        env:
+          CI: true
       - name: Run TypeScript check
         run: pnpm ts
         env:

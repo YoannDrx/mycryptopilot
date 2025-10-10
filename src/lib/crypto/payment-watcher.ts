@@ -5,11 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
 import { Contract, JsonRpcProvider } from "ethers";
 import TronWeb from "tronweb";
-import {
-  calculateDaysGranted,
-  getPlanFromAmount,
-  type MyCryptoPilotPlanName,
-} from "./mycryptopilot-plans";
+import { calculateDaysGranted, getPlanFromAmount } from "./mycryptopilot-plans";
+import { activateSubscription } from "@/lib/subscription/subscription-manager";
 
 /**
  * Crypto Payment Watcher
@@ -383,91 +380,15 @@ export async function processPayment(
 
   // If payment is confirmed, activate subscription
   if (isConfirmed) {
-    await activateUserSubscription(userId, plan, daysGranted);
+    const result = await activateSubscription({ userId, plan, daysGranted });
+    if (!result.success) {
+      logger.error("Failed to activate subscription", {
+        userId,
+        plan,
+        error: result.error,
+      });
+    }
   }
-}
-
-/**
- * Activate or extend user's subscription
- *
- * Updates the Organization's subscription based on the plan and days granted.
- * Since MyCryptoPilot uses 1 org = 1 user, we update the user's personal org.
- *
- * @param userId - The user ID
- * @param plan - The plan name (free, pro, ultra)
- * @param daysGranted - Number of days to grant
- * @returns Promise<void>
- */
-async function activateUserSubscription(
-  userId: string,
-  plan: MyCryptoPilotPlanName,
-  daysGranted: number,
-): Promise<void> {
-  logger.info("Activating user subscription", { userId, plan, daysGranted });
-
-  // Get user's organization (should have exactly 1)
-  const membership = await prisma.member.findFirst({
-    where: {
-      userId,
-      role: "owner",
-    },
-    include: {
-      organization: {
-        include: {
-          subscription: true,
-        },
-      },
-    },
-  });
-
-  if (!membership) {
-    logger.error("No organization found for user", { userId });
-    throw new Error(`No organization found for user ${userId}`);
-  }
-
-  const org = membership.organization;
-  const currentDate = new Date();
-
-  // Calculate new expiration date
-  let periodEnd: Date;
-
-  if (org.subscription?.periodEnd && org.subscription.periodEnd > currentDate) {
-    // Extend existing subscription
-    periodEnd = new Date(org.subscription.periodEnd);
-    periodEnd.setDate(periodEnd.getDate() + daysGranted);
-  } else {
-    // New subscription
-    periodEnd = new Date();
-    periodEnd.setDate(periodEnd.getDate() + daysGranted);
-  }
-
-  const periodStart = new Date();
-
-  // Update subscription
-  await prisma.subscription.upsert({
-    where: { referenceId: org.id },
-    create: {
-      id: `sub_${Date.now()}`,
-      referenceId: org.id,
-      plan,
-      status: "active",
-      periodStart,
-      periodEnd,
-    },
-    update: {
-      plan,
-      status: "active",
-      periodStart,
-      periodEnd,
-    },
-  });
-
-  logger.info("Subscription activated/extended", {
-    userId,
-    organizationId: org.id,
-    plan,
-    periodEnd,
-  });
 }
 
 /**
