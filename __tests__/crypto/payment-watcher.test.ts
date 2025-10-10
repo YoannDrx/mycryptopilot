@@ -9,6 +9,22 @@ vi.mock("@/lib/env", () => ({
   },
 }));
 
+vi.mock("@/lib/subscription/subscription-manager", () => ({
+  activateSubscription: vi.fn().mockResolvedValue({
+    success: true,
+    organizationId: "org_123",
+    periodEnd: new Date(),
+  }),
+}));
+
+vi.mock("@/lib/mail/resend", () => ({
+  resendMailAdapter: vi.fn(),
+}));
+
+vi.mock("@/lib/discord/roles", () => ({
+  assignRoleToUser: vi.fn().mockResolvedValue(true),
+}));
+
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
@@ -30,6 +46,9 @@ vi.mock("@/lib/prisma", () => ({
     },
     member: {
       findFirst: vi.fn(),
+    },
+    user: {
+      update: vi.fn(),
     },
     subscription: {
       upsert: vi.fn(),
@@ -172,26 +191,10 @@ describe("payment-watcher", () => {
         id: "payment_123",
       } as never);
 
-      // Mock organization membership for subscription activation
-      vi.mocked(prisma.member.findFirst).mockResolvedValue({
-        id: "member_123",
-        userId: "user_123",
-        organizationId: "org_123",
-        role: "owner",
-        organization: {
-          id: "org_123",
-          name: "Test Org",
-          slug: "test-org",
-          subscription: null,
-        },
-      } as never);
-
-      // Mock subscription upsert
-      vi.mocked(prisma.subscription.upsert).mockResolvedValue({
-        id: "sub_123",
-      } as never);
-
       const { processPayment } = await import("@/lib/crypto/payment-watcher");
+      const { activateSubscription } = await import(
+        "@/lib/subscription/subscription-manager"
+      );
 
       const mockPayment = {
         txHash: "0xabc123",
@@ -207,7 +210,11 @@ describe("payment-watcher", () => {
       await processPayment(mockPayment, "user_123");
 
       expect(prisma.cryptoPayment.create).toHaveBeenCalled();
-      expect(prisma.subscription.upsert).toHaveBeenCalled();
+      expect(activateSubscription).toHaveBeenCalledWith({
+        userId: "user_123",
+        plan: "pro",
+        daysGranted: 30,
+      });
     });
 
     it("should update existing payment confirmations", async () => {
@@ -226,26 +233,10 @@ describe("payment-watcher", () => {
         id: "payment_123",
       } as never);
 
-      // Mock organization membership for subscription activation
-      vi.mocked(prisma.member.findFirst).mockResolvedValue({
-        id: "member_123",
-        userId: "user_123",
-        organizationId: "org_123",
-        role: "owner",
-        organization: {
-          id: "org_123",
-          name: "Test Org",
-          slug: "test-org",
-          subscription: null,
-        },
-      } as never);
-
-      // Mock subscription upsert
-      vi.mocked(prisma.subscription.upsert).mockResolvedValue({
-        id: "sub_123",
-      } as never);
-
       const { processPayment } = await import("@/lib/crypto/payment-watcher");
+      const { activateSubscription } = await import(
+        "@/lib/subscription/subscription-manager"
+      );
 
       const mockPayment = {
         txHash: "0xabc123",
@@ -268,7 +259,11 @@ describe("payment-watcher", () => {
           confirmedAt: expect.any(Date),
         },
       });
-      expect(prisma.subscription.upsert).toHaveBeenCalled();
+      expect(activateSubscription).toHaveBeenCalledWith({
+        userId: "user_123",
+        plan: "pro",
+        daysGranted: 30,
+      });
     });
   });
 
