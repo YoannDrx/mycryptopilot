@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -12,25 +9,104 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-// ============================================
-// FEEDBACK (existing)
-// ============================================
-
 model Feedback {
-  id      String  @id @default(nanoid(11))
-  review  Int
-  message String
-  email   String?
-  userId  String?
-  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-
+  id        String   @id @default(nanoid(11))
+  review    Int
+  message   String
+  email     String?
+  userId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
-// ============================================
-// MYCRYPTOPILOT ENUMS
-// ============================================
+model TraderProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  displayName     String
+  bio             String?
+  priceMonthlyUSD Int       @default(0)
+  statsJson       Json?
+  verified        Boolean   @default(false)
+  verifiedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("trader_profile")
+}
+
+model CryptoAddress {
+  id             String          @id @default(cuid())
+  userId         String
+  network        CryptoNetwork
+  address        String          @unique
+  derivationPath String?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments       CryptoPayment[]
+
+  @@index([userId])
+  @@map("crypto_address")
+}
+
+model Follow {
+  id        String       @id @default(cuid())
+  userId    String
+  traderId  String
+  status    FollowStatus @default(ACTIVE)
+  startedAt DateTime     @default(now())
+  expiresAt DateTime?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  trader    User         @relation("TraderFollowers", fields: [traderId], references: [id], onDelete: Cascade)
+  user      User         @relation("UserFollows", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, traderId])
+  @@index([traderId])
+  @@map("follow")
+}
+
+model CryptoPayment {
+  id            String         @id @default(cuid())
+  userId        String
+  addressId     String?
+  network       CryptoNetwork
+  txHash        String         @unique
+  amountToken   Decimal        @db.Decimal(38, 18)
+  amountUSD     Decimal        @db.Decimal(18, 2)
+  currency      String
+  confirmations Int            @default(0)
+  status        PaymentStatus  @default(PENDING)
+  confirmedAt   DateTime?
+  plan          String
+  daysGranted   Int            @default(30)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  address       CryptoAddress? @relation(fields: [addressId], references: [id])
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([txHash])
+  @@map("crypto_payment")
+}
+
+model Signal {
+  id          String   @id @default(cuid())
+  traderId    String
+  symbol      String
+  payloadJson Json
+  ttlSec      Int
+  hash        String   @unique
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  trader      User     @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId])
+  @@index([createdAt])
+  @@map("signal")
+}
 
 enum UserRole {
   USER
@@ -61,121 +137,4 @@ enum PaymentStatus {
   PENDING
   CONFIRMED
   FAILED
-}
-
-// ============================================
-// MYCRYPTOPILOT MODELS
-// ============================================
-
-model TraderProfile {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Public information
-  displayName     String
-  bio             String?
-  priceMonthlyUSD Int      @default(0)
-
-  // Stats (calculated periodically from signals and user journals)
-  // JSON format: { winrate: number, payoff: number, maxDD: number, nTrades: number, expectancy: number }
-  statsJson       Json?
-
-  // Certification
-  verified        Boolean  @default(false)
-  verifiedAt      DateTime?
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("trader_profile")
-}
-
-model CryptoAddress {
-  id             String        @id @default(cuid())
-  userId         String
-  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  network        CryptoNetwork
-  address        String        @unique
-  derivationPath String?       // HD wallet derivation path (for watch-only wallets)
-  isActive       Boolean       @default(true)
-
-  payments       CryptoPayment[]
-
-  createdAt      DateTime      @default(now())
-
-  @@index([userId])
-  @@map("crypto_address")
-}
-
-model Follow {
-  id        String       @id @default(cuid())
-  userId    String       // Who is following
-  user      User         @relation("UserFollows", fields: [userId], references: [id], onDelete: Cascade)
-  traderId  String       // Who is being followed
-  trader    User         @relation("TraderFollowers", fields: [traderId], references: [id], onDelete: Cascade)
-
-  status    FollowStatus @default(ACTIVE)
-  startedAt DateTime     @default(now())
-  expiresAt DateTime?    // When subscription expires (if applicable)
-
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  @@unique([userId, traderId])
-  @@index([traderId])
-  @@map("follow")
-}
-
-model CryptoPayment {
-  id            String        @id @default(cuid())
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  addressId     String?
-  address       CryptoAddress? @relation(fields: [addressId], references: [id])
-
-  network       CryptoNetwork
-  txHash        String        @unique
-  amountToken   Decimal       @db.Decimal(38, 18) // Crypto amount (high precision)
-  amountUSD     Decimal       @db.Decimal(18, 2)  // USD value at time of payment
-  currency      String        // USDC, USDT
-
-  confirmations Int           @default(0)
-  status        PaymentStatus @default(PENDING)
-  confirmedAt   DateTime?
-
-  // Plan purchased
-  plan          String        // free, pro, ultra
-  daysGranted   Int           @default(30)
-
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  @@index([userId])
-  @@index([txHash])
-  @@map("crypto_payment")
-}
-
-model Signal {
-  id          String   @id @default(cuid())
-  traderId    String
-  trader      User     @relation(fields: [traderId], references: [id], onDelete: Cascade)
-
-  symbol      String   // e.g., "BTC-USDT", "SOL-USDT"
-
-  // Trading card payload (JSON)
-  // Format: { instrumentType, bias, entry, invalidation, tps, leverageBand, risk, confidence, rationales, regime, managedBy, version }
-  payloadJson Json
-
-  ttlSec      Int      // Time-to-live in seconds
-  hash        String   @unique // SHA256 hash for integrity verification
-
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime // createdAt + ttlSec
-
-  @@index([traderId])
-  @@index([createdAt])
-  @@map("signal")
 }
