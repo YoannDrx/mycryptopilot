@@ -1,13 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -30,7 +24,11 @@ export const SubscriptionCard = ({
   showUpgradeButton = true,
   className,
 }: SubscriptionCardProps) => {
-  const planData = MYCRYPTOPILOT_PLANS.find((p) => p.name === plan)!;
+  const planData = MYCRYPTOPILOT_PLANS.find((p) => p.name === plan);
+
+  if (!planData) {
+    throw new Error(`Plan ${plan} not found in MYCRYPTOPILOT_PLANS`);
+  }
   const isFreePlan = plan === "free";
   const isPro = plan === "pro";
   const isUltra = plan === "ultra";
