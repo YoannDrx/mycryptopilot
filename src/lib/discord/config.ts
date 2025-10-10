@@ -1,5 +1,3 @@
-import { env } from "../env";
-
 /**
  * Discord Bot Configuration
  *
@@ -10,7 +8,11 @@ export const DISCORD_CONFIG = {
    * Vérifier si le bot est activé
    */
   isEnabled: () => {
-    return env.DISCORD_BOT_ENABLED === "true" && !!env.DISCORD_BOT_TOKEN;
+    // Read directly from process.env to get live values (important for standalone script)
+    return (
+      process.env.DISCORD_BOT_ENABLED === "true" &&
+      !!process.env.DISCORD_BOT_TOKEN
+    );
   },
 
   /**

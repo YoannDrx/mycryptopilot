@@ -12,6 +12,19 @@
  *   - DISCORD_BOT_ENABLED=true
  */
 
+// Load environment variables BEFORE importing any modules
+// Load .env.development for development environment
+import dotenv from "dotenv";
+import path from "node:path";
+
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? ".env.production"
+    : ".env.development";
+
+// Force override existing env variables (some may be loaded by prisma.config.ts)
+dotenv.config({ path: path.join(process.cwd(), envFile), override: true });
+
 import { discordBot } from "../src/lib/discord/bot-client";
 import { logger } from "../src/lib/logger";
 
@@ -20,7 +33,9 @@ async function main() {
 
   // Vérifier si le bot est activé
   if (!discordBot.isEnabled()) {
-    logger.error("❌ Discord bot is disabled. Set DISCORD_BOT_ENABLED=true in .env");
+    logger.error(
+      "❌ Discord bot is disabled. Set DISCORD_BOT_ENABLED=true in .env",
+    );
     process.exit(1);
   }
 
