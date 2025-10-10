@@ -6,17 +6,16 @@
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# Setup Phase - Install Node.js 22
+# Setup Phase - Install Node.js 22 + pnpm
 # ------------------------------------------------------------------------------
 [phases.setup]
-nixPkgs = ["nodejs_22"]
+nixPkgs = ["nodejs_22", "nodePackages.pnpm"]
 
 # ------------------------------------------------------------------------------
 # Install Phase - Install dependencies with pnpm
 # ------------------------------------------------------------------------------
 [phases.install]
 cmds = [
-  "corepack enable",                      # Enable corepack for pnpm
   "pnpm install --frozen-lockfile"        # Install dependencies (production + dev for prisma)
 ]
 
