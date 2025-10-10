@@ -11,6 +11,8 @@ import {
 import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
+import Link from "next/link";
+import { getCurrentOrg } from "@/lib/organizations/get-org";
 
 export const metadata: Metadata = {
   title: "Pricing - MyCryptoPilot",
@@ -18,7 +20,13 @@ export const metadata: Metadata = {
     "Choose your plan and start receiving crypto trading signals. Pay with USDC (Base) or USDT (Tron).",
 };
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const org = await getCurrentOrg();
+
+  if (!org) {
+    throw new Error("Organization not found");
+  }
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="mx-auto max-w-6xl">
@@ -126,13 +134,29 @@ export default function PricingPage() {
               </CardContent>
 
               <CardFooter>
-                <Button
-                  className="w-full"
-                  variant={plan.isPopular ? "default" : "outline"}
-                  size="lg"
-                >
-                  {plan.priceUSD === 0 ? "Get Started" : "Subscribe Now"}
-                </Button>
+                {plan.priceUSD === 0 ? (
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    size="lg"
+                    asChild
+                  >
+                    <Link href={`/orgs/${org.slug}/dashboard`}>
+                      Get Started
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full"
+                    variant={plan.isPopular ? "default" : "outline"}
+                    size="lg"
+                    asChild
+                  >
+                    <Link href={`/orgs/${org.slug}/checkout/${plan.name}`}>
+                      Subscribe Now
+                    </Link>
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
