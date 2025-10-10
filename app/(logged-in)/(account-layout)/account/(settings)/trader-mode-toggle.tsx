@@ -9,12 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  FormControl,
-  FormDescription,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toggleTraderRoleAction } from "@/features/trader/trader.action";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
@@ -74,8 +69,7 @@ export const TraderModeToggle = ({
       <CardHeader>
         <CardTitle>Mode Trader</CardTitle>
         <CardDescription>
-          Activez le mode trader pour publier des signaux et gérer vos
-          followers
+          Activez le mode trader pour publier des signaux et gérer vos followers
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -93,25 +87,21 @@ export const TraderModeToggle = ({
             </Link>
           </div>
         ) : (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
-              <FormLabel className="text-base">
-                Activer le mode trader
-              </FormLabel>
-              <FormDescription>
+              <Label className="text-base">Activer le mode trader</Label>
+              <p className="text-muted-foreground text-sm">
                 {isEnabled
                   ? "Vous pouvez publier des signaux et accéder au dashboard trader"
                   : "Votre profil trader reste visible mais vous ne pouvez pas publier de signaux"}
-              </FormDescription>
+              </p>
             </div>
-            <FormControl>
-              <Switch
-                checked={isEnabled}
-                onCheckedChange={handleToggle}
-                disabled={toggleMutation.isPending}
-              />
-            </FormControl>
-          </FormItem>
+            <Switch
+              checked={isEnabled}
+              onCheckedChange={handleToggle}
+              disabled={toggleMutation.isPending}
+            />
+          </div>
         )}
       </CardContent>
       {hasTraderProfile && (

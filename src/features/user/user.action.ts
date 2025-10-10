@@ -11,6 +11,7 @@ import {
 } from "@/lib/crypto/mycryptopilot-plans";
 import { LinkDiscordSchema, UnlinkDiscordSchema } from "./user.schema";
 import { logger } from "@/lib/logger";
+import { revalidatePath } from "next/cache";
 
 /**
  * Action pour lier un Discord ID à l'utilisateur actuel
@@ -110,14 +111,18 @@ export const unlinkDiscordAction = authAction
 
     const discordId = currentUser.discordId;
 
-    // Retirer le Discord ID de l'utilisateur
+    // Retirer le Discord ID ET désactiver l'intégration Discord
+    // Note: On garde le compte OAuth (table account) pour permettre le login via Discord
     await prisma.user.update({
       where: { id: user.id },
-      data: { discordId: null },
+      data: {
+        discordId: null,
+        discordIntegrationEnabled: false, // Empêche le re-sync automatique
+      },
     });
 
     logger.info(
-      `Discord ID ${discordId} unlinked from user ${user.id} (${user.email})`,
+      `Discord integration disabled for user ${user.id} (${user.email}) - Discord ID ${discordId} unlinked`,
     );
 
     // Retirer tous les rôles MyCryptoPilot du compte Discord
@@ -133,6 +138,9 @@ export const unlinkDiscordAction = authAction
       logger.error("Error removing Discord roles:", error);
       // Ne pas throw d'erreur car le lien a été supprimé avec succès
     }
+
+    // Invalider le cache de la page Discord
+    revalidatePath("/account/discord");
 
     return {
       success: true,

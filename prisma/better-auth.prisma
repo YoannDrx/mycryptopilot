@@ -17,6 +17,7 @@ model User {
   dailySignalsUsed Int            @default(0)
   lastSignalReset DateTime        @default(now())
   discordId       String?         @unique
+  discordIntegrationEnabled Boolean @default(true) // true = veut les notifications Discord, false = a explicitement unlinked
   feedbacks       Feedback[]
   accounts        Account[]
   cryptoAddresses CryptoAddress[]
