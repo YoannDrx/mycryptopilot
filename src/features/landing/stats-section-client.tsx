@@ -1,7 +1,7 @@
 "use client";
 
 import { animate } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type StatProps = {
   number: number;
@@ -31,9 +31,14 @@ function Counter({
   duration?: number;
 }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (!nodeRef.current) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !nodeRef.current) return;
     const node = nodeRef.current;
 
     const controls = animate(from, to, {
@@ -46,7 +51,7 @@ function Counter({
     });
 
     return () => controls.stop();
-  }, [from, to, duration]);
+  }, [from, to, duration, isMounted]);
 
-  return <span ref={nodeRef}>{from}</span>;
+  return <span ref={nodeRef}>{to.toFixed(2)}</span>;
 }

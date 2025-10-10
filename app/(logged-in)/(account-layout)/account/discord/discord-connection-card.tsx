@@ -2,7 +2,6 @@
 
 import { LoadingButton } from "@/features/form/submit-button";
 import { authClient } from "@/lib/auth-client";
-import type { User } from "better-auth";
 import { MessageSquare, X } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -14,30 +13,48 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { unlinkDiscordAction } from "@/features/user/user.action";
 import { Badge } from "@/components/ui/badge";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type DiscordConnectionCardProps = {
-  user: User;
+  user: { discordId?: string | null };
 };
 
 export const DiscordConnectionCard = ({
   user,
 }: DiscordConnectionCardProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isConnecting, setIsConnecting] = useState(false);
+  const toastShownRef = useRef(false);
 
-  const discordId = (user as User & { discordId?: string | null }).discordId;
+  const discordId = user.discordId;
+
+  // Afficher le toast après reconnect Discord
+  useEffect(() => {
+    if (toastShownRef.current) return;
+
+    const synced = searchParams.get("synced") === "true";
+
+    if (synced && discordId) {
+      toast.success("Discord bot connected successfully!");
+      toastShownRef.current = true;
+      // Attendre un peu avant de nettoyer l'URL pour que l'utilisateur voie le toast
+      setTimeout(() => {
+        router.replace("/account/discord");
+      }, 100);
+    }
+  }, [searchParams, router, discordId]);
 
   const connectDiscord = async () => {
     setIsConnecting(true);
     try {
       await authClient.signIn.social({
         provider: "discord",
-        callbackURL: "/account/discord",
+        callbackURL: "/account/discord?reconnect=true",
       });
     } catch {
       toast.error("Failed to connect Discord");
@@ -57,10 +74,11 @@ export const DiscordConnectionCard = ({
     },
     onSuccess: () => {
       toast.success("Discord account unlinked successfully");
+      // Forcer le refresh de la page pour recharger les données
       router.refresh();
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error.message ?? "Failed to unlink Discord");
     },
   });
 
@@ -132,27 +150,15 @@ export const DiscordConnectionCard = ({
       </CardContent>
       <CardFooter className="flex gap-2">
         {discordId ? (
-          <>
-            <LoadingButton
-              variant="destructive"
-              size="sm"
-              onClick={() => unlinkMutation.mutate()}
-              loading={unlinkMutation.isPending}
-            >
-              <X className="mr-2 size-4" />
-              Unlink Discord
-            </LoadingButton>
-            <div className="flex-1"></div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={connectDiscord}
-              disabled={isConnecting}
-            >
-              <MessageSquare className="mr-2 size-4" />
-              Reconnect
-            </Button>
-          </>
+          <LoadingButton
+            variant="destructive"
+            size="sm"
+            onClick={() => unlinkMutation.mutate()}
+            loading={unlinkMutation.isPending}
+          >
+            <X className="mr-2 size-4" />
+            Unlink Discord
+          </LoadingButton>
         ) : (
           <LoadingButton
             onClick={connectDiscord}

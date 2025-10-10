@@ -106,16 +106,24 @@ export const auth = betterAuth({
     account: {
       create: {
         after: async (account) => {
+          logger.info(
+            `[DISCORD DEBUG] account.create.after hook triggered - providerId: ${account.providerId}, accountId: ${account.accountId}, userId: ${account.userId}`,
+          );
+
           // Si l'utilisateur se connecte via Discord OAuth, sauvegarder son Discord ID
           if (account.providerId === "discord" && account.accountId) {
             try {
+              logger.info(
+                `[DISCORD DEBUG] Attempting to update user ${account.userId} with discordId ${account.accountId}`,
+              );
+
               await prisma.user.update({
                 where: { id: account.userId },
                 data: { discordId: account.accountId },
               });
 
               logger.info(
-                `Discord ID ${account.accountId} automatically linked to user ${account.userId}`,
+                `✅ Discord ID ${account.accountId} automatically linked to user ${account.userId}`,
               );
 
               // Assigner le rôle Discord automatiquement (non-bloquant)
