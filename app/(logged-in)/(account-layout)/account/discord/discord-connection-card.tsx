@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { unlinkDiscordAction } from "@/features/user/user.action";
@@ -23,9 +22,7 @@ type DiscordConnectionCardProps = {
   user: { discordId?: string | null };
 };
 
-export const DiscordConnectionCard = ({
-  user,
-}: DiscordConnectionCardProps) => {
+export const DiscordConnectionCard = ({ user }: DiscordConnectionCardProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isConnecting, setIsConnecting] = useState(false);
@@ -78,7 +75,7 @@ export const DiscordConnectionCard = ({
       router.refresh();
     },
     onError: (error) => {
-      toast.error(error.message ?? "Failed to unlink Discord");
+      toast.error(error.message || "Failed to unlink Discord");
     },
   });
 
@@ -105,21 +102,26 @@ export const DiscordConnectionCard = ({
               </div>
               <div>
                 <p className="font-medium">Discord Connected</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Discord ID: {discordId.slice(0, 8)}...
                   {discordId.slice(-4)}
                 </p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+            <Badge
+              variant="secondary"
+              className="bg-green-500/10 text-green-600"
+            >
               ✓ Connected
             </Badge>
           </div>
         ) : (
           <div className="rounded-lg border border-dashed p-4 text-center">
-            <MessageSquare className="mx-auto mb-2 size-8 text-muted-foreground" />
-            <p className="mb-1 text-sm font-medium">No Discord account connected</p>
-            <p className="text-xs text-muted-foreground">
+            <MessageSquare className="text-muted-foreground mx-auto mb-2 size-8" />
+            <p className="mb-1 text-sm font-medium">
+              No Discord account connected
+            </p>
+            <p className="text-muted-foreground text-xs">
               Connect your Discord to use the bot commands and receive
               notifications
             </p>
@@ -128,7 +130,7 @@ export const DiscordConnectionCard = ({
 
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Benefits:</h4>
-          <ul className="space-y-1 text-sm text-muted-foreground">
+          <ul className="text-muted-foreground space-y-1 text-sm">
             <li className="flex items-start gap-2">
               <span className="text-green-600">✓</span>
               <span>Use Discord bot commands (/status, /signals, /follow)</span>
