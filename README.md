@@ -39,9 +39,8 @@ cp .env.example .env.local
 # - Crypto RPC URLs (optional for crypto payments)
 
 # Setup database
-# ⚠️ IMPORTANT: Generate and apply Prisma migrations first
-npx prisma migrate dev --name init_mycryptopilot
-# Or if migrations exist: npx prisma migrate deploy
+npx prisma migrate deploy  # Apply all Prisma migrations
+npx prisma migrate status   # Verify: "Database schema is up to date!"
 
 # Seed database (optional)
 pnpm prisma:seed
@@ -50,7 +49,7 @@ pnpm prisma:seed
 pnpm dev
 ```
 
-**⚠️ Note Importante**: Les migrations Prisma doivent être générées et appliquées avant toute utilisation.
+**✅ Database Status (10 oct 2025 - 16h15)**: 5 migrations Prisma appliquées avec succès. Base de données opérationnelle. Toutes les fonctionnalités (profils traders, signaux, follows, Discord bot) sont débloquées.
 
 ## 🛠️ Development Commands
 

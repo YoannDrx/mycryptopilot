@@ -2,6 +2,44 @@
 
 Ce module implémente la génération d'adresses crypto pour les paiements Base (USDC) et Tron (USDT) en utilisant la dérivation HD wallet (BIP44).
 
+---
+
+## ⚠️ IMPORTANT: ÉTAT ACTUEL DU SYSTÈME (10 octobre 2025)
+
+**STATUT**: 🟡 **STRUCTURE CRÉÉE - IMPLÉMENTATION PLACEHOLDERS**
+
+Ce système crypto est **structuré et documenté** mais contient des **placeholders** dans les parties critiques :
+
+### 🔴 TODOs Critiques
+
+**Issue #4 - Génération Adresses Crypto (2 TODOs)**:
+- `src/lib/crypto/address-generator.ts:137` - `deriveAddressFromIndex()` - HD wallet derivation = placeholder
+- `src/lib/crypto/address-generator.ts:184` - `generatePaymentAddress()` - Retourne des adresses placeholder
+
+**Issue #5 - Watcher On-Chain (2 TODOs)**:
+- `src/lib/crypto/payment-watcher.ts:81` - `watchPayment()` - RPC calls = placeholder
+- `src/lib/crypto/payment-watcher.ts:120` - `watchPaymentWithTimeout()` - Polling réel = placeholder
+
+### ✅ Ce Qui Fonctionne
+
+- Plans configuration (`mycryptopilot-plans.ts`) ✅
+- Structure de la base de données (CryptoAddress, CryptoPayment) ✅
+- Documentation complète (ce fichier) ✅
+- Tests de structure ✅
+
+### ❌ Ce Qui Manque
+
+- Vraie dérivation HD wallet (ethers v6 + tronweb)
+- Appels RPC réels (Base/Tron networks)
+- Détection on-chain des transferts USDC/USDT
+- UI de paiement crypto (`/checkout/[plan]`)
+
+**Effort restant**: ~4-5 jours de développement (Issue #4: 3j, Issue #5: 2j)
+
+Pour implémenter le système complet, voir sections ci-dessous.
+
+---
+
 ## 🎯 Fonctionnalités
 
 ✅ **Génération d'adresses Base** (Ethereum-compatible, pour USDC)
