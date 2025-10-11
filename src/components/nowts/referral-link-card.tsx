@@ -93,6 +93,7 @@ export const ReferralLinkCard = ({
             variant="outline"
             size="icon"
             className="shrink-0"
+            aria-label={copied ? "Copied" : "Copy referral link"}
           >
             {copied ? (
               <Check className="size-4 text-green-600" />
