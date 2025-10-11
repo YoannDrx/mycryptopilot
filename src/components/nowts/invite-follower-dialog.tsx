@@ -63,7 +63,10 @@ export const InviteFollowerDialog = ({
       form.reset();
       setOpen(false);
       void queryClient.invalidateQueries();
-      window.location.reload(); // Hard refresh to update invitation list
+      // Wait for toast to be visible before reloading
+      setTimeout(() => {
+        window.location.reload(); // Hard refresh to update invitation list
+      }, 500);
       onInvitationSent?.();
     },
     onError: (error: Error) => {

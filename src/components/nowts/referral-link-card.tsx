@@ -30,7 +30,7 @@ export const ReferralLinkCard = ({
     try {
       await navigator.clipboard.writeText(referralUrl);
       setCopied(true);
-      toast.success("Link copied to clipboard!");
+      toast.success("Link copied to clipboard");
 
       // Reset after 2 seconds
       setTimeout(() => {
