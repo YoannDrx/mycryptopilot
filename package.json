@@ -18,7 +18,7 @@
     "discord-bot": "NODE_ENV=development tsx scripts/start-discord-bot.ts",
     "deploy:railway": "./scripts/deploy-railway.sh",
     "ts": "tsc --noEmit",
-    "vercel-build": "prisma generate && prisma migrate deploy && pnpm build",
+    "vercel-build": "echo '🔧 Generating Prisma client...' && prisma generate && echo '🗄️  Deploying migrations...' && prisma migrate deploy && echo '✅ Migrations deployed!' && echo '🏗️  Building Next.js app...' && pnpm build",
     "test": "vitest",
     "test:e2e": "HEADLESS=0 playwright test --ui",
     "test:ci": "vitest run",
