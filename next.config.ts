@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
     "@discordjs/builders",
     "zlib-sync",
   ],
+  images: {
+    // No need to declare remote patterns anymore
+    // All external images are automatically proxied through /api/image-proxy
+    remotePatterns: [],
+  },
 };
 
 export default nextConfig;

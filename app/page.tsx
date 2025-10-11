@@ -67,7 +67,7 @@ export default function HomePage() {
         name="Antoine B."
         review={`I've been trading crypto solo since 2021 with average results. **MyCryptoPilot opened my eyes to the importance of stats**: win rate isn't enough, it's the payoff ratio that matters. Signals are solid and rationales helped me improve. **Best ROI since following 2-3 verified traders.**`}
         role="Experienced Trader"
-        compagnyImage="https://cryptologos.cc/logos/bitcoin-btc-logo.png"
+        compagnyImage="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
         key={1}
       />
 
