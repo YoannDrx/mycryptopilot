@@ -369,8 +369,8 @@ export default async function TradersMarketplacePage({
                 </p>
               </div>
             </div>
-            <Button size="lg" className="mt-4">
-              Start Trading Today
+            <Button size="lg" className="mt-4" asChild>
+              <Link href="/account/become-trader">Start Trading Today</Link>
             </Button>
           </CardContent>
         </Card>
