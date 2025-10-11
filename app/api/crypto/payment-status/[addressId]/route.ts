@@ -33,10 +33,7 @@ export async function GET(request: Request, context: RouteContext) {
     });
 
     if (!cryptoAddress || cryptoAddress.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Address not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Address not found" }, { status: 404 });
     }
 
     // TODO: Implement payment status checking
@@ -49,10 +46,11 @@ export async function GET(request: Request, context: RouteContext) {
     });
   } catch (error) {
     // Use logger instead of console
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: "Internal server error", details: errorMessage },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

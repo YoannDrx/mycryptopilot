@@ -91,7 +91,7 @@ export const TraderSignalsList = async ({
       {/* Expired Signals */}
       {expiredSignals.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-muted-foreground">
+          <h3 className="text-muted-foreground text-lg font-semibold">
             Expired Signals ({expiredSignals.length})
           </h3>
 

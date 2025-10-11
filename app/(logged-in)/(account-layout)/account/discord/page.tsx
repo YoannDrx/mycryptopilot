@@ -7,7 +7,11 @@ import { redirect } from "next/navigation";
 export default async function RoutePage({
   searchParams,
 }: {
-  searchParams: Promise<{ synced?: string; reconnect?: string; unlinked?: string }>;
+  searchParams: Promise<{
+    synced?: string;
+    reconnect?: string;
+    unlinked?: string;
+  }>;
 }) {
   const session = await getRequiredUser();
   const params = await searchParams;
@@ -33,10 +37,10 @@ export default async function RoutePage({
   // Cas 1: User veut l'intégration (discordIntegrationEnabled = true) ET pas encore lié
   // Cas 2: User vient de faire l'OAuth avec ?synced=true - réactivation après première connexion
   // Cas 3: User vient de faire l'OAuth avec ?reconnect=true - réactivation après unlink
-  const isReconnecting = params.reconnect === "true" || params.synced === "true";
+  const isReconnecting =
+    params.reconnect === "true" || params.synced === "true";
   const shouldSync =
-    !user.discordId &&
-    (isReconnecting || user.discordIntegrationEnabled);
+    !user.discordId && (isReconnecting || user.discordIntegrationEnabled);
 
   if (shouldSync) {
     const discordAccount = await prisma.account.findFirst({

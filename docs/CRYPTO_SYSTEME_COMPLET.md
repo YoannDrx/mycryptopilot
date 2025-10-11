@@ -38,12 +38,13 @@ Permettre aux utilisateurs de payer leurs abonnements MyCryptoPilot en crypto-mo
 
 ### Networks Supportés
 
-| Network | Token | Confirmations | Temps Moyen | Frais Typiques |
-|---------|-------|---------------|-------------|----------------|
-| **Base L2** | USDC | 1 | ~2 secondes | ~$0.01 |
-| **Tron** | USDT (TRC-20) | 2 | ~3 secondes | ~$0.10 |
+| Network     | Token         | Confirmations | Temps Moyen | Frais Typiques |
+| ----------- | ------------- | ------------- | ----------- | -------------- |
+| **Base L2** | USDC          | 1             | ~2 secondes | ~$0.01         |
+| **Tron**    | USDT (TRC-20) | 2             | ~3 secondes | ~$0.10         |
 
 **Pourquoi ces networks?**
+
 - ✅ Frais ultra-bas (< $0.10)
 - ✅ Confirmations rapides (< 5 secondes)
 - ✅ Tokens stables (USDC/USDT = $1)
@@ -76,15 +77,15 @@ Permettre aux utilisateurs de payer leurs abonnements MyCryptoPilot en crypto-mo
 
 ### Fichiers Clés
 
-| Fichier | Lignes | Description |
-|---------|--------|-------------|
-| `src/lib/crypto/address-generator.ts` | 240 | HD wallet derivation (Base + Tron) |
-| `src/lib/crypto/payment-watcher.ts` | 400 | RPC monitoring avec confirmations |
-| `src/lib/crypto/mycryptopilot-plans.ts` | 120 | Configuration plans (Free/Pro/Ultra) |
-| `src/lib/subscription/subscription-manager.ts` | 435 | Activation subscriptions + Discord + Email |
-| `src/components/checkout/checkout-form.tsx` | 420 | UI checkout avec QR + timer + polling |
-| `app/api/crypto/generate-address/route.ts` | 77 | API génération adresses |
-| `app/api/crypto/check-payment/route.ts` | 146 | API vérification paiement |
+| Fichier                                        | Lignes | Description                                |
+| ---------------------------------------------- | ------ | ------------------------------------------ |
+| `src/lib/crypto/address-generator.ts`          | 240    | HD wallet derivation (Base + Tron)         |
+| `src/lib/crypto/payment-watcher.ts`            | 400    | RPC monitoring avec confirmations          |
+| `src/lib/crypto/mycryptopilot-plans.ts`        | 120    | Configuration plans (Free/Pro/Ultra)       |
+| `src/lib/subscription/subscription-manager.ts` | 435    | Activation subscriptions + Discord + Email |
+| `src/components/checkout/checkout-form.tsx`    | 420    | UI checkout avec QR + timer + polling      |
+| `app/api/crypto/generate-address/route.ts`     | 77     | API génération adresses                    |
+| `app/api/crypto/check-payment/route.ts`        | 146    | API vérification paiement                  |
 
 **Total**: ~1800 lignes de code production
 
@@ -188,6 +189,7 @@ Dérivation d'adresses:
 ```
 
 **Code (Base - ethers.js)**:
+
 ```typescript
 import { HDNodeWallet } from "ethers";
 
@@ -197,6 +199,7 @@ const address = derivedWallet.address; // 0x...
 ```
 
 **Code (Tron - @scure/bip32)**:
+
 ```typescript
 import { HDKey } from "@scure/bip32";
 import { keccak_256 } from "@noble/hashes/sha3";
@@ -210,7 +213,7 @@ const publicKey = derivedKey.publicKey;
 const hash = keccak_256(publicKey.slice(1));
 const addressBytes = Buffer.concat([
   Buffer.from([0x41]),
-  Buffer.from(hash.slice(-20))
+  Buffer.from(hash.slice(-20)),
 ]);
 const address = bs58check.encode(addressBytes); // T...
 ```
@@ -256,14 +259,22 @@ import TronWeb from "tronweb";
 const tronWeb = new TronWeb({ fullHost: env.TRON_RPC_URL });
 
 // 2. Query transactions liées à notre adresse
-const transactions = await tronWeb.trx.getTransactionsRelated(recipientAddress, "all", 50);
+const transactions = await tronWeb.trx.getTransactionsRelated(
+  recipientAddress,
+  "all",
+  50,
+);
 
 // 3. Filter USDT TRC-20 transfers
 const usdtContractAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
 
 for (const tx of transactions) {
-  if (tx.raw_data.contract[0].parameter.value.contract_address === usdtContractAddress) {
-    const amount = parseInt(tx.raw_data.contract[0].parameter.value.amount) / 1e6; // USDT = 6 decimals
+  if (
+    tx.raw_data.contract[0].parameter.value.contract_address ===
+    usdtContractAddress
+  ) {
+    const amount =
+      parseInt(tx.raw_data.contract[0].parameter.value.amount) / 1e6; // USDT = 6 decimals
     const txBlock = tx.blockNumber;
     const confirmations = currentBlock - txBlock;
 
@@ -284,6 +295,7 @@ for (const tx of transactions) {
 **Fichier**: `src/lib/crypto/address-generator.ts` (240 lignes)
 
 **Features**:
+
 - ✅ Dérivation Base (Ethereum/EVM) avec `ethers.js`
 - ✅ Dérivation Tron avec `@scure/bip32` + keccak256 + Base58Check
 - ✅ BIP-44 paths: `m/44'/60'/0'/0/{index}` (Base), `m/44'/195'/0'/0/{index}` (Tron)
@@ -291,6 +303,7 @@ for (const tx of transactions) {
 - ✅ Validation format adresses (0x... pour Base, T... pour Tron)
 
 **Fonctions**:
+
 ```typescript
 // Génère adresses Base + Tron pour un user
 export async function generatePaymentAddress(params: {
@@ -303,6 +316,7 @@ export async function generatePaymentAddress(params: {
 ```
 
 **Sécurité**:
+
 - ⚠️ XPUB (public) configuré dans env vars → OK pour dériver adresses
 - ❌ XPRV/Seed (privé) JAMAIS utilisé en production → Fonds sécurisés
 - ✅ Chaque user a des adresses uniques → Pas de confusion
@@ -312,6 +326,7 @@ export async function generatePaymentAddress(params: {
 **Fichier**: `src/lib/crypto/payment-watcher.ts` (400 lignes)
 
 **Features**:
+
 - ✅ Polling RPC avec retry automatique (3 tentatives)
 - ✅ Query Base: `Transfer` events du contrat USDC
 - ✅ Query Tron: `getTransactionsRelated` avec filter USDT TRC-20
@@ -323,15 +338,16 @@ export async function generatePaymentAddress(params: {
 - ✅ Appel automatique Subscription Manager après confirmation
 
 **Fonctions**:
+
 ```typescript
 // Check payment status pour une adresse Base
 export async function checkBaseAddress(
-  address: string
+  address: string,
 ): Promise<PaymentDetection[]>;
 
 // Check payment status pour une adresse Tron
 export async function checkTronAddress(
-  address: string
+  address: string,
 ): Promise<PaymentDetection[]>;
 
 // Watch payment avec timeout 15 min
@@ -345,6 +361,7 @@ export async function watchPaymentWithTimeout(params: {
 ```
 
 **RPC Endpoints**:
+
 - Base: `https://mainnet.base.org` (public, gratuit)
 - Tron: `https://api.trongrid.io` (public, 15k req/jour gratuit)
 
@@ -353,6 +370,7 @@ export async function watchPaymentWithTimeout(params: {
 **Fichier**: `src/lib/subscription/subscription-manager.ts` (435 lignes)
 
 **Features**:
+
 - ✅ Activation automatique subscription après paiement confirmé
 - ✅ Update atomique DB: `User.planName` + `User.planExpiresAt`
 - ✅ Upsert `Organization.Subscription` (create ou update)
@@ -362,6 +380,7 @@ export async function watchPaymentWithTimeout(params: {
 - ✅ Gestion erreurs avec logging complet
 
 **Fonctions**:
+
 ```typescript
 // Active un abonnement (appelé par payment-watcher)
 export async function activateSubscription(params: {
@@ -377,6 +396,7 @@ export async function activateSubscription(params: {
 ```
 
 **Intégration**:
+
 - Discord Bot: `src/lib/discord/roles.ts` - `assignRoleToUser()`
 - Email: `src/emails/subscription-activated.tsx` (React Email)
 
@@ -385,6 +405,7 @@ export async function activateSubscription(params: {
 **Fichier**: `src/components/checkout/checkout-form.tsx` (420 lignes)
 
 **Features**:
+
 - ✅ Génération adresses avec loading state
 - ✅ Affichage 2 adresses (Base + Tron) avec icônes networks
 - ✅ QR codes générés avec library `qrcode`
@@ -397,17 +418,19 @@ export async function activateSubscription(params: {
 - ✅ Responsive mobile (QR codes + addresses stack verticalement)
 
 **Components**:
+
 ```tsx
 <CheckoutForm
-  plan="pro"           // Plan sélectionné
-  userId="user_xxx"    // User authentifié
-  orgSlug="org_xxx"    // Organization slug (pour redirect)
+  plan="pro" // Plan sélectionné
+  userId="user_xxx" // User authentifié
+  orgSlug="org_xxx" // Organization slug (pour redirect)
 />
 ```
 
 ### 5. API Routes (100%)
 
 **Generate Address** - `app/api/crypto/generate-address/route.ts` (77 lignes):
+
 ```typescript
 POST /api/crypto/generate-address
 Body: { plan: "pro" | "ultra" }
@@ -421,6 +444,7 @@ Response: {
 ```
 
 **Check Payment** - `app/api/crypto/check-payment/route.ts` (146 lignes):
+
 ```typescript
 POST /api/crypto/check-payment
 Body: { baseAddressId: "addr_xxx", tronAddressId: "addr_xxx", plan: "pro" }
@@ -469,30 +493,33 @@ export const MYCRYPTOPILOT_PLANS = {
 // Helper: Calculer jours accordés (pro-rata)
 export function calculateDaysGranted(
   amountUSD: number,
-  plan: "PRO" | "ULTRA"
+  plan: "PRO" | "ULTRA",
 ): number;
 
 // Helper: Détecter plan depuis montant
 export function getPlanFromAmount(
-  amountUSD: number
+  amountUSD: number,
 ): MyCryptoPilotPlanName | null;
 ```
 
 ### 7. Scripts Utilitaires (100%)
 
 **Generate XPUBs** - `scripts/generate-xpubs.ts`:
+
 ```bash
 npx tsx scripts/generate-xpubs.ts
 # Génère seeds + XPUBs pour Base et Tron
 ```
 
 **Test Checkout** - `scripts/test-checkout-simple.ts`:
+
 ```bash
 npx tsx scripts/test-checkout-simple.ts
 # Teste génération adresses (30 secondes)
 ```
 
 **Test RPC URLs** - `scripts/test-rpc-urls.ts`:
+
 ```bash
 npx tsx scripts/test-rpc-urls.ts
 # Vérifie connexions Base + Tron RPC
@@ -527,6 +554,7 @@ TRON_RPC_URL="https://api.trongrid.io"
 ✅ Ces endpoints publics fonctionnent immédiatement (pas besoin de compte).
 
 **Optionnel - Pour production** (meilleurs rate limits):
+
 - Base: Aller sur https://www.alchemy.com/ → Create App → Base Mainnet → Copy HTTPS URL
 - Tron: TronGrid public suffit (15k req/jour gratuits)
 
@@ -537,6 +565,7 @@ npx tsx scripts/generate-xpubs.ts
 ```
 
 **Output attendu**:
+
 ```
 📘 BASE NETWORK
 Seed Phrase: "word1 word2 ... word12"
@@ -548,6 +577,7 @@ XPUB: xpubDEF456...
 ```
 
 **Action immédiate**:
+
 1. ✅ Copier les 2 seed phrases → 1Password/Bitwarden
 2. ✅ Ajouter dans `.env.local`:
    ```bash
@@ -567,6 +597,7 @@ pnpm dev
 ```
 
 **Résultat attendu**:
+
 ```
 ✅ Base: 0x6c0007212cD997820B576ACd1764e2C7A8715fA7
 ✅ Tron: TKvCsfj279Q65LwcqzEVT65rqXAr2LmUK3
@@ -595,6 +626,7 @@ npx tsx scripts/generate-xpubs.ts
 ```
 
 **Sauvegarder les seeds**:
+
 1. ✅ Copier les 2 seed phrases (24 mots au total)
 2. ✅ Les mettre dans 1Password/Bitwarden avec label "MyCryptoPilot Production Wallets"
 3. ✅ Copier les 2 XPUB → Prêts pour Vercel
@@ -605,14 +637,15 @@ Aller sur: https://vercel.com/[ton-projet]/settings/environment-variables
 
 **Ajouter ces 4 variables** avec scope **"Production"**:
 
-| Variable | Value | Scope |
-|----------|-------|-------|
-| `BASE_RPC_URL` | `https://mainnet.base.org` | Production |
-| `TRON_RPC_URL` | `https://api.trongrid.io` | Production |
-| `CRYPTO_XPUB_BASE` | `xpub...` (production) | Production |
-| `CRYPTO_XPUB_TRON` | `xpub...` (production) | Production |
+| Variable           | Value                      | Scope      |
+| ------------------ | -------------------------- | ---------- |
+| `BASE_RPC_URL`     | `https://mainnet.base.org` | Production |
+| `TRON_RPC_URL`     | `https://api.trongrid.io`  | Production |
+| `CRYPTO_XPUB_BASE` | `xpub...` (production)     | Production |
+| `CRYPTO_XPUB_TRON` | `xpub...` (production)     | Production |
 
 **Comment ajouter**:
+
 1. Click "Add New" → "Environment Variable"
 2. Name: `BASE_RPC_URL`
 3. Value: `https://mainnet.base.org`
@@ -625,15 +658,16 @@ Aller sur: https://vercel.com/[ton-projet]/settings/environment-variables
 **Pour tester les PRs sans risque**:
 
 Même process, mais:
+
 - Scope: **Preview** (pas Production)
 - Values: Testnet URLs + Dev XPUB
 
-| Variable | Value (Preview) |
-|----------|-----------------|
-| `BASE_RPC_URL` | `https://sepolia.base.org` |
-| `TRON_RPC_URL` | `https://nile.trongrid.io` |
-| `CRYPTO_XPUB_BASE` | `xpub...` (dev, pas prod) |
-| `CRYPTO_XPUB_TRON` | `xpub...` (dev, pas prod) |
+| Variable           | Value (Preview)            |
+| ------------------ | -------------------------- |
+| `BASE_RPC_URL`     | `https://sepolia.base.org` |
+| `TRON_RPC_URL`     | `https://nile.trongrid.io` |
+| `CRYPTO_XPUB_BASE` | `xpub...` (dev, pas prod)  |
+| `CRYPTO_XPUB_TRON` | `xpub...` (dev, pas prod)  |
 
 ### Étape 4: Tester avec Petits Montants
 
@@ -676,6 +710,7 @@ npx tsx scripts/test-rpc-urls.ts
 ### Test Payment Detection (Testnet)
 
 **Testnet Setup**:
+
 ```bash
 # Dans .env.local (dev)
 BASE_RPC_URL="https://sepolia.base.org"
@@ -683,10 +718,12 @@ TRON_RPC_URL="https://nile.trongrid.io"
 ```
 
 **Obtenir tokens testnet**:
+
 - Base Sepolia ETH: https://sepoliafaucet.com/
 - Tron Nile TRX: https://nileex.io/join/getJoinPage
 
 **Flow de test**:
+
 1. Générer adresse checkout
 2. Envoyer 49 USDC testnet (Base Sepolia) OU 49 USDT testnet (Tron Nile)
 3. Observer logs serveur:
@@ -703,12 +740,14 @@ TRON_RPC_URL="https://nile.trongrid.io"
 ### HD Wallet Security
 
 ✅ **Bonnes pratiques**:
+
 - XPUB (public) configuré dans env vars → OK pour dériver adresses
 - XPRV/Seed (privé) JAMAIS utilisé en production → Fonds sécurisés
 - Wallets production différents de dev
 - Seeds sauvegardées dans vault chiffré (1Password/Bitwarden)
 
 ❌ **À NE JAMAIS FAIRE**:
+
 - Commit seeds dans Git
 - Réutiliser wallets entre environnements
 - Partager seeds par email/Slack
@@ -717,10 +756,12 @@ TRON_RPC_URL="https://nile.trongrid.io"
 ### RPC Security
 
 **Rate Limiting**:
+
 - Limiter `/api/crypto/generate-address` (1 req/user/5min)
 - Limiter `/api/crypto/check-payment` (1 req/10s)
 
 **Validation**:
+
 - ✅ Vérifier que l'adresse appartient au user avant check payment
 - ✅ Vérifier montant reçu (tolérance ±5%)
 - ✅ Vérifier confirmations (1 pour Base, 2 pour Tron)
@@ -728,12 +769,14 @@ TRON_RPC_URL="https://nile.trongrid.io"
 ### Fund Management
 
 **Sweep automatique** (recommandé):
+
 - Créer cron job (Vercel Cron ou GitHub Actions)
 - Tous les jours à 3h du matin
 - Transférer tous les fonds des adresses dérivées → Binance master wallet
 - Utiliser seed phrase pour signer les transactions
 
 **Wallets Binance** (configuration):
+
 ```bash
 # Dans .env.local / Vercel
 BINANCE_MASTER_WALLET_BASE="0xYourBinanceBaseAddress"
@@ -741,6 +784,7 @@ BINANCE_MASTER_WALLET_TRON="TYourBinanceTronAddress"
 ```
 
 **Récupérer adresses Binance**:
+
 1. Se connecter à Binance
 2. Wallet → Fiat and Spot
 3. Deposit → USDC (Base) → Copier l'adresse
@@ -755,6 +799,7 @@ BINANCE_MASTER_WALLET_TRON="TYourBinanceTronAddress"
 **Cause**: XPUB manquant ou mal configuré
 
 **Solution**:
+
 ```bash
 # Vérifier .env.local
 cat .env.local | grep CRYPTO_XPUB
@@ -770,6 +815,7 @@ npx tsx scripts/generate-xpubs.ts
 **Cause**: Endpoint down ou rate limit
 
 **Solution**:
+
 ```bash
 # Tester manuellement
 npx tsx scripts/test-rpc-urls.ts
@@ -780,12 +826,14 @@ npx tsx scripts/test-rpc-urls.ts
 ### Problème: Payment not detected
 
 **Causes possibles**:
+
 1. ⏱️ Transaction pas encore confirmée → Attendre 1-2 min
 2. 💰 Montant incorrect → Doit être ±5% du plan ($49 ou $99)
 3. 🪙 Mauvais token → USDC sur Base / USDT TRC-20 sur Tron
 4. 🌐 Mauvais network → Base L2 (pas Ethereum L1)
 
 **Debug**:
+
 ```bash
 # Vérifier transaction sur block explorer
 # Base: https://basescan.org/tx/[txHash]
@@ -801,6 +849,7 @@ npx tsx scripts/test-rpc-urls.ts
 ### Problème: Rate limit exceeded
 
 **Solutions**:
+
 - Base: Utiliser Alchemy (300M compute units/mois gratuits, 330 req/s)
 - Tron: TronGrid Pro (100k req/jour gratuits) ou augmenter polling interval (10s → 30s)
 
@@ -838,18 +887,21 @@ npx tsx scripts/test-rpc-urls.ts
 ### Monitoring Production (À Configurer)
 
 **1. Sentry** (erreurs runtime):
+
 ```typescript
 // Capturer erreurs payment-watcher
 // Alertes si RPC down
 ```
 
 **2. Vercel Analytics** (performance):
+
 ```typescript
 // Monitorer page checkout
 // Temps de génération adresses
 ```
 
 **3. DB Monitoring** (Neon):
+
 ```sql
 -- Alerter si CryptoPayment.status = PENDING > 1 heure
 SELECT * FROM "CryptoPayment"
@@ -858,6 +910,7 @@ AND "createdAt" < NOW() - INTERVAL '1 hour';
 ```
 
 **4. Discord Alerts** (custom):
+
 ```typescript
 // Webhook pour chaque paiement confirmé
 await fetch(process.env.DISCORD_WEBHOOK_PAYMENTS, {
@@ -909,23 +962,27 @@ Le système de paiement crypto MyCryptoPilot est **100% FONCTIONNEL** et **PRODU
 ### Résumé de ce qui a été fait
 
 ✅ **Backend complet** (~1800 lignes):
+
 - HD wallet derivation (Base + Tron)
 - RPC monitoring avec retry + confirmations
 - Subscription manager avec Discord + Email
 - API routes génération + vérification
 
 ✅ **UI complète** (~420 lignes):
+
 - Checkout page avec QR codes
 - Timer countdown 15 min
 - Polling automatique 10s
 - Status indicators + redirect
 
 ✅ **Tests automatisés**:
+
 - Script génération XPUB
 - Script test checkout
 - Script test RPC URLs
 
 ✅ **Documentation exhaustive**:
+
 - Guide quick start (30 secondes)
 - Guide setup RPC (5 minutes)
 - Guide déploiement production
@@ -934,6 +991,7 @@ Le système de paiement crypto MyCryptoPilot est **100% FONCTIONNEL** et **PRODU
 ### Pour Release
 
 Il suffit de:
+
 1. ✅ Tester localement (30 sec)
 2. ✅ Configurer Vercel (5 min)
 3. ✅ Test prod avec $5-10 (2 min)

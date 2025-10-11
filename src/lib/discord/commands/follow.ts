@@ -129,7 +129,10 @@ export async function handleFollowCommand(
   const limits = getPlanLimits(planName);
   const currentFollowCount = user.follows.length;
 
-  if (limits.tradersFollow !== 999 && currentFollowCount >= limits.tradersFollow) {
+  if (
+    limits.tradersFollow !== 999 &&
+    currentFollowCount >= limits.tradersFollow
+  ) {
     const embed = new EmbedBuilder()
       .setColor(0xef4444) // Red
       .setTitle("❌ Limite atteinte")

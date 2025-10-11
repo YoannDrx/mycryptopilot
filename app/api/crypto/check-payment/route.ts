@@ -17,7 +17,10 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { checkAddressForPayments } from "@/lib/crypto/payment-watcher";
-import { getPlanFromAmount, calculateDaysGranted } from "@/lib/crypto/mycryptopilot-plans";
+import {
+  getPlanFromAmount,
+  calculateDaysGranted,
+} from "@/lib/crypto/mycryptopilot-plans";
 import { activateSubscription } from "@/lib/subscription/subscription-manager";
 
 const CheckPaymentSchema = z.object({
@@ -31,7 +34,11 @@ export const POST = authRoute
     const { baseAddressId, tronAddressId } = body;
     const userId = ctx.user.id;
 
-    logger.info("Checking payment status", { userId, baseAddressId, tronAddressId });
+    logger.info("Checking payment status", {
+      userId,
+      baseAddressId,
+      tronAddressId,
+    });
 
     try {
       // Fetch addresses from DB
@@ -45,7 +52,11 @@ export const POST = authRoute
       ]);
 
       if (!baseAddress || !tronAddress) {
-        logger.error("Addresses not found", { baseAddressId, tronAddressId, userId });
+        logger.error("Addresses not found", {
+          baseAddressId,
+          tronAddressId,
+          userId,
+        });
         return {
           confirmed: false,
           error: "Invalid address IDs",
@@ -60,7 +71,8 @@ export const POST = authRoute
 
       // Find first confirmed payment (if any)
       const confirmedPayment = [...basePayments, ...tronPayments].find(
-        (payment) => payment.confirmations >= (payment.network === "BASE" ? 1 : 2)
+        (payment) =>
+          payment.confirmations >= (payment.network === "BASE" ? 1 : 2),
       );
 
       if (!confirmedPayment) {
@@ -81,7 +93,10 @@ export const POST = authRoute
 
       // Detect plan from amount
       const plan = getPlanFromAmount(confirmedPayment.amountUSD);
-      const daysGranted = calculateDaysGranted(confirmedPayment.amountUSD, plan);
+      const daysGranted = calculateDaysGranted(
+        confirmedPayment.amountUSD,
+        plan,
+      );
 
       // Create or update CryptoPayment record
       const existingPayment = await prisma.cryptoPayment.findFirst({

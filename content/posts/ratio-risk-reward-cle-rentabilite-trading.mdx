@@ -26,17 +26,20 @@ Le ratio Risk/Reward est THE metric qui détermine si vous serez profitable ou n
 Le **ratio R/R** mesure **combien vous pouvez gagner vs combien vous risquez** sur un trade.
 
 **Formule** :
+
 ```
 R/R = Gain Potentiel / Risque
 R/R = (Take-Profit - Entry) / (Entry - Stop-Loss)
 ```
 
 **Exemple** :
+
 - Entry BTC : 40,000$
 - Stop-Loss : 38,000$ → Risque = 2,000$
 - Take-Profit : 46,000$ → Gain = 6,000$
 
 **Calcul** :
+
 ```
 R/R = 6,000 / 2,000 = 3
 ```
@@ -48,10 +51,12 @@ R/R = 6,000 / 2,000 = 3
 **Question** : Quel trader sera profitable ?
 
 **Trader A** :
+
 - Win rate : 70%
 - R/R moyen : 1:0.5
 
 **Trader B** :
+
 - Win rate : 40%
 - R/R moyen : 1:3
 
@@ -60,11 +65,13 @@ R/R = 6,000 / 2,000 = 3
 **Démonstration sur 10 trades** :
 
 **Trader A (70% wins, R/R 1:0.5)** :
+
 - 7 wins × +50$ = +350$
 - 3 losses × -100$ = -300$
 - **Profit net : +50$** (+5%)
 
 **Trader B (40% wins, R/R 1:3)** :
+
 - 4 wins × +300$ = +1,200$
 - 6 losses × -100$ = -600$
 - **Profit net : +600$** (+60%)
@@ -78,11 +85,13 @@ R/R = 6,000 / 2,000 = 3
 ### Méthode 1 : En $ (Dollars/USDT)
 
 **Données** :
+
 - Entry : 42,000$
 - SL : 40,500$
 - TP : 46,500$
 
 **Calcul** :
+
 ```
 Risque $ = Entry - SL = 42,000 - 40,500 = 1,500$
 Gain $ = TP - Entry = 46,500 - 42,000 = 4,500$
@@ -94,11 +103,13 @@ R/R = 4,500 / 1,500 = 3
 ### Méthode 2 : En % (Pourcentage)
 
 **Données** :
+
 - Entry : 100$
 - SL : 95$ (-5%)
 - TP : 112$ (+12%)
 
 **Calcul** :
+
 ```
 Risque % = 5%
 Gain % = 12%
@@ -110,6 +121,7 @@ R/R = 12 / 5 = 2.4
 ### Méthode 3 : Avec Multiple TP
 
 **Données** :
+
 - Entry : 42,000$
 - SL : 40,500$ (risque 1,500$)
 - TP1 : 44,000$ (+2,000$, sortie 50%)
@@ -117,6 +129,7 @@ R/R = 12 / 5 = 2.4
 - TP3 : 49,000$ (+7,000$, sortie 20%)
 
 **Calcul R/R moyen** :
+
 ```
 Gain moyen = (2,000 × 0.5) + (4,500 × 0.3) + (7,000 × 0.2)
 Gain moyen = 1,000 + 1,350 + 1,400 = 3,750$
@@ -139,7 +152,7 @@ R/R = 3,750 / 1,500 = 2.5
 **Simulation avec R/R 1:1.5 et winrate 50%** :
 
 | Trade | Résultat | Montant |
-|-------|----------|---------|
+| ----- | -------- | ------- |
 | 1     | ✅ Win   | +150$   |
 | 2     | ❌ Loss  | -100$   |
 | 3     | ✅ Win   | +150$   |
@@ -149,6 +162,7 @@ R/R = 3,750 / 1,500 = 2.5
 | ...   | ...      | ...     |
 
 **Bilan 100 trades** :
+
 - 50 wins × 150$ = +7,500$
 - 50 losses × -100$ = -5,000$
 - **Profit net : +2,500$** (+25%)
@@ -156,6 +170,7 @@ R/R = 3,750 / 1,500 = 2.5
 - **Profit net final : +2,400$** (+24%)
 
 **Avec R/R 1:1 (même winrate 50%)** :
+
 - 50 wins × 100$ = +5,000$
 - 50 losses × -100$ = -5,000$
 - **Profit net : 0$**
@@ -166,15 +181,16 @@ R/R = 3,750 / 1,500 = 2.5
 
 ## R/R et Winrate : Le Tableau de Rentabilité
 
-| Win Rate | R/R 1:1 | R/R 1:1.5 | R/R 1:2 | R/R 1:3 |
-|----------|---------|-----------|---------|---------|
-| 30%      | -40%    | -25%      | -10%    | +20%    |
-| 40%      | -20%    | 0%        | +20%    | +60%    |
-| **50%**  | **0%**  | **+25%**  | **+50%**| **+100%**|
-| 60%      | +20%    | +50%      | +80%    | +140%   |
-| 70%      | +40%    | +75%      | +110%   | +180%   |
+| Win Rate | R/R 1:1 | R/R 1:1.5 | R/R 1:2  | R/R 1:3   |
+| -------- | ------- | --------- | -------- | --------- |
+| 30%      | -40%    | -25%      | -10%     | +20%      |
+| 40%      | -20%    | 0%        | +20%     | +60%      |
+| **50%**  | **0%**  | **+25%**  | **+50%** | **+100%** |
+| 60%      | +20%    | +50%      | +80%     | +140%     |
+| 70%      | +40%    | +75%      | +110%    | +180%     |
 
 **Lecture** :
+
 - Avec 40% winrate et R/R 1:2 → +20% profit
 - Avec 50% winrate et R/R 1:3 → +100% profit (doublez votre capital !)
 
@@ -189,12 +205,14 @@ R/R = 3,750 / 1,500 = 2.5
 **Exemple** :
 
 **Scénario A : Entry au Sommet du Range**
+
 - Entry : 44,000$
 - SL : 43,000$ (support range)
 - TP : 46,000$ (résistance)
 - Risque : 1,000$, Gain : 2,000$ → **R/R 1:2**
 
 **Scénario B : Entry au Bas du Range (pullback)**
+
 - Entry : 40,000$
 - SL : 39,000$ (même support range -1k buffer)
 - TP : 46,000$ (même résistance)
@@ -213,6 +231,7 @@ R/R = 3,750 / 1,500 = 2.5
 **Principe** : Plus le SL est proche, plus le R/R est élevé (à TP constant).
 
 **Exemple** :
+
 - Entry : 42,000$
 - TP : 46,000$ (+4,000$)
 
@@ -222,11 +241,13 @@ R/R = 3,750 / 1,500 = 2.5
 **MAIS ATTENTION** : SL trop serré = touché trop facilement (faux signals, noise).
 
 **Règle** : SL doit être à un **niveau d'invalidation technique** :
+
 - Sous support (LONG)
 - Au-dessus résistance (SHORT)
 - En dehors du bruit (noise) normal du marché
 
 **Technique ATR** :
+
 - SL = Entry - (1.5 × ATR)
 - S'adapte à la volatilité de chaque crypto
 
@@ -235,6 +256,7 @@ R/R = 3,750 / 1,500 = 2.5
 **Principe** : Plus le TP est éloigné, plus le R/R est élevé (à SL constant).
 
 **Exemple** :
+
 - Entry : 42,000$
 - SL : 40,500$ (-1,500$)
 
@@ -244,6 +266,7 @@ R/R = 3,750 / 1,500 = 2.5
 **MAIS** : TP trop ambitieux = rarement atteint = winrate chute.
 
 **Solution** : Basez TP sur **niveaux techniques réels** :
+
 - Résistances historiques
 - Fibonacci extensions (1.618, 2.618)
 - Round numbers psychologiques (50k$, 100k$...)
@@ -252,11 +275,13 @@ R/R = 3,750 / 1,500 = 2.5
 **Alternative : Multiple TP (Scaling Out)**
 
 Au lieu d'un seul TP :
+
 - TP1 (conservateur) : 50% position
 - TP2 (médian) : 30% position
 - TP3 (ambitieux) : 20% position
 
 **Avantages** :
+
 - Sécurise profits progressivement
 - Profite des extensions si marché continue
 - R/R moyen élevé
@@ -268,11 +293,13 @@ Au lieu d'un seul TP :
 Les frais de trading **réduisent** votre R/R effectif.
 
 **Exemple** :
+
 - Entry : 42,000$, SL : 40,500$, TP : 46,500$
 - R/R brut : 1:3
 - Frais : 0.1% par trade (×2 = entry + exit) = 0.2% total
 
 **Ajustement** :
+
 - Gain brut : 4,500$ (10.7%)
 - Gain net : 4,500$ - (42,000$ × 0.002) = 4,500 - 84 = **4,416$**
 - Risque brut : 1,500$ (3.57%)
@@ -289,16 +316,19 @@ Les frais de trading **réduisent** votre R/R effectif.
 Le **slippage** est l'écart entre prix attendu et prix exécuté.
 
 **Exemple SL touché** :
+
 - SL placé à 40,500$
 - Marché dump rapide, exécution à 40,200$ (-0.7% slippage)
 - Risque prévu : 1,500$
 - Risque réel : 1,800$ (+20% !)
 
 **Impact sur R/R** :
+
 - R/R prévu : 1:3
 - R/R réel : 4,500 / 1,800 = **1:2.5**
 
 **Solution** :
+
 - Utilisez **Stop-Market** (pas Stop-Limit) pour garantir exécution
 - Ajoutez buffer de 1-2% au SL prévu pour slippage
 - Évitez trades sur cryptos ultra-volatiles ou peu liquides (slippage énorme)
@@ -308,17 +338,20 @@ Le **slippage** est l'écart entre prix attendu et prix exécuté.
 Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur positions longues.
 
 **Exemple** :
+
 - Position LONG 10,000$ PERP
 - Funding : +0.05% par 8h
 - Position tenue 3 jours (9 funding payments)
 - Coût total : 10,000 × 0.05% × 9 = **45$**
 
 **Impact** :
+
 - Gain prévu : 1,000$ (TP atteint)
 - Gain net : 1,000 - 45 = **955$**
 - R/R réduit de ~4.5%
 
 **Solution** :
+
 - Pour trades courts (< 2 jours) : funding négligeable
 - Pour trades longs (> 7 jours) : préférez **SPOT** (pas de funding)
 
@@ -327,6 +360,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Le Syndrome du Débutant Chanceux
 
 **Scénario** :
+
 - Débutant prend un trade avec R/R 1:0.5 (mauvais)
 - Par chance, ça gagne → +50$
 - Il répète 3×, ça gagne encore → +150$
@@ -342,17 +376,20 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Le Regret du TP Manqué
 
 **Scénario** :
+
 - Trade avec TP à 46,000$ (R/R 1:3)
 - TP atteint → profit +300$
 - 2h après : prix continue à 50,000$ (+1,000$ potentiel manqué)
 - Vous : "J'aurais dû garder, j'ai raté +700$ !"
 
 **Pièges** :
+
 1. **Biais rétrospectif** : Vous ne POUVIEZ PAS savoir que ça continuerait
 2. **Avidité** : Déplacer TP plus haut = casser le plan initial
 3. **Regret toxique** : Mine votre confiance sur prochains trades
 
 **Solution** :
+
 - **Célébrez le respect du plan**, pas le "max potentiel"
 - Utilisez **trailing stop** après TP1 pour laisser courir gagnants (avec protection)
 - Acceptez qu'on ne prend JAMAIS 100% d'un mouvement (impossible)
@@ -362,6 +399,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Day Trading / Scalping
 
 **Caractéristiques** :
+
 - Positions courtes (minutes à heures)
 - Nombreux trades par jour
 - Mouvements de prix faibles (+1-3%)
@@ -373,6 +411,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Swing Trading
 
 **Caractéristiques** :
+
 - Positions moyennes (3-7 jours)
 - 5-10 trades par semaine
 - Mouvements de prix moyens (+5-15%)
@@ -384,6 +423,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Position Trading
 
 **Caractéristiques** :
+
 - Positions longues (2-8 semaines)
 - 2-5 trades par mois
 - Mouvements de prix larges (+20-100%)
@@ -397,11 +437,13 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Erreur 1 : Calculer R/R Après Entry
 
 **Mauvaise pratique** :
+
 - Vous entrez sans calculer R/R
 - Après entry, vous calculez : "Oh, c'est 1:0.8, pas terrible"
 - Vous gardez quand même (sunk cost fallacy)
 
 **Bonne pratique** :
+
 - **Calculez R/R AVANT d'entrer**
 - Si R/R < 1:1.5 → **SKIP le trade**
 - Attendez meilleur setup ou meilleur timing
@@ -409,6 +451,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Erreur 2 : Ignorer R/R Sur "Trade de Conviction"
 
 **Piège** :
+
 - Vous êtes "CONVAINCU" que BTC va pumper
 - R/R = 1:1 mais "c'est sûr, je prends quand même"
 - Résultat : Même si vous gagnez, long terme le R/R faible vous ruine
@@ -418,6 +461,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 ### Erreur 3 : Déplacer TP Vers le Bas (Avidité Négative)
 
 **Scénario** :
+
 - TP initial : 46,000$ (R/R 1:3)
 - Prix approche 45,500$
 - Vous : "Il va peut-être pas atteindre 46k, je descends TP à 45,500$"
@@ -427,6 +471,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 **Problème** : Vous réduisez votre R/R par **peur** de "manquer" le profit.
 
 **Solution** : **Respectez votre TP initial**. Si vraiment anxieux :
+
 - Sortez 50% au TP réduit
 - Gardez 50% pour TP initial
 - Meilleur des deux mondes
@@ -436,6 +481,7 @@ Le **funding rate** (frais toutes les 8h sur PERP) grignote les profits sur posi
 Le ratio Risk/Reward est **plus important** que votre winrate pour déterminer votre rentabilité.
 
 **Rappels clés** :
+
 - ✅ **Calculez R/R AVANT chaque trade**
 - ✅ **Minimum 1:1.5, idéal 1:2+**
 - ✅ **Optimisez entry > tout le reste**
@@ -443,6 +489,7 @@ Le ratio Risk/Reward est **plus important** que votre winrate pour déterminer v
 - ✅ **R/R élevé compense winrate moyen**
 
 **La formule gagnante** :
+
 ```
 R/R >= 1:2 + Win Rate >= 50% = Rentabilité garantie long terme
 ```
@@ -450,6 +497,7 @@ R/R >= 1:2 + Win Rate >= 50% = Rentabilité garantie long terme
 Même avec winrate "médiocre" de 45%, un R/R de 1:3 vous rend profitable.
 
 **Action immédiate** :
+
 1. Auditez vos 20 derniers trades : calculez R/R moyen réalisé
 2. Si < 1:1.5 → identifiez pourquoi (mauvais entry ? TP trop proches ? SL trop larges ?)
 3. Définissez votre R/R minimum acceptable (1:2 recommandé)
@@ -459,4 +507,4 @@ Tradez avec les maths de votre côté, pas contre elles.
 
 ---
 
-*Sur [MyCryptoPilot](https://mycryptopilot.app), tous nos signaux affichent le ratio R/R calculé. Filtrez par R/R minimum (1:2, 1:3...) et focusez sur les setups les plus rentables mathématiquement.*
+_Sur [MyCryptoPilot](https://mycryptopilot.app), tous nos signaux affichent le ratio R/R calculé. Filtrez par R/R minimum (1:2, 1:3...) et focusez sur les setups les plus rentables mathématiquement._

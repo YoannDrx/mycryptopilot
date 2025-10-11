@@ -102,7 +102,9 @@ export async function activateSubscription(
 
     // 2. Calculer la nouvelle date d'expiration
     let periodEnd: Date;
-    const isExtension = !!(user.planExpiresAt && user.planExpiresAt > currentDate);
+    const isExtension = !!(
+      user.planExpiresAt && user.planExpiresAt > currentDate
+    );
 
     if (isExtension && user.planExpiresAt) {
       // Étendre l'abonnement existant

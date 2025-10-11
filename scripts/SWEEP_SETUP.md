@@ -222,19 +222,19 @@ Ajoute dans `vercel.json` :
 Crée `app/api/cron/sweep/route.ts` :
 
 ```typescript
-import { sweepAllAddresses } from '@/scripts/sweep-to-binance'
+import { sweepAllAddresses } from "@/scripts/sweep-to-binance";
 
 export async function GET(request: Request) {
   // Vérifier secret CRON_SECRET
-  const authHeader = request.headers.get('authorization')
+  const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 })
+    return new Response("Unauthorized", { status: 401 });
   }
 
   // Exécuter sweep
-  const results = await sweepAllAddresses()
+  const results = await sweepAllAddresses();
 
-  return Response.json({ success: true, results })
+  return Response.json({ success: true, results });
 }
 ```
 

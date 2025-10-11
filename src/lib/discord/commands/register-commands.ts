@@ -26,7 +26,9 @@ export function registerCommands() {
     // Commande /signals
     new SlashCommandBuilder()
       .setName("signals")
-      .setDescription("Affiche les 5 derniers signaux des traders que vous suivez")
+      .setDescription(
+        "Affiche les 5 derniers signaux des traders que vous suivez",
+      )
       .toJSON(),
 
     // Commande /follow

@@ -168,13 +168,11 @@ export function CryptoPaymentOption({
   if (!paymentAddress) {
     return (
       <div className="space-y-4 p-6">
-        <div className="text-center space-y-2">
+        <div className="space-y-2 text-center">
           <h3 className="text-lg font-semibold">
             {networkName} ({currency})
           </h3>
-          <p className="text-sm text-muted-foreground">
-            {networkDescription}
-          </p>
+          <p className="text-muted-foreground text-sm">{networkDescription}</p>
           <p className="text-sm">
             <span className="font-medium">Confirmation time:</span>{" "}
             {confirmationTime}
@@ -193,7 +191,9 @@ export function CryptoPaymentOption({
               Generating address...
             </>
           ) : (
-            <>Pay ${amount} with {currency}</>
+            <>
+              Pay ${amount} with {currency}
+            </>
           )}
         </Button>
       </div>
@@ -237,17 +237,19 @@ export function CryptoPaymentOption({
     <div className="space-y-6 p-6">
       {/* Instructions */}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-center">
+        <h3 className="text-center text-lg font-semibold">
           Payment Instructions
         </h3>
-        <ol className="text-sm space-y-1 text-muted-foreground">
+        <ol className="text-muted-foreground space-y-1 text-sm">
           <li>
             <span className="font-medium">1.</span> Scan QR code or copy address
           </li>
           <li>
             <span className="font-medium">2.</span> Send exactly{" "}
-            <span className="font-bold text-foreground">${amount} {currency}</span> on{" "}
-            {networkName} network
+            <span className="text-foreground font-bold">
+              ${amount} {currency}
+            </span>{" "}
+            on {networkName} network
           </li>
           <li>
             <span className="font-medium">3.</span> Wait for{" "}
@@ -257,7 +259,7 @@ export function CryptoPaymentOption({
       </div>
 
       {/* QR Code */}
-      <div className="flex justify-center bg-white p-6 rounded-lg">
+      <div className="flex justify-center rounded-lg bg-white p-6">
         <QRCode value={paymentAddress.qrData} size={200} />
       </div>
 
@@ -269,7 +271,7 @@ export function CryptoPaymentOption({
             type="text"
             value={paymentAddress.address}
             readOnly
-            className="flex-1 px-3 py-2 text-sm border rounded-md bg-muted font-mono"
+            className="bg-muted flex-1 rounded-md border px-3 py-2 font-mono text-sm"
           />
           <Button onClick={handleCopyAddress} variant="outline" size="icon">
             <Copy className="h-4 w-4" />
@@ -280,7 +282,7 @@ export function CryptoPaymentOption({
       {/* Amount */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Amount</label>
-        <div className="px-3 py-2 text-sm border rounded-md bg-muted font-bold">
+        <div className="bg-muted rounded-md border px-3 py-2 text-sm font-bold">
           {amount} {currency}
         </div>
       </div>
@@ -288,15 +290,15 @@ export function CryptoPaymentOption({
       {/* Network */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Network</label>
-        <div className="px-3 py-2 text-sm border rounded-md bg-muted">
+        <div className="bg-muted rounded-md border px-3 py-2 text-sm">
           {networkName}
         </div>
       </div>
 
       {/* Timer */}
-      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+      <div className="bg-muted flex items-center justify-between rounded-lg p-3">
         <span className="text-sm font-medium">Time remaining</span>
-        <span className="text-lg font-bold font-mono">
+        <span className="font-mono text-lg font-bold">
           {formatTime(timeRemaining)}
         </span>
       </div>
@@ -307,7 +309,7 @@ export function CryptoPaymentOption({
         {!paymentStatus ? (
           <Skeleton className="h-10 w-full" />
         ) : (
-          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+          <div className="bg-muted flex items-center gap-2 rounded-lg p-3">
             {paymentStatus.status === "PENDING" && (
               <>
                 <Loader2 className="h-4 w-4 animate-spin text-blue-500" />

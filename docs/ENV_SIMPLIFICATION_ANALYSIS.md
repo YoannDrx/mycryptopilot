@@ -20,6 +20,7 @@
 ## 🚨 Problème Identifié
 
 ### Symptôme
+
 **Impossible de se connecter via Discord OAuth en production** (`https://www.mycryptopilot.app`)
 
 ### Cause Racine
@@ -43,6 +44,7 @@ L'app Discord OAuth `1421427515922317332` est configurée avec **un seul redirec
 `http://localhost:3000/api/auth/callback/discord`
 
 Quand un user tente de se connecter en production :
+
 1. User clique "Sign in with Discord" sur `https://www.mycryptopilot.app`
 2. Redirigé vers Discord OAuth
 3. Discord essaie de rediriger vers `http://localhost:3000/...` ❌
@@ -69,6 +71,7 @@ GOOGLE_CLIENT_SECRET="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"
 ```
 
 Google OAuth permet **plusieurs redirect URIs** dans une même app, donc ça peut fonctionner si les 2 URLs sont configurées :
+
 - `http://localhost:3000/api/auth/callback/google`
 - `https://www.mycryptopilot.app/api/auth/callback/google`
 
@@ -78,15 +81,15 @@ Google OAuth permet **plusieurs redirect URIs** dans une même app, donc ça peu
 
 ### Fichiers .env Existants
 
-| Fichier | Usage | Gitignored | Committé |
-|---------|-------|------------|----------|
-| `.env` | Base (jamais utilisé directement) | ✅ | ❌ |
-| `.env.local` | Dev local override | ✅ | ❌ |
-| `.env.development` | Dev (NODE_ENV=development) | ✅ | ❌ |
-| `.env.production` | Prod (NODE_ENV=production) | ✅ | ❌ |
-| `.env.test` | Tests (NODE_ENV=test) | ✅ | ❌ |
-| `.env.example` | Template public | ❌ | ✅ |
-| `.env.production.template` | Template prod | ❌ | ✅ |
+| Fichier                    | Usage                             | Gitignored | Committé |
+| -------------------------- | --------------------------------- | ---------- | -------- |
+| `.env`                     | Base (jamais utilisé directement) | ✅         | ❌       |
+| `.env.local`               | Dev local override                | ✅         | ❌       |
+| `.env.development`         | Dev (NODE_ENV=development)        | ✅         | ❌       |
+| `.env.production`          | Prod (NODE_ENV=production)        | ✅         | ❌       |
+| `.env.test`                | Tests (NODE_ENV=test)             | ✅         | ❌       |
+| `.env.example`             | Template public                   | ❌         | ✅       |
+| `.env.production.template` | Template prod                     | ❌         | ✅       |
 
 **Total** : 7 fichiers (trop complexe!)
 
@@ -100,6 +103,7 @@ Google OAuth permet **plusieurs redirect URIs** dans une même app, donc ça peu
 4. `.env` (base)
 
 **Exemple Dev** :
+
 ```bash
 pnpm dev  # NODE_ENV=development
 # Charge dans l'ordre :
@@ -110,6 +114,7 @@ pnpm dev  # NODE_ENV=development
 ```
 
 **Exemple Prod (Vercel)** :
+
 ```bash
 # NODE_ENV=production
 # Charge dans l'ordre :
@@ -122,6 +127,7 @@ pnpm dev  # NODE_ENV=development
 ### Problème de Confusion
 
 **Scénario actuel** :
+
 - Dev : `.env.development` avec `BETTER_AUTH_URL=http://localhost:3000`
 - Prod Vercel : Variables dans Vercel Dashboard OU `.env.production` (selon config)
 
@@ -159,6 +165,7 @@ export const authOptions = {
 ### Flow OAuth Discord
 
 1. **User clique "Sign in with Discord"**
+
    ```typescript
    // Frontend
    <button onClick={() => signIn.social({ provider: "discord" })}>
@@ -167,6 +174,7 @@ export const authOptions = {
    ```
 
 2. **Better Auth génère l'URL d'autorisation**
+
    ```
    https://discord.com/api/oauth2/authorize
      ?client_id=1421427515922317332
@@ -174,6 +182,7 @@ export const authOptions = {
      &response_type=code
      &scope=identify+email
    ```
+
    - ⚠️ `redirect_uri` doit matcher exactement celui configuré dans l'app Discord
 
 3. **User autorise sur Discord**
@@ -181,12 +190,15 @@ export const authOptions = {
    - User clique "Authorize"
 
 4. **Discord redirige avec code**
+
    ```
    {BETTER_AUTH_URL}/api/auth/callback/discord?code=ABC123
    ```
+
    - ⚠️ Si `BETTER_AUTH_URL` est mal configuré → redirige vers mauvaise URL
 
 5. **Better Auth échange le code contre un token**
+
    ```typescript
    POST https://discord.com/api/oauth2/token
    {
@@ -198,12 +210,14 @@ export const authOptions = {
    ```
 
 6. **Better Auth récupère les infos user**
+
    ```typescript
    GET https://discord.com/api/users/@me
    Authorization: Bearer {access_token}
    ```
 
 7. **Better Auth crée/met à jour le user en DB**
+
    ```typescript
    await prisma.user.upsert({
      where: { email: discordUser.email },
@@ -233,12 +247,12 @@ export const authOptions = {
 
 ### Comparaison Avant/Après
 
-| Avant | Après | Raison |
-|-------|-------|--------|
-| `.env.development` | `.env.local` | Next.js standard, plus simple |
-| `.env.production` | Vercel Dashboard | Secrets jamais committés |
-| `.env.production.template` | `.env.example` | Un seul template suffit |
-| `.env` | ❌ Supprimé | Pas utilisé directement |
+| Avant                      | Après            | Raison                        |
+| -------------------------- | ---------------- | ----------------------------- |
+| `.env.development`         | `.env.local`     | Next.js standard, plus simple |
+| `.env.production`          | Vercel Dashboard | Secrets jamais committés      |
+| `.env.production.template` | `.env.example`   | Un seul template suffit       |
+| `.env`                     | ❌ Supprimé      | Pas utilisé directement       |
 
 ### Nouvelle Structure
 
@@ -251,6 +265,7 @@ mycryptopilot/
 ```
 
 **`.gitignore`** :
+
 ```gitignore
 # Environment Variables
 .env
@@ -283,6 +298,7 @@ mycryptopilot/
    - **Scopes** : `identify`, `email`
 
 4. **Copier les credentials** :
+
    ```
    Client ID: [NEW_DISCORD_CLIENT_ID_PROD]
    Client Secret: [NEW_DISCORD_CLIENT_SECRET_PROD]
@@ -295,11 +311,13 @@ mycryptopilot/
 ### Étape 2 : Créer `.env.local` (Dev)
 
 1. **Copier `.env.development`** → **`.env.local`** :
+
    ```bash
    cp .env.development .env.local
    ```
 
 2. **Vérifier le contenu** :
+
    ```bash
    # .env.local
    BETTER_AUTH_URL=http://localhost:3000
@@ -359,6 +377,7 @@ mycryptopilot/
    ```
 
 3. **Redéployer** :
+
    ```bash
    git push origin main
    # Vercel auto-deploy avec nouvelles variables
@@ -374,6 +393,7 @@ mycryptopilot/
 ### Étape 4 : Nettoyer les Anciens Fichiers
 
 1. **Supprimer les fichiers obsolètes** :
+
    ```bash
    rm .env.development
    rm .env.production
@@ -381,6 +401,7 @@ mycryptopilot/
    ```
 
 2. **Garder** :
+
    ```bash
    .env.local          # Dev (gitignored)
    .env.test           # Tests (committé)
@@ -388,6 +409,7 @@ mycryptopilot/
    ```
 
 3. **Mettre à jour `.env.example`** :
+
    ```bash
    # Ajouter un commentaire clair
    # ==============================================================================
@@ -407,6 +429,7 @@ mycryptopilot/
    ```
 
 4. **Commit les changements** :
+
    ```bash
    git add .gitignore .env.example .env.test
    git commit -m "refactor: simplify environment variables structure
@@ -429,6 +452,7 @@ Si Google OAuth ne fonctionne pas en production :
 2. **Ouvrir l'OAuth Client** : `728181273656-8qmvc2374hpu3r0faf6tq1i4s6ihnm15`
 
 3. **Vérifier "Authorized redirect URIs"** contient :
+
    ```
    http://localhost:3000/api/auth/callback/google
    https://www.mycryptopilot.app/api/auth/callback/google
@@ -503,6 +527,7 @@ Si Google OAuth ne fonctionne pas en production :
 ### Avant
 
 7 fichiers `.env*` :
+
 ```
 .env
 .env.local
@@ -514,6 +539,7 @@ Si Google OAuth ne fonctionne pas en production :
 ```
 
 **Problèmes** :
+
 - Credentials OAuth dev/prod identiques → Discord échoue en prod
 - Trop de fichiers → confusion
 - Pas clair quel fichier utiliser
@@ -521,6 +547,7 @@ Si Google OAuth ne fonctionne pas en production :
 ### Après
 
 3 fichiers `.env*` :
+
 ```
 .env.local       ← Dev (gitignored)
 .env.example     ← Template (committé)
@@ -528,6 +555,7 @@ Si Google OAuth ne fonctionne pas en production :
 ```
 
 **Avantages** :
+
 - ✅ Credentials OAuth séparés dev/prod
 - ✅ Structure simple et claire
 - ✅ Vercel Dashboard pour prod (sécurisé)

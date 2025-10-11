@@ -45,7 +45,7 @@ async function testEnvVars() {
       console.error(`❌ ${varName} not configured`);
       allPresent = false;
     } else {
-      const preview = `${value.substring(0, 30)  }...`;
+      const preview = `${value.substring(0, 30)}...`;
       console.log(`✅ ${varName}: ${preview}`);
     }
   }
@@ -62,35 +62,31 @@ async function testBaseAddressGeneration() {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   try {
-    // Générer 3 adresses avec indexes différents
-    const addresses = await Promise.all([
-      deriveBaseAddress(0),
-      deriveBaseAddress(1),
-      deriveBaseAddress(2),
-    ]);
+    // Générer une adresse pour tester le format
+    const result = await deriveBaseAddress("test-base");
+    const address = result.address;
 
-    console.log("Adresses générées:");
-    addresses.forEach((addr, i) => {
-      console.log(`  [${i}] ${addr}`);
-    });
+    console.log("Adresse générée:");
+    console.log(`  ${address}`);
+    console.log(`  Derivation path: ${result.derivationPath}`);
 
-    // Vérifications
+    // Vérifications de format
     const checks = [
       {
         name: "Format 0x...",
-        pass: addresses.every((a) => a.startsWith("0x")),
+        pass: address.startsWith("0x"),
       },
       {
         name: "Longueur 42 chars",
-        pass: addresses.every((a) => a.length === 42),
+        pass: address.length === 42,
       },
       {
         name: "Hexadecimal valide",
-        pass: addresses.every((a) => /^0x[0-9a-fA-F]{40}$/.test(a)),
+        pass: /^0x[0-9a-fA-F]{40}$/.test(address),
       },
       {
-        name: "Adresses uniques",
-        pass: new Set(addresses).size === addresses.length,
+        name: "Derivation path valide",
+        pass: /^m\/44'\/60'\/0'\/0\/\d+$/.test(result.derivationPath),
       },
     ];
 
@@ -118,35 +114,31 @@ async function testTronAddressGeneration() {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   try {
-    // Générer 3 adresses avec indexes différents
-    const addresses = await Promise.all([
-      deriveTronAddress(0),
-      deriveTronAddress(1),
-      deriveTronAddress(2),
-    ]);
+    // Générer une adresse pour tester le format
+    const result = await deriveTronAddress("test-tron");
+    const address = result.address;
 
-    console.log("Adresses générées:");
-    addresses.forEach((addr, i) => {
-      console.log(`  [${i}] ${addr}`);
-    });
+    console.log("Adresse générée:");
+    console.log(`  ${address}`);
+    console.log(`  Derivation path: ${result.derivationPath}`);
 
-    // Vérifications
+    // Vérifications de format
     const checks = [
       {
         name: "Format T...",
-        pass: addresses.every((a) => a.startsWith("T")),
+        pass: address.startsWith("T"),
       },
       {
         name: "Longueur 34 chars",
-        pass: addresses.every((a) => a.length === 34),
+        pass: address.length === 34,
       },
       {
         name: "Base58 valide",
-        pass: addresses.every((a) => /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(a)),
+        pass: /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address),
       },
       {
-        name: "Adresses uniques",
-        pass: new Set(addresses).size === addresses.length,
+        name: "Derivation path valide",
+        pass: /^m\/44'\/195'\/0'\/0\/\d+$/.test(result.derivationPath),
       },
     ];
 
@@ -197,12 +189,12 @@ async function testDatabasePersistence() {
     console.log(`Adresses existantes: ${existingAddresses}`);
 
     // Générer adresses
-    const baseAddress = await deriveBaseAddress(existingAddresses);
-    const tronAddress = await deriveTronAddress(existingAddresses);
+    const baseResult = await deriveBaseAddress(String(existingAddresses));
+    const tronResult = await deriveTronAddress(String(existingAddresses));
 
     console.log(`\nNouvelles adresses générées:`);
-    console.log(`  Base: ${baseAddress}`);
-    console.log(`  Tron: ${tronAddress}`);
+    console.log(`  Base: ${baseResult.address}`);
+    console.log(`  Tron: ${tronResult.address}`);
 
     // Créer records en DB
     const [baseRecord, tronRecord] = await Promise.all([
@@ -210,16 +202,16 @@ async function testDatabasePersistence() {
         data: {
           userId: testUser.id,
           network: "BASE",
-          address: baseAddress,
-          derivationPath: `m/44'/60'/0'/0/${existingAddresses}`,
+          address: baseResult.address,
+          derivationPath: baseResult.derivationPath,
         },
       }),
       prisma.cryptoAddress.create({
         data: {
           userId: testUser.id,
           network: "TRON",
-          address: tronAddress,
-          derivationPath: `m/44'/195'/0'/0/${existingAddresses}`,
+          address: tronResult.address,
+          derivationPath: tronResult.derivationPath,
         },
       }),
     ]);

@@ -141,8 +141,8 @@ export default async function DashboardPage() {
             <AlertCircle className="size-4" />
             <AlertTitle>No traders followed yet</AlertTitle>
             <AlertDescription>
-              Start by exploring our marketplace and following traders that match
-              your trading style. You'll see their signals here.
+              Start by exploring our marketplace and following traders that
+              match your trading style. You'll see their signals here.
               <Button variant="link" className="ml-2 p-0" asChild>
                 <Link href="/traders">
                   Browse Traders

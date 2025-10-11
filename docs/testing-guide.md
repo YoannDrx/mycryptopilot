@@ -32,6 +32,7 @@
 ### Comptes de Test
 
 Créer au minimum 3 comptes :
+
 1. **User Basic** : Pour tester le parcours utilisateur standard
 2. **Trader** : Pour tester la création de signaux
 3. **Admin** : Pour tester le panel admin
@@ -43,6 +44,7 @@ Créer au minimum 3 comptes :
 ### 🎯 Parcours 1 : Inscription et Découverte (15-20 min)
 
 #### Objectif
+
 Tester le flow complet d'inscription et découverte de l'application.
 
 #### Étapes Détaillées
@@ -72,6 +74,7 @@ Tester le flow complet d'inscription et découverte de l'application.
      - Confirm Password
 
 5. **Remplir le formulaire** :
+
    ```
    Name: Test User
    Email: testuser@example.com
@@ -217,6 +220,7 @@ Tester le flow complet d'inscription et découverte de l'application.
 ### 🎯 Parcours 2 : Upgrade Plan (10-15 min)
 
 #### Objectif
+
 Tester le flow de souscription crypto (Pro ou Ultra).
 
 #### Étapes Détaillées
@@ -361,6 +365,7 @@ Tester le flow de souscription crypto (Pro ou Ultra).
 ### 🎯 Parcours 3 : Following et Signaux (10 min)
 
 #### Objectif
+
 Tester le système de follow/unfollow et la réception de signaux.
 
 #### Étapes Détaillées
@@ -411,6 +416,7 @@ Tester le système de follow/unfollow et la réception de signaux.
 ### 🎯 Parcours 4 : Devenir Trader (20-25 min)
 
 #### Objectif
+
 Tester la création d'un profil trader et la publication de signaux.
 
 #### Étapes Détaillées
@@ -438,9 +444,9 @@ Tester la création d'un profil trader et la publication de signaux.
 
 5. **Activer le toggle "Trader Mode"**
    - ✅ **Attendu** :
-      - Loading spinner pendant ~1s
-      - Toast "Trader mode enabled!"
-      - **Redirection automatique** vers `/account/become-trader`
+     - Loading spinner pendant ~1s
+     - Toast "Trader mode enabled!"
+     - **Redirection automatique** vers `/account/become-trader`
 
 ##### 4.2 Remplir le Formulaire Trader
 
@@ -456,6 +462,7 @@ Tester la création d'un profil trader et la publication de signaux.
      - Social Links (optionnel)
 
 7. **Remplir le formulaire** :
+
    ```
    Display Name: Crypto Master
    Bio: 5+ years in crypto trading. Specializing in BTC/ETH swing trading with risk management focus.
@@ -510,7 +517,7 @@ Tester la création d'un profil trader et la publication de signaux.
     - ✅ Bouton "Create Your First Signal"
 
 14. **Tab "Performance"** :
-    - ✅ Placeholder data (--%, -.-,  --)
+    - ✅ Placeholder data (--%, -.-, --)
     - ✅ Message "Not enough data to display chart"
 
 15. **Tab "Revenue"** :
@@ -542,48 +549,59 @@ Tester la création d'un profil trader et la publication de signaux.
     - ✅ **Preview en temps réel** : TradingCard affichée à droite (ou en bas sur mobile)
 
 19. **Remplir le formulaire - Section "Basic Info"** :
+
     ```
     Asset: BTC
     Instrument Type: PERP (sélectionner radio)
     Bias: LONG (sélectionner radio)
     ```
+
     - ✅ **Observer le preview** : Header devient vert (LONG)
 
 20. **Section "Price Levels"** :
+
     ```
     Entry Price: 42000
     Invalidation (Stop Loss): 40500
     ```
+
     - ✅ **Observer le preview** : Prix affichés dans la card
 
-21. **Section "Take Profits"**  :
+21. **Section "Take Profits"** :
+
     ```
     TP1: 43500
     TP2: 45000
     TP3: 47000
     ```
+
     - ✅ Cliquer sur "+ Add TP" pour ajouter TP2 et TP3
     - ✅ **Observer le preview** : TPs listés dans la card
 
 22. **Section "Risk & Confidence"** :
+
     ```
     Risk Level: 3 (slider)
     Confidence: 75% (slider)
     Leverage Band: 1x-3x (input)
     ```
+
     - ✅ **Observer le preview** : Risk indicator affiché (3/5 étoiles)
 
 23. **Section "Market Context"** :
+
     ```
     Regime: Bullish continuation after breakout
     ```
 
 24. **Section "Rationales"** :
+
     ```
     Rationale 1: Breaking above key resistance at 41.8k with strong volume
     Rationale 2: RSI showing bullish divergence on 4H timeframe
     Rationale 3: Funding rate neutral, indicating no overheating
     ```
+
     - ✅ Cliquer sur "+ Add Rationale" pour ajouter 2ème et 3ème
 
 25. **Vérifier la TradingCard preview** :
@@ -633,6 +651,7 @@ Tester la création d'un profil trader et la publication de signaux.
 ### 🎯 Parcours 5 : Gestion des Signaux (10 min)
 
 #### Objectif
+
 Tester l'édition, clôture et gestion des signaux.
 
 #### Étapes Détaillées
@@ -675,6 +694,7 @@ Tester l'édition, clôture et gestion des signaux.
 ### 🎯 Parcours 6 : Panel Admin (15 min)
 
 #### Objectif
+
 Tester les fonctionnalités d'administration (réservé aux admins).
 
 ⚠️ **Note** : Nécessite un compte avec `role: ADMIN` dans la DB.
@@ -742,6 +762,7 @@ Tester les fonctionnalités d'administration (réservé aux admins).
 ### 🎯 Parcours 7 : Tests Paiements Avancés (30 min)
 
 #### Objectif
+
 Tester tous les cas edge du système de paiement crypto.
 
 #### Scénarios à Tester
@@ -755,7 +776,7 @@ Tester tous les cas edge du système de paiement crypto.
 3. **Payer seulement $25** (au lieu de $49)
 4. ✅ **Attendu** :
    - Paiement confirmé
-   - Subscription activée pour **15 jours** (25/49 * 30 jours)
+   - Subscription activée pour **15 jours** (25/49 \* 30 jours)
    - Dashboard affiche expiration dans 15 jours
 
 ##### 7.2 Paiement Doublé
@@ -841,6 +862,7 @@ Tester tous les cas edge du système de paiement crypto.
 ### 🎯 Parcours 8 : Discord Bot (20 min)
 
 #### Objectif
+
 Tester toutes les commandes Discord et intégrations.
 
 ⚠️ **Note** : Nécessite accès au serveur Discord MyCryptoPilot.
@@ -937,6 +959,7 @@ Tester toutes les commandes Discord et intégrations.
 ### ✅ Fonctionnalités Critiques (MVP)
 
 #### Authentication & Users
+
 - [ ] Inscription email/password
 - [ ] Connexion email/password
 - [ ] Magic link login (optionnel)
@@ -946,6 +969,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Logout
 
 #### Profils & Roles
+
 - [ ] Création profil trader
 - [ ] Upload photo profil
 - [ ] Toggle User ↔ Trader ↔ Both
@@ -953,6 +977,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Édition profil trader
 
 #### Signaux de Trading
+
 - [ ] Création signal (formulaire complet)
 - [ ] Preview temps réel (TradingCard)
 - [ ] Publication signal
@@ -963,6 +988,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Countdown timer sur TradingCard
 
 #### Follow System
+
 - [ ] Follow trader (marketplace)
 - [ ] Unfollow trader
 - [ ] Limites plan respectées (Free: 1, Pro: 5, Ultra: ∞)
@@ -970,6 +996,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Compteurs followers
 
 #### Marketplace
+
 - [ ] Liste traders
 - [ ] Filtres (All, Verified)
 - [ ] Tri (Win Rate, Followers, Signals, Recent)
@@ -979,6 +1006,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Stats trader (winrate, payoff, drawdown)
 
 #### Crypto Payments
+
 - [ ] Page pricing
 - [ ] Page checkout (Pro, Ultra)
 - [ ] Génération adresse Base
@@ -995,6 +1023,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Régénération adresse
 
 #### Subscriptions
+
 - [ ] Activation plan (Free par défaut)
 - [ ] Upgrade Free → Pro
 - [ ] Upgrade Free → Ultra
@@ -1004,6 +1033,7 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Limites appliquées (signals/day, traders suivis)
 
 #### Discord Integration
+
 - [ ] Bot déployé 24/7 (Railway)
 - [ ] Connexion Discord OAuth
 - [ ] Commandes slash (/help, /status, /signals, /follow, /upgrade)
@@ -1013,12 +1043,14 @@ Tester toutes les commandes Discord et intégrations.
 - [ ] Channel #signals auto-créé
 
 #### Dashboards
+
 - [ ] User Dashboard (3 stats cards, tabs, feed)
 - [ ] Trader Dashboard (4 stats cards, tabs, signaux)
 - [ ] Fetches Prisma réels (pas de placeholders)
 - [ ] Stats mises à jour en temps réel
 
 #### Admin Panel (Optionnel pour MVP)
+
 - [ ] Liste users
 - [ ] Détails user
 - [ ] Liste organizations
@@ -1032,11 +1064,13 @@ Tester toutes les commandes Discord et intégrations.
 #### Boutons Non Fonctionnels (À Fixer)
 
 ##### Landing Page
+
 - ❌ **`src/features/landing/cta/cta-card-section.tsx:29`**
   - Bouton "Learn more" → `<Link href="#">`
   - **Fix** : Lien vers `/docs` ou section #features
 
 ##### User Dashboard
+
 - ❌ **`app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx:79`**
   - Bouton "Follow Traders" (header) → Pas d'action
   - **Fix** : `<Link href="/traders">`
@@ -1053,6 +1087,7 @@ Tester toutes les commandes Discord et intégrations.
   - **Fix** : Ajouter `asChild` + `<Link>`
 
 ##### Trader Dashboard
+
 - ❌ **`app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx:174`**
   - Bouton "Complete Profile" → Pas d'action
   - **Fix** : `<Link href="/account/become-trader">`
@@ -1065,6 +1100,7 @@ Tester toutes les commandes Discord et intégrations.
   - **Fix** : Ajouter `asChild` + `<Link>`
 
 ##### Total Boutons Cassés
+
 - **Landing** : 1
 - **User Dashboard** : 5
 - **Trader Dashboard** : 5
@@ -1073,39 +1109,46 @@ Tester toutes les commandes Discord et intégrations.
 #### Fonctionnalités Manquantes (Phase 5 - Post-MVP)
 
 ##### Journal de Trading
+
 - ❌ Page `/journal` (liste trades)
 - ❌ Page `/journal/new` (ajouter trade)
 - ❌ Calcul stats (win rate, profit factor)
 - ❌ Graphique equity curve
 
 ##### Console de Risque
+
 - ❌ Page `/risk-calculator`
 - ❌ Calcul position sizing
 - ❌ Calcul R:R ratio
 - ❌ Suggestion stop loss
 
 ##### Alertes Custom (Ultra Plan)
+
 - ❌ Créer alertes personnalisées
 - ❌ Notifications email/Discord/SMS
 - ❌ Filtres avancés (prix, volume, RSI, etc.)
 
 ##### Screener Temps Réel
+
 - ❌ Page `/screener`
 - ❌ Refresh automatique (5s pour Ultra, 1min pour Pro, 5min pour Free)
 - ❌ Filtres techniques (RSI, MACD, Volume)
 
 ##### Gestion Signaux (Traders)
+
 - ❌ Éditer signal existant
 - ❌ Clôturer signal (TP hit / invalidated)
 - ❌ Historique performances (calculé automatiquement)
 
 ##### Analytics Avancés
+
 - ❌ Graphiques performances (equity curve)
 - ❌ Heatmap trades
 - ❌ Analyse par asset/timeframe
 - ❌ Export CSV
 
 ##### Revenue Tracking (Traders)
+
 - ❌ Dashboard revenue (actuellement $0 hardcodé)
 - ❌ Historique paiements reçus
 - ❌ Statistiques followers (growth chart)
@@ -1127,18 +1170,21 @@ Après chaque fix, re-tester :
 ### 📊 Métriques de Succès
 
 #### Performance
+
 - ⏱️ Temps de chargement page < 2s
 - ⏱️ Temps génération adresse crypto < 3s
 - ⏱️ Temps publication signal < 3s
 - ⏱️ Polling payment status : 5s intervals (pas de lag)
 
 #### UX
+
 - ✅ 0 erreurs console navigateur
 - ✅ Mobile responsive (toutes pages)
 - ✅ Toasts informatifs (pas d'erreurs silencieuses)
 - ✅ Loading states clairs (pas de "hang")
 
 #### Data Integrity
+
 - ✅ Compteurs justes (followers, signaux, traders suivis)
 - ✅ Stats mises à jour en temps réel
 - ✅ Pas de data factice affichée
@@ -1161,6 +1207,7 @@ Quand tu trouves un bug, utilise ce format :
 **Plan** : [Free / Pro / Ultra]
 
 **Steps to Reproduce** :
+
 1. Aller sur X
 2. Cliquer sur Y
 3. Observer Z
@@ -1193,6 +1240,7 @@ Quand tu trouves un bug, utilise ce format :
 **Plan** : Free
 
 **Steps** :
+
 1. Remplir formulaire signal complet
 2. Cliquer "Publish Signal"
 3. Erreur 500
@@ -1203,8 +1251,10 @@ Quand tu trouves un bug, utilise ce format :
 
 **Console** :
 ```
+
 POST /api/signals/create 500
 Error: Database connection failed
+
 ```
 
 **Priorité** : P0 Bloquant
@@ -1221,6 +1271,7 @@ Error: Database connection failed
 **Plan** : Free
 
 **Steps** :
+
 1. Générer adresse
 2. Payer $49 en USDC
 3. Attendre confirmation

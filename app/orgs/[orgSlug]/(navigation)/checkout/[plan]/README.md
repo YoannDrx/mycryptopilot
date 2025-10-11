@@ -19,11 +19,13 @@ checkout/[plan]/
 ## 🔧 Implementation Phases
 
 ### Phase 1: Setup (4h) - ⏳ TODO
+
 - [ ] Install `qrcode` + `react-countdown`
 - [ ] Test page route works (http://localhost:3000/orgs/test/checkout/pro)
 - [ ] Test API routes respond
 
 ### Phase 2: Address Generation (8h) - ⏳ TODO
+
 - [ ] Implement `generateAddressAction`
 - [ ] Connect to HD wallet functions
 - [ ] Store addresses in DB
@@ -57,10 +59,10 @@ curl -X POST http://localhost:3000/api/crypto/generate-address \
 ## ✅ Acceptance Criteria
 
 User can:
+
 1. Visit `/checkout/pro` or `/checkout/ultra`
 2. See unique crypto addresses (Base + Tron)
 3. Scan QR codes for mobile payment
 4. See countdown timer (15 min)
 5. Payment auto-detected → Subscription activated
 6. Redirect to dashboard with success toast
-

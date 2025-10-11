@@ -174,7 +174,7 @@
 │ │ │ │
 │ │ Migration Prisma : │ │
 │ │ # Créer le fichier de migration │ │
-│ │ npx prisma migrate dev --name add_mycryptopilot_models │ │
+│ │ npx prisma migrate dev --name add*mycryptopilot_models │ │
 │ │ │ │
 │ │ # Générer le client Prisma │ │
 │ │ npx prisma generate │ │
@@ -553,12 +553,12 @@
 │ │ plan, │ │
 │ │ status: "active", │ │
 │ │ periodStart: new Date(), │ │
-│ │ periodEnd: new Date(Date.now() + days _ 24 _ 60 _ 60 _ 1000), │ │
+│ │ periodEnd: new Date(Date.now() + days * 24 _ 60 _ 60 _ 1000), │ │
 │ │ }, │ │
 │ │ update: { │ │
 │ │ plan, │ │
 │ │ status: "active", │ │
-│ │ periodEnd: new Date(Date.now() + days _ 24 _ 60 _ 60 _ 1000), │ │
+│ │ periodEnd: new Date(Date.now() + days _ 24 _ 60 _ 60 \_ 1000), │ │
 │ │ }, │ │
 │ │ }); │ │
 │ │ } │ │
