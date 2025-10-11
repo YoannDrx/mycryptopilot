@@ -88,22 +88,22 @@ export async function sweepAllAddresses(): Promise<SweepResult[]> {
   const baseAddresses = addresses.filter((a) => a.network === "BASE");
   const tronAddresses = addresses.filter((a) => a.network === "TRON");
 
-  // Sweep Base (USDC) addresses
+  // Sweep Base (USDC) addresses in parallel
   if (baseAddresses.length > 0) {
     console.log(`🟦 Checking ${baseAddresses.length} Base addresses...\n`);
-    for (const addr of baseAddresses) {
-      const result = await sweepBaseAddress(addr.address, addr.userId);
-      results.push(result);
-    }
+    const baseResults = await Promise.all(
+      baseAddresses.map(async (addr) => sweepBaseAddress(addr.address, addr.userId)),
+    );
+    results.push(...baseResults);
   }
 
-  // Sweep Tron (USDT) addresses
+  // Sweep Tron (USDT) addresses in parallel
   if (tronAddresses.length > 0) {
     console.log(`🟣 Checking ${tronAddresses.length} Tron addresses...\n`);
-    for (const addr of tronAddresses) {
-      const result = await sweepTronAddress(addr.address, addr.userId);
-      results.push(result);
-    }
+    const tronResults = await Promise.all(
+      tronAddresses.map(async (addr) => sweepTronAddress(addr.address, addr.userId)),
+    );
+    results.push(...tronResults);
   }
 
   // Summary
@@ -128,7 +128,7 @@ export async function sweepAllAddresses(): Promise<SweepResult[]> {
 
 async function sweepBaseAddress(
   address: string,
-  userId: string,
+  _userId: string,
 ): Promise<SweepResult> {
   try {
     // TODO: Get Binance master wallet address from env
@@ -195,7 +195,7 @@ async function sweepBaseAddress(
 
 async function sweepTronAddress(
   address: string,
-  userId: string,
+  _userId: string,
 ): Promise<SweepResult> {
   try {
     // TODO: Get Binance master wallet address from env
@@ -205,9 +205,8 @@ async function sweepTronAddress(
     }
 
     // Connect to Tron RPC
-    const tronWeb = new TronWeb({
-      fullHost: env.TRON_RPC_URL,
-    });
+    // @ts-expect-error - TronWeb types are incorrect, constructor accepts string
+    const tronWeb = new TronWeb(env.TRON_RPC_URL);
 
     // Get USDT TRC-20 balance
     const contract = await tronWeb.contract().at(TRON_USDT_CONTRACT);
