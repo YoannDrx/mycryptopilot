@@ -8,24 +8,51 @@ import { prisma } from "@/lib/prisma";
 import {
   countFollowedTraders,
   getFollow,
-  getUserWithPlan,
   isFollowingTrader,
 } from "./follow-queries";
 import { FollowTraderSchema, UnfollowTraderSchema } from "./follow.schema";
 
 /**
- * Helper pour récupérer le plan d'un user
+ * Helper pour récupérer le plan d'un user depuis son organisation
+ * MyCryptoPilot: 1 Organization = 1 User, donc on récupère le plan depuis l'organization.subscription
  */
 const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
-  const user = await getUserWithPlan(userId);
+  // Récupérer l'organization de l'utilisateur avec sa subscription
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    include: {
+      organization: {
+        include: {
+          subscription: {
+            select: {
+              plan: true,
+              status: true,
+              periodEnd: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  if (!user) {
-    throw new ActionError("User not found");
+  if (!member?.organization) {
+    // Si pas d'organization, retourner le plan free par défaut
+    return "free";
   }
 
-  // Return user's actual plan, default to "free" if not set
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- planName is nullable in DB
-  return (user.planName as MyCryptoPilotPlanName) ?? "free";
+  const subscription = member.organization.subscription;
+
+  // Vérifier que la subscription est active et non expirée
+  if (
+    !subscription ||
+    !["active", "trialing"].includes(subscription.status ?? "") ||
+    (subscription.periodEnd && subscription.periodEnd < new Date())
+  ) {
+    return "free";
+  }
+
+  // Retourner le plan de la subscription
+  return subscription.plan as MyCryptoPilotPlanName;
 };
 
 /**
