@@ -35,6 +35,7 @@ jobs:
       DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
       BETTER_AUTH_URL: "http://localhost:3000"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       NODE_ENV: "production"
       # Email
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

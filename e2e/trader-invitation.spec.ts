@@ -53,10 +53,6 @@ test.describe("Trader Invitation System", () => {
     expect(invitation).not.toBeNull();
     expect(invitation?.status).toBe("PENDING");
 
-    // Wait for page reload to complete (triggered by invitation success)
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(2000); // Extra buffer for table to render after reload
-
     // 5. Test resend functionality
     // Find the row with the email and wait for resend button to be visible
     const invitationRow = page.locator(`tr:has-text("${followerEmail}")`);
