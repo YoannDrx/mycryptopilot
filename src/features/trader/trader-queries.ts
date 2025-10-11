@@ -110,6 +110,35 @@ export const listTraderProfiles = async (params?: {
 };
 
 /**
+ * Récupère un trader (user + traderProfile) par son userId
+ * Utilisé pour les pages publiques (/follow/[traderId], /traders/[traderId])
+ */
+export const getTraderById = async (userId: string) => {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      traderProfile: {
+        select: {
+          id: true,
+          displayName: true,
+          bio: true,
+          priceMonthlyUSD: true,
+          verified: true,
+          verifiedAt: true,
+          statsJson: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Recherche et filtre des traders pour la marketplace
  */
 export const searchTraders = async (params?: {

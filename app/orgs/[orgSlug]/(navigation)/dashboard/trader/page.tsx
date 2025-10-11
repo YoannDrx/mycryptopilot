@@ -27,6 +27,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TraderSignalsList } from "./_components/trader-signals-list";
 import { redirect } from "next/navigation";
+import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
 
 export const metadata: Metadata = {
   title: "Trader Dashboard - MyCryptoPilot",
@@ -143,6 +144,12 @@ export default async function TraderDashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Referral Link Card */}
+        <ReferralLinkCard
+          traderId={user.id}
+          traderName={traderProfile.displayName}
+        />
 
         {/* Trader Status Card */}
         <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
