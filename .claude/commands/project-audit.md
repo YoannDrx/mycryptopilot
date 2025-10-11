@@ -74,30 +74,30 @@ Tu vas effectuer un audit complet et systématique du projet MyCryptoPilot en 5 
 2. **Mettre à jour chaque fichier .md**:
 
    a. **README.md** (racine projet):
-      - Section "Documentation" renvoyant vers CLAUDE.md
-      - Section "Installation" avec warnings si nécessaire (ex: migrations)
-      - Garder le contenu minimal et vitrine publique
-      - Mettre à jour date si nécessaire
-      - Vérifier cohérence avec état réel du projet
+   - Section "Documentation" renvoyant vers CLAUDE.md
+   - Section "Installation" avec warnings si nécessaire (ex: migrations)
+   - Garder le contenu minimal et vitrine publique
+   - Mettre à jour date si nécessaire
+   - Vérifier cohérence avec état réel du projet
 
    b. **.claude/CLAUDE.md** (FICHIER PRINCIPAL - Support dev):
-      - ⚠️ **PRIORITÉ ABSOLUE** - C'est le fichier de référence pour tout le développement
-      - Lire complètement le fichier actuel
-      - Section "État Actuel du développement" synchronisée avec découvertes de la Phase 1
-      - Progression globale du projet mise à jour (avec %)
-      - TODOs critiques listés avec fichiers et lignes précises
-      - Parcours testables documentés (✅ ⚠️ ❌)
-      - Blocages critiques identifiés (migrations, env vars, etc.)
-      - Section "Prochaines étapes MVP" mise à jour avec priorités P0/P1/P2
-      - Mettre à jour TOUTES les dates dans le fichier
-      - Vérifier cohérence de toutes les sections avec l'état réel
+   - ⚠️ **PRIORITÉ ABSOLUE** - C'est le fichier de référence pour tout le développement
+   - Lire complètement le fichier actuel
+   - Section "État Actuel du développement" synchronisée avec découvertes de la Phase 1
+   - Progression globale du projet mise à jour (avec %)
+   - TODOs critiques listés avec fichiers et lignes précises
+   - Parcours testables documentés (✅ ⚠️ ❌)
+   - Blocages critiques identifiés (migrations, env vars, etc.)
+   - Section "Prochaines étapes MVP" mise à jour avec priorités P0/P1/P2
+   - Mettre à jour TOUTES les dates dans le fichier
+   - Vérifier cohérence de toutes les sections avec l'état réel
 
    c. **Autres fichiers .md trouvés**:
-      - Pour chaque fichier .md trouvé (docs/, src/, features/, etc.):
-        - Lire le contenu
-        - Vérifier si le contenu est à jour (dates, TODOs, statuts)
-        - Mettre à jour si nécessaire
-        - Exemples : TRADING_CARDS.md, XPUB_GENERATION.md, etc.
+   - Pour chaque fichier .md trouvé (docs/, src/, features/, etc.):
+     - Lire le contenu
+     - Vérifier si le contenu est à jour (dates, TODOs, statuts)
+     - Mettre à jour si nécessaire
+     - Exemples : TRADING_CARDS.md, XPUB_GENERATION.md, etc.
 
 3. **Synchroniser toutes les dates**:
    - Utiliser date actuelle (format: "X octobre 2025")

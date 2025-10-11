@@ -105,12 +105,7 @@ export const SubscriptionCTA = ({
         className,
       )}
     >
-      <CardHeader
-        className={cn(
-          "bg-gradient-to-br pb-6",
-          plan.bgGradient,
-        )}
-      >
+      <CardHeader className={cn("bg-gradient-to-br pb-6", plan.bgGradient)}>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div
@@ -163,7 +158,7 @@ export const SubscriptionCTA = ({
               Upgrade to {plan.name} <ArrowRight className="ml-2 size-5" />
             </Button>
           </Link>
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-center text-xs">
             Pay with crypto (USDC or USDT)
           </p>
         </div>

@@ -48,7 +48,14 @@ const CRYPTO_SYMBOLS = [
   "MATIC-USDT",
 ];
 
-const REGIMES = ["Bull", "Bear", "Ranging", "Volatile", "Breakout", "Consolidation"];
+const REGIMES = [
+  "Bull",
+  "Bear",
+  "Ranging",
+  "Volatile",
+  "Breakout",
+  "Consolidation",
+];
 
 export const CreateSignalForm = () => {
   const router = useRouter();
@@ -158,7 +165,10 @@ export const CreateSignalForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Symbol *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a crypto" />
@@ -184,7 +194,10 @@ export const CreateSignalForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Instrument Type *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -207,7 +220,10 @@ export const CreateSignalForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Bias (Direction) *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -237,10 +253,14 @@ export const CreateSignalForm = () => {
                       placeholder="e.g., 42500"
                       {...field}
                       value={field.value}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value))
+                      }
                     />
                   </FormControl>
-                  <FormDescription>The price at which to enter the trade</FormDescription>
+                  <FormDescription>
+                    The price at which to enter the trade
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -260,10 +280,14 @@ export const CreateSignalForm = () => {
                       placeholder="e.g., 40000"
                       {...field}
                       value={field.value}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value))
+                      }
                     />
                   </FormControl>
-                  <FormDescription>Stop loss / invalidation price</FormDescription>
+                  <FormDescription>
+                    Stop loss / invalidation price
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -286,7 +310,9 @@ export const CreateSignalForm = () => {
                             placeholder={`TP${index + 1}`}
                             {...field}
                             value={field.value}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -306,7 +332,12 @@ export const CreateSignalForm = () => {
                 </div>
               ))}
               {tpInputs.length < 5 && (
-                <Button type="button" variant="outline" size="sm" onClick={addTp}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addTp}
+                >
                   <Plus className="mr-2 size-4" />
                   Add TP
                 </Button>
@@ -321,7 +352,11 @@ export const CreateSignalForm = () => {
                 <FormItem>
                   <FormLabel>Leverage Band *</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 1-3x, 5-10x" {...field} value={field.value} />
+                    <Input
+                      placeholder="e.g., 1-3x, 5-10x"
+                      {...field}
+                      value={field.value}
+                    />
                   </FormControl>
                   <FormDescription>Recommended leverage range</FormDescription>
                   <FormMessage />
@@ -346,7 +381,9 @@ export const CreateSignalForm = () => {
                       onChange={(e) => field.onChange(parseInt(e.target.value))}
                     />
                   </FormControl>
-                  <FormDescription>1 = Low risk, 5 = Very high risk</FormDescription>
+                  <FormDescription>
+                    1 = Low risk, 5 = Very high risk
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -369,7 +406,9 @@ export const CreateSignalForm = () => {
                       onChange={(e) => field.onChange(parseInt(e.target.value))}
                     />
                   </FormControl>
-                  <FormDescription>Your confidence in this signal</FormDescription>
+                  <FormDescription>
+                    Your confidence in this signal
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -411,7 +450,12 @@ export const CreateSignalForm = () => {
                 </div>
               ))}
               {rationaleInputs.length < 5 && (
-                <Button type="button" variant="outline" size="sm" onClick={addRationale}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addRationale}
+                >
                   <Plus className="mr-2 size-4" />
                   Add Rationale
                 </Button>
@@ -425,7 +469,10 @@ export const CreateSignalForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Market Regime *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -451,7 +498,10 @@ export const CreateSignalForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Managed By *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -481,7 +531,9 @@ export const CreateSignalForm = () => {
                       max={168}
                       {...field}
                       value={field.value / 3600}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) * 3600)}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) * 3600)
+                      }
                     />
                   </FormControl>
                   <FormDescription>
@@ -492,7 +544,10 @@ export const CreateSignalForm = () => {
               )}
             />
 
-            <LoadingButton loading={createSignalMutation.isPending} type="submit">
+            <LoadingButton
+              loading={createSignalMutation.isPending}
+              type="submit"
+            >
               Create Signal
             </LoadingButton>
           </div>

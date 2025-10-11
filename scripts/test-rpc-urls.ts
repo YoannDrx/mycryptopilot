@@ -14,12 +14,24 @@
 /* eslint-disable no-console */
 
 import { JsonRpcProvider } from "ethers";
-// @ts-expect-error - TronWeb ESM import issue
-import TronWebDefault from "tronweb";
+import * as TronWebModule from "tronweb";
 import "dotenv/config";
 
-// Handle both ESM and CommonJS imports
-const TronWeb = TronWebDefault.default ?? TronWebDefault;
+// Extract TronWeb constructor from module
+const TronWeb = TronWebModule.TronWeb;
+
+// Type for TronWeb instance (minimal interface for our usage)
+type TronWebInstance = {
+  trx: {
+    getCurrentBlock: () => Promise<{
+      block_header: {
+        raw_data: {
+          number: number;
+        };
+      };
+    }>;
+  };
+};
 
 const BASE_RPC_URL = process.env.BASE_RPC_URL;
 const TRON_RPC_URL = process.env.TRON_RPC_URL;
@@ -36,7 +48,9 @@ async function testBaseRPC() {
 
   if (!BASE_RPC_URL) {
     console.error("❌ BASE_RPC_URL not configured in .env.local");
-    console.log("   Add: BASE_RPC_URL=\"https://base-mainnet.g.alchemy.com/v2/YOUR_API_KEY\"");
+    console.log(
+      '   Add: BASE_RPC_URL="https://base-mainnet.g.alchemy.com/v2/YOUR_API_KEY"',
+    );
     return false;
   }
 
@@ -65,9 +79,13 @@ async function testBaseRPC() {
     console.log("");
     console.log("💡 Solutions:");
     console.log("   1. Vérifier que BASE_RPC_URL est correct dans .env.local");
-    console.log("   2. Vérifier ton API key Alchemy: https://dashboard.alchemy.com/");
+    console.log(
+      "   2. Vérifier ton API key Alchemy: https://dashboard.alchemy.com/",
+    );
     console.log("   3. Tester manuellement:");
-    console.log(`      curl "${BASE_RPC_URL}" -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`);
+    console.log(
+      `      curl "${BASE_RPC_URL}" -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`,
+    );
     console.log("");
     return false;
   }
@@ -82,7 +100,7 @@ async function testTronRPC() {
 
   if (!TRON_RPC_URL) {
     console.error("❌ TRON_RPC_URL not configured in .env.local");
-    console.log("   Add: TRON_RPC_URL=\"https://api.trongrid.io\"");
+    console.log('   Add: TRON_RPC_URL="https://api.trongrid.io"');
     return false;
   }
 
@@ -90,8 +108,11 @@ async function testTronRPC() {
 
   try {
     // Connect to Tron network
-    // @ts-expect-error - TronWeb types are incorrect
-    const tronWeb = new TronWeb(TRON_RPC_URL);
+    const tronWeb = new (TronWeb as new (config: {
+      fullHost: string;
+    }) => TronWebInstance)({
+      fullHost: TRON_RPC_URL,
+    });
 
     // Get current block
     const currentBlock = await tronWeb.trx.getCurrentBlock();

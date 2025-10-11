@@ -25,12 +25,14 @@ Chaque rôle supérieur **hérite automatiquement** des permissions du rôle inf
 ### 🆓 Free Member (Niveau 0)
 
 **Permissions de base** :
+
 - ✅ Voir les channels publics
 - ✅ Envoyer des messages
 - ✅ Lire l'historique des messages
 - ✅ Utiliser les commandes bot (`/help`, `/status`, `/upgrade`)
 
 **Limitations** :
+
 - ❌ Accès limité à 5 signaux/jour
 - ❌ Peut suivre 1 seul trader
 - ❌ Pas d'accès aux channels premium
@@ -41,6 +43,7 @@ Chaque rôle supérieur **hérite automatiquement** des permissions du rôle inf
 ### 💎 Pro Trader (Niveau 1)
 
 **Hérite de Free Member +** :
+
 - ✅ Utiliser des emojis externes
 - ✅ Attacher des fichiers
 - ✅ Intégrer des liens (preview)
@@ -56,6 +59,7 @@ Chaque rôle supérieur **hérite automatiquement** des permissions du rôle inf
 ### 🚀 Ultra Trader (Niveau 2)
 
 **Hérite de Pro Trader + Free Member +** :
+
 - ✅ Créer des threads privés
 - ✅ Accès aux channels `#ultra-lounge` et `#strategy-talks`
 - ✅ **Signaux illimités**
@@ -65,6 +69,7 @@ Chaque rôle supérieur **hérite automatiquement** des permissions du rôle inf
 - ✅ Accès anticipé aux nouvelles features
 
 **Permissions désactivées par défaut** (pour éviter abus) :
+
 - ❌ Mentionner @everyone (spam)
 - ❌ Gérer les messages des autres
 
@@ -72,11 +77,11 @@ Chaque rôle supérieur **hérite automatiquement** des permissions du rôle inf
 
 ## 🎨 Couleurs des Rôles
 
-| Rôle | Couleur | Code Hex |
-|------|---------|----------|
-| Free Member | Gris | `#6B7280` |
-| Pro Trader | Amber | `#F59E0B` |
-| Ultra Trader | Violet | `#8B5CF6` |
+| Rôle         | Couleur | Code Hex  |
+| ------------ | ------- | --------- |
+| Free Member  | Gris    | `#6B7280` |
+| Pro Trader   | Amber   | `#F59E0B` |
+| Ultra Trader | Violet  | `#8B5CF6` |
 
 ---
 
@@ -87,6 +92,7 @@ Les rôles sont assignés automatiquement dans les cas suivants :
 ### 1. Connexion via Discord OAuth
 
 Lorsqu'un utilisateur se connecte sur le site avec Discord :
+
 1. Son `discordId` est automatiquement lié à son compte
 2. Le rôle correspondant à son plan est assigné immédiatement
 3. Les anciens rôles MyCryptoPilot sont retirés
@@ -94,6 +100,7 @@ Lorsqu'un utilisateur se connecte sur le site avec Discord :
 ### 2. Mise à jour du plan
 
 Lorsqu'un utilisateur achète un plan (Pro ou Ultra) :
+
 1. Son plan est mis à jour dans la DB
 2. Une action serveur appelle `updateDiscordRoleAction`
 3. Le nouveau rôle est assigné sur Discord
@@ -102,6 +109,7 @@ Lorsqu'un utilisateur achète un plan (Pro ou Ultra) :
 ### 3. Expiration du plan
 
 Lorsqu'un plan expire :
+
 1. Un cron job vérifie les plans expirés
 2. Le plan est réinitialisé à "free"
 3. Le rôle Discord est rétrogradé automatiquement
@@ -170,6 +178,7 @@ Pour tester la hiérarchie des rôles :
 ### Position des Rôles
 
 Les rôles sont positionnés dans cet ordre (du plus haut au plus bas) :
+
 1. **Ultra Trader** (position 3)
 2. **Pro Trader** (position 2)
 3. **Free Member** (position 1)

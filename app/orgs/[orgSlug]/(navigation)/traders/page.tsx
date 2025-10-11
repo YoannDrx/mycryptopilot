@@ -49,7 +49,11 @@ export default async function TradersMarketplacePage({
 
   // Map filter to verified boolean
   const verified =
-    filterValue === "verified" ? true : filterValue === "all" ? undefined : undefined;
+    filterValue === "verified"
+      ? true
+      : filterValue === "all"
+        ? undefined
+        : undefined;
 
   // Validate and map sort to allowed values
   const sortBy: "winrate" | "followers" | "signals" | "recent" | undefined =
@@ -61,7 +65,11 @@ export default async function TradersMarketplacePage({
       : "recent";
 
   // Fetch traders with search, filters, and pagination
-  const { items: traders, hasNextPage, nextCursor } = await searchTraders({
+  const {
+    items: traders,
+    hasNextPage,
+    nextCursor,
+  } = await searchTraders({
     search,
     verified,
     sortBy,
@@ -136,7 +144,9 @@ export default async function TradersMarketplacePage({
             <CardContent>
               <div className="text-2xl font-bold">{totalTraders}</div>
               <p className="text-muted-foreground text-xs">
-                {totalTraders === 0 ? "Be the first!" : "Publishing signals daily"}
+                {totalTraders === 0
+                  ? "Be the first!"
+                  : "Publishing signals daily"}
               </p>
             </CardContent>
           </Card>
@@ -158,9 +168,7 @@ export default async function TradersMarketplacePage({
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Results
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Results</CardTitle>
               <TrendingUp className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
@@ -254,9 +262,7 @@ export default async function TradersMarketplacePage({
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs">
-                          Payoff
-                        </p>
+                        <p className="text-muted-foreground text-xs">Payoff</p>
                         <p className="text-xl font-bold">
                           {typeof stats.payoff === "number"
                             ? stats.payoff.toFixed(1)
@@ -270,9 +276,7 @@ export default async function TradersMarketplacePage({
                         <p className="text-xl font-bold">{followersCount}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-xs">
-                          Signals
-                        </p>
+                        <p className="text-muted-foreground text-xs">Signals</p>
                         <p className="text-xl font-bold">{signalsCount}</p>
                       </div>
                     </div>

@@ -208,11 +208,9 @@ Stratégie : "Keep it simple, adapt progressively"
 Phase 1 : MVP (garder org, masquer la complexité)
 
 1. Garder le système d'org tel quel :
-
-
-    - Création automatique à l'inscription ✅
-    - Un user = une org (toujours seul dedans)
-    - Désactiver les invitations (masquer UI + bloquer permissions)
+   - Création automatique à l'inscription ✅
+   - Un user = une org (toujours seul dedans)
+   - Désactiver les invitations (masquer UI + bloquer permissions)
 
 2. Ajouter les nouveaux modèles MyCryptoPilot :
    // Ajout au modèle User
@@ -220,9 +218,8 @@ Phase 1 : MVP (garder org, masquer la complexité)
    // ... champs existants
    role UserRole @default(USER) // USER | TRADER | BOTH
 
-
-    traderProfile TraderProfile?
-    cryptoAddresses CryptoAddress[]
+   traderProfile TraderProfile?
+   cryptoAddresses CryptoAddress[]
 
 }
 
@@ -264,26 +261,20 @@ expiresAt DateTime
 }
 
 3. Adapter le billing :
-
-
-    - Garder Organization.stripeCustomerId (on ne l'utilise juste plus)
-    - Ajouter CryptoAddress pour paiements crypto
-    - Créer un nouveau système de CryptoSubscription (ou étendre Subscription)
+   - Garder Organization.stripeCustomerId (on ne l'utilise juste plus)
+   - Ajouter CryptoAddress pour paiements crypto
+   - Créer un nouveau système de CryptoSubscription (ou étendre Subscription)
 
 4. UI simplifiée :
-
-
-    - Masquer le sélecteur d'organisations (toujours une seule org)
-    - Renommer "Organization Settings" → "Account Settings"
-    - Supprimer la page "Members" et "Invitations"
-    - Garder "Billing" mais remplacer Stripe par crypto
+   - Masquer le sélecteur d'organisations (toujours une seule org)
+   - Renommer "Organization Settings" → "Account Settings"
+   - Supprimer la page "Members" et "Invitations"
+   - Garder "Billing" mais remplacer Stripe par crypto
 
 5. Permissions :
-
-
-    - Garder le système de rôles org (owner/admin/member)
-    - User est toujours "owner" de sa propre org
-    - Ajouter de nouvelles permissions pour trader :
+   - Garder le système de rôles org (owner/admin/member)
+   - User est toujours "owner" de sa propre org
+   - Ajouter de nouvelles permissions pour trader :
 
 const statement = {
 ...defaultStatements,

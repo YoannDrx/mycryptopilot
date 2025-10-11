@@ -28,11 +28,13 @@ Le **position sizing** (dimensionnement de position) est le calcul de la **taill
 3. La **distance de votre stop-loss**
 
 **Ce n'est PAS** :
+
 - ❌ "Je mets toujours 10% de mon capital"
 - ❌ "Je tradela toujours 0.1 BTC"
 - ❌ "Selon ma conviction (plus je suis sûr, plus je mets)"
 
 **C'est** :
+
 - ✅ Calculer mathématiquement pour risquer exactement 1-2% du capital
 - ✅ Ajuster la taille selon la distance du stop-loss
 - ✅ Protéger le capital de manière systématique
@@ -42,6 +44,7 @@ Le **position sizing** (dimensionnement de position) est le calcul de la **taill
 ### L'Erreur Fatale du Débutant
 
 **Trader A** (sans position sizing) :
+
 - Capital : 10,000$
 - Trade 1 : Achète pour 5,000$ de BTC, SL à -10% → perte 500$ (-5% capital)
 - Trade 2 : Achète pour 5,000$ d'ETH, SL à -5% → perte 250$ (-2.5% capital)
@@ -49,6 +52,7 @@ Le **position sizing** (dimensionnement de position) est le calcul de la **taill
 - **Total pertes** : 1,350$ (-13.5% capital) en **3 trades**
 
 **Trader B** (avec position sizing pour 2% risque) :
+
 - Capital : 10,000$
 - Trade 1 : Calcul → 2,000$ de BTC, SL à -10% → perte 200$ (-2% capital)
 - Trade 2 : Calcul → 4,000$ d'ETH, SL à -5% → perte 200$ (-2% capital)
@@ -60,11 +64,11 @@ Le **position sizing** (dimensionnement de position) est le calcul de la **taill
 ### Survie Mathématique
 
 | Perte Totale | Capital Restant | Gain Nécessaire pour Récupérer |
-|--------------|-----------------|-------------------------------|
-| -5%          | 95%             | +5.3%                         |
-| -10%         | 90%             | +11.1%                        |
-| -20%         | 80%             | +25%                          |
-| -50%         | 50%             | +100%                         |
+| ------------ | --------------- | ------------------------------ |
+| -5%          | 95%             | +5.3%                          |
+| -10%         | 90%             | +11.1%                         |
+| -20%         | 80%             | +25%                           |
+| -50%         | 50%             | +100%                          |
 
 **Position sizing contrôle vos pertes** → vous gardez votre capital → vous pouvez continuer à trader → vous finissez profitable.
 
@@ -77,6 +81,7 @@ Taille Position (USDT) = (Capital × % Risque) / (% Distance Stop-Loss)
 ```
 
 **Où** :
+
 - **Capital** : Total de votre capital trading
 - **% Risque** : Pourcentage que vous acceptez de perdre (1-2%)
 - **% Distance SL** : Pourcentage entre entry et stop-loss
@@ -84,6 +89,7 @@ Taille Position (USDT) = (Capital × % Risque) / (% Distance Stop-Loss)
 ### Exemple Concret Pas à Pas
 
 **Données** :
+
 - Capital total : **10,000 USDT**
 - Risque accepté : **2%** = 200 USDT max
 - Trade : LONG BTC/USDT
@@ -117,6 +123,7 @@ Nombre BTC = 0.1334 BTC
 ```
 
 **Vérification** :
+
 - Position : 0.1334 BTC × 42,000$ = **5,602 USDT**
 - Si SL touché à 40,500$ : 0.1334 BTC × 40,500$ = **5,402 USDT**
 - Perte = 5,602 - 5,402 = **200 USDT** ✅ (exactement 2% du capital)
@@ -126,10 +133,12 @@ Nombre BTC = 0.1334 BTC
 ### Scénario 1 : Stop-Loss Serré (1-2%)
 
 **Trade** : LONG ETH
+
 - Entry : 2,500$
 - SL : 2,450$ (-2%)
 
 **Position sizing** :
+
 ```
 Taille = (10,000 × 0.02) / 0.02 = 200 / 0.02 = 10,000 USDT
 ```
@@ -139,6 +148,7 @@ Taille = (10,000 × 0.02) / 0.02 = 200 / 0.02 = 10,000 USDT
 **Solution** : Règle de sécurité → **jamais plus de 20-30% du capital sur un trade**, même si le calcul le permet.
 
 **Ajustement** :
+
 - Max position autorisée : 3,000 USDT (30% capital)
 - Risque réel : (3,000 × 0.02) = 60 USDT (0.6% capital au lieu de 2%)
 
@@ -147,10 +157,12 @@ Taille = (10,000 × 0.02) / 0.02 = 200 / 0.02 = 10,000 USDT
 ### Scénario 2 : Stop-Loss Large (10%+)
 
 **Trade** : LONG Altcoin volatile
+
 - Entry : 10$
 - SL : 8.50$ (-15%)
 
 **Position sizing** :
+
 ```
 Taille = (10,000 × 0.02) / 0.15 = 200 / 0.15 = 1,333 USDT
 ```
@@ -164,13 +176,16 @@ Taille = (10,000 × 0.02) / 0.15 = 200 / 0.15 = 1,333 USDT
 **Situation** : Après quelques pertes, votre capital est passé de 10,000$ à 9,200$.
 
 **Ajustement** :
+
 - Nouveau risque 2% = 9,200 × 0.02 = **184 USDT** (plus 200$)
 
 **Trade** : LONG BTC
+
 - Entry : 43,000$
 - SL : 41,500$ (-3.5%)
 
 **Position sizing** :
+
 ```
 Taille = (9,200 × 0.02) / 0.035 = 184 / 0.035 = 5,257 USDT
 ```
@@ -180,6 +195,7 @@ Taille = (9,200 × 0.02) / 0.035 = 184 / 0.035 = 5,257 USDT
 ### Scénario 4 : Perpetuals avec Levier
 
 **Trade** : SHORT BTC PERP avec levier ×3
+
 - Entry : 44,000$
 - SL : 45,500$ (+3.4%)
 - Capital : 10,000$
@@ -188,18 +204,21 @@ Taille = (9,200 × 0.02) / 0.035 = 184 / 0.035 = 5,257 USDT
 **ATTENTION** : Avec levier, la formule change !
 
 **Formule avec levier** :
+
 ```
 Taille Notional = (Capital × % Risque × Levier) / % Distance SL
 Taille Margin = Taille Notional / Levier
 ```
 
 **Calcul** :
+
 ```
 Taille Notional = (10,000 × 0.02 × 3) / 0.034 = 600 / 0.034 = 17,647 USDT
 Taille Margin = 17,647 / 3 = 5,882 USDT (marge requise)
 ```
 
 **Vérification** :
+
 - Position notionnelle : 17,647$
 - Avec levier ×3 : besoin de 5,882$ de marge
 - Si SL touché (+3.4%) : perte = 17,647 × 0.034 = 600$ → mais avec levier ×3, perte réelle = 600 / 3 = **200$** ✅
@@ -217,11 +236,13 @@ Taille = Risque Fixe ($) / Distance SL ($)
 ```
 
 **Exemple** :
+
 - Vous voulez risquer **200$** maximum
 - Trade : LONG BTC à 42,000$
 - SL : 40,500$ (distance = 1,500$)
 
 **Calcul** :
+
 ```
 Taille = 200 / 1,500 = 0.1333 BTC
 0.1333 BTC × 42,000$ = 5,599 USDT
@@ -234,6 +255,7 @@ Taille = 200 / 1,500 = 0.1333 BTC
 ### Piège 1 : Taille Fixe ("Je trade toujours X$")
 
 **Erreur** :
+
 - Trade A : 1,000$ de BTC, SL à -5% → risque 50$
 - Trade B : 1,000$ d'Altcoin, SL à -20% → risque 200$
 
@@ -244,6 +266,7 @@ Taille = 200 / 1,500 = 0.1333 BTC
 ### Piège 2 : Pourcentage du Capital ("10% du capital")
 
 **Erreur** :
+
 - Capital : 10,000$
 - "Je mets 10%" = 1,000$ sur chaque trade
 - Trade avec SL -15% → risque réel = 150$ (1.5% capital)
@@ -256,6 +279,7 @@ Taille = 200 / 1,500 = 0.1333 BTC
 ### Piège 3 : "Conviction Trading"
 
 **Erreur** :
+
 - "Je suis SÛR que BTC va monter → je mets 50% de mon capital"
 - Si erreur (et le marché s'en fout de votre conviction) → perte massive
 
@@ -266,6 +290,7 @@ Taille = 200 / 1,500 = 0.1333 BTC
 Même si le calcul dit "vous pouvez mettre 100% du capital", **ne le faites jamais**.
 
 **Règle de sécurité** :
+
 - Max 20% capital pour traders avancés
 - Max 10% capital pour débutants
 - Si le calcul donne plus → réduisez le risque % (passez de 2% à 1% ou 0.5%)
@@ -273,12 +298,14 @@ Même si le calcul dit "vous pouvez mettre 100% du capital", **ne le faites jama
 ### Piège 5 : Ne Pas Ajuster quand le Capital Change
 
 **Erreur** :
+
 - Capital initial : 10,000$ → risque 200$ (2%)
 - Après profits : 12,000$ → toujours risque 200$ → **maintenant 1.67%**
 
 **Problème** : Vous sous-utilisez votre capital.
 
 **Solution** : Recalculez le risque $ à chaque trade :
+
 - Si capital = 12,000$ et risque 2% → risque = 240$
 
 **Fréquence** : Recalcul hebdomadaire ou après gain/perte > 10%.
@@ -290,6 +317,7 @@ Même si le calcul dit "vous pouvez mettre 100% du capital", **ne le faites jama
 **Indicateur** : "Position Size Calculator" by @fikira
 
 **Comment utiliser** :
+
 1. Ajoutez l'indicateur au graphique
 2. Dessinez votre entry et SL
 3. L'indicateur affiche automatiquement :
@@ -301,18 +329,19 @@ Même si le calcul dit "vous pouvez mettre 100% du capital", **ne le faites jama
 
 **Créez un template simple** :
 
-| Paramètre | Valeur |
-|-----------|--------|
-| Capital Total | 10,000 |
-| % Risque | 2% |
-| Risque $ | =B2*B3 (200) |
-| Entry Price | 42,000 |
-| SL Price | 40,500 |
-| % Distance SL | =(B5-B6)/B5 (3.57%) |
-| **Taille Position $** | **=B4/B7 (5,602)** |
-| Nombre Coins | =B8/B5 (0.1334) |
+| Paramètre             | Valeur              |
+| --------------------- | ------------------- |
+| Capital Total         | 10,000              |
+| % Risque              | 2%                  |
+| Risque $              | =B2\*B3 (200)       |
+| Entry Price           | 42,000              |
+| SL Price              | 40,500              |
+| % Distance SL         | =(B5-B6)/B5 (3.57%) |
+| **Taille Position $** | **=B4/B7 (5,602)**  |
+| Nombre Coins          | =B8/B5 (0.1334)     |
 
 **Avantages** :
+
 - Gratuit
 - Customisable
 - Stocke historique
@@ -320,6 +349,7 @@ Même si le calcul dit "vous pouvez mettre 100% du capital", **ne le faites jama
 ### 3. Apps Position Sizing
 
 **Apps recommandées** :
+
 - **Position Size Calculator** (iOS/Android, gratuit)
 - **Risk Manager** (Crypto-focused)
 - **MyFXBook Calculator** (Forex mais adaptable)
@@ -327,6 +357,7 @@ Même si le calcul dit "vous pouvez mettre 100% du capital", **ne le faites jama
 ### 4. Calculateur MyCryptoPilot (Promo)
 
 Sur [MyCryptoPilot](https://mycryptopilot.app), notre **console de risque** inclut :
+
 - Calculateur automatique position sizing
 - Pré-remplissage avec signaux reçus
 - Historique de vos positions
@@ -340,16 +371,19 @@ Sur [MyCryptoPilot](https://mycryptopilot.app), notre **console de risque** incl
 Le **Kelly Criterion** calcule la taille optimale pour maximiser la croissance long terme.
 
 **Formule** :
+
 ```
 Kelly % = (Win Rate × Avg Win) - (Loss Rate × Avg Loss) / Avg Win
 ```
 
 **Exemple** :
+
 - Win rate : 55%
 - Avg win : +4%
 - Avg loss : -2%
 
 **Calcul** :
+
 ```
 Kelly = (0.55 × 4) - (0.45 × 2) / 4 = (2.2 - 0.9) / 4 = 0.325 = 32.5%
 ```
@@ -359,6 +393,7 @@ Kelly = (0.55 × 4) - (0.45 × 2) / 4 = (2.2 - 0.9) / 4 = 0.325 = 32.5%
 **Problème** : Kelly assume win rate et R/R constants (jamais le cas en réalité). Un mauvais streak avec 32% risque = ruine.
 
 **Solution** : Utilisez **Half-Kelly ou Quarter-Kelly** :
+
 - Half-Kelly : 32.5% / 2 = **16.25%**
 - Quarter-Kelly : 32.5% / 4 = **8%**
 
@@ -369,6 +404,7 @@ Kelly = (0.55 × 4) - (0.45 × 2) / 4 = (2.2 - 0.9) / 4 = 0.325 = 32.5%
 Ajustez la taille selon la **volatilité** de la crypto.
 
 **Principe** :
+
 - BTC (faible volatilité) : risque 2%
 - Altcoin large cap (ETH, SOL) : risque 1.5%
 - Small cap (haute volatilité) : risque 0.5-1%
@@ -380,11 +416,13 @@ Ajustez la taille selon la **volatilité** de la crypto.
 Au lieu d'entrer 100% position d'un coup :
 
 **Exemple** :
+
 - Capital : 10,000$
 - Risque total : 2% = 200$
 - Calculer taille pour 200$ → 5,600$
 
 **Split en 3 entrées** :
+
 - Entry 1 (42,000$) : 2,800$ (50%)
 - Entry 2 (41,500$) : 1,680$ (30%)
 - Entry 3 (41,000$) : 1,120$ (20%)
@@ -439,11 +477,13 @@ Avant chaque trade :
 Le position sizing n'est pas une formule compliquée pour "nerds de la finance". C'est votre **bouclier** contre la ruine.
 
 **Sans position sizing** :
+
 - Vous survivrez 3-6 mois
 - Une série de pertes explosera votre compte
 - Vous blâmerez "le marché" ou "la malchance"
 
 **Avec position sizing rigoureux** :
+
 - Vous survivrez aux losing streaks (inévitables)
 - Votre capital croît lentement mais sûrement
 - Vous rejoignez les 5% de traders profitables
@@ -455,6 +495,7 @@ Taille = (Capital × % Risque) / % Distance SL
 ```
 
 **Les 3 règles d'or** :
+
 1. ✅ Toujours calculer avant d'entrer
 2. ✅ Jamais > 2% de risque par trade
 3. ✅ Jamais > 20-30% du capital investi
@@ -463,4 +504,4 @@ Maîtrisez cette compétence, et vous aurez fait 80% du chemin vers la rentabili
 
 ---
 
-*La [Console de Risque de MyCryptoPilot](https://mycryptopilot.app) calcule automatiquement votre position size idéale pour chaque signal. Plus d'erreurs, plus de calculs manuels. Tradez avec précision, tradez avec science.*
+_La [Console de Risque de MyCryptoPilot](https://mycryptopilot.app) calcule automatiquement votre position size idéale pour chaque signal. Plus d'erreurs, plus de calculs manuels. Tradez avec précision, tradez avec science._

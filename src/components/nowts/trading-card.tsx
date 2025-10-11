@@ -1,7 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
-import { ArrowDown, ArrowUp, Target, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Target,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type TradingCardProps = {
@@ -69,7 +75,7 @@ export const TradingCard = ({
 
         {/* Trader Info */}
         {traderName && (
-          <div className="mt-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-2 text-sm">
             By <span className="font-medium">{traderName}</span>
           </div>
         )}
@@ -79,14 +85,16 @@ export const TradingCard = ({
         {/* Entry & Invalidation */}
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex items-center gap-1 text-xs">
               <ArrowUp className="size-3" />
               <span>Entry</span>
             </div>
-            <div className="mt-1 text-lg font-bold">${payload.entry.toFixed(2)}</div>
+            <div className="mt-1 text-lg font-bold">
+              ${payload.entry.toFixed(2)}
+            </div>
           </div>
           <div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex items-center gap-1 text-xs">
               <ArrowDown className="size-3" />
               <span>Invalidation</span>
             </div>
@@ -98,7 +106,7 @@ export const TradingCard = ({
 
         {/* Take Profits */}
         <div className="mb-4">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
             <Target className="size-3" />
             <span>Take Profits</span>
           </div>
@@ -114,7 +122,7 @@ export const TradingCard = ({
         {/* Risk & Confidence */}
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div>
-            <div className="text-xs text-muted-foreground">Risk Level</div>
+            <div className="text-muted-foreground text-xs">Risk Level</div>
             <div className="mt-1 flex gap-1">
               {[1, 2, 3, 4, 5].map((level) => (
                 <div
@@ -128,14 +136,16 @@ export const TradingCard = ({
             </div>
           </div>
           <div>
-            <div className="text-xs text-muted-foreground">Confidence</div>
-            <div className="mt-1 text-lg font-semibold">{payload.confidence}%</div>
+            <div className="text-muted-foreground text-xs">Confidence</div>
+            <div className="mt-1 text-lg font-semibold">
+              {payload.confidence}%
+            </div>
           </div>
         </div>
 
         {/* Rationales */}
         <div className="mb-4">
-          <div className="text-xs text-muted-foreground">Rationales</div>
+          <div className="text-muted-foreground text-xs">Rationales</div>
           <ul className="mt-2 space-y-1">
             {payload.rationales.map((rationale, idx) => (
               <li key={idx} className="flex items-start gap-2 text-sm">
@@ -147,7 +157,7 @@ export const TradingCard = ({
         </div>
 
         {/* Regime & Metadata */}
-        <div className="flex flex-wrap items-center gap-2 border-t pt-3 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex flex-wrap items-center gap-2 border-t pt-3 text-xs">
           <Badge variant="secondary">{payload.regime}</Badge>
           <Badge variant="outline">
             {payload.managedBy === "AI" ? "🤖 AI" : "👤 Human"}

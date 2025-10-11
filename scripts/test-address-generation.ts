@@ -16,7 +16,10 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
-import { generateCryptoAddress, getUserCryptoAddresses } from "../src/lib/crypto/address-generator";
+import {
+  generateCryptoAddress,
+  getUserCryptoAddresses,
+} from "../src/lib/crypto/address-generator";
 import { prisma } from "../src/lib/prisma";
 
 console.log("🧪 Testing Crypto Address Generation\n");
@@ -29,14 +32,14 @@ async function runTests() {
       where: {
         OR: [
           { userId: { startsWith: "test_" } },
-          { address: { contains: "PLACEHOLDER" } }
-        ]
-      }
+          { address: { contains: "PLACEHOLDER" } },
+        ],
+      },
     });
     await prisma.user.deleteMany({
       where: {
-        id: { startsWith: "test_" }
-      }
+        id: { startsWith: "test_" },
+      },
     });
     console.log("✅ Cleanup complete\n");
 
@@ -51,8 +54,8 @@ async function runTests() {
         emailVerified: false,
         userRole: "USER",
         createdAt: now,
-        updatedAt: now
-      }
+        updatedAt: now,
+      },
     });
     const testUser2Id = "test_user_2";
     await prisma.user.create({
@@ -63,8 +66,8 @@ async function runTests() {
         emailVerified: false,
         userRole: "USER",
         createdAt: now,
-        updatedAt: now
-      }
+        updatedAt: now,
+      },
     });
     console.log("✅ Test users created\n");
 
@@ -77,7 +80,10 @@ async function runTests() {
     console.log(`   User ID: ${baseAddress.userId}\n`);
 
     // Validate Base address format
-    if (!baseAddress.address.startsWith("0x") || baseAddress.address.length !== 42) {
+    if (
+      !baseAddress.address.startsWith("0x") ||
+      baseAddress.address.length !== 42
+    ) {
       throw new Error(`Invalid Base address format: ${baseAddress.address}`);
     }
     console.log("✅ Base address format is valid\n");
@@ -90,7 +96,10 @@ async function runTests() {
     console.log(`   User ID: ${tronAddress.userId}\n`);
 
     // Validate Tron address format
-    if (!tronAddress.address.startsWith("T") || tronAddress.address.length < 30) {
+    if (
+      !tronAddress.address.startsWith("T") ||
+      tronAddress.address.length < 30
+    ) {
       throw new Error(`Invalid Tron address format: ${tronAddress.address}`);
     }
     console.log("✅ Tron address format is valid\n");
@@ -136,13 +145,13 @@ async function runTests() {
     console.log("🧹 Cleaning up test data...");
     await prisma.cryptoAddress.deleteMany({
       where: {
-        userId: { startsWith: "test_" }
-      }
+        userId: { startsWith: "test_" },
+      },
     });
     await prisma.user.deleteMany({
       where: {
-        id: { startsWith: "test_" }
-      }
+        id: { startsWith: "test_" },
+      },
     });
     console.log("✅ Test data cleaned up");
 

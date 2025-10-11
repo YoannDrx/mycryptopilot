@@ -98,6 +98,7 @@ Le bot supporte les commandes slash suivantes :
 Affiche la liste des commandes disponibles avec leurs descriptions.
 
 **Exemple de réponse** :
+
 ```
 📊 /status
 Affiche le statut de ton abonnement (plan actuel, date d'expiration, signaux restants)
@@ -118,6 +119,7 @@ Affiche le statut de l'abonnement de l'utilisateur.
 **Pré-requis** : L'utilisateur doit avoir lié son compte Discord à MyCryptoPilot (via le champ `discordId` dans la DB).
 
 **Exemple de réponse** :
+
 ```
 📊 Statut de ton abonnement
 
@@ -138,6 +140,7 @@ Utilise `/upgrade` pour passer Pro ou Ultra et débloquer plus de signaux !
 Affiche les plans d'abonnement disponibles avec leurs avantages.
 
 **Exemple de réponse** :
+
 ```
 ⬆️ Upgrade ton abonnement
 
@@ -194,6 +197,7 @@ Utilise `Ctrl+C` pour arrêter le bot gracieusement.
 ### ⚠️ Important : Vercel ne peut PAS héberger le bot Discord
 
 **Pourquoi ?**
+
 - **Vercel = Serverless** : Pas de long-running processes
 - **Timeout** : 10s (Hobby) / 60s (Pro) max par requête
 - **Bot Discord** : Doit rester connecté **24/7** via WebSocket Gateway
@@ -227,6 +231,7 @@ Séparer l'infrastructure en deux parties :
 ### Option 1 : Railway (Recommandé ⭐)
 
 **Avantages** :
+
 - ✅ Setup ultra-simple (5 minutes)
 - ✅ ~$5/mois (usage-based)
 - ✅ Support natif Node.js
@@ -292,10 +297,12 @@ railway up
 ### Option 2 : Render
 
 **Avantages** :
+
 - ✅ Free tier disponible
 - ✅ Interface simple
 
 **Inconvénients** :
+
 - ⚠️ Free tier : bot s'endort après 15min d'inactivité
 - 💰 $7/mois pour service actif 24/7
 
@@ -318,10 +325,12 @@ railway up
 ### Option 3 : Fly.io
 
 **Avantages** :
+
 - ✅ Free tier généreux (3 machines gratuites)
 - ✅ Très performant
 
 **Inconvénients** :
+
 - ⚠️ Setup plus technique (Dockerfile requis)
 
 **Setup** :
@@ -363,14 +372,14 @@ flyctl deploy
 
 Quelle que soit la plateforme choisie, configure ces variables :
 
-| Variable | Description | Exemple |
-|----------|-------------|---------|
-| `DISCORD_BOT_TOKEN` | Token du bot Discord | `MTIzNDU2Nzg5MDEyMzQ1Njc4OQ...` |
-| `DISCORD_GUILD_ID` | ID du serveur Discord | `1234567890123456789` |
-| `DISCORD_BOT_ENABLED` | Active le bot | `true` |
-| `DATABASE_URL` | URL Neon production (pooler) | `postgresql://neondb_owner:***@ep-proud-term-abutee8y-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require` |
-| `BETTER_AUTH_SECRET` | Secret Better Auth (même que Vercel) | `your-production-secret-32-chars` |
-| `NODE_ENV` | Environnement | `production` |
+| Variable              | Description                          | Exemple                                                                                                      |
+| --------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `DISCORD_BOT_TOKEN`   | Token du bot Discord                 | `MTIzNDU2Nzg5MDEyMzQ1Njc4OQ...`                                                                              |
+| `DISCORD_GUILD_ID`    | ID du serveur Discord                | `1234567890123456789`                                                                                        |
+| `DISCORD_BOT_ENABLED` | Active le bot                        | `true`                                                                                                       |
+| `DATABASE_URL`        | URL Neon production (pooler)         | `postgresql://neondb_owner:***@ep-proud-term-abutee8y-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require` |
+| `BETTER_AUTH_SECRET`  | Secret Better Auth (même que Vercel) | `your-production-secret-32-chars`                                                                            |
+| `NODE_ENV`            | Environnement                        | `production`                                                                                                 |
 
 **⚠️ IMPORTANT** : Utilise la **même `DATABASE_URL`** que ton app Vercel pour que le bot puisse accéder aux données utilisateurs !
 
@@ -379,6 +388,7 @@ Quelle que soit la plateforme choisie, configure ces variables :
 ### GitHub Actions (OPTIONNEL - Non recommandé)
 
 GitHub Actions peut faire tourner le bot, mais ce n'est **pas recommandé** pour la production car :
+
 - ❌ Limité à 2000 minutes/mois (free tier)
 - ❌ Pas de restart automatique si le workflow se termine
 - ❌ Pas fait pour les long-running processes
@@ -421,6 +431,7 @@ jobs:
 Quel que soit le service choisi, configure des alertes :
 
 **Railway** :
+
 ```bash
 # Voir les logs en temps réel
 railway logs
@@ -430,10 +441,12 @@ railway restart
 ```
 
 **Render** :
+
 - Dashboard → Logs (temps réel)
 - Configure des **Health Checks** (optionnel)
 
 **Fly.io** :
+
 ```bash
 # Voir les logs
 flyctl logs
@@ -478,13 +491,13 @@ app/api/discord/
 
 Le bot peut assigner automatiquement des rôles selon le plan de l'utilisateur :
 
-| Plan  | Rôle Discord     | Couleur |
-|-------|------------------|---------|
-| FREE  | Free Member      | Gris    |
-| PRO   | Pro Trader       | Amber   |
-| ULTRA | Ultra Trader     | Violet  |
+| Plan  | Rôle Discord | Couleur |
+| ----- | ------------ | ------- |
+| FREE  | Free Member  | Gris    |
+| PRO   | Pro Trader   | Amber   |
+| ULTRA | Ultra Trader | Violet  |
 
-*(Feature à implémenter : assignation automatique après paiement)*
+_(Feature à implémenter : assignation automatique après paiement)_
 
 ---
 

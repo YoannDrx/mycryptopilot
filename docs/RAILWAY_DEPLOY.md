@@ -78,6 +78,7 @@ chmod +x scripts/deploy-railway.sh
 ```
 
 Le script va automatiquement :
+
 1. ✅ Installer Railway CLI si nécessaire
 2. ✅ Te connecter à Railway
 3. ✅ Créer un nouveau projet (si besoin)
@@ -96,14 +97,14 @@ Lorsque le script te le demande, configure ces variables dans Railway Dashboard 
 3. Clique sur l'onglet **"Variables"**
 4. Ajoute chaque variable :
 
-| Variable | Où la trouver | Exemple |
-|----------|---------------|---------|
-| `DISCORD_BOT_TOKEN` | Discord Developer Portal | `MTIzNDU2Nzg5...` |
-| `DISCORD_GUILD_ID` | Discord (clic droit serveur) | `1426106950374002811` |
-| `DISCORD_BOT_ENABLED` | - | `true` |
-| `DATABASE_URL` | **Vercel Dashboard** → Variables | `postgresql://neondb_owner:***@ep-proud-term-abutee8y-pooler...` |
-| `BETTER_AUTH_SECRET` | **Vercel Dashboard** → Variables | `your-production-secret-32-chars` |
-| `NODE_ENV` | - | `production` |
+| Variable              | Où la trouver                    | Exemple                                                          |
+| --------------------- | -------------------------------- | ---------------------------------------------------------------- |
+| `DISCORD_BOT_TOKEN`   | Discord Developer Portal         | `MTIzNDU2Nzg5...`                                                |
+| `DISCORD_GUILD_ID`    | Discord (clic droit serveur)     | `1426106950374002811`                                            |
+| `DISCORD_BOT_ENABLED` | -                                | `true`                                                           |
+| `DATABASE_URL`        | **Vercel Dashboard** → Variables | `postgresql://neondb_owner:***@ep-proud-term-abutee8y-pooler...` |
+| `BETTER_AUTH_SECRET`  | **Vercel Dashboard** → Variables | `your-production-secret-32-chars`                                |
+| `NODE_ENV`            | -                                | `production`                                                     |
 
 **⚠️ CRITIQUE** : `DATABASE_URL` et `BETTER_AUTH_SECRET` doivent être **exactement les mêmes** que sur Vercel !
 
@@ -149,6 +150,7 @@ railway init
 ```
 
 Railway détectera automatiquement :
+
 - ✅ `nixpacks.toml` (configuration build)
 - ✅ `railway.json` (configuration service)
 - ✅ `.railwayignore` (fichiers à ignorer)
@@ -195,6 +197,7 @@ railway up
 ### Récupérer BETTER_AUTH_SECRET depuis Vercel
 
 Même processus :
+
 1. Vercel Dashboard → Settings → Environment Variables
 2. Cherche `BETTER_AUTH_SECRET` (scope: Production)
 3. Copie la valeur exacte
@@ -221,6 +224,7 @@ railway status
 ```
 
 Output attendu :
+
 ```
 Project: mycryptopilot-discord-bot
 Status: Deploying...
@@ -234,6 +238,7 @@ railway logs
 ```
 
 Tu devrais voir :
+
 ```
 [dotenv] injecting env (6) from .env.production
 🚀 Starting MyCryptoPilot Discord Bot...
@@ -288,6 +293,7 @@ Cela ouvrira le Railway Dashboard dans le navigateur.
 **Cause** : `DISCORD_BOT_TOKEN` incorrect ou manquant.
 
 **Solution** :
+
 ```bash
 # Vérifier la variable
 railway variables
@@ -303,6 +309,7 @@ railway variables set DISCORD_BOT_TOKEN="ton_vrai_token"
 **Cause** : `DATABASE_URL` incorrect ou différent de Vercel.
 
 **Solution** :
+
 1. Vérifie que tu utilises **exactement** la même URL que Vercel
 2. L'URL doit pointer vers Neon **production** (pas dev)
 3. Doit contenir `-pooler` pour les connexions concurrentes
@@ -322,6 +329,7 @@ railway variables | grep DATABASE_URL
 **Cause** : Railway n'utilise pas `nixpacks.toml`.
 
 **Solution** :
+
 1. Vérifie que `nixpacks.toml` est à la racine
 2. Vérifie que `railway.json` pointe vers `nixpacks.toml`
 3. Redéploie :
@@ -336,16 +344,12 @@ railway variables | grep DATABASE_URL
 **Cause** : Service Railway s'endort (uniquement free tier avec inactivité).
 
 **Solution** :
+
 - Upgrade vers Railway **Starter Plan** ($5/mois)
 - Ou configure un **cron job** pour garder le bot actif :
   ```yaml
   # railway.json
-  {
-    "deploy": {
-      "healthcheckPath": "/health",
-      "healthcheckTimeout": 100
-    }
-  }
+  { "deploy": { "healthcheckPath": "/health", "healthcheckTimeout": 100 } }
   ```
 
 ---
@@ -355,6 +359,7 @@ railway variables | grep DATABASE_URL
 **Cause** : Commandes non enregistrées sur Discord.
 
 **Solution** :
+
 1. Vérifie les logs Railway :
    ```bash
    railway logs | grep "Registering"
@@ -401,11 +406,11 @@ railway logout
 
 ## Coûts Estimés
 
-| Plan | Prix | Limitations |
-|------|------|-------------|
-| **Free Trial** | $5 crédit gratuit | 500h/mois d'exécution |
-| **Hobby** | Usage-based (~$5/mois) | Bot 24/7 sans limitations |
-| **Pro** | $20/mois | Support prioritaire, plus de ressources |
+| Plan           | Prix                   | Limitations                             |
+| -------------- | ---------------------- | --------------------------------------- |
+| **Free Trial** | $5 crédit gratuit      | 500h/mois d'exécution                   |
+| **Hobby**      | Usage-based (~$5/mois) | Bot 24/7 sans limitations               |
+| **Pro**        | $20/mois               | Support prioritaire, plus de ressources |
 
 **Estimation pour le bot Discord** : ~$5-7/mois (usage normal)
 

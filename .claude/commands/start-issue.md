@@ -16,27 +16,33 @@ Cette commande gère intelligemment le démarrage d'une issue en vérifiant l'é
 ### Actions à exécuter en parallèle:
 
 1. **Vérifier état git local**:
+
    ```bash
    git status
    git fetch origin
    git branch --list
    ```
+
    - Branche actuelle?
    - Modifications en cours?
    - Branches locales existantes?
 
 2. **Vérifier branches remote + état sync**:
+
    ```bash
    git rev-list --count HEAD..origin/main 2>/dev/null || echo "0"
    git rev-list --count origin/main..HEAD 2>/dev/null || echo "0"
    ```
+
    - Main est-il à jour avec origin/main?
    - Branche actuelle est-elle sync avec remote?
 
 3. **Lister PRs en cours**:
+
    ```bash
    gh pr list --json number,title,headRefName,state,isDraft
    ```
+
    - Y a-t-il des PRs ouvertes?
    - Quelles branches sont concernées?
 
@@ -44,6 +50,7 @@ Cette commande gère intelligemment le démarrage d'une issue en vérifiant l'é
    ```bash
    gh issue list --limit 50 --json number,title,state,labels,createdAt,updatedAt
    ```
+
    - Issues ouvertes disponibles
    - Labels (priority, phase, status)
 
@@ -77,6 +84,7 @@ Après avoir récupéré ces infos, déterminer le **Scenario**:
      % Done = (checked / total) * 100
      ```
    - Afficher résumé:
+
      ```
      📍 Travail en cours sur: #<number> - <title>
 
@@ -92,6 +100,7 @@ Après avoir récupéré ces infos, déterminer le **Scenario**:
      ```
 
 3. **Proposer action**:
+
    ```
    🔧 Options:
 
@@ -192,9 +201,11 @@ Après avoir récupéré ces infos, déterminer le **Scenario**:
 #### Si l'utilisateur choisit une issue:
 
 1. **Vérifier qu'une branche n'existe pas déjà**:
+
    ```bash
    git branch --list "*<issue_number>*" --all
    ```
+
    - Si branche locale existe → checkout
    - Si branche remote existe → checkout + track
    - Sinon → créer nouvelle branche
@@ -216,12 +227,14 @@ Après avoir récupéré ces infos, déterminer le **Scenario**:
 3. **Créer/Checkout la branche**:
 
    **Si branche existe déjà**:
+
    ```bash
    git checkout <branch_name>
    git pull origin <branch_name> 2>/dev/null || echo "Pas de remote"
    ```
 
    **Si branche n'existe pas**:
+
    ```bash
    # S'assurer que main est à jour
    git checkout main
@@ -232,6 +245,7 @@ Après avoir récupéré ces infos, déterminer le **Scenario**:
    ```
 
 4. **Afficher confirmation**:
+
    ```
    ✅ Branche configurée: <branch_name>
 
@@ -447,6 +461,7 @@ Tape le numéro d'issue (ou 'list' pour tout voir):
 ## 📝 Notes Finales
 
 Cette commande doit:
+
 - ✅ Être **autonome** (pas besoin de taper des commandes manuellement)
 - ✅ Être **intelligente** (analyser contexte, recommander)
 - ✅ Être **sûre** (vérifier avant d'agir, gérer erreurs)

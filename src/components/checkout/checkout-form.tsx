@@ -81,7 +81,9 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
   // Generate crypto addresses on mount
   const generateMutation = useMutation({
     mutationFn: async () => {
-      const result = await generateAddressAction({ plan: plan as "pro" | "ultra" });
+      const result = await generateAddressAction({
+        plan: plan as "pro" | "ultra",
+      });
 
       if (!isActionSuccessful(result)) {
         throw new Error(result.serverError ?? "Failed to generate addresses");
@@ -237,20 +239,17 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
 
       {/* Timer Card */}
       {paymentStatus === "pending" && (
-        <Card className="mb-6 border-amber-200 bg-amber-50">
-          <CardContent className="flex items-center justify-between pt-6">
+        <Card className="mb-6">
+          <CardContent className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Timer className="size-5 text-amber-600" />
-              <span className="font-medium text-amber-900">Time Remaining:</span>
+              <Timer className="size-5" />
+              <span className="font-medium">Time Remaining:</span>
             </div>
             <Countdown
               date={expiresAt}
               onComplete={handleExpiration}
               renderer={({ minutes, seconds }) => (
-                <Badge
-                  variant="outline"
-                  className="border-amber-500 text-lg font-mono text-amber-700"
-                >
+                <Badge variant="secondary" className="font-mono text-lg">
                   {String(minutes).padStart(2, "0")}:
                   {String(seconds).padStart(2, "0")}
                 </Badge>
@@ -264,10 +263,10 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
       <div className="mb-6 flex flex-col gap-8 lg:flex-row">
         {/* Base Network */}
         <Card className="flex-1">
-          <CardHeader className="bg-blue-50">
+          <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-blue-900">
-                <Wallet className="size-5" />
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="size-5 text-blue-500" />
                 Base Network (USDC)
               </CardTitle>
               <Badge variant="secondary">Recommended</Badge>
@@ -281,7 +280,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
                   <img
                     src={qrCodes.base}
                     alt="Base USDC Address QR Code"
-                    className="rounded-lg border-4 border-blue-100"
+                    className="rounded-lg border"
                   />
                 </div>
               )}
@@ -290,7 +289,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium">Send USDC to:</span>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 rounded-md bg-gray-100 px-3 py-2 text-xs break-all font-mono">
+                  <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
                     {addresses.base.address}
                   </code>
                   <Button
@@ -306,12 +305,12 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               </div>
 
               {/* Amount */}
-              <div className="rounded-lg bg-blue-50 p-4">
-                <p className="text-sm text-blue-900">
-                  <span className="font-bold">Amount:</span> ${planData.priceUSD}{" "}
-                  USDC
+              <div className="bg-muted/50 rounded-lg border p-4">
+                <p className="text-sm font-medium">
+                  <span className="font-semibold">Amount:</span> $
+                  {planData.priceUSD} USDC
                 </p>
-                <p className="mt-1 text-xs text-blue-700">
+                <p className="text-muted-foreground mt-1 text-xs">
                   Lower fees • Faster confirmation (1 block)
                 </p>
               </div>
@@ -332,10 +331,10 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
 
         {/* Tron Network */}
         <Card className="flex-1">
-          <CardHeader className="bg-red-50">
+          <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-red-900">
-                <Wallet className="size-5" />
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="size-5 text-red-500" />
                 Tron Network (USDT)
               </CardTitle>
             </div>
@@ -348,16 +347,18 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
                   <img
                     src={qrCodes.tron}
                     alt="Tron USDT Address QR Code"
-                    className="rounded-lg border-4 border-red-100"
+                    className="rounded-lg border"
                   />
                 </div>
               )}
 
               {/* Address */}
               <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium">Send USDT (TRC-20) to:</span>
+                <span className="text-sm font-medium">
+                  Send USDT (TRC-20) to:
+                </span>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 rounded-md bg-gray-100 px-3 py-2 text-xs break-all font-mono">
+                  <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
                     {addresses.tron.address}
                   </code>
                   <Button
@@ -373,12 +374,12 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               </div>
 
               {/* Amount */}
-              <div className="rounded-lg bg-red-50 p-4">
-                <p className="text-sm text-red-900">
-                  <span className="font-bold">Amount:</span> ${planData.priceUSD}{" "}
-                  USDT
+              <div className="bg-muted/50 rounded-lg border p-4">
+                <p className="text-sm font-medium">
+                  <span className="font-semibold">Amount:</span> $
+                  {planData.priceUSD} USDT
                 </p>
-                <p className="mt-1 text-xs text-red-700">
+                <p className="text-muted-foreground mt-1 text-xs">
                   TRC-20 only • Requires 2 confirmations
                 </p>
               </div>
@@ -405,7 +406,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
             {paymentStatus === "pending" && (
               <>
                 <Loader2 className="size-5 animate-spin text-blue-600" />
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-muted-foreground text-sm font-medium">
                   Waiting for payment confirmation...
                 </span>
               </>
@@ -419,9 +420,14 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               </>
             )}
           </div>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Your payment will be detected automatically. Do not close this page.
-          </p>
+          <div className="mt-4 space-y-2">
+            <p className="text-muted-foreground text-center text-xs">
+              Your payment will be detected automatically.
+            </p>
+            <p className="text-center text-xs font-semibold text-amber-600">
+              ⚠️ Do not leave this page until payment is detected.
+            </p>
+          </div>
         </CardContent>
       </Card>
 

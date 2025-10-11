@@ -11,7 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
-import { countActiveSignalsByTrader, countTotalSignalsByTrader } from "@/features/signal/signal-queries";
+import {
+  countActiveSignalsByTrader,
+  countTotalSignalsByTrader,
+} from "@/features/signal/signal-queries";
 import { prisma } from "@/lib/prisma";
 import {
   BarChart3,
@@ -92,7 +95,9 @@ export default async function TraderDashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold">{followersCount}</div>
               <p className="text-muted-foreground text-xs">
-                {followersCount === 0 ? "No followers yet" : "Growing your audience"}
+                {followersCount === 0
+                  ? "No followers yet"
+                  : "Growing your audience"}
               </p>
             </CardContent>
           </Card>
