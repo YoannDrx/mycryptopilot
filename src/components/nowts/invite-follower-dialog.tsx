@@ -28,6 +28,7 @@ import {
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -40,6 +41,7 @@ export const InviteFollowerDialog = ({
 }: InviteFollowerDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const form = useZodForm({
     schema: InviteFollowerSchema,
@@ -63,6 +65,7 @@ export const InviteFollowerDialog = ({
       form.reset();
       setOpen(false);
       void queryClient.invalidateQueries();
+      router.refresh();
       onInvitationSent?.();
     },
     onError: (error: Error) => {
