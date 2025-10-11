@@ -26,7 +26,7 @@ import {
   type InviteFollowerType,
 } from "@/features/invitation/invitation.schema";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ export const InviteFollowerDialog = ({
   onInvitationSent,
 }: InviteFollowerDialogProps) => {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const form = useZodForm({
     schema: InviteFollowerSchema,
@@ -61,6 +62,8 @@ export const InviteFollowerDialog = ({
       toast.success(data.message);
       form.reset();
       setOpen(false);
+      void queryClient.invalidateQueries();
+      window.location.reload(); // Hard refresh to update invitation list
       onInvitationSent?.();
     },
     onError: (error: Error) => {

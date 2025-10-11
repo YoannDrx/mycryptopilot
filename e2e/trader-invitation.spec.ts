@@ -54,9 +54,11 @@ test.describe("Trader Invitation System", () => {
     expect(invitation?.status).toBe("PENDING");
 
     // 5. Test resend functionality
-    // Find the row with the email and click resend
+    // Find the row with the email and wait for resend button to be visible
     const invitationRow = page.locator(`tr:has-text("${followerEmail}")`);
-    await invitationRow.getByRole("button", { name: /resend/i }).click();
+    const resendButton = invitationRow.getByRole("button", { name: /resend/i });
+    await expect(resendButton).toBeVisible({ timeout: 10000 });
+    await resendButton.click();
 
     // Wait for success message
     await page.waitForSelector(`text=Invitation resent to ${followerEmail}`, {
