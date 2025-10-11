@@ -105,7 +105,10 @@ export default async function AcceptInvitationPage(
           <CardHeader>
             <div className="flex flex-col items-center gap-4 text-center">
               <Avatar className="size-24">
-                <AvatarImage src={trader.image ?? undefined} alt={trader.name} />
+                <AvatarImage
+                  src={trader.image ?? undefined}
+                  alt={trader.name}
+                />
                 <AvatarFallback>
                   {traderProfile.displayName.charAt(0).toUpperCase()}
                 </AvatarFallback>
@@ -164,7 +167,7 @@ export default async function AcceptInvitationPage(
 
             {/* CTA */}
             <div className="space-y-4">
-              <div className="rounded-lg border bg-muted/50 p-4">
+              <div className="bg-muted/50 rounded-lg border p-4">
                 <div className="flex items-start gap-3">
                   <Signal className="text-primary mt-0.5 size-5" />
                   <div className="space-y-1">
