@@ -335,7 +335,7 @@ export default async function TraderDashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Manage your trading profile</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <CardContent className="grid gap-4 sm:grid-cols-3">
             <Button
               asChild
               variant="outline"
@@ -351,19 +351,10 @@ export default async function TraderDashboardPage() {
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
             >
-              <Link href={`/orgs/${org.slug}/dashboard/trader`}>
-                <Users className="size-6" />
-                <span>View Followers</span>
+              <Link href={`/orgs/${org.slug}/signals`}>
+                <BarChart3 className="size-6" />
+                <span>Browse Signals</span>
               </Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 py-4"
-              disabled
-              title="Coming soon"
-            >
-              <BarChart3 className="size-6" />
-              <span>Analytics</span>
             </Button>
             <Button
               asChild
