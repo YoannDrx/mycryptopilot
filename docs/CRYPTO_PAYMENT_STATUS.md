@@ -10,11 +10,13 @@
 ### 1. Génération XPUB Keys Testnet
 
 ✅ **Script exécuté avec succès**
+
 ```bash
 npx tsx scripts/generate-testnet-xpub.ts
 ```
 
 **Résultat** :
+
 - ✅ Base XPUB : `xpub6MuBJVs8PxXAbxb7nB2SL2iKPwZZq598gCLW9UHHHrrxxBeCdnEB7tdohvDobh9tadUjJE6VoTRDWezqMVHehxfB3fw4RW2J1QHCaFDhPzP`
 - ✅ Tron XPUB : `xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8jrGhg9u6mVDjK7UGjFGXXSwxuLdF2AW1hX2LpjcCiyytCcMDR9`
 - ✅ Mnemonic sauvegardé : `almost gas infant pyramid judge deliver myth pause link copper cabbage pulse`
@@ -26,6 +28,7 @@ npx tsx scripts/generate-testnet-xpub.ts
 ### 2. Configuration .env.local
 
 ✅ **Ajouté dans `.env.local`** (gitignored) :
+
 ```bash
 # 💳 CRYPTO PAYMENTS (Testnet - Development)
 # ⚠️  WARNING: These are TEST keys only. DO NOT use in production!
@@ -46,6 +49,7 @@ CRYPTO_XPUB_TRON="xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8j
 ### 3. Configuration Vercel Production
 
 ✅ **Variables ajoutées dans Vercel Dashboard** (Production scope only) :
+
 ```bash
 BASE_RPC_URL=https://mainnet.base.org
 TRON_RPC_URL=https://api.trongrid.io
@@ -54,6 +58,7 @@ CRYPTO_XPUB_TRON=xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8jr
 ```
 
 **Vérification** :
+
 ```bash
 vercel env ls | grep CRYPTO
 # ✅ CRYPTO_XPUB_BASE (Production)
@@ -67,6 +72,7 @@ vercel env ls | grep CRYPTO
 ✅ **Créé** : `scripts/sweep-to-binance.ts` (279 lignes)
 
 **Fonctionnalités actuelles** :
+
 - ✅ Lecture de toutes les CryptoAddress en base
 - ✅ Check balance Base (USDC) via RPC
 - ✅ Check balance Tron (USDT) via RPC
@@ -75,10 +81,12 @@ vercel env ls | grep CRYPTO
 - ⚠️ Transfert réel **PAS ENCORE IMPLÉMENTÉ** (nécessite clé privée)
 
 **Seuils configurés** :
+
 - Minimum sweep Base : 10 USDC (éviter frais gas inutiles)
 - Minimum sweep Tron : 10 USDT
 
 **Utilisation** :
+
 ```bash
 npx tsx scripts/sweep-to-binance.ts
 ```
@@ -90,6 +98,7 @@ npx tsx scripts/sweep-to-binance.ts
 ✅ **Créé** : `scripts/SWEEP_SETUP.md` (420 lignes)
 
 **Contenu** :
+
 - Guide configuration adresses dépôt Binance
 - Instructions .env.local + Vercel
 - 3 options d'implémentation transferts (manuel/service externe/hardware wallet)
@@ -103,12 +112,14 @@ npx tsx scripts/sweep-to-binance.ts
 ✅ **Créé** : `scripts/test-crypto-addresses.ts` (97 lignes)
 
 **Tests** :
+
 1. ✅ Génération adresse Base (USDC)
 2. ✅ Génération adresse Tron (USDT)
 3. ✅ Validation format adresses (0x... et T...)
 4. ✅ Réutilisation adresses (même user = même adresse)
 
 **Résultat des tests** :
+
 ```
 ✅ All tests passed!
 🎉 Your crypto payment system is ready!
@@ -120,6 +131,7 @@ npx tsx scripts/sweep-to-binance.ts
 ```
 
 **Adresses générées (exemple)** :
+
 - Base : `0x9c677d357A4567a10038C479F18698d7edF33aBD`
 - Tron : `THwfUfhWoTYdavuvFhaHrGV9QqDRXjhNzy`
 
@@ -128,6 +140,7 @@ npx tsx scripts/sweep-to-binance.ts
 ### 7. Variables Environnement (env.ts)
 
 ✅ **Ajouté** dans `src/lib/env.ts` :
+
 ```typescript
 // Binance master wallets for sweep (optional)
 BINANCE_MASTER_WALLET_BASE: z.string().optional(),
@@ -141,11 +154,12 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 ### 1. Configuration Adresses Binance (5 min) ⚠️ ACTION REQUISE
 
 **Toi, tu dois** :
+
 1. Te connecter à Binance
 2. Aller dans Wallet → Fiat and Spot → Deposit
 3. Sélectionner USDC (réseau Base) → Copier adresse
 4. Sélectionner USDT (réseau TRC20/Tron) → Copier adresse
-5. Ajouter dans `.env.local` :
+5. Ajouter dans `.env.local` :xxX
    ```bash
    # 🏦 BINANCE MASTER WALLETS (for sweep)
    BINANCE_MASTER_WALLET_BASE="0xTON_ADRESSE_BINANCE_BASE"
@@ -161,6 +175,7 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 ❌ **Page `/checkout/[plan]` à créer**
 
 **Fonctionnalités requises** :
+
 - Afficher plan sélectionné (PRO $49 ou ULTRA $99)
 - Générer adresses crypto (Base USDC + Tron USDT)
 - Afficher QR codes pour paiement mobile
@@ -169,6 +184,7 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 - Redirection post-paiement vers dashboard
 
 **Dépendances** :
+
 - `qrcode` (npm package pour QR codes)
 - `react-countdown` (npm package pour timer)
 - Payment watcher fonctionnel (étape 3)
@@ -180,10 +196,12 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 ⚠️ **Fichier** : `src/lib/crypto/payment-watcher.ts`
 
 **État actuel** : Placeholders (2 TODOs)
+
 - Ligne 81 : `watchPayment()` - RPC calls = placeholder
 - Ligne 120 : `watchPaymentWithTimeout()` - Polling réel = placeholder
 
 **À implémenter** :
+
 - RPC calls Base : Détecter Transfer events USDC via ethers.js
 - RPC calls Tron : Détecter Transfer events USDT via TronWeb
 - Polling avec retry (toutes les 10s pendant 15 min)
@@ -203,6 +221,7 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 **État actuel** : Read-only (détecte balances, ne transfère pas)
 
 **À implémenter** :
+
 - Dériver clés privées depuis mnemonic (sécurisé)
 - Signer transactions Base (ethers.js)
 - Signer transactions Tron (TronWeb)
@@ -210,6 +229,7 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 - Logger transactions en base
 
 **3 Options** :
+
 1. **Script manuel avec mnemonic** (2-3h, sécurité moyenne)
 2. **Service externe** (Fireblocks, Coinbase Commerce - 1-2j, sécurité excellente)
 3. **Hardware wallet + script** (Ledger - 4-5h, sécurité excellente)
@@ -225,6 +245,7 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 **Actuellement** : Clés testnet (non sécurisées)
 
 **Avant le lancement prod**, tu DOIS :
+
 1. Acheter un Ledger Nano S (~80€) OU
 2. Utiliser un mnemonic sécurisé de 24 mots
 
@@ -236,13 +257,13 @@ BINANCE_MASTER_WALLET_TRON: z.string().optional(),
 
 ## 📊 Récapitulatif Effort Restant
 
-| Tâche | Effort | Priorité | Bloquant MVP ? |
-|-------|--------|----------|----------------|
-| Config adresses Binance | 5 min | P0 | ❌ Non (manuel OK) |
-| UI Checkout page | 2-3 jours | P0 | ✅ **OUI** |
-| Payment watcher impl | 2-3 jours | P0 | ✅ **OUI** |
-| Sweep transfers impl | 3-5h | P1 | ❌ Non (manuel OK) |
-| Production XPUB keys | 30 min | P1 | ❌ Non (avant launch) |
+| Tâche                   | Effort    | Priorité | Bloquant MVP ?        |
+| ----------------------- | --------- | -------- | --------------------- |
+| Config adresses Binance | 5 min     | P0       | ❌ Non (manuel OK)    |
+| UI Checkout page        | 2-3 jours | P0       | ✅ **OUI**            |
+| Payment watcher impl    | 2-3 jours | P0       | ✅ **OUI**            |
+| Sweep transfers impl    | 3-5h      | P1       | ❌ Non (manuel OK)    |
+| Production XPUB keys    | 30 min    | P1       | ❌ Non (avant launch) |
 
 **Total MVP** : ~5-6 jours (checkout UI + payment watcher)
 
