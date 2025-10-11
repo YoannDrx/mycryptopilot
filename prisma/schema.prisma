@@ -108,6 +108,25 @@ model Signal {
   @@map("signal")
 }
 
+model TraderInvitation {
+  id         String           @id @default(cuid())
+  traderId   String
+  email      String
+  token      String           @unique
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  trader     User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@unique([traderId, email])
+  @@index([token])
+  @@index([traderId])
+  @@index([status])
+  @@map("trader_invitation")
+}
+
 enum UserRole {
   USER
   TRADER
@@ -137,4 +156,10 @@ enum PaymentStatus {
   PENDING
   CONFIRMED
   FAILED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
 }

@@ -19,6 +19,10 @@ export const SiteConfig = {
     twitter: "https://twitter.com/mycryptopilot",
     name: "MyCryptoPilot Team",
   },
+  email: {
+    from: "MyCryptoPilot <noreply@mycryptopilot.app>",
+    contact: "support@mycryptopilot.app",
+  },
   features: {
     /**
      * Image upload enabled for trader profile pictures and logos
