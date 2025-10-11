@@ -11,6 +11,10 @@ const HEADLESS = process.env.HEADLESS
 const config: PlaywrightTestConfig = {
   // 50 seconds
   timeout: 70 * 1000,
+  // Expect timeout for assertions (e.g., toBeVisible, toHaveText)
+  expect: {
+    timeout: 15000,
+  },
   projects: [
     {
       name: "chromium",
