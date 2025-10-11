@@ -21,3 +21,21 @@ export const AcceptInvitationSchema = z.object({
 });
 
 export type AcceptInvitationType = z.infer<typeof AcceptInvitationSchema>;
+
+/**
+ * Schema for deleting an invitation
+ */
+export const DeleteInvitationSchema = z.object({
+  invitationId: z.string().cuid("Invalid invitation ID"),
+});
+
+export type DeleteInvitationType = z.infer<typeof DeleteInvitationSchema>;
+
+/**
+ * Schema for resending an invitation
+ */
+export const ResendInvitationSchema = z.object({
+  invitationId: z.string().cuid("Invalid invitation ID"),
+});
+
+export type ResendInvitationType = z.infer<typeof ResendInvitationSchema>;

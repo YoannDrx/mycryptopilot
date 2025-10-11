@@ -10,6 +10,7 @@ import {
 import { getTraderInvitations } from "@/features/invitation/invitation-queries";
 import { formatDistanceToNow } from "date-fns";
 import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { InvitationActions } from "./invitation-actions";
 
 type InvitationsTableProps = {
   traderId: string;
@@ -66,6 +67,7 @@ export const InvitationsTable = async ({ traderId }: InvitationsTableProps) => {
             <TableHead>Status</TableHead>
             <TableHead>Sent</TableHead>
             <TableHead>Expires</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -95,6 +97,13 @@ export const InvitationsTable = async ({ traderId }: InvitationsTableProps) => {
                     : formatDistanceToNow(invitation.expiresAt, {
                         addSuffix: true,
                       })}
+                </TableCell>
+                <TableCell className="text-right">
+                  <InvitationActions
+                    invitationId={invitation.id}
+                    email={invitation.email}
+                    status={isExpired ? "EXPIRED" : invitation.status}
+                  />
                 </TableCell>
               </TableRow>
             );

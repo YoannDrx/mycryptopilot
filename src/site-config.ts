@@ -3,6 +3,7 @@ export const SiteConfig = {
   description:
     "Signaux de trading crypto risk-first. Analyse temps réel, plans explicables, console de risque.",
   prodUrl: "https://mycryptopilot.app",
+  appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://mycryptopilot.app",
   appId: "mycryptopilot",
   domain: "mycryptopilot.app",
   appIcon: "/images/icon.png",

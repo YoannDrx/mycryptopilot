@@ -15,7 +15,7 @@ type AcceptInvitationButtonProps = {
 
 export const AcceptInvitationButton = ({
   token,
-  traderId,
+  traderId: _traderId,
   traderName,
 }: AcceptInvitationButtonProps) => {
   const router = useRouter();
@@ -30,10 +30,10 @@ export const AcceptInvitationButton = ({
 
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success(`You're now following ${traderName}!`);
-      // Redirect to trader profile
-      router.push(`/traders/${traderId}`);
+      // Redirect to user dashboard where they can see signals from followed traders
+      router.push(`/orgs/${data.orgSlug}/dashboard`);
       router.refresh();
     },
     onError: (error: Error) => {

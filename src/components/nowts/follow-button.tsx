@@ -27,6 +27,7 @@ type FollowButtonProps = {
   isFollowing: boolean;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
+  onFollowSuccess?: () => void;
 };
 
 export const FollowButton = ({
@@ -35,6 +36,7 @@ export const FollowButton = ({
   isFollowing,
   variant = "default",
   size = "default",
+  onFollowSuccess,
 }: FollowButtonProps) => {
   const queryClient = useQueryClient();
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
@@ -55,6 +57,10 @@ export const FollowButton = ({
       // Invalider les queries pour rafraîchir les données
       void queryClient.invalidateQueries({ queryKey: ["traders"] });
       void queryClient.invalidateQueries({ queryKey: ["following"] });
+      // Call custom success handler if provided
+      if (onFollowSuccess) {
+        onFollowSuccess();
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message);

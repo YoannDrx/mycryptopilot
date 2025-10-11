@@ -8,11 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FollowButton } from "@/components/nowts/follow-button";
+import { FollowTraderButton } from "./_components/follow-trader-button";
 import { isFollowingTrader } from "@/features/follow/follow-queries";
 import { countTotalSignalsByTrader } from "@/features/signal/signal-queries";
 import { getTraderById } from "@/features/trader/trader-queries";
 import { getUser } from "@/lib/auth/auth-user";
+import { prisma } from "@/lib/prisma";
 import { CheckCircle2, Signal, TrendingUp } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -65,9 +66,23 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
   // Check if already following this trader
   const isFollowing = await isFollowingTrader(user.id, params.traderId);
 
-  // If already following, redirect to trader profile
+  // Get user's org slug for redirection
+  const userMember = await prisma.member.findFirst({
+    where: { userId: user.id },
+    include: {
+      organization: {
+        select: {
+          slug: true,
+        },
+      },
+    },
+  });
+
+  const orgSlug = userMember?.organization.slug ?? "org-slug-default";
+
+  // If already following, show they're already following with redirect to dashboard
   if (isFollowing) {
-    redirect(`/traders/${params.traderId}`);
+    redirect(`/orgs/${orgSlug}/dashboard?already_following=${params.traderId}`);
   }
 
   // Count trader's signals
@@ -75,8 +90,10 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
 
   // Trader stats
   const stats =
-    (traderProfile.statsJson as Record<string, number | string | boolean> | null) ??
-    {};
+    (traderProfile.statsJson as Record<
+      string,
+      number | string | boolean
+    > | null) ?? {};
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -86,7 +103,10 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
           <CardHeader>
             <div className="flex flex-col items-center gap-4 text-center">
               <Avatar className="size-24">
-                <AvatarImage src={trader.image ?? undefined} alt={trader.name} />
+                <AvatarImage
+                  src={trader.image ?? undefined}
+                  alt={trader.name}
+                />
                 <AvatarFallback>
                   {traderProfile.displayName.charAt(0).toUpperCase()}
                 </AvatarFallback>
@@ -145,27 +165,27 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
 
             {/* CTA Follow */}
             <div className="space-y-4">
-              <div className="rounded-lg border bg-muted/50 p-4">
+              <div className="bg-muted/50 rounded-lg border p-4">
                 <div className="flex items-start gap-3">
                   <Signal className="text-primary mt-0.5 size-5" />
                   <div className="space-y-1">
                     <p className="font-medium">
-                      Follow {traderProfile.displayName} to receive their signals
+                      Follow {traderProfile.displayName} to receive their
+                      signals
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Get real-time Discord notifications for every new published signal.
-                      Access trading journal and detailed statistics.
+                      Get real-time Discord notifications for every new
+                      published signal. Access trading journal and detailed
+                      statistics.
                     </p>
                   </div>
                 </div>
               </div>
 
-              <FollowButton
+              <FollowTraderButton
                 traderId={params.traderId}
                 traderName={traderProfile.displayName}
-                isFollowing={isFollowing}
-                variant="default"
-                size="lg"
+                orgSlug={orgSlug}
               />
             </div>
 
@@ -188,9 +208,7 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
         <Card className="bg-muted/30">
           <CardContent className="pt-6">
             <div className="text-muted-foreground space-y-2 text-center text-sm">
-              <p>
-                ✅ Follow verified traders with transparent track records
-              </p>
+              <p>✅ Follow verified traders with transparent track records</p>
               <p>🔔 Get instant notifications on Discord</p>
               <p>📊 Access risk management tools</p>
             </div>

@@ -58,14 +58,7 @@ export function TraderInvitationEmail({
       </Text>
 
       <Text className="text-sm text-gray-500">
-        Questions? Visit our{" "}
-        <a
-          href={`${SiteConfig.prodUrl}/docs`}
-          className="text-indigo-600 no-underline"
-        >
-          documentation
-        </a>{" "}
-        or contact us at{" "}
+        Questions? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
           className="text-indigo-600 no-underline"
