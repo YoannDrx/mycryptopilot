@@ -55,7 +55,6 @@ test.describe("Trader Referral System", () => {
     // 6. Navigate to referral link
     await page.goto(referralUrl);
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000); // Extra buffer for RSC to render
 
     // Should see trader profile preview
     await expect(page.getByText(traderProfile.displayName)).toBeVisible();
