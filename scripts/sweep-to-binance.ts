@@ -92,7 +92,9 @@ export async function sweepAllAddresses(): Promise<SweepResult[]> {
   if (baseAddresses.length > 0) {
     console.log(`🟦 Checking ${baseAddresses.length} Base addresses...\n`);
     const baseResults = await Promise.all(
-      baseAddresses.map(async (addr) => sweepBaseAddress(addr.address, addr.userId)),
+      baseAddresses.map(async (addr) =>
+        sweepBaseAddress(addr.address, addr.userId),
+      ),
     );
     results.push(...baseResults);
   }
@@ -101,7 +103,9 @@ export async function sweepAllAddresses(): Promise<SweepResult[]> {
   if (tronAddresses.length > 0) {
     console.log(`🟣 Checking ${tronAddresses.length} Tron addresses...\n`);
     const tronResults = await Promise.all(
-      tronAddresses.map(async (addr) => sweepTronAddress(addr.address, addr.userId)),
+      tronAddresses.map(async (addr) =>
+        sweepTronAddress(addr.address, addr.userId),
+      ),
     );
     results.push(...tronResults);
   }
@@ -155,7 +159,9 @@ async function sweepBaseAddress(
     console.log(`  ${address}: ${balanceFormatted} USDC`);
 
     // Skip if balance below threshold
-    if (parseFloat(balanceFormatted) < parseFloat(MINIMUM_SWEEP_THRESHOLD_USDC)) {
+    if (
+      parseFloat(balanceFormatted) < parseFloat(MINIMUM_SWEEP_THRESHOLD_USDC)
+    ) {
       return {
         address,
         network: "BASE",
@@ -167,8 +173,12 @@ async function sweepBaseAddress(
     // TODO: Implement actual transfer
     // This requires access to the private key derived from mnemonic
     // For now, we return a placeholder
-    console.log(`    ⚠️  Would sweep ${balanceFormatted} USDC to ${binanceMasterWallet}`);
-    console.log(`    ⚠️  Transfer not implemented yet (requires private key access)`);
+    console.log(
+      `    ⚠️  Would sweep ${balanceFormatted} USDC to ${binanceMasterWallet}`,
+    );
+    console.log(
+      `    ⚠️  Transfer not implemented yet (requires private key access)`,
+    );
 
     return {
       address,
@@ -212,12 +222,16 @@ async function sweepTronAddress(
     const contract = await tronWeb.contract().at(TRON_USDT_CONTRACT);
     const balance = await contract.balanceOf(address).call();
     const decimals = await contract.decimals().call();
-    const balanceFormatted = (Number(balance) / 10 ** Number(decimals)).toFixed(2);
+    const balanceFormatted = (Number(balance) / 10 ** Number(decimals)).toFixed(
+      2,
+    );
 
     console.log(`  ${address}: ${balanceFormatted} USDT`);
 
     // Skip if balance below threshold
-    if (parseFloat(balanceFormatted) < parseFloat(MINIMUM_SWEEP_THRESHOLD_USDT)) {
+    if (
+      parseFloat(balanceFormatted) < parseFloat(MINIMUM_SWEEP_THRESHOLD_USDT)
+    ) {
       return {
         address,
         network: "TRON",
@@ -228,8 +242,12 @@ async function sweepTronAddress(
 
     // TODO: Implement actual transfer
     // This requires access to the private key derived from mnemonic
-    console.log(`    ⚠️  Would sweep ${balanceFormatted} USDT to ${binanceMasterWallet}`);
-    console.log(`    ⚠️  Transfer not implemented yet (requires private key access)`);
+    console.log(
+      `    ⚠️  Would sweep ${balanceFormatted} USDT to ${binanceMasterWallet}`,
+    );
+    console.log(
+      `    ⚠️  Transfer not implemented yet (requires private key access)`,
+    );
 
     return {
       address,

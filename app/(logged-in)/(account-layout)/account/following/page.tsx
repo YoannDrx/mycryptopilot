@@ -34,10 +34,7 @@ export default async function FollowingPage() {
             <CardTitle>No traders followed yet</CardTitle>
             <CardDescription>
               Visit the{" "}
-              <Link
-                href="/traders"
-                className="text-primary underline"
-              >
+              <Link href="/traders" className="text-primary underline">
                 traders marketplace
               </Link>{" "}
               to discover and follow professional traders.
@@ -55,7 +52,10 @@ export default async function FollowingPage() {
             }
 
             const stats =
-              (traderProfile.statsJson as Record<string, number | string | boolean> | null) ?? {};
+              (traderProfile.statsJson as Record<
+                string,
+                number | string | boolean
+              > | null) ?? {};
 
             return (
               <Card key={follow.id}>

@@ -14,6 +14,7 @@ npx prisma migrate status
 ```
 
 **Migrations appliquées**:
+
 - ✅ `20250806031537_initail_migration`
 - ✅ `20250813011134_org_move_to_stirpe_to_org_level`
 - ✅ `20250813021925_admin_add_admin_control_of_better_auth`
@@ -21,6 +22,7 @@ npx prisma migrate status
 - ✅ `20251010090500_add_user_plan_and_discord_fields`
 
 ✅ **Toutes les fonctionnalités sont maintenant opérationnelles**:
+
 - Profils traders ✅
 - Création de signaux ✅
 - Système follow/unfollow ✅
@@ -64,11 +66,11 @@ Voir [docs/neon-setup.md](./neon-setup.md) pour la configuration complète Neon.
 
 **Résumé rapide :**
 
-| Environnement | Base Neon | Fichier |
-|---------------|-----------|---------|
-| Dev local | Branch `dev` | `.env.development` |
-| Production | Branch `main` | Variables Vercel |
-| Tests E2E | PostgreSQL local | `.env.test` |
+| Environnement | Base Neon        | Fichier            |
+| ------------- | ---------------- | ------------------ |
+| Dev local     | Branch `dev`     | `.env.development` |
+| Production    | Branch `main`    | Variables Vercel   |
+| Tests E2E     | PostgreSQL local | `.env.test`        |
 
 ---
 
@@ -85,6 +87,7 @@ NODE_ENV=development pnpm dev
 ```
 
 **Variables importantes :**
+
 ```bash
 DATABASE_URL="postgresql://...@ep-falling-bar-ab0lufee..." # Branch dev
 BETTER_AUTH_URL=http://localhost:3000
@@ -101,6 +104,7 @@ pnpm test:e2e:ui
 ```
 
 **Prérequis :** PostgreSQL local doit tourner :
+
 ```bash
 # Avec Docker
 docker run -d \
@@ -154,13 +158,14 @@ NODE_ENV=production pnpm build
 
 Les secrets GitHub Actions sont configurés dans **Settings → Secrets → Actions** :
 
-| Secret | Usage | Exemple |
-|--------|-------|---------|
-| `BETTER_AUTH_SECRET_TEST` | Tests E2E CI | `test-secret-key...` |
-| `RESEND_API_KEY` | Emails en CI | `re_***` |
-| `NEON_PROJECT_ID` | Gestion DB Neon | `prj_***` |
+| Secret                    | Usage           | Exemple              |
+| ------------------------- | --------------- | -------------------- |
+| `BETTER_AUTH_SECRET_TEST` | Tests E2E CI    | `test-secret-key...` |
+| `RESEND_API_KEY`          | Emails en CI    | `re_***`             |
+| `NEON_PROJECT_ID`         | Gestion DB Neon | `prj_***`            |
 
 **Ajouter un secret :**
+
 ```bash
 gh secret set SECRET_NAME -R YoannDrx/mycryptopilot
 ```
@@ -202,9 +207,9 @@ Ajouter temporairement dans `next.config.ts` :
 ```typescript
 console.log({
   NODE_ENV: process.env.NODE_ENV,
-  DATABASE_URL: process.env.DATABASE_URL?.slice(0, 30) + '...', // Tronquer pour sécurité
+  DATABASE_URL: process.env.DATABASE_URL?.slice(0, 30) + "...", // Tronquer pour sécurité
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
-})
+});
 ```
 
 ---
@@ -257,6 +262,7 @@ git push origin hotfix/critical-bug
 **Cause :** Mauvaise `DATABASE_URL` ou DB non accessible.
 
 **Solution :**
+
 ```bash
 # Vérifier quelle URL est chargée
 echo $DATABASE_URL
@@ -270,6 +276,7 @@ pnpm prisma db pull
 **Cause :** Variable manquante ou non chargée.
 
 **Solution :**
+
 ```bash
 # Générer un nouveau secret
 openssl rand -base64 32
@@ -283,6 +290,7 @@ BETTER_AUTH_SECRET="<votre-secret-généré>"
 **Cause :** Fichier `.env.*` au mauvais endroit ou mal nommé.
 
 **Solution :**
+
 ```bash
 # Vérifier que les fichiers sont à la racine du projet
 ls -la .env.*
@@ -299,6 +307,7 @@ ls -la .env.*
 **Cause :** Secret non configuré dans GitHub.
 
 **Solution :**
+
 ```bash
 # Lister les secrets
 gh secret list -R YoannDrx/mycryptopilot

@@ -133,14 +133,14 @@ async function sendExpirationReminderEmail(params: {
   const { user, daysLeft, expiresAt } = params;
 
   const planDisplayName =
-    user.planName === "pro" ? "Pro" : user.planName === "ultra" ? "Ultra" : "Free";
+    user.planName === "pro"
+      ? "Pro"
+      : user.planName === "ultra"
+        ? "Ultra"
+        : "Free";
 
   const urgencyText =
-    daysLeft === 3
-      ? "dans 3 jours"
-      : daysLeft === 1
-        ? "demain"
-        : "bientôt";
+    daysLeft === 3 ? "dans 3 jours" : daysLeft === 1 ? "demain" : "bientôt";
 
   const markdown = `
 # ⏰ Ton abonnement ${planDisplayName} expire ${urgencyText}

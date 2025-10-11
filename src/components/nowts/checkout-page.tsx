@@ -25,10 +25,10 @@ export function CheckoutPage({ plan, planDetails }: CheckoutPageProps) {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">
+      <div className="mb-8 text-center">
+        <h1 className="mb-2 text-3xl font-bold">
           Subscribe to {planDetails.displayName} Plan
         </h1>
         <div className="flex items-center justify-center gap-2">
@@ -46,7 +46,7 @@ export function CheckoutPage({ plan, planDetails }: CheckoutPageProps) {
           <CardTitle>What's included</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {planDetails.features.map((feature, index) => (
               <li key={index} className="flex items-center gap-2">
                 <span className="text-green-500">✓</span>
@@ -61,7 +61,7 @@ export function CheckoutPage({ plan, planDetails }: CheckoutPageProps) {
       <Card>
         <CardHeader>
           <CardTitle>Select Payment Method</CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Choose your preferred network and currency
           </p>
         </CardHeader>
@@ -117,10 +117,8 @@ export function CheckoutPage({ plan, planDetails }: CheckoutPageProps) {
       </Card>
 
       {/* Help Footer */}
-      <div className="mt-6 text-center text-sm text-muted-foreground">
-        <p>
-          Need help? Join our Discord or contact support
-        </p>
+      <div className="text-muted-foreground mt-6 text-center text-sm">
+        <p>Need help? Join our Discord or contact support</p>
       </div>
     </div>
   );

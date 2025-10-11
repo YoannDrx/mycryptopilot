@@ -35,8 +35,12 @@ export const SubscriptionCard = ({
 
   // Calculate days left
   const now = new Date();
-  const timeLeft = planExpiresAt ? planExpiresAt.getTime() - now.getTime() : null;
-  const daysLeft = timeLeft ? Math.ceil(timeLeft / (1000 * 60 * 60 * 24)) : null;
+  const timeLeft = planExpiresAt
+    ? planExpiresAt.getTime() - now.getTime()
+    : null;
+  const daysLeft = timeLeft
+    ? Math.ceil(timeLeft / (1000 * 60 * 60 * 24))
+    : null;
   const isExpired = timeLeft !== null && timeLeft <= 0;
   const isExpiringSoon = daysLeft !== null && daysLeft <= 7 && daysLeft > 0;
 
@@ -87,7 +91,10 @@ export const SubscriptionCard = ({
             {isExpired ? (
               <Badge variant="destructive">Expired</Badge>
             ) : isExpiringSoon ? (
-              <Badge variant="outline" className="border-amber-500 text-amber-700">
+              <Badge
+                variant="outline"
+                className="border-amber-500 text-amber-700"
+              >
                 Expiring Soon
               </Badge>
             ) : isFreePlan ? (
@@ -111,9 +118,9 @@ export const SubscriptionCard = ({
       <CardContent className="space-y-4">
         {/* Expiration Info */}
         {!isFreePlan && planExpiresAt && (
-          <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+          <div className="bg-muted flex items-center justify-between rounded-lg p-3">
             <div className="flex items-center gap-2 text-sm">
-              <Calendar className="size-4 text-muted-foreground" />
+              <Calendar className="text-muted-foreground size-4" />
               <span className="text-muted-foreground">
                 {isExpired ? "Expired on" : "Valid until"}
               </span>
@@ -130,7 +137,7 @@ export const SubscriptionCard = ({
 
         {/* Days Left (for non-free plans) */}
         {!isFreePlan && daysLeft !== null && !isExpired && (
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-center text-sm">
             {daysLeft} {daysLeft === 1 ? "day" : "days"} remaining
           </div>
         )}
@@ -138,21 +145,28 @@ export const SubscriptionCard = ({
         {/* Features List */}
         <div className="space-y-2">
           <p className="text-sm font-semibold">Plan Features:</p>
-          <ul className="space-y-1 text-sm text-muted-foreground">
+          <ul className="text-muted-foreground space-y-1 text-sm">
             <li>
-              • {planData.limits.signalsPerDay === -1 ? "Unlimited" : planData.limits.signalsPerDay}{" "}
+              •{" "}
+              {planData.limits.signalsPerDay === -1
+                ? "Unlimited"
+                : planData.limits.signalsPerDay}{" "}
               signals per day
             </li>
             <li>
               • Follow up to{" "}
-              {planData.limits.tradersFollow === -1 ? "unlimited" : planData.limits.tradersFollow}{" "}
+              {planData.limits.tradersFollow === -1
+                ? "unlimited"
+                : planData.limits.tradersFollow}{" "}
               {planData.limits.tradersFollow === 1 ? "trader" : "traders"}
             </li>
-            <li>
-              • Screener refresh: {planData.limits.screenerRefreshSec}s
-            </li>
-            {planData.limits.riskConsole && <li>• Risk Console & Trading Journal</li>}
-            {planData.limits.customAlerts && <li>• Custom Alerts & Advanced Filters</li>}
+            <li>• Screener refresh: {planData.limits.screenerRefreshSec}s</li>
+            {planData.limits.riskConsole && (
+              <li>• Risk Console & Trading Journal</li>
+            )}
+            {planData.limits.customAlerts && (
+              <li>• Custom Alerts & Advanced Filters</li>
+            )}
           </ul>
         </div>
 
@@ -160,13 +174,24 @@ export const SubscriptionCard = ({
         {showUpgradeButton && !isUltra && (
           <div className="pt-2">
             {isExpired || isFreePlan ? (
-              <Link href="/orgs/[orgSlug]/pricing" as="/pricing" className="w-full">
-                <Button className="w-full" variant={isExpired ? "default" : "outline"}>
+              <Link
+                href="/orgs/[orgSlug]/pricing"
+                as="/pricing"
+                className="w-full"
+              >
+                <Button
+                  className="w-full"
+                  variant={isExpired ? "default" : "outline"}
+                >
                   {isExpired ? "Renew Subscription" : "Upgrade Plan"}
                 </Button>
               </Link>
             ) : isExpiringSoon ? (
-              <Link href="/orgs/[orgSlug]/pricing" as="/pricing" className="w-full">
+              <Link
+                href="/orgs/[orgSlug]/pricing"
+                as="/pricing"
+                className="w-full"
+              >
                 <Button className="w-full" variant="outline">
                   Extend Subscription
                 </Button>

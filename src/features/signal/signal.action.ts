@@ -102,7 +102,10 @@ export const createSignalAction = authAction
       await notifyNewSignal(signal);
       logger.info(`Discord notification sent for signal ${signal.id}`);
     } catch (error) {
-      logger.error(`Failed to send Discord notification for signal ${signal.id}:`, error);
+      logger.error(
+        `Failed to send Discord notification for signal ${signal.id}:`,
+        error,
+      );
       // Ne pas throw d'erreur car le signal a été créé avec succès
     }
 
