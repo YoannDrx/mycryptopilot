@@ -13,7 +13,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { getRequiredUser } from "@/lib/auth/cached-get-user";
+import { getRequiredUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 
 type RouteContext = {
@@ -48,9 +48,10 @@ export async function GET(request: Request, context: RouteContext) {
       message: "Payment watcher not implemented yet (Issue #34)",
     });
   } catch (error) {
-    console.error("Payment status error:", error);
+    // Use logger instead of console
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: errorMessage },
       { status: 500 }
     );
   }

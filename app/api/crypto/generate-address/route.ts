@@ -13,9 +13,10 @@
  */
 
 import { NextResponse } from "next/server";
-import { getRequiredUser } from "@/lib/auth/cached-get-user";
-import { deriveBaseAddress, deriveTronAddress } from "@/lib/crypto/address-generator";
-import { prisma } from "@/lib/prisma";
+import { generateCryptoAddress } from "@/lib/crypto/address-generator";
+import { getPlanByName } from "@/lib/crypto/mycryptopilot-plans";
+import { getRequiredUser } from "@/lib/auth/auth-user";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: Request) {
   try {
@@ -23,28 +24,64 @@ export async function POST(request: Request) {
     const { plan } = await request.json();
 
     // Validate plan
-    if (!plan || !["PRO", "ULTRA"].includes(plan.toUpperCase())) {
+    const planName = plan?.toLowerCase();
+    if (planName !== "pro" && planName !== "ultra") {
       return NextResponse.json(
-        { error: "Invalid plan parameter" },
-        { status: 400 }
+        { error: "Invalid plan parameter. Must be pro or ultra." },
+        { status: 400 },
       );
     }
 
-    // TODO: Implement address generation
-    // 1. Get user's existing addresses or create new ones
-    // 2. Call deriveBaseAddress() and deriveTronAddress()
-    // 3. Store in DB via CryptoAddress model
-    // 4. Return addresses + expiration (15 min from now)
+    const planConfig = getPlanByName(planName);
+
+    logger.info("Generating crypto addresses for checkout", {
+      userId: user.id,
+      plan: planName,
+    });
+
+    // Generate addresses for both networks (parallel)
+    const [baseAddress, tronAddress] = await Promise.all([
+      generateCryptoAddress(user.id, "BASE"),
+      generateCryptoAddress(user.id, "TRON"),
+    ]);
+
+    // Calculate expiration (15 minutes from now)
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    logger.info("Crypto addresses generated successfully", {
+      userId: user.id,
+      plan: planName,
+      baseAddress: baseAddress.address,
+      tronAddress: tronAddress.address,
+      expiresAt,
+    });
 
     return NextResponse.json({
-      success: false,
-      message: "Address generation not implemented yet (Issue #34)",
+      success: true,
+      addresses: {
+        base: {
+          id: baseAddress.id,
+          address: baseAddress.address,
+          network: "BASE",
+        },
+        tron: {
+          id: tronAddress.id,
+          address: tronAddress.address,
+          network: "TRON",
+        },
+      },
+      plan: {
+        name: planConfig.name,
+        price: planConfig.priceUSD,
+        currency: "USD",
+      },
+      expiresAt: expiresAt.toISOString(),
     });
   } catch (error) {
-    console.error("Generate address error:", error);
+    logger.error("Generate address error", { error });
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { error: "Failed to generate addresses. Please try again." },
+      { status: 500 },
     );
   }
 }

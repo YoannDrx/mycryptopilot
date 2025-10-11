@@ -13,9 +13,9 @@
  */
 
 import { redirect } from "next/navigation";
-import { getRequiredUser } from "@/lib/auth/cached-get-user";
-import { getCurrentOrgCache } from "@/lib/org/cached-get-current-org";
-import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
+import { getRequiredUser } from "@/lib/auth/auth-user";
+import { getRequiredCurrentOrg } from "@/lib/organizations/get-org";
+import { CheckoutForm } from "@/components/checkout/checkout-form";
 
 type CheckoutPageProps = {
   params: {
@@ -25,33 +25,14 @@ type CheckoutPageProps = {
 };
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {
-  const user = await getRequiredUser();
-  const org = await getCurrentOrgCache();
+  await getRequiredUser();
+  const org = await getRequiredCurrentOrg();
 
   // Validate plan parameter
-  const planName = params.plan.toUpperCase();
-  if (planName !== "PRO" && planName !== "ULTRA") {
+  const planName = params.plan.toLowerCase();
+  if (planName !== "pro" && planName !== "ultra") {
     redirect(`/orgs/${org.slug}/pricing`);
   }
 
-  const plan = MYCRYPTOPILOT_PLANS[planName as "PRO" | "ULTRA"];
-
-  return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <h1 className="mb-4 text-3xl font-bold">Checkout - {plan.name} Plan</h1>
-      <p className="mb-8 text-muted-foreground">
-        Complete your payment to unlock {plan.limits.signalsPerDay} signals per day
-      </p>
-
-      {/* TODO: Add CheckoutForm component */}
-      <div className="rounded-lg border p-8">
-        <p className="text-center text-muted-foreground">
-          🚧 Checkout UI coming soon...
-        </p>
-        <p className="mt-4 text-center text-sm">
-          Issue #34: UI Checkout Page implementation in progress
-        </p>
-      </div>
-    </div>
-  );
+  return <CheckoutForm plan={planName as "pro" | "ultra"} orgSlug={org.slug} />;
 }
