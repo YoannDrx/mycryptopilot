@@ -85,10 +85,7 @@ export const getInvitationByToken = async (token: string) => {
  * @param email - Email to check
  * @returns True if invitation exists and is pending
  */
-export const hasActiveInvitation = async (
-  traderId: string,
-  email: string,
-) => {
+export const hasActiveInvitation = async (traderId: string, email: string) => {
   const invitation = await prisma.traderInvitation.findUnique({
     where: {
       traderId_email: {

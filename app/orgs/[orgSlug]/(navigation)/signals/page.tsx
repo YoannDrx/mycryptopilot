@@ -14,9 +14,7 @@ type SignalsPageProps = {
   }>;
 };
 
-export default async function SignalsPage({
-  searchParams,
-}: SignalsPageProps) {
+export default async function SignalsPage({ searchParams }: SignalsPageProps) {
   const org = await getRequiredCurrentOrg();
   const params = await searchParams;
 

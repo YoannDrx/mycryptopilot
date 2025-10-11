@@ -47,6 +47,7 @@ Cette commande gère intelligemment le démarrage d'une issue en vérifiant l'é
    - Quelles branches sont concernées?
 
 4. **Lister toutes les issues**:
+
    ```bash
    gh issue list --limit 50 --json number,title,state,labels,createdAt,updatedAt
    ```

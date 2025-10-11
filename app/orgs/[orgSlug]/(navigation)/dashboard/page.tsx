@@ -179,10 +179,12 @@ export default async function DashboardPage() {
               <CardContent>
                 <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
                   <BookOpen className="mb-4 size-12 opacity-20" />
-                  <p className="mb-2 font-medium">Trading Journal Coming Soon</p>
+                  <p className="mb-2 font-medium">
+                    Trading Journal Coming Soon
+                  </p>
                   <p className="text-sm">
-                    We're building a comprehensive trading journal to help you track
-                    your performance. Stay tuned!
+                    We're building a comprehensive trading journal to help you
+                    track your performance. Stay tuned!
                   </p>
                 </div>
               </CardContent>

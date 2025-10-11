@@ -117,10 +117,7 @@ export const InviteFollowerDialog = ({
             >
               Cancel
             </Button>
-            <LoadingButton
-              type="submit"
-              loading={inviteMutation.isPending}
-            >
+            <LoadingButton type="submit" loading={inviteMutation.isPending}>
               Send Invitation
             </LoadingButton>
           </div>
