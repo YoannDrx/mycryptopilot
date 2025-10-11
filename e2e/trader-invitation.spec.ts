@@ -54,6 +54,11 @@ test.describe("Trader Invitation System", () => {
     expect(invitation?.status).toBe("PENDING");
 
     // 5. Test resend functionality
+    // After the invitation dialog closes, the page may reload and return to the default "signals" tab
+    // We need to click on the "Invitations" tab again to see the invitation
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("tab", { name: /invitations/i }).click();
+
     // Find the row with the email and wait for resend button to be visible
     const invitationRow = page.locator(`tr:has-text("${followerEmail}")`);
     const resendButton = invitationRow.getByRole("button", { name: /resend/i });

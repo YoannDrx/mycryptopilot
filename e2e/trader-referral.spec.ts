@@ -56,9 +56,11 @@ test.describe("Trader Referral System", () => {
     await page.goto(referralUrl);
     await page.waitForLoadState("networkidle");
 
-    // Should see trader profile preview (use heading role to avoid strict mode violation)
+    // Should see trader profile preview (CardTitle is a div, not a heading)
     await expect(
-      page.getByRole("heading", { name: traderProfile.displayName }),
+      page
+        .locator('[data-slot="card-title"]')
+        .filter({ hasText: traderProfile.displayName }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: /follow/i })).toBeVisible();
 
