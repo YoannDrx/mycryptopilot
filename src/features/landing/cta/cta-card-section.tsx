@@ -25,6 +25,7 @@ export function CTASectionCard() {
             View plans
           </Link>
 
+          {/* TODO: Fix broken CTA - Link to /docs or #features instead of # */}
           <Link
             href="#"
             className={buttonVariants({ size: "lg", variant: "outline" })}

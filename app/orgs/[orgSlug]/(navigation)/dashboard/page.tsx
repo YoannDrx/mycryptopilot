@@ -76,6 +76,7 @@ export default async function DashboardPage() {
               Welcome back! Here's your trading activity overview.
             </p>
           </div>
+          {/* TODO: Fix broken CTA - Add Link to /traders */}
           <Button>
             <TrendingUp className="mr-2 size-4" />
             Follow Traders
@@ -181,6 +182,7 @@ export default async function DashboardPage() {
                   <p className="text-sm">
                     Start logging your trades to build your journal
                   </p>
+                  {/* TODO: Fix broken CTA - Link to /journal/new (page to create) */}
                   <Button className="mt-4" variant="outline">
                     Add First Trade
                   </Button>
@@ -256,6 +258,7 @@ export default async function DashboardPage() {
             <CardDescription>Common tasks to get you started</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* TODO: Fix broken CTAs - Add asChild + Link components for all 4 buttons */}
             <Button variant="outline" className="h-auto flex-col gap-2 py-4">
               <TrendingUp className="size-6" />
               <span>Follow Traders</span>

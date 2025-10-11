@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 10 octobre 2025 - 18h30 (Issue #6 - Système gestion abonnements terminé)
+**Dernière mise à jour**: 11 octobre 2025 - Guide de test E2E complet + 11 boutons cassés identifiés
 
 ---
 
@@ -1115,6 +1115,94 @@ await activateSubscription({
 - `@/*` is link to `@src`
 - `@email/*` is link to `@emails`
 - `@app/*` is link to `@app`
+
+### 🐛 Boutons/CTA Non Fonctionnels (À Fixer)
+
+**Dernière mise à jour** : 11 octobre 2025
+
+Au total, **11 boutons/CTA sans action** identifiés lors de l'audit E2E. Tous sont marqués avec `// TODO:` dans le code.
+
+#### 1. Landing Page (1 bouton)
+
+**Fichier** : `src/features/landing/cta/cta-card-section.tsx`
+- **Ligne 28-35** : Bouton "Learn more" → `<Link href="#">`
+- **Fix** : Remplacer `#` par `/docs` ou `#features`
+- **Priorité** : P2 (Important mais non bloquant)
+
+#### 2. User Dashboard (5 boutons)
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx`
+
+- **Ligne 79-83** : Bouton "Follow Traders" (header) → Pas d'action
+  - **Fix** : Ajouter `asChild` + `<Link href="/traders">`
+  - **Priorité** : P1 (Critique pour UX)
+
+- **Ligne 185-188** : Bouton "Add First Trade" (tab Trading Journal) → Pas d'action
+  - **Fix** : `<Link href="/journal/new">` (page à créer)
+  - **Priorité** : P2 (Feature Phase 5)
+
+- **Lignes 261-278** : Section "Quick Actions" (4 boutons sans action)
+  - "Follow Traders" → Lien vers `/traders`
+  - "View Signals" → Lien vers tab "Signals Feed"
+  - "Add Trade" → Lien vers `/journal/new` (à créer)
+  - "Risk Calculator" → Lien vers `/risk-calculator` (à créer)
+  - **Fix** : Ajouter `asChild` + `<Link>` pour chaque bouton
+  - **Priorité** : P2 (Nice-to-have)
+
+#### 3. Trader Dashboard (5 boutons)
+
+**Fichier** : `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx`
+
+- **Ligne 174-177** : Bouton "Complete Profile" → Pas d'action
+  - **Fix** : `<Link href="/account/become-trader">`
+  - **Priorité** : P1 (Critique pour onboarding traders)
+
+- **Lignes 326-343** : Section "Quick Actions" (4 boutons sans action)
+  - "Create Signal" → Lien vers `/dashboard/trader/signals/new` (header fonctionne déjà)
+  - "View Followers" → Lien vers `/dashboard/trader/followers` (à créer)
+  - "Analytics" → Lien vers tab "Performance"
+  - "Edit Profile" → Lien vers `/account/become-trader`
+  - **Fix** : Ajouter `asChild` + `<Link>` pour chaque bouton
+  - **Priorité** : P2 (Nice-to-have)
+
+#### Récapitulatif par Priorité
+
+**P0 (Bloquant)** : 0 boutons
+**P1 (Critique)** : 2 boutons
+  - User Dashboard: "Follow Traders" (header)
+  - Trader Dashboard: "Complete Profile"
+
+**P2 (Important)** : 9 boutons
+  - Landing: "Learn more"
+  - User Dashboard: "Add First Trade" + 4 Quick Actions
+  - Trader Dashboard: 4 Quick Actions
+
+#### Quick Wins (30 minutes)
+
+Les 2 boutons P1 peuvent être fixés rapidement :
+
+```typescript
+// User Dashboard - Ligne 79
+<Button asChild>
+  <Link href={`/orgs/${org.slug}/traders`}>
+    <TrendingUp className="mr-2 size-4" />
+    Follow Traders
+  </Link>
+</Button>
+
+// Trader Dashboard - Ligne 174
+<Button className="mt-4" variant="outline" asChild>
+  <Link href="/account/become-trader">
+    Complete Profile
+  </Link>
+</Button>
+```
+
+#### Note Importante
+
+Ces boutons sont **fonctionnels mais sans action** (cliquables mais ne font rien). Ils ne bloquent pas l'utilisation de l'app, mais dégradent l'UX.
+
+**Référence** : Voir `/docs/testing-guide.md` pour le guide de test E2E complet.
 
 ---
 

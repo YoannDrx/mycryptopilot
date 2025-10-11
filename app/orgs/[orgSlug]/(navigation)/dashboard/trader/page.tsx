@@ -171,6 +171,7 @@ export default async function TraderDashboardPage() {
                 <span>Get 5+ followers</span>
               </div>
             </div>
+            {/* TODO: Fix broken CTA - Link to /account/become-trader */}
             <Button className="mt-4" variant="outline">
               Complete Profile
             </Button>
@@ -322,6 +323,7 @@ export default async function TraderDashboardPage() {
             <CardDescription>Manage your trading profile</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* TODO: Fix broken CTAs - Add asChild + Link components for all 4 buttons */}
             <Button variant="outline" className="h-auto flex-col gap-2 py-4">
               <PlusCircle className="size-6" />
               <span>Create Signal</span>
