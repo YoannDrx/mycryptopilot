@@ -81,7 +81,8 @@ const canFollowTrader = async (userId: string): Promise<boolean> => {
  */
 export const followTraderAction = authAction
   .inputSchema(FollowTraderSchema)
-  .action(async ({ parsedInput: { traderId }, ctx: { user } }) => {
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    const { traderId, source = "DIRECT", invitationId } = parsedInput;
     // Vérifier qu'on ne suit pas soi-même
     if (user.id === traderId) {
       throw new ActionError("You cannot follow yourself");
@@ -133,6 +134,8 @@ export const followTraderAction = authAction
         userId: user.id,
         traderId,
         status: "ACTIVE",
+        source,
+        invitationId,
         startedAt: new Date(),
       },
       include: {
@@ -141,15 +144,47 @@ export const followTraderAction = authAction
             id: true,
             name: true,
             image: true,
+            discordId: true,
             traderProfile: {
               select: {
                 displayName: true,
+                verified: true,
               },
             },
           },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            discordId: true,
+          },
+        },
       },
     });
+
+    // Send Discord notifications (non-blocking)
+    const { notifyTraderNewFollower, notifyFollowerWelcome } = await import(
+      "@/lib/discord/dm-notifications"
+    );
+
+    // Notify trader about new follower
+    if (follow.trader.discordId) {
+      void notifyTraderNewFollower(
+        follow.trader.discordId,
+        follow.user.name,
+        source,
+      );
+    }
+
+    // Welcome message to follower
+    if (follow.user.discordId) {
+      void notifyFollowerWelcome(
+        follow.user.discordId,
+        follow.trader.traderProfile?.displayName ?? follow.trader.name,
+        follow.trader.traderProfile?.verified ?? false,
+      );
+    }
 
     return {
       follow,

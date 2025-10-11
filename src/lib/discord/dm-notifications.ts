@@ -410,3 +410,96 @@ export async function notifyDowngradeToFree(
 
   return sendDM(discordUserId, embed);
 }
+
+/**
+ * Notifier un trader en DM qu'il a un nouveau follower
+ *
+ * @param traderDiscordId - Discord User ID du trader
+ * @param followerName - Nom du nouveau follower
+ * @param source - Source du follow ("DIRECT", "INVITATION", "REFERRAL")
+ * @returns true si le message a été envoyé avec succès
+ */
+export async function notifyTraderNewFollower(
+  traderDiscordId: string,
+  followerName: string,
+  source: "DIRECT" | "INVITATION" | "REFERRAL",
+): Promise<boolean> {
+  const sourceText = {
+    DIRECT: "via le marketplace",
+    INVITATION: "via une invitation email",
+    REFERRAL: "via votre lien de parrainage",
+  };
+
+  const sourceEmoji = {
+    DIRECT: "👤",
+    INVITATION: "✉️",
+    REFERRAL: "🔗",
+  };
+
+  const embed = new EmbedBuilder()
+    .setColor(0x10b981) // Green
+    .setTitle(`${sourceEmoji[source]} Nouveau Follower !`)
+    .setDescription(
+      `**${followerName}** vous suit maintenant ${sourceText[source]} !\n\n` +
+        `Ils recevront vos futurs signaux de trading en temps réel sur Discord. 🎉`,
+    )
+    .addFields({
+      name: "📊 Gérer vos followers",
+      value: `Utilisez la commande \`/status\` pour voir vos statistiques`,
+      inline: false,
+    })
+    .setFooter({
+      text: `${SiteConfig.title}`,
+    })
+    .setTimestamp();
+
+  return sendDM(traderDiscordId, embed);
+}
+
+/**
+ * Envoyer un message de bienvenue à un nouveau follower
+ *
+ * @param followerDiscordId - Discord User ID du nouveau follower
+ * @param traderName - Nom du trader suivi
+ * @param traderVerified - Si le trader est vérifié
+ * @returns true si le message a été envoyé avec succès
+ */
+export async function notifyFollowerWelcome(
+  followerDiscordId: string,
+  traderName: string,
+  traderVerified: boolean,
+): Promise<boolean> {
+  const embed = new EmbedBuilder()
+    .setColor(0x8b5cf6) // Purple
+    .setTitle(`🎉 Bienvenue chez ${traderName} !`)
+    .setDescription(
+      `Vous suivez maintenant **${traderName}** ${traderVerified ? "✓" : ""}\n\n` +
+        `Vous recevrez désormais tous leurs signaux de trading en temps réel ! 🚀`,
+    )
+    .addFields(
+      {
+        name: "📬 Notifications",
+        value: `Vous recevrez un message Discord privé à chaque fois que ${traderName} publie un nouveau signal.`,
+        inline: false,
+      },
+      {
+        name: "📊 Commandes utiles",
+        value:
+          `• \`/signals\` - Voir les derniers signaux\n` +
+          `• \`/status\` - Vérifier votre statut et vos suivis\n` +
+          `• \`/help\` - Aide et commandes disponibles`,
+        inline: false,
+      },
+      {
+        name: "🔗 Dashboard",
+        value: `[Accéder à votre dashboard](${SiteConfig.appUrl}/dashboard)`,
+        inline: false,
+      },
+    )
+    .setFooter({
+      text: `${SiteConfig.title} - Bon trading ! 📈`,
+    })
+    .setTimestamp();
+
+  return sendDM(followerDiscordId, embed);
+}
