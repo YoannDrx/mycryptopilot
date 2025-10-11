@@ -140,9 +140,11 @@ export const acceptInvitationByTokenAction = authAction
       throw new ActionError("You cannot accept your own invitation.");
     }
 
-    // Automatically follow the trader
+    // Automatically follow the trader with invitation tracking
     const followResult = await followTraderAction({
       traderId: invitation.traderId,
+      source: "INVITATION",
+      invitationId: invitation.id,
     });
 
     if (!isActionSuccessful(followResult)) {

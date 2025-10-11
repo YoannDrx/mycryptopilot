@@ -30,6 +30,7 @@ import { redirect } from "next/navigation";
 import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
 import { InviteFollowerDialog } from "@/components/nowts/invite-follower-dialog";
 import { InvitationsTable } from "@/components/nowts/invitations-table";
+import { ConversionStatsCard } from "@/components/nowts/conversion-stats-card";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -211,13 +212,20 @@ export default async function TraderDashboardPage() {
 
           {/* Invitations Tab */}
           <TabsContent value="invitations" className="space-y-4">
+            {/* Conversion Stats */}
+            <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+              <ConversionStatsCard traderId={user.id} />
+            </Suspense>
+
+            {/* Invitations Table */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Follower Invitations</CardTitle>
                     <CardDescription>
-                      Invite people to follow you and receive your trading signals
+                      Invite people to follow you and receive your trading
+                      signals
                     </CardDescription>
                   </div>
                   <InviteFollowerDialog />

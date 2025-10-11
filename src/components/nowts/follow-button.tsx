@@ -27,6 +27,7 @@ type FollowButtonProps = {
   isFollowing: boolean;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
+  source?: "DIRECT" | "INVITATION" | "REFERRAL";
   onFollowSuccess?: () => void;
 };
 
@@ -36,6 +37,7 @@ export const FollowButton = ({
   isFollowing,
   variant = "default",
   size = "default",
+  source = "DIRECT",
   onFollowSuccess,
 }: FollowButtonProps) => {
   const queryClient = useQueryClient();
@@ -44,7 +46,7 @@ export const FollowButton = ({
   // Mutation pour suivre un trader
   const followMutation = useMutation({
     mutationFn: async () => {
-      const result = await followTraderAction({ traderId });
+      const result = await followTraderAction({ traderId, source });
 
       if (!isActionSuccessful(result)) {
         throw new Error(result.serverError ?? "Failed to follow trader");

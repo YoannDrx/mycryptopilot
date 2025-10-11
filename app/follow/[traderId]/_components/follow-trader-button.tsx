@@ -29,6 +29,7 @@ export const FollowTraderButton = ({
       isFollowing={false}
       variant="default"
       size="lg"
+      source="REFERRAL"
       onFollowSuccess={handleFollowSuccess}
     />
   );
