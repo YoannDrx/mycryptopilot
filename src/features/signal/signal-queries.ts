@@ -30,6 +30,8 @@ export const getSignalById = async (id: string) => {
 export const listSignals = async (params?: {
   traderId?: string;
   symbol?: string;
+  bias?: "LONG" | "SHORT";
+  status?: "ACTIVE" | "EXPIRED";
   cursor?: string;
   limit?: number;
   includeExpired?: boolean;
@@ -37,6 +39,8 @@ export const listSignals = async (params?: {
   const {
     traderId,
     symbol,
+    bias,
+    status,
     cursor,
     limit = 20,
     includeExpired = false,
@@ -46,7 +50,13 @@ export const listSignals = async (params?: {
   const where: {
     traderId?: string;
     symbol?: string;
-    expiresAt?: { gt: Date };
+    expiresAt?: { gt: Date } | { lte: Date };
+    AND?: {
+      payloadJson?: {
+        path: string[];
+        equals: string;
+      };
+    }[];
   } = {};
 
   if (traderId) {
@@ -57,11 +67,27 @@ export const listSignals = async (params?: {
     where.symbol = symbol;
   }
 
-  if (!includeExpired) {
-    // Ne récupérer que les signaux non expirés
+  // Filter by status
+  if (status === "ACTIVE" || !includeExpired) {
     where.expiresAt = {
       gt: new Date(),
     };
+  } else if (status === "EXPIRED") {
+    where.expiresAt = {
+      lte: new Date(),
+    };
+  }
+
+  // Filter by bias (LONG/SHORT) in JSON payload
+  if (bias) {
+    where.AND = [
+      {
+        payloadJson: {
+          path: ["bias"],
+          equals: bias,
+        },
+      },
+    ];
   }
 
   return prisma.signal.findMany({
