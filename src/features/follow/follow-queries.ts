@@ -118,9 +118,7 @@ export const getTraderFollowers = async (traderId: string) => {
 };
 
 /**
- * Récupère un user avec son rôle
- * Note: Le système de plans (planName, planExpiresAt) n'est pas encore implémenté en DB
- * Pour l'instant, on assume que tous les users sont en plan "free"
+ * Récupère un user avec son rôle et son plan
  */
 export const getUserWithPlan = async (userId: string) => {
   return prisma.user.findUnique({
@@ -128,6 +126,7 @@ export const getUserWithPlan = async (userId: string) => {
     select: {
       id: true,
       userRole: true,
+      planName: true,
     },
   });
 };

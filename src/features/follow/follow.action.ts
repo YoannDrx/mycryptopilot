@@ -15,8 +15,6 @@ import { FollowTraderSchema, UnfollowTraderSchema } from "./follow.schema";
 
 /**
  * Helper pour récupérer le plan d'un user
- * Note: Pour l'instant, tous les users sont en plan "free" par défaut
- * TODO: Implémenter la gestion des plans en DB (planName, planExpiresAt)
  */
 const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
   const user = await getUserWithPlan(userId);
@@ -25,9 +23,9 @@ const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
     throw new ActionError("User not found");
   }
 
-  // TODO: Récupérer le vrai plan depuis user.planName quand implémenté
-  // Pour l'instant, on retourne toujours "free"
-  return "free";
+  // Return user's actual plan, default to "free" if not set
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- planName is nullable in DB
+  return (user.planName as MyCryptoPilotPlanName) ?? "free";
 };
 
 /**
