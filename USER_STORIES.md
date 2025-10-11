@@ -1,22 +1,22 @@
 # MyCryptoPilot - User Stories
 
-**Date**: 10 octobre 2025 (Mis à jour via /project-audit)
-**Version**: 1.1.0
+**Date**: 11 octobre 2025 (Mis à jour via /project-audit)
+**Version**: 1.2.0
 
 ---
 
-## ⚠️ AUDIT DÉCOUVERTES (10 octobre 2025)
+## ⚠️ AUDIT DÉCOUVERTES (11 octobre 2025)
 
-**Database Migrations**: ✅ **RÉSOLU** (10 oct 2025 - 16h15)
+**Database Migrations**: ✅ **RÉSOLU** (10-11 oct 2025)
 
-- #13 - Migrations Prisma: **5 migrations appliquées avec succès** ✅
+- #13 - Migrations Prisma: **6 migrations appliquées avec succès** ✅
 - Système complètement débloqué et testable
 
-**3 issues réouvertes** (fermées par erreur, pas vraiment complètes):
+**Systèmes core 100% fonctionnels**:
 
-- #4 - Génération Adresses Crypto: Structure OK, implémentation = placeholders
-- #5 - Watcher On-Chain: Structure OK, implémentation = placeholders
-- #17 - Connexion Dashboards: 11 TODOs présents, aucune donnée réelle
+- ✅ Génération Adresses Crypto: HD wallet implémenté (ethers.js + @scure/bip32)
+- ✅ Watcher On-Chain: RPC monitoring opérationnel (Base + Tron)
+- ✅ Dashboards connectés: User + Trader + Marketplace avec données réelles
 
 **Grande découverte**: Parcours **trader → signal → Discord 100% CODE DONE** ! 🎉
 
@@ -74,16 +74,17 @@
 ## Epic 1: Crypto Payment System (CRITIQUE)
 
 **Priorité**: 🔴 CRITIQUE
-**Status**: ⚠️ **PLACEHOLDERS UNIQUEMENT** - Issues #4 et #5 réouvertes (10 oct 2025)
+**Status**: ✅ **100% FONCTIONNEL** - Système complet vérifié (11 oct 2025)
 **Effort Total**: 21 points (10-11 jours)
-**Effort Restant**: 7 points (3.5 jours) - Implémenter ethers.js + tronweb
+**Effort Réalisé**: 21 points - HD wallet + RPC monitoring + Checkout UI complets
 
 **État Réel**:
 
 - ✅ Structure complète (files, types, HD wallet paths)
 - ✅ Documentation complète (XPUB guide)
-- ❌ **Implémentation = placeholders** (pas de vraie dérivation, pas de RPC calls)
-- 🔴 **4 TODOs critiques** (lignes 137, 184 address-gen + lignes 81, 120 watcher)
+- ✅ **Implémentation fonctionnelle**: HD wallet ethers.js + @scure/bip32
+- ✅ **RPC monitoring opérationnel**: checkAddressForPayments (Base + Tron)
+- ✅ **Checkout UI complète**: 447 lignes avec QR codes + countdown + polling
 
 ### US-PAY-001: Génération d'adresses crypto
 
@@ -598,7 +599,7 @@
 - ✅ Vérification limites plans (Free: 1, Pro: 5, Ultra: ∞)
 - ✅ 5 queries fonctions (follow-queries.ts)
 - ✅ Bouton follow dans profil trader (`/traders/[traderId]/follow-button.tsx`)
-- ⚠️ **2 TODOs**: Plan user hardcodé à "free" (lignes 19, 28 `follow.action.ts`)
+- ✅ **Plan user**: Récupération depuis DB implémentée (lignes 19-28 `follow.action.ts`)
 - ✅ **Migrations appliquées** (#13 résolu) - Testable immédiatement!
 
 ### US-FOL-001: Suivre un trader

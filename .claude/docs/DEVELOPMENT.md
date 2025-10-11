@@ -1,11 +1,11 @@
 # Development Status & Roadmap - MyCryptoPilot
 
 **Dernière mise à jour**: 11 octobre 2025
-**Audit complet**: 11 octobre 2025
+**Audit complet via /project-audit**: 11 octobre 2025
 
 ## 📊 Progression Globale
 
-**Projet**: ~97% complete (MVP quasi-ready!)
+**Projet**: ~98% complete (MVP quasi-ready!)
 
 ### Phases Complétées
 
@@ -176,7 +176,7 @@ npx prisma migrate status
 - ✅ Vérification limites plans (Free: 1, Pro: 5, Ultra: ∞)
 - ✅ Queries: 5 fonctions dans `follow-queries.ts`
 - ✅ Bouton follow: `/traders/[traderId]/follow-button.tsx`
-- ⚠️ **2 TODOs**: Plan user hardcodé "free" (lignes 19, 28 follow.action.ts) - **30 min**
+- ✅ **Plan user**: Récupération du plan depuis DB implémentée (lignes 19-28 follow.action.ts)
 
 #### Dashboards (100%)
 
@@ -207,50 +207,9 @@ npx prisma migrate status
 
 Aucun! Tout est fonctionnel. 🎉
 
-### P1 (Critique) - 2 items
+### P1 (Critique) - 11 items
 
-#### 1. Fix Plan User Hardcodé (follow.action.ts)
-
-**Lignes**: 19, 28
-**Fichier**: `src/features/follow/follow.action.ts`
-**Temps**: 30 minutes
-
-```typescript
-// Ligne 19: TODO comment
-// TODO: Implémenter la gestion des plans en DB (planName, planExpiresAt)
-
-// Ligne 28: TODO implementation
-const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { planName: true },
-  });
-
-  // TODO: Récupérer le vrai plan depuis user.planName quand implémenté
-  return "free"; // ⚠️ Hardcodé!
-};
-```
-
-**Fix**:
-
-```typescript
-const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { planName: true },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  return (user.planName as MyCryptoPilotPlanName) ?? "free";
-};
-```
-
-### P2 (Important) - 11 items
-
-#### 2-12. Boutons/CTA Sans Action (11 boutons)
+#### 1-11. Boutons/CTA Sans Action (11 boutons)
 
 **Découverte audit 11 oct 2025**: 11 boutons cliquables mais sans action.
 
@@ -271,27 +230,27 @@ const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
   - Ligne 174: "Complete Profile" → Pas d'action
   - Lignes 326-343: Section "Quick Actions" (4 boutons sans action)
 
-**Fix**: Ajouter `asChild` + `<Link>` pour chaque bouton. Voir `CLAUDE.md` section "Boutons Non Fonctionnels".
+**Fix**: Ajouter `asChild` + `<Link>` pour chaque bouton.
 
 **Temps**: 1-2 heures (quick wins)
 
-### P3 (Nice-to-have) - 3 items
+### P2 (Nice-to-have) - 3 items
 
-#### 13. Route payment-status Legacy
+#### 12. Route payment-status Legacy
 
 **Fichier**: `app/api/crypto/payment-status/[addressId]/route.ts`
 **Ligne**: 42
 **Description**: TODO placeholder, mais `/api/crypto/check-payment` existe et fonctionne
 **Action**: Probablement supprimer cette route ou l'implémenter si nécessaire
 
-#### 14. Variable Env Discord Signals Channel
+#### 13. Variable Env Discord Signals Channel
 
 **Fichier**: `src/lib/discord/webhook.ts`
 **Ligne**: 36
 **Description**: `const channelId = env.DISCORD_GUILD_ID; // TODO: Créer une var DISCORD_SIGNALS_CHANNEL_ID`
 **Action**: Ajouter env var `DISCORD_SIGNALS_CHANNEL_ID` pour channel #signals dédié
 
-#### 15. Sweep Script (Non Implémenté)
+#### 14. Sweep Script (Non Implémenté)
 
 **Fichier**: `scripts/sweep-to-binance.ts`
 **Lignes**: 134, 167, 201, 229 (4 TODOs)

@@ -1224,8 +1224,7 @@ const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
     throw new Error("User not found");
   }
 
-  // ⚠️ TODO: Récupérer le vrai plan depuis user.planName quand implémenté
-  // Pour l'instant, on retourne toujours "free"
+  // Return user's actual plan, default to "free" if not set
   return (user.planName as MyCryptoPilotPlanName) ?? "free";
 };
 ```
@@ -1502,7 +1501,7 @@ Features:
 
 ## Prochaines Étapes
 
-- [ ] Fixer 2 TODOs plan user (follow.action.ts lignes 19, 28) - **30 min**
+- [x] Plan user récupération depuis DB implémentée (follow.action.ts lignes 19-28) - **DONE**
 - [ ] Feed signaux avec filtres (asset, bias, status) - **1-2j**
 - [ ] Pagination + infinite scroll pour feeds - **1j**
 - [ ] Real-time signal updates (webhooks ou polling) - **2-3j**
