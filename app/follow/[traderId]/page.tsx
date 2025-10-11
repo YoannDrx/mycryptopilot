@@ -46,7 +46,7 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
   const params = await props.params;
   const user = await getUser();
 
-  // Récupérer le trader
+  // Fetch trader
   const trader = await getTraderById(params.traderId);
 
   if (!trader?.traderProfile) {
@@ -55,25 +55,25 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
 
   const traderProfile = trader.traderProfile;
 
-  // Si pas connecté, rediriger vers signin avec callback
+  // If not logged in, redirect to signin with callback
   if (!user) {
     redirect(
       `/auth/signin?callbackUrl=${encodeURIComponent(`/follow/${params.traderId}`)}`,
     );
   }
 
-  // Vérifier si on suit déjà ce trader
+  // Check if already following this trader
   const isFollowing = await isFollowingTrader(user.id, params.traderId);
 
-  // Si on suit déjà, rediriger vers le profil trader
+  // If already following, redirect to trader profile
   if (isFollowing) {
     redirect(`/traders/${params.traderId}`);
   }
 
-  // Compter les signaux du trader
+  // Count trader's signals
   const signalsCount = await countTotalSignalsByTrader(params.traderId);
 
-  // Stats du trader
+  // Trader stats
   const stats =
     (traderProfile.statsJson as Record<string, number | string | boolean> | null) ??
     {};
@@ -81,7 +81,7 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-2xl space-y-6">
-        {/* Header avec avatar et info */}
+        {/* Header with avatar and info */}
         <Card>
           <CardHeader>
             <div className="flex flex-col items-center gap-4 text-center">
@@ -150,12 +150,11 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
                   <Signal className="text-primary mt-0.5 size-5" />
                   <div className="space-y-1">
                     <p className="font-medium">
-                      Suivez {traderProfile.displayName} pour recevoir ses signaux
+                      Follow {traderProfile.displayName} to receive their signals
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      Recevez des notifications Discord en temps réel pour chaque
-                      nouveau signal publié. Accédez au journal de trading et aux
-                      statistiques détaillées.
+                      Get real-time Discord notifications for every new published signal.
+                      Access trading journal and detailed statistics.
                     </p>
                   </div>
                 </div>
@@ -170,30 +169,30 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
               />
             </div>
 
-            {/* Liens additionnels */}
+            {/* Additional links */}
             <div className="flex flex-col gap-2 border-t pt-4">
               <Button variant="outline" asChild>
                 <Link href={`/traders/${params.traderId}`}>
                   <TrendingUp className="mr-2 size-4" />
-                  Voir le profil complet
+                  View full profile
                 </Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link href="/traders">Voir tous les traders</Link>
+                <Link href="/traders">View all traders</Link>
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Info supplémentaire */}
+        {/* Additional info */}
         <Card className="bg-muted/30">
           <CardContent className="pt-6">
             <div className="text-muted-foreground space-y-2 text-center text-sm">
               <p>
-                ✅ Suivez des traders vérifiés avec un track record transparent
+                ✅ Follow verified traders with transparent track records
               </p>
-              <p>🔔 Recevez des notifications instantanées sur Discord</p>
-              <p>📊 Accédez aux outils de gestion du risque</p>
+              <p>🔔 Get instant notifications on Discord</p>
+              <p>📊 Access risk management tools</p>
             </div>
           </CardContent>
         </Card>

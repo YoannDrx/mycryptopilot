@@ -30,36 +30,36 @@ export const ReferralLinkCard = ({
     try {
       await navigator.clipboard.writeText(referralUrl);
       setCopied(true);
-      toast.success("Lien copié dans le presse-papier!");
+      toast.success("Link copied to clipboard!");
 
-      // Reset après 2 secondes
+      // Reset after 2 seconds
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch {
-      toast.error("Erreur lors de la copie du lien");
+      toast.error("Error copying link");
     }
   };
 
   const handleShare = async () => {
-    // Vérifier si l'API Web Share est disponible
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- navigator.share peut être undefined sur desktop
+    // Check if Web Share API is available
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- navigator.share can be undefined on desktop
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Suivez ${traderName} sur MyCryptoPilot`,
-          text: `Recevez les signaux de trading de ${traderName} en temps réel!`,
+          title: `Follow ${traderName} on MyCryptoPilot`,
+          text: `Get ${traderName}'s trading signals in real-time!`,
           url: referralUrl,
         });
-        toast.success("Partagé avec succès!");
+        toast.success("Shared successfully!");
       } catch (error) {
-        // L'utilisateur a annulé le partage
+        // User cancelled sharing
         if ((error as Error).name !== "AbortError") {
-          toast.error("Erreur lors du partage");
+          toast.error("Error sharing");
         }
       }
     } else {
-      // Fallback: copier dans le presse-papier
+      // Fallback: copy to clipboard
       await handleCopy();
     }
   };
@@ -71,16 +71,16 @@ export const ReferralLinkCard = ({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Share2 className="size-5" />
-              Ton lien de parrainage
+              Your Referral Link
             </CardTitle>
             <CardDescription>
-              Partage ce lien pour que d'autres puissent te suivre facilement
+              Share this link so others can easily follow you
             </CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Lien avec bouton copier */}
+        {/* Link with copy button */}
         <div className="flex gap-2">
           <Input
             value={referralUrl}
@@ -102,16 +102,16 @@ export const ReferralLinkCard = ({
           </Button>
         </div>
 
-        {/* Actions rapides */}
+        {/* Quick actions */}
         <div className="flex gap-2">
           <Button onClick={handleShare} variant="default" className="flex-1">
             <Share2 className="mr-2 size-4" />
-            Partager
+            Share
           </Button>
           <Button variant="outline" asChild>
             <a href={referralUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="mr-2 size-4" />
-              Prévisualiser
+              Preview
             </a>
           </Button>
         </div>
@@ -119,13 +119,12 @@ export const ReferralLinkCard = ({
         {/* Stats & info */}
         <div className="bg-muted rounded-lg p-4">
           <div className="text-muted-foreground space-y-2 text-sm">
-            <p className="font-medium">💡 Comment utiliser ton lien?</p>
+            <p className="font-medium">💡 How to use your link?</p>
             <ul className="ml-4 list-disc space-y-1">
-              <li>Partage-le sur les réseaux sociaux (Twitter, Discord, etc.)</li>
-              <li>Envoie-le par email à tes contacts</li>
+              <li>Share it on social media (Twitter, Discord, etc.)</li>
+              <li>Send it by email to your contacts</li>
               <li>
-                Ajoute-le à ta bio ou signature pour gagner des followers
-                automatiquement
+                Add it to your bio or signature to automatically gain followers
               </li>
             </ul>
           </div>
