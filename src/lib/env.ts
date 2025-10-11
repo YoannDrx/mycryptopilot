@@ -30,6 +30,9 @@ export const env = createEnv({
     TRON_RPC_URL: z.string().url().optional(),
     CRYPTO_XPUB_BASE: z.string().optional(),
     CRYPTO_XPUB_TRON: z.string().optional(),
+    // Binance master wallets for sweep (optional)
+    BINANCE_MASTER_WALLET_BASE: z.string().optional(),
+    BINANCE_MASTER_WALLET_TRON: z.string().optional(),
     // Discord Bot configuration
     DISCORD_BOT_TOKEN: z.string().optional(),
     DISCORD_GUILD_ID: z.string().optional(),
