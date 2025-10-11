@@ -97,7 +97,13 @@ test.describe("account", () => {
     await page.locator('input[name="confirmPassword"]').fill(newPassword);
     await page.getByRole("button", { name: /Change Password/i }).click();
 
-    await expect(page.getByText("Password changed successfully")).toBeVisible();
+    // Wait for toast to appear and navigation to complete
+    await expect(page.getByText("Password changed successfully")).toBeVisible({
+      timeout: 2000,
+    });
+
+    // Wait for navigation back to /account
+    await page.waitForURL(/\/account$/, { timeout: 3000 });
 
     await signOutAccount({ page });
 
