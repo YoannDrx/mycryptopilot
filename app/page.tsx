@@ -19,7 +19,10 @@ import Image from "next/image";
 
 export default function HomePage() {
   return (
-    <div className="bg-background text-foreground relative flex h-fit flex-col">
+    <div
+      className="bg-background text-foreground relative flex h-fit flex-col"
+      suppressHydrationWarning
+    >
       <div className="mt-16"></div>
 
       <LandingHeader />
