@@ -29,6 +29,7 @@ type FollowButtonProps = {
   size?: "default" | "sm" | "lg";
   source?: "DIRECT" | "INVITATION" | "REFERRAL";
   onFollowSuccess?: () => void;
+  className?: string;
 };
 
 export const FollowButton = ({
@@ -39,6 +40,7 @@ export const FollowButton = ({
   size = "default",
   source = "DIRECT",
   onFollowSuccess,
+  className,
 }: FollowButtonProps) => {
   const queryClient = useQueryClient();
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
@@ -115,6 +117,7 @@ export const FollowButton = ({
           disabled={isLoading}
           variant={variant}
           size={size}
+          className={className}
         >
           {isLoading ? (
             <>Loading...</>
@@ -131,6 +134,7 @@ export const FollowButton = ({
           disabled={isLoading}
           variant={variant}
           size={size}
+          className={className}
         >
           {isLoading ? (
             <>Loading...</>

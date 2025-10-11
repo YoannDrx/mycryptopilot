@@ -99,7 +99,7 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-2xl space-y-6">
         {/* Header with avatar and info */}
-        <Card>
+        <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-transparent dark:border-purple-900 dark:from-purple-950/20">
           <CardHeader>
             <div className="flex flex-col items-center gap-4 text-center">
               <Avatar className="size-24">

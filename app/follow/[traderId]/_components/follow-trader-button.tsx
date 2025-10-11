@@ -31,6 +31,7 @@ export const FollowTraderButton = ({
       size="lg"
       source="REFERRAL"
       onFollowSuccess={handleFollowSuccess}
+      className="w-full"
     />
   );
 };
