@@ -1,64 +1,50 @@
-import { generateCryptoAddress } from "@/lib/crypto/address-generator";
-import { logger } from "@/lib/logger";
-import { getRequiredUser } from "@/lib/auth/auth-user";
-import { route } from "@/lib/zod-route";
-import { z } from "zod";
-
 /**
+ * API Route: Generate Crypto Addresses
+ *
  * POST /api/crypto/generate-address
  *
- * Génère une adresse crypto unique pour un utilisateur sur un réseau spécifique.
- * Si l'utilisateur a déjà une adresse active pour ce réseau, elle est retournée.
+ * Generates unique crypto payment addresses for a user:
+ * - Base (USDC) address via HD wallet derivation
+ * - Tron (USDT) address via HD wallet derivation
+ * - Stores addresses in DB (CryptoAddress model)
+ * - Returns addresses + expiration timestamp (15 min)
  *
- * @body { network: "BASE" | "TRON", plan: "pro" | "ultra" }
- * @returns { address: string, network: string, qrData: string }
+ * @see https://github.com/YoannDrx/mycryptopilot/issues/34
  */
-export const POST = route
-  .body(
-    z.object({
-      network: z.enum(["BASE", "TRON"]),
-      plan: z.enum(["pro", "ultra"]),
-    }),
-  )
-  .handler(async (req, { body }) => {
+
+import { NextResponse } from "next/server";
+import { getRequiredUser } from "@/lib/auth/cached-get-user";
+import { deriveBaseAddress, deriveTronAddress } from "@/lib/crypto/address-generator";
+import { prisma } from "@/lib/prisma";
+
+export async function POST(request: Request) {
+  try {
     const user = await getRequiredUser();
+    const { plan } = await request.json();
 
-    logger.info("Generating crypto address for payment", {
-      userId: user.id,
-      network: body.network,
-      plan: body.plan,
-    });
-
-    try {
-      // Générer ou récupérer l'adresse crypto
-      const cryptoAddress = await generateCryptoAddress(user.id, body.network);
-
-      logger.info("Crypto address generated successfully", {
-        userId: user.id,
-        addressId: cryptoAddress.id,
-        network: body.network,
-      });
-
-      // QR data: format standard pour wallets (address:amount)
-      // Pour USDC/USDT, on pourrait utiliser EIP-681 (ethereum:address@chainId?value=...)
-      // Mais la plupart des wallets scannent juste l'adresse
-      const qrData = cryptoAddress.address;
-
-      return {
-        addressId: cryptoAddress.id,
-        address: cryptoAddress.address,
-        network: body.network,
-        qrData,
-      };
-    } catch (error) {
-      logger.error("Failed to generate crypto address", {
-        userId: user.id,
-        network: body.network,
-        error,
-      });
-
-      throw new Error(
-        "Failed to generate crypto address. Please try again or contact support.",
+    // Validate plan
+    if (!plan || !["PRO", "ULTRA"].includes(plan.toUpperCase())) {
+      return NextResponse.json(
+        { error: "Invalid plan parameter" },
+        { status: 400 }
       );
     }
-  });
+
+    // TODO: Implement address generation
+    // 1. Get user's existing addresses or create new ones
+    // 2. Call deriveBaseAddress() and deriveTronAddress()
+    // 3. Store in DB via CryptoAddress model
+    // 4. Return addresses + expiration (15 min from now)
+
+    return NextResponse.json({
+      success: false,
+      message: "Address generation not implemented yet (Issue #34)",
+    });
+  } catch (error) {
+    console.error("Generate address error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
