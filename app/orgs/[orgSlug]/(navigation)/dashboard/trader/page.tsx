@@ -28,6 +28,10 @@ import Link from "next/link";
 import { TraderSignalsList } from "./_components/trader-signals-list";
 import { redirect } from "next/navigation";
 import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
+import { InviteFollowerDialog } from "@/components/nowts/invite-follower-dialog";
+import { InvitationsTable } from "@/components/nowts/invitations-table";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Trader Dashboard - MyCryptoPilot",
@@ -195,6 +199,7 @@ export default async function TraderDashboardPage() {
         <Tabs defaultValue="signals" className="space-y-4">
           <TabsList>
             <TabsTrigger value="signals">My Signals</TabsTrigger>
+            <TabsTrigger value="invitations">Invitations</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
           </TabsList>
@@ -202,6 +207,36 @@ export default async function TraderDashboardPage() {
           {/* Signals Tab */}
           <TabsContent value="signals" className="space-y-4">
             <TraderSignalsList traderId={user.id} />
+          </TabsContent>
+
+          {/* Invitations Tab */}
+          <TabsContent value="invitations" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Follower Invitations</CardTitle>
+                    <CardDescription>
+                      Invite people to follow you and receive your trading signals
+                    </CardDescription>
+                  </div>
+                  <InviteFollowerDialog />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Suspense
+                  fallback={
+                    <div className="space-y-2">
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                    </div>
+                  }
+                >
+                  <InvitationsTable traderId={user.id} />
+                </Suspense>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Performance Tab */}
