@@ -99,7 +99,7 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
     <div className="container mx-auto px-4 py-8">
       <div className="mx-auto max-w-2xl space-y-6">
         {/* Header with avatar and info */}
-        <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-transparent dark:border-purple-900 dark:from-purple-950/20">
+        <Card>
           <CardHeader>
             <div className="flex flex-col items-center gap-4 text-center">
               <Avatar className="size-24">
@@ -192,13 +192,13 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
             {/* Additional links */}
             <div className="flex flex-col gap-2 border-t pt-4">
               <Button variant="outline" asChild>
-                <Link href={`/traders/${params.traderId}`}>
+                <Link href={`/orgs/${orgSlug}/traders/${params.traderId}`}>
                   <TrendingUp className="mr-2 size-4" />
                   View full profile
                 </Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link href="/traders">View all traders</Link>
+                <Link href={`/orgs/${orgSlug}/traders`}>View all traders</Link>
               </Button>
             </div>
           </CardContent>
