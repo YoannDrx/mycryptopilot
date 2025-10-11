@@ -27,6 +27,9 @@ type FollowButtonProps = {
   isFollowing: boolean;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
+  source?: "DIRECT" | "INVITATION" | "REFERRAL";
+  onFollowSuccess?: () => void;
+  className?: string;
 };
 
 export const FollowButton = ({
@@ -35,6 +38,9 @@ export const FollowButton = ({
   isFollowing,
   variant = "default",
   size = "default",
+  source = "DIRECT",
+  onFollowSuccess,
+  className,
 }: FollowButtonProps) => {
   const queryClient = useQueryClient();
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
@@ -42,7 +48,7 @@ export const FollowButton = ({
   // Mutation pour suivre un trader
   const followMutation = useMutation({
     mutationFn: async () => {
-      const result = await followTraderAction({ traderId });
+      const result = await followTraderAction({ traderId, source });
 
       if (!isActionSuccessful(result)) {
         throw new Error(result.serverError ?? "Failed to follow trader");
@@ -55,6 +61,10 @@ export const FollowButton = ({
       // Invalider les queries pour rafraîchir les données
       void queryClient.invalidateQueries({ queryKey: ["traders"] });
       void queryClient.invalidateQueries({ queryKey: ["following"] });
+      // Call custom success handler if provided
+      if (onFollowSuccess) {
+        onFollowSuccess();
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -107,6 +117,7 @@ export const FollowButton = ({
           disabled={isLoading}
           variant={variant}
           size={size}
+          className={className}
         >
           {isLoading ? (
             <>Loading...</>
@@ -123,6 +134,7 @@ export const FollowButton = ({
           disabled={isLoading}
           variant={variant}
           size={size}
+          className={className}
         >
           {isLoading ? (
             <>Loading...</>

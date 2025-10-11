@@ -23,7 +23,8 @@ export default function HomePage() {
       className="bg-background text-foreground relative flex h-fit flex-col"
       suppressHydrationWarning
     >
-      <div className="mt-16"></div>
+      {/* Spacer for fixed header */}
+      <div className="h-16" aria-hidden="true" />
 
       <LandingHeader />
 

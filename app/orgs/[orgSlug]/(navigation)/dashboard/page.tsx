@@ -179,18 +179,13 @@ export default async function DashboardPage() {
               <CardContent>
                 <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
                   <BookOpen className="mb-4 size-12 opacity-20" />
-                  <p className="mb-2 font-medium">No trades recorded yet</p>
-                  <p className="text-sm">
-                    Start logging your trades to build your journal
+                  <p className="mb-2 font-medium">
+                    Trading Journal Coming Soon
                   </p>
-                  <Button
-                    className="mt-4"
-                    variant="outline"
-                    disabled
-                    title="Coming soon"
-                  >
-                    Add First Trade
-                  </Button>
+                  <p className="text-sm">
+                    We're building a comprehensive trading journal to help you
+                    track your performance. Stay tuned!
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -262,7 +257,7 @@ export default async function DashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common tasks to get you started</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <CardContent className="grid gap-4 sm:grid-cols-2">
             <Button
               asChild
               variant="outline"
@@ -278,28 +273,10 @@ export default async function DashboardPage() {
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
             >
-              <Link href={`/orgs/${org.slug}/dashboard`}>
+              <Link href={`/orgs/${org.slug}/signals`}>
                 <BarChart3 className="size-6" />
-                <span>View Signals</span>
+                <span>Browse Signals</span>
               </Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 py-4"
-              disabled
-              title="Coming soon"
-            >
-              <BookOpen className="size-6" />
-              <span>Add Trade</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 py-4"
-              disabled
-              title="Coming soon"
-            >
-              <AlertCircle className="size-6" />
-              <span>Risk Calculator</span>
             </Button>
           </CardContent>
         </Card>

@@ -5,6 +5,8 @@ import { z } from "zod";
  */
 export const FollowTraderSchema = z.object({
   traderId: z.string().min(1, "Trader ID is required"),
+  source: z.enum(["DIRECT", "INVITATION", "REFERRAL"]).optional(),
+  invitationId: z.string().optional(),
 });
 
 /**

@@ -18,8 +18,8 @@
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
-            "type": "command",
-            "command": "bun $CLAUDE_PROJECT_DIR/.claude/hooks/hook-post-file.ts"
+            "type": "command"
+            // "command": "bun $CLAUDE_PROJECT_DIR/.claude/hooks/hook-post-file.ts"
           }
         ]
       }

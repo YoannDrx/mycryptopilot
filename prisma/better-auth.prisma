@@ -18,17 +18,18 @@ model User {
   lastSignalReset DateTime        @default(now())
   discordId       String?         @unique
   discordIntegrationEnabled Boolean @default(true) // true = veut les notifications Discord, false = a explicitement unlinked
-  feedbacks       Feedback[]
-  accounts        Account[]
-  cryptoAddresses CryptoAddress[]
-  cryptoPayments  CryptoPayment[]
-  followers       Follow[]        @relation("TraderFollowers")
-  follows         Follow[]        @relation("UserFollows")
-  invitations     Invitation[]
-  members         Member[]
-  sessions        Session[]
-  signals         Signal[]
-  traderProfile   TraderProfile?
+  feedbacks        Feedback[]
+  accounts         Account[]
+  cryptoAddresses  CryptoAddress[]
+  cryptoPayments   CryptoPayment[]
+  followers        Follow[]            @relation("TraderFollowers")
+  follows          Follow[]            @relation("UserFollows")
+  invitations      Invitation[]
+  members          Member[]
+  sessions         Session[]
+  signals          Signal[]
+  traderProfile    TraderProfile?
+  traderInvitations TraderInvitation[]
 
   @@map("user")
 }

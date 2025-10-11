@@ -41,40 +41,38 @@ export function OrgSidebar({
   const links: NavigationGroup[] = getOrganizationNavigation(slug, roles);
 
   return (
-    <Sidebar variant="inset">
-      <div suppressHydrationWarning>
-        <SidebarHeader className="flex flex-col gap-2">
-          <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
-          <OrgCommand orgSlug={slug} roles={roles} />
-        </SidebarHeader>
-        <SidebarContent>
-          {links.map((link) => (
-            <ItemCollapsing
-              defaultOpenStartPath={link.defaultOpenStartPath}
-              key={link.title}
-            >
-              <SidebarGroup key={link.title}>
-                <SidebarGroupLabel asChild>
-                  <CollapsibleTrigger>
-                    {link.title}
-                    <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                  </CollapsibleTrigger>
-                </SidebarGroupLabel>
-                <CollapsibleContent>
-                  <SidebarGroupContent>
-                    <SidebarNavigationMenu link={link} />
-                  </SidebarGroupContent>
-                </CollapsibleContent>
-              </SidebarGroup>
-            </ItemCollapsing>
-          ))}
-        </SidebarContent>
-        <SidebarFooter className="flex flex-col gap-2">
-          <UpgradeCard />
-          <ContactFeedbackPopover />
-          <SidebarUserButton />
-        </SidebarFooter>
-      </div>
+    <Sidebar variant="inset" suppressHydrationWarning>
+      <SidebarHeader className="flex flex-col gap-2">
+        <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
+        <OrgCommand orgSlug={slug} roles={roles} />
+      </SidebarHeader>
+      <SidebarContent>
+        {links.map((link) => (
+          <ItemCollapsing
+            defaultOpenStartPath={link.defaultOpenStartPath}
+            key={link.title}
+          >
+            <SidebarGroup key={link.title}>
+              <SidebarGroupLabel asChild>
+                <CollapsibleTrigger>
+                  {link.title}
+                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarNavigationMenu link={link} />
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </ItemCollapsing>
+        ))}
+      </SidebarContent>
+      <SidebarFooter className="flex flex-col gap-2">
+        <UpgradeCard />
+        <ContactFeedbackPopover />
+        <SidebarUserButton />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

@@ -8,24 +8,51 @@ import { prisma } from "@/lib/prisma";
 import {
   countFollowedTraders,
   getFollow,
-  getUserWithPlan,
   isFollowingTrader,
 } from "./follow-queries";
 import { FollowTraderSchema, UnfollowTraderSchema } from "./follow.schema";
 
 /**
- * Helper pour récupérer le plan d'un user
+ * Helper pour récupérer le plan d'un user depuis son organisation
+ * MyCryptoPilot: 1 Organization = 1 User, donc on récupère le plan depuis l'organization.subscription
  */
 const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
-  const user = await getUserWithPlan(userId);
+  // Récupérer l'organization de l'utilisateur avec sa subscription
+  const member = await prisma.member.findFirst({
+    where: { userId },
+    include: {
+      organization: {
+        include: {
+          subscription: {
+            select: {
+              plan: true,
+              status: true,
+              periodEnd: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  if (!user) {
-    throw new ActionError("User not found");
+  if (!member?.organization) {
+    // Si pas d'organization, retourner le plan free par défaut
+    return "free";
   }
 
-  // Return user's actual plan, default to "free" if not set
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- planName is nullable in DB
-  return (user.planName as MyCryptoPilotPlanName) ?? "free";
+  const subscription = member.organization.subscription;
+
+  // Vérifier que la subscription est active et non expirée
+  if (
+    !subscription ||
+    !["active", "trialing"].includes(subscription.status ?? "") ||
+    (subscription.periodEnd && subscription.periodEnd < new Date())
+  ) {
+    return "free";
+  }
+
+  // Retourner le plan de la subscription
+  return subscription.plan as MyCryptoPilotPlanName;
 };
 
 /**
@@ -54,7 +81,8 @@ const canFollowTrader = async (userId: string): Promise<boolean> => {
  */
 export const followTraderAction = authAction
   .inputSchema(FollowTraderSchema)
-  .action(async ({ parsedInput: { traderId }, ctx: { user } }) => {
+  .action(async ({ parsedInput, ctx: { user } }) => {
+    const { traderId, source = "DIRECT", invitationId } = parsedInput;
     // Vérifier qu'on ne suit pas soi-même
     if (user.id === traderId) {
       throw new ActionError("You cannot follow yourself");
@@ -106,6 +134,8 @@ export const followTraderAction = authAction
         userId: user.id,
         traderId,
         status: "ACTIVE",
+        source,
+        invitationId,
         startedAt: new Date(),
       },
       include: {
@@ -114,15 +144,47 @@ export const followTraderAction = authAction
             id: true,
             name: true,
             image: true,
+            discordId: true,
             traderProfile: {
               select: {
                 displayName: true,
+                verified: true,
               },
             },
           },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            discordId: true,
+          },
+        },
       },
     });
+
+    // Send Discord notifications (non-blocking)
+    const { notifyTraderNewFollower, notifyFollowerWelcome } = await import(
+      "@/lib/discord/dm-notifications"
+    );
+
+    // Notify trader about new follower
+    if (follow.trader.discordId) {
+      void notifyTraderNewFollower(
+        follow.trader.discordId,
+        follow.user.name,
+        source,
+      );
+    }
+
+    // Welcome message to follower
+    if (follow.user.discordId) {
+      void notifyFollowerWelcome(
+        follow.user.discordId,
+        follow.trader.traderProfile?.displayName ?? follow.trader.name,
+        follow.trader.traderProfile?.verified ?? false,
+      );
+    }
 
     return {
       follow,
