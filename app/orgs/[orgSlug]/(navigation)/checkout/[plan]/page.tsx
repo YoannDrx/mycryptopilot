@@ -1,46 +1,38 @@
-import { CheckoutPage } from "@/components/nowts/checkout-page";
-import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
-import { getRequiredUser } from "@/lib/auth/auth-user";
-import { redirect } from "next/navigation";
+/**
+ * Checkout Page - Crypto Payment
+ *
+ * User flow:
+ * 1. User arrives from pricing page (e.g., /checkout/pro)
+ * 2. Generate unique crypto addresses (Base USDC + Tron USDT)
+ * 3. Display addresses with QR codes
+ * 4. Countdown timer (15 min expiration)
+ * 5. Poll payment status every 10s
+ * 6. On payment confirmed → Activate subscription → Redirect to dashboard
+ *
+ * @see https://github.com/YoannDrx/mycryptopilot/issues/34
+ */
 
-type PageProps = {
-  params: Promise<{
+import { redirect } from "next/navigation";
+import { getRequiredUser } from "@/lib/auth/auth-user";
+import { getRequiredCurrentOrg } from "@/lib/organizations/get-org";
+import { CheckoutForm } from "@/components/checkout/checkout-form";
+
+type CheckoutPageProps = {
+  params: {
     orgSlug: string;
     plan: string;
-  }>;
+  };
 };
 
-export default async function CryptoCheckoutPage(props: PageProps) {
-  const params = await props.params;
-  const { plan } = params;
-
-  // Vérifier que l'utilisateur est authentifié
+export default async function CheckoutPage({ params }: CheckoutPageProps) {
   await getRequiredUser();
+  const org = await getRequiredCurrentOrg();
 
-  // Valider le plan
-  const validPlans = ["pro", "ultra"];
-  if (!validPlans.includes(plan)) {
-    redirect("/pricing");
+  // Validate plan parameter
+  const planName = params.plan.toLowerCase();
+  if (planName !== "pro" && planName !== "ultra") {
+    redirect(`/orgs/${org.slug}/pricing`);
   }
 
-  // Récupérer les détails du plan
-  const planDetails = MYCRYPTOPILOT_PLANS.find((p) => p.name === plan);
-
-  if (!planDetails) {
-    redirect("/pricing");
-  }
-
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <CheckoutPage
-        plan={plan as "pro" | "ultra"}
-        planDetails={{
-          name: planDetails.name,
-          displayName: planDetails.name.charAt(0).toUpperCase() + planDetails.name.slice(1),
-          price: planDetails.priceUSD,
-          features: planDetails.features.map((f) => f.label),
-        }}
-      />
-    </div>
-  );
+  return <CheckoutForm plan={planName as "pro" | "ultra"} orgSlug={org.slug} />;
 }

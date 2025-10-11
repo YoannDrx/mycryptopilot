@@ -11,7 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
-import { countActiveSignalsByTrader, countTotalSignalsByTrader } from "@/features/signal/signal-queries";
+import {
+  countActiveSignalsByTrader,
+  countTotalSignalsByTrader,
+} from "@/features/signal/signal-queries";
 import { prisma } from "@/lib/prisma";
 import {
   BarChart3,
@@ -31,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TraderDashboardPage() {
-  await getRequiredCurrentOrgCache();
+  const org = await getRequiredCurrentOrgCache();
   const user = await getRequiredUser();
 
   // Fetch trader profile
@@ -92,7 +95,9 @@ export default async function TraderDashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold">{followersCount}</div>
               <p className="text-muted-foreground text-xs">
-                {followersCount === 0 ? "No followers yet" : "Growing your audience"}
+                {followersCount === 0
+                  ? "No followers yet"
+                  : "Growing your audience"}
               </p>
             </CardContent>
           </Card>
@@ -171,9 +176,10 @@ export default async function TraderDashboardPage() {
                 <span>Get 5+ followers</span>
               </div>
             </div>
-            {/* TODO: Fix broken CTA - Link to /account/become-trader */}
-            <Button className="mt-4" variant="outline">
-              Complete Profile
+            <Button asChild className="mt-4" variant="outline">
+              <Link href={`/orgs/${org.slug}/account/become-trader`}>
+                Complete Profile
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -323,22 +329,44 @@ export default async function TraderDashboardPage() {
             <CardDescription>Manage your trading profile</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* TODO: Fix broken CTAs - Add asChild + Link components for all 4 buttons */}
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <PlusCircle className="size-6" />
-              <span>Create Signal</span>
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
+              <Link href={`/orgs/${org.slug}/dashboard/trader/signals/new`}>
+                <PlusCircle className="size-6" />
+                <span>Create Signal</span>
+              </Link>
             </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <Users className="size-6" />
-              <span>View Followers</span>
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
+              <Link href={`/orgs/${org.slug}/dashboard/trader`}>
+                <Users className="size-6" />
+                <span>View Followers</span>
+              </Link>
             </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+              disabled
+              title="Coming soon"
+            >
               <BarChart3 className="size-6" />
               <span>Analytics</span>
             </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <TrendingUp className="size-6" />
-              <span>Edit Profile</span>
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
+              <Link href={`/orgs/${org.slug}/account/become-trader`}>
+                <TrendingUp className="size-6" />
+                <span>Edit Profile</span>
+              </Link>
             </Button>
           </CardContent>
         </Card>

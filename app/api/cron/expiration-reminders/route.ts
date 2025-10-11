@@ -1,6 +1,6 @@
 import { runExpirationReminderJob } from "@/lib/cron/expiration-reminder-job";
 import { logger } from "@/lib/logger";
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 /**
@@ -35,15 +35,10 @@ export async function GET(request: NextRequest) {
   if (cronSecret) {
     if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
       logger.warn("Unauthorized cron request attempt");
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   } else {
-    logger.warn(
-      "CRON_SECRET not configured - cron endpoint is not protected!",
-    );
+    logger.warn("CRON_SECRET not configured - cron endpoint is not protected!");
   }
 
   // Exécuter le job

@@ -47,7 +47,11 @@ export default async function TraderProfilePage({
   });
 
   const traderProfile = trader.traderProfile;
-  const stats = (traderProfile.statsJson as Record<string, number | string | boolean> | null) ?? {};
+  const stats =
+    (traderProfile.statsJson as Record<
+      string,
+      number | string | boolean
+    > | null) ?? {};
 
   return (
     <div className="container mx-auto max-w-6xl space-y-8 py-8">
@@ -68,7 +72,9 @@ export default async function TraderProfilePage({
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Typography variant="h1">{traderProfile.displayName}</Typography>
+                  <Typography variant="h1">
+                    {traderProfile.displayName}
+                  </Typography>
                   {traderProfile.verified && (
                     <Badge variant="default" className="gap-1">
                       <CheckCircle2 className="size-3" />
@@ -88,13 +94,19 @@ export default async function TraderProfilePage({
                   <div className="flex items-center gap-1.5">
                     <Users className="text-muted-foreground size-4" />
                     <span className="text-sm">
-                      {typeof stats.followers === "number" ? stats.followers : 0} followers
+                      {typeof stats.followers === "number"
+                        ? stats.followers
+                        : 0}{" "}
+                      followers
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <TrendingUp className="text-muted-foreground size-4" />
                     <span className="text-sm">
-                      {typeof stats.totalSignals === "number" ? stats.totalSignals : 0} signals
+                      {typeof stats.totalSignals === "number"
+                        ? stats.totalSignals
+                        : 0}{" "}
+                      signals
                     </span>
                   </div>
                   {typeof stats.winrate === "number" && (

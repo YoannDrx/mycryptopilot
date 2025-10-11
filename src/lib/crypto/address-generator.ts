@@ -127,7 +127,7 @@ export async function generateCryptoAddress(
  * @param userId - User ID to derive address for
  * @returns Promise<{ address: string, derivationPath: string }>
  */
-async function deriveBaseAddress(
+export async function deriveBaseAddress(
   _userId: string,
 ): Promise<{ address: string; derivationPath: string }> {
   // Get next available index by counting existing Base addresses
@@ -184,7 +184,7 @@ async function deriveBaseAddress(
  * @param userId - User ID to derive address for
  * @returns Promise<{ address: string, derivationPath: string }>
  */
-async function deriveTronAddress(
+export async function deriveTronAddress(
   _userId: string,
 ): Promise<{ address: string; derivationPath: string }> {
   // Get next available index by counting existing Tron addresses

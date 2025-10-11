@@ -201,7 +201,7 @@ export async function removeAllRolesFromUser(
 
     // Retirer tous les rôles MyCryptoPilot
     const allMyCryptoPilotRoles = Object.values(DISCORD_CONFIG.roles);
-     
+
     for (const roleName of allMyCryptoPilotRoles) {
       const role = guild.roles.cache.find((r) => r.name === roleName);
       if (role && member.roles.cache.has(role.id)) {

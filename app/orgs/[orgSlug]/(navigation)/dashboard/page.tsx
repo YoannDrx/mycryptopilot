@@ -76,10 +76,11 @@ export default async function DashboardPage() {
               Welcome back! Here's your trading activity overview.
             </p>
           </div>
-          {/* TODO: Fix broken CTA - Add Link to /traders */}
-          <Button>
-            <TrendingUp className="mr-2 size-4" />
-            Follow Traders
+          <Button asChild>
+            <Link href={`/orgs/${org.slug}/traders`}>
+              <TrendingUp className="mr-2 size-4" />
+              Follow Traders
+            </Link>
           </Button>
         </div>
 
@@ -141,8 +142,8 @@ export default async function DashboardPage() {
             <AlertCircle className="size-4" />
             <AlertTitle>No traders followed yet</AlertTitle>
             <AlertDescription>
-              Start by exploring our marketplace and following traders that match
-              your trading style. You'll see their signals here.
+              Start by exploring our marketplace and following traders that
+              match your trading style. You'll see their signals here.
               <Button variant="link" className="ml-2 p-0" asChild>
                 <Link href="/traders">
                   Browse Traders
@@ -182,8 +183,12 @@ export default async function DashboardPage() {
                   <p className="text-sm">
                     Start logging your trades to build your journal
                   </p>
-                  {/* TODO: Fix broken CTA - Link to /journal/new (page to create) */}
-                  <Button className="mt-4" variant="outline">
+                  <Button
+                    className="mt-4"
+                    variant="outline"
+                    disabled
+                    title="Coming soon"
+                  >
                     Add First Trade
                   </Button>
                 </div>
@@ -258,20 +263,41 @@ export default async function DashboardPage() {
             <CardDescription>Common tasks to get you started</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* TODO: Fix broken CTAs - Add asChild + Link components for all 4 buttons */}
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <TrendingUp className="size-6" />
-              <span>Follow Traders</span>
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
+              <Link href={`/orgs/${org.slug}/traders`}>
+                <TrendingUp className="size-6" />
+                <span>Follow Traders</span>
+              </Link>
             </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <BarChart3 className="size-6" />
-              <span>View Signals</span>
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
+              <Link href={`/orgs/${org.slug}/dashboard`}>
+                <BarChart3 className="size-6" />
+                <span>View Signals</span>
+              </Link>
             </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+              disabled
+              title="Coming soon"
+            >
               <BookOpen className="size-6" />
               <span>Add Trade</span>
             </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+              disabled
+              title="Coming soon"
+            >
               <AlertCircle className="size-6" />
               <span>Risk Calculator</span>
             </Button>

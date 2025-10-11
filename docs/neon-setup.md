@@ -14,6 +14,7 @@ npx prisma migrate status
 ```
 
 5 migrations ont été appliquées avec succès. **Toutes les fonctionnalités sont débloquées** :
+
 - ✅ Profils traders
 - ✅ Système de signaux
 - ✅ Follow/unfollow
@@ -28,11 +29,11 @@ Vous pouvez maintenant développer et tester toutes les fonctionnalités MyCrypt
 
 ### Branches Neon
 
-| Branch | Usage | Endpoint | Fichier .env |
-|--------|-------|----------|--------------|
-| **main** (prod) | Production | `ep-proud-term-abutee8y` | `.env.production` |
-| **dev** | Staging/Dev | `ep-falling-bar-ab0lufee` | `.env.development` |
-| **preview-\*** | PR previews | Auto-créées par Vercel | Variables Vercel |
+| Branch          | Usage       | Endpoint                  | Fichier .env       |
+| --------------- | ----------- | ------------------------- | ------------------ |
+| **main** (prod) | Production  | `ep-proud-term-abutee8y`  | `.env.production`  |
+| **dev**         | Staging/Dev | `ep-falling-bar-ab0lufee` | `.env.development` |
+| **preview-\***  | PR previews | Auto-créées par Vercel    | Variables Vercel   |
 
 ---
 
@@ -41,6 +42,7 @@ Vous pouvez maintenant développer et tester toutes les fonctionnalités MyCrypt
 ### Pourquoi ?
 
 Chaque Pull Request aura sa propre base de données isolée :
+
 - ✅ Pas de risque de casser la DB dev/prod
 - ✅ Tests E2E sur données isolées
 - ✅ Nettoyage automatique après merge

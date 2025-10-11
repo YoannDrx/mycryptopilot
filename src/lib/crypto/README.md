@@ -13,10 +13,12 @@ Ce système crypto est **structuré et documenté** mais contient des **placehol
 ### 🔴 TODOs Critiques
 
 **Issue #4 - Génération Adresses Crypto (2 TODOs)**:
+
 - `src/lib/crypto/address-generator.ts:137` - `deriveAddressFromIndex()` - HD wallet derivation = placeholder
 - `src/lib/crypto/address-generator.ts:184` - `generatePaymentAddress()` - Retourne des adresses placeholder
 
 **Issue #5 - Watcher On-Chain (2 TODOs)**:
+
 - `src/lib/crypto/payment-watcher.ts:81` - `watchPayment()` - RPC calls = placeholder
 - `src/lib/crypto/payment-watcher.ts:120` - `watchPaymentWithTimeout()` - Polling réel = placeholder
 
@@ -63,12 +65,14 @@ Pour implémenter le système complet, voir sections ci-dessous.
 ### Dérivation HD Wallet (BIP44)
 
 **Base (Ethereum)**: `m/44'/60'/0'/0/{index}`
+
 - 44' = BIP44 standard
 - 60' = Ethereum coin type
 - 0'/0 = Account 0, External chain
 - {index} = Index séquentiel par utilisateur
 
 **Tron**: `m/44'/195'/0'/0/{index}`
+
 - 44' = BIP44 standard
 - 195' = Tron coin type
 - 0'/0 = Account 0, External chain
@@ -79,34 +83,34 @@ Pour implémenter le système complet, voir sections ci-dessous.
 ### Générer une adresse pour un utilisateur
 
 ```typescript
-import { generateCryptoAddress } from '@/lib/crypto/address-generator'
+import { generateCryptoAddress } from "@/lib/crypto/address-generator";
 
 // Générer une adresse Base (USDC)
-const baseAddress = await generateCryptoAddress(userId, 'BASE')
-console.log(baseAddress.address) // 0x...
+const baseAddress = await generateCryptoAddress(userId, "BASE");
+console.log(baseAddress.address); // 0x...
 
 // Générer une adresse Tron (USDT)
-const tronAddress = await generateCryptoAddress(userId, 'TRON')
-console.log(tronAddress.address) // T...
+const tronAddress = await generateCryptoAddress(userId, "TRON");
+console.log(tronAddress.address); // T...
 ```
 
 ### Récupérer toutes les adresses d'un utilisateur
 
 ```typescript
-import { getUserCryptoAddresses } from '@/lib/crypto/address-generator'
+import { getUserCryptoAddresses } from "@/lib/crypto/address-generator";
 
-const addresses = await getUserCryptoAddresses(userId)
-addresses.forEach(addr => {
-  console.log(`${addr.network}: ${addr.address}`)
-})
+const addresses = await getUserCryptoAddresses(userId);
+addresses.forEach((addr) => {
+  console.log(`${addr.network}: ${addr.address}`);
+});
 ```
 
 ### Générer adresses pour tous les réseaux supportés
 
 ```typescript
-import { ensureUserCryptoAddresses } from '@/lib/crypto/address-generator'
+import { ensureUserCryptoAddresses } from "@/lib/crypto/address-generator";
 
-const addresses = await ensureUserCryptoAddresses(userId)
+const addresses = await ensureUserCryptoAddresses(userId);
 // Génère automatiquement Base + Tron si elles n'existent pas
 ```
 
@@ -129,6 +133,7 @@ CRYPTO_XPUB_TRON="xpub..." # Extended public key Tron
 Un **Extended Public Key (xpub)** permet de générer une infinité d'adresses publiques **sans avoir accès aux clés privées**. C'est parfait pour un système de paiement watch-only.
 
 **Avantages**:
+
 - ✅ Aucune clé privée sur le serveur (sécurité maximale)
 - ✅ Génération d'adresses illimitée
 - ✅ Si le serveur est compromis, les fonds sont en sécurité
@@ -226,7 +231,7 @@ Pour Tron, c'est plus complexe car Ledger Live ne montre pas directement l'xpub.
 4. Utilisez les Developer Tools pour extraire l'xpub:
    ```javascript
    // Dans la console du navigateur (F12)
-   tronWeb.defaultAddress.base58
+   tronWeb.defaultAddress.base58;
    // Note: Ceci donne l'adresse, pas l'xpub directement
    ```
 
@@ -262,12 +267,14 @@ Services comme **Fireblocks**, **Copper**, ou **Anchorage** offrent la gestion d
 Ajoutez les xpub dans votre système de secrets :
 
 **Vercel**:
+
 ```bash
 vercel env add CRYPTO_XPUB_BASE
 vercel env add CRYPTO_XPUB_TRON
 ```
 
 **AWS Secrets Manager**:
+
 ```bash
 aws secretsmanager create-secret \
   --name mycryptopilot/crypto/xpub-base \
@@ -275,6 +282,7 @@ aws secretsmanager create-secret \
 ```
 
 **GitHub Secrets** (pour CI uniquement):
+
 ```
 Settings → Secrets and variables → Actions → New repository secret
 ```
@@ -291,10 +299,12 @@ Si vous voulez éviter la complexité de Ledger pour Tron, vous pouvez utiliser 
 #### Étape 1: Générer un mnemonic sécurisé
 
 **Option A: Via hardware wallet**
+
 1. Configurez un nouveau Ledger/Trezor
 2. Notez le mnemonic de 24 mots généré
 
 **Option B: Via Ian Coleman's BIP39 Tool (OFFLINE)**
+
 1. Téléchargez [BIP39 Tool](https://github.com/iancoleman/bip39) en local
 2. Déconnectez internet
 3. Générez un mnemonic de 24 mots
@@ -316,6 +326,7 @@ const mnemonic = {
 ```
 
 Exécutez:
+
 ```bash
 npx tsx scripts/generate-testnet-xpub.ts
 ```
@@ -325,17 +336,20 @@ npx tsx scripts/generate-testnet-xpub.ts
 #### Étape 3: Chiffrer et stocker le mnemonic
 
 **Option A: Via Ansible Vault**
+
 ```bash
 ansible-vault create secrets.yml
 # Entrez le mnemonic
 ```
 
 **Option B: Via GPG**
+
 ```bash
 echo "votre mnemonic" | gpg --encrypt --armor > mnemonic.gpg
 ```
 
 **Option C: Via Password Manager**
+
 - 1Password, Bitwarden, LastPass (avec 2FA activé)
 
 #### Étape 4: Configurer les XPUB en production
@@ -346,13 +360,13 @@ Même processus que l'Option 2, Étape 4.
 
 ### 📊 Comparaison des Options
 
-| Critère | Option 1 (Script) | Option 2 (Ledger) | Option 3 (Mnemonic) |
-|---------|-------------------|-------------------|---------------------|
-| **Sécurité** | ⚠️ Faible (dev only) | ✅ Excellente | 🟡 Moyenne |
-| **Durée setup** | 5 min | 45 min | 15 min |
-| **Coût** | Gratuit | ~80€ (Ledger) | Gratuit |
-| **Usage recommandé** | Dev/Testnet | Production | Staging/Pre-prod |
-| **Accès fonds** | ⚠️ Mnemonic en clair | ✅ Hardware wallet | 🟡 Mnemonic chiffré |
+| Critère              | Option 1 (Script)    | Option 2 (Ledger)  | Option 3 (Mnemonic) |
+| -------------------- | -------------------- | ------------------ | ------------------- |
+| **Sécurité**         | ⚠️ Faible (dev only) | ✅ Excellente      | 🟡 Moyenne          |
+| **Durée setup**      | 5 min                | 45 min             | 15 min              |
+| **Coût**             | Gratuit              | ~80€ (Ledger)      | Gratuit             |
+| **Usage recommandé** | Dev/Testnet          | Production         | Staging/Pre-prod    |
+| **Accès fonds**      | ⚠️ Mnemonic en clair | ✅ Hardware wallet | 🟡 Mnemonic chiffré |
 
 ---
 
@@ -427,6 +441,7 @@ echo $CRYPTO_XPUB_BASE | grep "^xpub"
 ```
 
 Les tests vérifient:
+
 - ✅ Génération d'adresses Base valides (format `0x...`)
 - ✅ Génération d'adresses Tron valides (format `T...`)
 - ✅ Réutilisation des adresses pour le même utilisateur
@@ -497,6 +512,7 @@ model CryptoAddress {
 ### Activer les logs
 
 Les logs sont automatiques via le logger. Vérifiez:
+
 - `Derived Base address from HD wallet` - Succès dérivation Base
 - `Derived Tron address from HD wallet` - Succès dérivation Tron
 - `Returning existing crypto address` - Réutilisation d'adresse

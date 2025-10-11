@@ -85,11 +85,13 @@ Les **Trading Cards** sont le format structuré utilisé par MyCryptoPilot pour 
 ```
 
 **Métriques**:
+
 - Risk distance: 4% (2000/50000)
 - Average reward: 8% (avg of TPs)
 - Risk/Reward ratio: 2:1
 
 **Optimal Position Size** (pour 10k USD account, 2% risk):
+
 - Risk amount: 200 USD
 - Position size: 5000 USD
 - Position units: 0.1 BTC
@@ -121,6 +123,7 @@ Les **Trading Cards** sont le format structuré utilisé par MyCryptoPilot pour 
 ```
 
 **Métriques**:
+
 - Risk distance: 5% (150/3000)
 - Average reward: 8.3% (avg of TPs)
 - Risk/Reward ratio: 1.66:1
@@ -151,6 +154,7 @@ Les **Trading Cards** sont le format structuré utilisé par MyCryptoPilot pour 
 ```
 
 **Métriques**:
+
 - Risk distance: 6.67% (10/150)
 - Average reward: 21.1% (avg of TPs)
 - Risk/Reward ratio: 3.17:1
@@ -162,24 +166,26 @@ Les **Trading Cards** sont le format structuré utilisé par MyCryptoPilot pour 
 ### 1. Cohérence des Prix
 
 **Pour LONG**:
+
 - `invalidation < entry < tous les TPs`
 - Stop loss en dessous de l'entrée
 - Take profits au-dessus de l'entrée
 
 **Pour SHORT**:
+
 - `invalidation > entry > tous les TPs`
 - Stop loss au-dessus de l'entrée
 - Take profits en dessous de l'entrée
 
 ### 2. Risk Levels
 
-| Level | Description | Use Case |
-|-------|-------------|----------|
-| 1 | Très faible | Setup avec haute probabilité, stop large |
-| 2 | Faible | Setup confirmé, bonne RR |
-| 3 | Moyen | Setup standard, conditions normales |
-| 4 | Élevé | Setup spéculatif, conditions incertaines |
-| 5 | Extrême | High risk/high reward, taille position réduite |
+| Level | Description | Use Case                                       |
+| ----- | ----------- | ---------------------------------------------- |
+| 1     | Très faible | Setup avec haute probabilité, stop large       |
+| 2     | Faible      | Setup confirmé, bonne RR                       |
+| 3     | Moyen       | Setup standard, conditions normales            |
+| 4     | Élevé       | Setup spéculatif, conditions incertaines       |
+| 5     | Extrême     | High risk/high reward, taille position réduite |
 
 ### 3. Limitations
 
@@ -214,12 +220,14 @@ Collateral (with leverage) = Position Size / Leverage
 ### Exemple de Calcul
 
 **Paramètres**:
+
 - Account: 10,000 USD
 - Risk: 2%
 - Entry: 50,000
 - Invalidation: 48,000
 
 **Calcul**:
+
 1. Risk Amount = 10,000 × 0.02 = **200 USD**
 2. Risk Distance = (50,000 - 48,000) / 50,000 = **4%**
 3. Position Size = 200 / 0.04 = **5,000 USD**
@@ -234,21 +242,23 @@ Le système suggère automatiquement un levier approprié selon:
 
 ### 1. Liquidité du Token
 
-| Catégorie | Tokens | Max Leverage |
-|-----------|--------|--------------|
-| High Liquidity | BTC, ETH | 10-20x |
-| Medium Liquidity | SOL, BNB, XRP, ADA, AVAX, MATIC, DOT, LINK | 5-10x |
-| Low Liquidity | Autres altcoins | 2-5x |
+| Catégorie        | Tokens                                     | Max Leverage |
+| ---------------- | ------------------------------------------ | ------------ |
+| High Liquidity   | BTC, ETH                                   | 10-20x       |
+| Medium Liquidity | SOL, BNB, XRP, ADA, AVAX, MATIC, DOT, LINK | 5-10x        |
+| Low Liquidity    | Autres altcoins                            | 2-5x         |
 
 ### 2. Ajustements
 
 **Risk Level**:
+
 - Risk 1-2: Levier max conservé
 - Risk 3: Réduction -15%
 - Risk 4: Réduction -30%
 - Risk 5: Réduction -45%
 
 **Stop Distance**:
+
 - < 2%: Réduction -50% (éviter liquidations)
 - < 4%: Réduction -25%
 - ≥ 4%: Aucune réduction
@@ -419,7 +429,7 @@ Chaque signal a une durée de vie limitée:
 Le champ `expiresAt` est calculé automatiquement:
 
 ```typescript
-expiresAt = createdAt + ttlSec
+expiresAt = createdAt + ttlSec;
 ```
 
 Les signaux expirés peuvent être filtrés dans les queries:
@@ -437,10 +447,11 @@ const activeSignals = await listSignals({
 Chaque signal possède un hash SHA256 pour garantir son intégrité:
 
 ```typescript
-Hash = SHA256(traderId + symbol + JSON.stringify(payload) + createdAt)
+Hash = SHA256(traderId + symbol + JSON.stringify(payload) + createdAt);
 ```
 
 Ce hash:
+
 - Empêche les doublons
 - Permet de vérifier que le signal n'a pas été modifié
 - Peut être utilisé pour timestamping blockchain (feature future)
@@ -473,6 +484,7 @@ Ce hash:
 ## Roadmap Features
 
 ### Phase 1 (MVP) ✅
+
 - [x] Format structuré validé
 - [x] Calculs position size
 - [x] Suggestions leverage
@@ -480,12 +492,14 @@ Ce hash:
 - [x] Hash & TTL
 
 ### Phase 2 (Q1 2026)
+
 - [ ] Composant `TradingCard` React (affichage visuel)
 - [ ] Calculateur interactif position size
 - [ ] Historique performance par card
 - [ ] Notes utilisateur sur signaux
 
 ### Phase 3 (Q2 2026)
+
 - [ ] Trading cards personnalisées par follower
 - [ ] Blockchain timestamping (immutabilité)
 - [ ] Analyse technique automatique
@@ -503,4 +517,4 @@ Pour toute question ou suggestion concernant le format Trading Cards:
 
 ---
 
-*Document généré pour MyCryptoPilot - Issue #10*
+_Document généré pour MyCryptoPilot - Issue #10_
