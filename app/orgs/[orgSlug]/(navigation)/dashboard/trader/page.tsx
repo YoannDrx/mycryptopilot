@@ -27,6 +27,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TraderSignalsList } from "./_components/trader-signals-list";
 import { redirect } from "next/navigation";
+import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
+import { InviteFollowerDialog } from "@/components/nowts/invite-follower-dialog";
+import { InvitationsTable } from "@/components/nowts/invitations-table";
+import { ConversionStatsCard } from "@/components/nowts/conversion-stats-card";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Trader Dashboard - MyCryptoPilot",
@@ -144,6 +150,12 @@ export default async function TraderDashboardPage() {
           </Card>
         </div>
 
+        {/* Referral Link Card */}
+        <ReferralLinkCard
+          traderId={user.id}
+          traderName={traderProfile.displayName}
+        />
+
         {/* Trader Status Card */}
         <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
           <CardHeader>
@@ -188,6 +200,7 @@ export default async function TraderDashboardPage() {
         <Tabs defaultValue="signals" className="space-y-4">
           <TabsList>
             <TabsTrigger value="signals">My Signals</TabsTrigger>
+            <TabsTrigger value="invitations">Invitations</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
           </TabsList>
@@ -195,6 +208,43 @@ export default async function TraderDashboardPage() {
           {/* Signals Tab */}
           <TabsContent value="signals" className="space-y-4">
             <TraderSignalsList traderId={user.id} />
+          </TabsContent>
+
+          {/* Invitations Tab */}
+          <TabsContent value="invitations" className="space-y-4">
+            {/* Conversion Stats */}
+            <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+              <ConversionStatsCard traderId={user.id} />
+            </Suspense>
+
+            {/* Invitations Table */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Follower Invitations</CardTitle>
+                    <CardDescription>
+                      Invite people to follow you and receive your trading
+                      signals
+                    </CardDescription>
+                  </div>
+                  <InviteFollowerDialog />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Suspense
+                  fallback={
+                    <div className="space-y-2">
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                    </div>
+                  }
+                >
+                  <InvitationsTable traderId={user.id} />
+                </Suspense>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Performance Tab */}
@@ -328,7 +378,7 @@ export default async function TraderDashboardPage() {
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Manage your trading profile</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <CardContent className="grid gap-4 sm:grid-cols-3">
             <Button
               asChild
               variant="outline"
@@ -344,19 +394,10 @@ export default async function TraderDashboardPage() {
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
             >
-              <Link href={`/orgs/${org.slug}/dashboard/trader`}>
-                <Users className="size-6" />
-                <span>View Followers</span>
+              <Link href={`/orgs/${org.slug}/signals`}>
+                <BarChart3 className="size-6" />
+                <span>Browse Signals</span>
               </Link>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 py-4"
-              disabled
-              title="Coming soon"
-            >
-              <BarChart3 className="size-6" />
-              <span>Analytics</span>
             </Button>
             <Button
               asChild

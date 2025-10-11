@@ -37,7 +37,10 @@ export function MarketplaceFilters({
   });
 
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center">
+    <div
+      className="flex flex-col gap-4 md:flex-row md:items-center"
+      suppressHydrationWarning
+    >
       {/* Search Input */}
       <div className="relative flex-1">
         <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />

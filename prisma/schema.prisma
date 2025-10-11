@@ -52,19 +52,22 @@ model CryptoAddress {
 }
 
 model Follow {
-  id        String       @id @default(cuid())
-  userId    String
-  traderId  String
-  status    FollowStatus @default(ACTIVE)
-  startedAt DateTime     @default(now())
-  expiresAt DateTime?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  trader    User         @relation("TraderFollowers", fields: [traderId], references: [id], onDelete: Cascade)
-  user      User         @relation("UserFollows", fields: [userId], references: [id], onDelete: Cascade)
+  id           String       @id @default(cuid())
+  userId       String
+  traderId     String
+  status       FollowStatus @default(ACTIVE)
+  source       FollowSource @default(DIRECT)
+  invitationId String?
+  startedAt    DateTime     @default(now())
+  expiresAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  trader       User         @relation("TraderFollowers", fields: [traderId], references: [id], onDelete: Cascade)
+  user         User         @relation("UserFollows", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, traderId])
   @@index([traderId])
+  @@index([source])
   @@map("follow")
 }
 
@@ -108,6 +111,25 @@ model Signal {
   @@map("signal")
 }
 
+model TraderInvitation {
+  id         String           @id @default(cuid())
+  traderId   String
+  email      String
+  token      String           @unique
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  trader     User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@unique([traderId, email])
+  @@index([token])
+  @@index([traderId])
+  @@index([status])
+  @@map("trader_invitation")
+}
+
 enum UserRole {
   USER
   TRADER
@@ -118,6 +140,12 @@ enum FollowStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+}
+
+enum FollowSource {
+  DIRECT
+  INVITATION
+  REFERRAL
 }
 
 enum CryptoNetwork {
@@ -137,4 +165,10 @@ enum PaymentStatus {
   PENDING
   CONFIRMED
   FAILED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
 }
