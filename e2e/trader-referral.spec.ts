@@ -209,8 +209,8 @@ test.describe("Trader Referral System", () => {
 
     // Should see trader stats
     await expect(page.getByText("75.5%")).toBeVisible(); // Win rate
-    await expect(page.getByText("2.3")).toBeVisible(); // Payoff
-    await expect(page.getByText("2")).toBeVisible(); // Signals count
+    await expect(page.getByText("2.3", { exact: true })).toBeVisible(); // Payoff
+    await expect(page.getByText("2", { exact: true })).toBeVisible(); // Signals count
 
     // Cleanup
     const follower = await prisma.user.findUnique({
