@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { RESERVED_SLUGS } from "@/lib/organizations/reserved-slugs";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
+import { logger } from "@/lib/logger";
 import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -21,7 +22,7 @@ export const handleRootRedirect = (request: NextRequest) => {
     return NextResponse.redirect(url);
   } catch (error) {
     // Si erreur parsing cookie (corrompu ou invalide), ne pas bloquer
-    console.error("Error in handleRootRedirect:", error);
+    logger.error("Error in handleRootRedirect:", error);
     return null;
   }
 };
@@ -58,7 +59,7 @@ export const validateSession = async (request: NextRequest) => {
     return { session, activeOrganisation };
   } catch (error) {
     // Si erreur validation session (session invalide, org inexistante, etc.)
-    console.error("Error in validateSession:", error);
+    logger.error("Error in validateSession:", error);
     return null;
   }
 };
@@ -78,7 +79,7 @@ export const findUserOrganization = async (slug: string, userId: string) => {
     return org;
   } catch (error) {
     // Si erreur DB (connexion, timeout, etc.)
-    console.error("Error in findUserOrganization:", error);
+    logger.error("Error in findUserOrganization:", error);
     return null;
   }
 };
@@ -96,7 +97,7 @@ export const switchActiveOrganization = async (
     return NextResponse.redirect(request.url);
   } catch (error) {
     // Si erreur switch org (org inexistante, session invalide, etc.)
-    console.error("Error in switchActiveOrganization:", error);
+    logger.error("Error in switchActiveOrganization:", error);
     // Fallback: rediriger vers /orgs
     const url = request.nextUrl.clone();
     url.pathname = "/orgs";
@@ -127,7 +128,7 @@ export const validateAdminAccess = async (request: NextRequest) => {
     return session.user;
   } catch (error) {
     // Si erreur validation admin (session invalide, etc.)
-    console.error("Error in validateAdminAccess:", error);
+    logger.error("Error in validateAdminAccess:", error);
     return null;
   }
 };
