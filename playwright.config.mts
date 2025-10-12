@@ -1,8 +1,27 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
 import { devices } from "@playwright/test";
-import { getServerUrl } from "./src/lib/server-url.js";
 
-const SERVER_URL = process.env.PLAYWRIGHT_TEST_BASE_URL ?? getServerUrl();
+// Simplified server URL logic for Playwright (no deps on compiled TS files)
+function getServerUrl(): string {
+  if (process.env.PLAYWRIGHT_TEST_BASE_URL) {
+    return process.env.PLAYWRIGHT_TEST_BASE_URL;
+  }
+
+  // Priority 1: Vercel preview
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // Priority 2: Production
+  if (process.env.VERCEL_ENV === "production" && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+
+  // Priority 3: Localhost
+  return "http://localhost:3000";
+}
+
+const SERVER_URL = getServerUrl();
 
 const HEADLESS = process.env.HEADLESS
   ? process.env.HEADLESS.toLowerCase() === "true"
