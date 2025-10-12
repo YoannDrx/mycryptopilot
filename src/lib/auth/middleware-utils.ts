@@ -9,15 +9,21 @@ import { NextResponse } from "next/server";
 export const handleRootRedirect = (request: NextRequest) => {
   if (!SiteConfig.features.enableLandingRedirection) return null;
 
-  const session = getSessionCookie(request, {
-    cookiePrefix: SiteConfig.appId,
-  });
+  try {
+    const session = getSessionCookie(request, {
+      cookiePrefix: SiteConfig.appId,
+    });
 
-  if (!session) return null;
+    if (!session) return null;
 
-  const url = request.nextUrl.clone();
-  url.pathname = "/orgs";
-  return NextResponse.redirect(url);
+    const url = request.nextUrl.clone();
+    url.pathname = "/orgs";
+    return NextResponse.redirect(url);
+  } catch (error) {
+    // Si erreur parsing cookie (corrompu ou invalide), ne pas bloquer
+    console.error("Error in handleRootRedirect:", error);
+    return null;
+  }
 };
 
 export const extractOrgSlug = (pathname: string) => {
@@ -35,46 +41,67 @@ export const extractOrgSlug = (pathname: string) => {
 };
 
 export const validateSession = async (request: NextRequest) => {
-  const sessionCookie = getSessionCookie(request, {
-    cookiePrefix: SiteConfig.appId,
-  });
+  try {
+    const sessionCookie = getSessionCookie(request, {
+      cookiePrefix: SiteConfig.appId,
+    });
 
-  if (!sessionCookie) return null;
+    if (!sessionCookie) return null;
 
-  const [session, activeOrganisation] = await Promise.all([
-    auth.api.getSession({ headers: request.headers }),
-    auth.api.getFullOrganization({ headers: request.headers }),
-  ]);
+    const [session, activeOrganisation] = await Promise.all([
+      auth.api.getSession({ headers: request.headers }),
+      auth.api.getFullOrganization({ headers: request.headers }),
+    ]);
 
-  if (!session?.session.userId) return null;
+    if (!session?.session.userId) return null;
 
-  return { session, activeOrganisation };
+    return { session, activeOrganisation };
+  } catch (error) {
+    // Si erreur validation session (session invalide, org inexistante, etc.)
+    console.error("Error in validateSession:", error);
+    return null;
+  }
 };
 
 export const findUserOrganization = async (slug: string, userId: string) => {
-  const org = await prisma.organization.findFirst({
-    where: {
-      OR: [{ slug }, { id: slug }],
-      members: {
-        some: { userId },
+  try {
+    const org = await prisma.organization.findFirst({
+      where: {
+        OR: [{ slug }, { id: slug }],
+        members: {
+          some: { userId },
+        },
       },
-    },
-    select: { id: true },
-  });
+      select: { id: true },
+    });
 
-  return org;
+    return org;
+  } catch (error) {
+    // Si erreur DB (connexion, timeout, etc.)
+    console.error("Error in findUserOrganization:", error);
+    return null;
+  }
 };
 
 export const switchActiveOrganization = async (
   request: NextRequest,
   organizationId: string,
 ) => {
-  await auth.api.setActiveOrganization({
-    headers: request.headers,
-    body: { organizationId },
-  });
+  try {
+    await auth.api.setActiveOrganization({
+      headers: request.headers,
+      body: { organizationId },
+    });
 
-  return NextResponse.redirect(request.url);
+    return NextResponse.redirect(request.url);
+  } catch (error) {
+    // Si erreur switch org (org inexistante, session invalide, etc.)
+    console.error("Error in switchActiveOrganization:", error);
+    // Fallback: rediriger vers /orgs
+    const url = request.nextUrl.clone();
+    url.pathname = "/orgs";
+    return NextResponse.redirect(url);
+  }
 };
 
 export const redirectToOrgList = (request: NextRequest) => {
@@ -84,19 +111,25 @@ export const redirectToOrgList = (request: NextRequest) => {
 };
 
 export const validateAdminAccess = async (request: NextRequest) => {
-  const sessionCookie = getSessionCookie(request, {
-    cookiePrefix: SiteConfig.appId,
-  });
+  try {
+    const sessionCookie = getSessionCookie(request, {
+      cookiePrefix: SiteConfig.appId,
+    });
 
-  if (!sessionCookie) return null;
+    if (!sessionCookie) return null;
 
-  const session = await auth.api.getSession({ headers: request.headers });
+    const session = await auth.api.getSession({ headers: request.headers });
 
-  if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || session.user.role !== "admin") {
+      return null;
+    }
+
+    return session.user;
+  } catch (error) {
+    // Si erreur validation admin (session invalide, etc.)
+    console.error("Error in validateAdminAccess:", error);
     return null;
   }
-
-  return session.user;
 };
 
 export const redirectToRoot = (request: NextRequest) => {

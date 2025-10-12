@@ -13,6 +13,7 @@ import { sendEmail } from "@/lib/mail/send-email";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
 import { setupResendCustomer } from "./auth/auth-config-setup";
+import { sendDiscordInviteEmail } from "./discord/invitations";
 import { env } from "./env";
 import { generateSlug } from "./format/id";
 import { logger } from "./logger";
@@ -116,6 +117,17 @@ export const auth = betterAuth({
                 );
               }
             }
+          }
+
+          // Envoyer invite Discord automatiquement (Phase 3.3 - non-blocking)
+          if (process.env.DISCORD_BOT_ENABLED === "true" && user.email) {
+            void sendDiscordInviteEmail(user.email, user.name).catch((err) => {
+              logger.error("Failed to send Discord invite email", {
+                err,
+                userId: user.id,
+              });
+              // Ne pas bloquer si l'email échoue
+            });
           }
         },
       },

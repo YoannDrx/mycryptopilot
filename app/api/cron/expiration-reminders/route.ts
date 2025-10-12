@@ -1,66 +1,83 @@
-import { runExpirationReminderJob } from "@/lib/cron/expiration-reminder-job";
-import { logger } from "@/lib/logger";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-
 /**
- * Cron Route: Expiration Reminders
+ * API Route: Expiration Reminders Cron Job
  *
- * Cette route API doit être appelée quotidiennement par un service cron externe.
+ * GET /api/cron/expiration-reminders
  *
- * Configuration Vercel Cron (vercel.json):
- * ```json
- * {
- *   "crons": [{
- *     "path": "/api/cron/expiration-reminders",
- *     "schedule": "0 9 * * *"
- *   }]
- * }
- * ```
+ * Exécuté quotidiennement à 9h UTC par Vercel Cron Jobs
  *
- * Sécurité: Protégé par CRON_SECRET (recommandé)
+ * Actions:
+ * 1. Envoie des rappels d'expiration aux users (7j, 3j, 1j avant expiration)
+ * 2. Downgrade automatiquement les abonnements expirés vers FREE
+ * 3. Envoie emails ET DMs Discord
+ * 4. Update les rôles Discord automatiquement
  *
- * @example
- * // Test manuel:
- * curl -X GET https://mycryptopilot.com/api/cron/expiration-reminders \
- *   -H "Authorization: Bearer YOUR_CRON_SECRET"
+ * Protection:
+ * - Vérifie le header Authorization: Bearer ${CRON_SECRET}
+ * - Retourne 401 si secret invalide ou absent
+ *
+ * Améliorations (Phase 5 - Discord Integration):
+ * - Ajout rappel 7 jours (préavis supplémentaire)
+ * - Utilisation template email React professionnel
+ * - Maintien DMs Discord (engagement utilisateur)
+ * - Migration vers zod-route pattern (validation stricte)
+ *
+ * @see https://vercel.com/docs/cron-jobs
  */
-export async function GET(request: NextRequest) {
-  logger.info("Expiration reminders cron endpoint called");
 
-  // Sécurité: Vérifier le secret cron (optionnel mais recommandé)
-  const authHeader = request.headers.get("authorization");
-  const cronSecret = process.env.CRON_SECRET;
+import { route } from "@/lib/zod-route";
+import { logger } from "@/lib/logger";
+import { env } from "@/lib/env";
+import { runExpirationReminderJob } from "@/lib/cron/expiration-reminder-job";
+import { ZodRouteError } from "@/lib/errors/zod-route-error";
 
-  if (cronSecret) {
-    if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
-      logger.warn("Unauthorized cron request attempt");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const GET = route.handler(async (req) => {
+  // Protection: Vérifier le CRON_SECRET
+  const authHeader = req.headers.get("Authorization");
+  const expectedSecret = env.CRON_SECRET;
+
+  if (!expectedSecret) {
+    logger.error("CRON_SECRET not configured in environment variables");
+    throw new ZodRouteError("Cron jobs not configured", 500);
+  }
+
+  // Format: "Bearer <secret>"
+  const token = authHeader?.replace("Bearer ", "");
+
+  if (token !== expectedSecret) {
+    logger.warn("Unauthorized cron job attempt", {
+      receivedToken: `${token?.slice(0, 10)  }...`,
+      ip: req.headers.get("x-forwarded-for") ?? "unknown",
+    });
+    throw new ZodRouteError("Unauthorized", 401);
+  }
+
+  logger.info("=== Starting expiration reminders cron job ===");
+
+  try {
+    // Exécuter le job complet (7j, 3j, 1j reminders + downgrades)
+    const result = await runExpirationReminderJob();
+
+    if (!result.success) {
+      throw new ZodRouteError(result.error ?? "Unknown error", 500);
     }
-  } else {
-    logger.warn("CRON_SECRET not configured - cron endpoint is not protected!");
-  }
 
-  // Exécuter le job
-  const result = await runExpirationReminderJob();
+    logger.info("=== Expiration reminders cron job completed ===", result);
 
-  if (result.success) {
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Expiration reminders processed successfully",
-        results: result.results,
-      },
-      { status: 200 },
-    );
-  } else {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Expiration reminders job failed",
-        error: result.error,
-      },
-      { status: 500 },
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      results: result.results,
+    };
+  } catch (error) {
+    logger.error("=== Expiration reminders cron job failed ===", error);
+
+    throw new ZodRouteError(
+      error instanceof Error ? error.message : "Unknown error",
+      500,
     );
   }
-}
+});
+
+// Configuration Vercel (export runtime edge ou node)
+export const runtime = "nodejs";
+export const maxDuration = 60; // 60 secondes max (Hobby plan limit)
