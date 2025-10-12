@@ -13,17 +13,21 @@
  */
 
 // Load environment variables BEFORE importing any modules
-// Load .env.development for development environment
+// IMPORTANT: Only load .env files in development
+// In production (Railway/Vercel), variables are injected via platform
 import dotenv from "dotenv";
 import path from "node:path";
 
-const envFile =
-  process.env.NODE_ENV === "production"
-    ? ".env.production"
-    : ".env.development";
-
-// Force override existing env variables (some may be loaded by prisma.config.ts)
-dotenv.config({ path: path.join(process.cwd(), envFile), override: true });
+// Only load .env files in non-production environments
+if (process.env.NODE_ENV !== "production") {
+  const envFile = ".env.development";
+  dotenv.config({ path: path.join(process.cwd(), envFile), override: true });
+  console.log(`Loaded environment from ${envFile}`);
+} else {
+  console.log(
+    "Production mode: Using environment variables from Railway/platform",
+  );
+}
 
 import { discordBot } from "../src/lib/discord/bot-client";
 import { logger } from "../src/lib/logger";
