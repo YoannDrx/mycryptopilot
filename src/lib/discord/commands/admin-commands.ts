@@ -63,17 +63,13 @@ export async function handleAdminSyncRoles(
       return;
     }
 
-    logger.info(
-      `Admin ${interaction.user.tag} triggered role synchronization`,
-    );
+    logger.info(`Admin ${interaction.user.tag} triggered role synchronization`);
     await ensureRolesExist(guild);
 
     const embed = new EmbedBuilder()
       .setColor(0x10b981) // Green
       .setTitle("✅ Rôles Synchronisés")
-      .setDescription(
-        "Les rôles Discord ont été créés/mis à jour avec succès.",
-      )
+      .setDescription("Les rôles Discord ont été créés/mis à jour avec succès.")
       .addFields(
         {
           name: "🟢 Free Member",
@@ -220,9 +216,7 @@ export async function handleAdminStats(
     await interaction.editReply({ embeds: [embed] });
   } catch (error) {
     logger.error("Error in handleAdminStats:", error);
-    await interaction.editReply(
-      "❌ Erreur lors de la récupération des stats.",
-    );
+    await interaction.editReply("❌ Erreur lors de la récupération des stats.");
   }
 }
 
@@ -292,8 +286,7 @@ export async function handleAdminCheckPermissions(
     });
 
     const hasCriticalMissing = requiredPermissions.some(
-      (perm) =>
-        perm.critical && !botMember.permissions.has(perm.flag as never),
+      (perm) => perm.critical && !botMember.permissions.has(perm.flag as never),
     );
 
     const embed = new EmbedBuilder()
@@ -469,7 +462,11 @@ export async function handleAdminAssignRole(
     if (success) {
       const planEmoji = plan === "free" ? "🟢" : plan === "pro" ? "🟡" : "🟣";
       const planName =
-        plan === "free" ? "Free Member" : plan === "pro" ? "Pro Trader" : "Ultra Trader";
+        plan === "free"
+          ? "Free Member"
+          : plan === "pro"
+            ? "Pro Trader"
+            : "Ultra Trader";
 
       const embed = new EmbedBuilder()
         .setColor(0x10b981) // Green
@@ -492,9 +489,7 @@ export async function handleAdminAssignRole(
     }
   } catch (error) {
     logger.error("Error in handleAdminAssignRole:", error);
-    await interaction.editReply(
-      "❌ Erreur lors de l'assignation du rôle.",
-    );
+    await interaction.editReply("❌ Erreur lors de l'assignation du rôle.");
   }
 }
 
@@ -587,11 +582,64 @@ export async function handleAdminTestSignal(
 
     await channel.send({ embeds: [testEmbed] });
 
-    await interaction.editReply(
-      "✅ Signal test envoyé dans #signals-free!",
-    );
+    await interaction.editReply("✅ Signal test envoyé dans #signals-free!");
   } catch (error) {
     logger.error("Error in handleAdminTestSignal:", error);
     await interaction.editReply("❌ Erreur lors de l'envoi du signal test.");
+  }
+}
+
+/**
+ * /admin-test-welcome - Tester le message de bienvenue en s'envoyant le DM
+ */
+export async function handleAdminTestWelcome(
+  interaction: ChatInputCommandInteraction,
+): Promise<void> {
+  if (!isUserAdmin(interaction)) {
+    await interaction.reply({
+      content: "❌ Cette commande est réservée aux administrateurs.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  await interaction.deferReply({ ephemeral: true });
+
+  try {
+    logger.info(`Admin ${interaction.user.tag} triggered test welcome message`);
+
+    // Importer la fonction de message de bienvenue
+    const { sendWelcomeMessage } = await import("../dm-notifications");
+
+    // Envoyer le message de bienvenue à l'admin qui a exécuté la commande
+    const success = await sendWelcomeMessage(
+      interaction.user.id,
+      interaction.user.username,
+    );
+
+    if (success) {
+      const embed = new EmbedBuilder()
+        .setColor(0x10b981) // Green
+        .setTitle("✅ Message de Bienvenue Envoyé")
+        .setDescription(
+          `Le message de bienvenue a été envoyé en DM à ${interaction.user}.\n\n` +
+            `Vérifie tes messages privés pour voir le résultat ! 📬`,
+        )
+        .setFooter({
+          text: `Testé par ${interaction.user.tag}`,
+        })
+        .setTimestamp();
+
+      await interaction.editReply({ embeds: [embed] });
+    } else {
+      await interaction.editReply(
+        "❌ Erreur lors de l'envoi du message de bienvenue. Vérifie que tes DM sont ouverts.",
+      );
+    }
+  } catch (error) {
+    logger.error("Error in handleAdminTestWelcome:", error);
+    await interaction.editReply(
+      "❌ Erreur lors de l'envoi du message de bienvenue.",
+    );
   }
 }

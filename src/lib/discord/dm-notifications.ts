@@ -503,3 +503,96 @@ export async function notifyFollowerWelcome(
 
   return sendDM(followerDiscordId, embed);
 }
+
+/**
+ * Envoyer un message de bienvenue à un nouveau membre Discord
+ *
+ * Message automatique envoyé quand quelqu'un rejoint le serveur Discord
+ * Inclut: règles, tuto, commandes, message BETA + récompense feedback
+ *
+ * @param discordUserId - Discord User ID du nouveau membre
+ * @param username - Nom d'utilisateur Discord
+ * @returns true si le message a été envoyé avec succès
+ */
+export async function sendWelcomeMessage(
+  discordUserId: string,
+  username: string,
+): Promise<boolean> {
+  const embed = new EmbedBuilder()
+    .setColor(0xf59e0b) // Amber (brand color)
+    .setTitle("🎉 Bienvenue sur MyCryptoPilot BETA !")
+    .setThumbnail(`${SiteConfig.appUrl}${SiteConfig.appIcon}`) // Logo MyCryptoPilot
+    .setDescription(
+      `Salut **${username}** ! 👋\n\n` +
+        `Félicitations, tu fais partie des **premiers utilisateurs BETA** de MyCryptoPilot ! 🚀\n\n` +
+        `En tant que membre pionnier, ton investissement et ton feedback régulier dans le channel **#app-development** seront **prochainement récompensés** ! 🎁`,
+    )
+    .addFields(
+      {
+        name: "📜 Les Règles du Serveur",
+        value:
+          `• **Respect mutuel**: Sois courtois avec les autres membres\n` +
+          `• **Pas de spam**: Les messages promotionnels non sollicités sont interdits\n` +
+          `• **Trading responsable**: Les signaux ne sont pas des conseils financiers (DYOR)\n` +
+          `• **Feedback constructif**: Partage tes suggestions dans #app-development\n` +
+          `• **Confidentialité**: Ne partage jamais tes clés privées ou mots de passe`,
+        inline: false,
+      },
+      {
+        name: "🎮 Comment Ça Marche Ici",
+        value:
+          `**1️⃣ Connecte ton compte**: Visite ${SiteConfig.appUrl} pour créer ton compte\n` +
+          `**2️⃣ Choisis un plan**: Free (5 signaux/jour) ou Pro/Ultra (plus de signaux)\n` +
+          `**3️⃣ Suis des traders**: Explore le marketplace et suis les traders vérifiés\n` +
+          `**4️⃣ Reçois des signaux**: Les signaux arrivent automatiquement en DM et dans les channels\n` +
+          `**5️⃣ Utilise la console de risque**: Gère ton portefeuille avec nos outils`,
+        inline: false,
+      },
+      {
+        name: "⚡ Commandes Discord Disponibles",
+        value:
+          `• \`/help\` - Afficher toutes les commandes\n` +
+          `• \`/status\` - Vérifier ton statut et ton plan\n` +
+          `• \`/signals\` - Voir les derniers signaux des traders que tu suis\n` +
+          `• \`/follow @trader\` - Suivre un trader\n` +
+          `• \`/upgrade\` - Upgrader ton abonnement`,
+        inline: false,
+      },
+      {
+        name: "🎁 Récompense BETA Testeurs",
+        value:
+          `En tant que testeur BETA, tu vas nous aider à améliorer MyCryptoPilot !\n\n` +
+          `**Comment participer ?**\n` +
+          `• Donne ton feedback régulier dans **#app-development**\n` +
+          `• Signale les bugs que tu rencontres\n` +
+          `• Propose des améliorations et nouvelles features\n` +
+          `• Teste activement la plateforme\n\n` +
+          `**Tes efforts seront récompensés prochainement !** 🏆`,
+        inline: false,
+      },
+      {
+        name: "🔗 Liens Utiles",
+        value:
+          `• **Site web**: ${SiteConfig.appUrl}\n` +
+          `• **Dashboard**: ${SiteConfig.appUrl}/dashboard\n` +
+          `• **Marketplace**: ${SiteConfig.appUrl}/traders\n` +
+          `• **Pricing**: ${SiteConfig.appUrl}/pricing`,
+        inline: false,
+      },
+      {
+        name: "📧 Contact & Support",
+        value:
+          `• **Email**: contact@mycryptopilot.app\n` +
+          `• **Twitter**: ${SiteConfig.team.twitter}\n` +
+          `• **Discord**: Pose tes questions dans les channels appropriés`,
+        inline: false,
+      },
+    )
+    .setFooter({
+      text: `${SiteConfig.team.name} | contact@mycryptopilot.app`,
+      iconURL: `${SiteConfig.appUrl}${SiteConfig.appIcon}`,
+    })
+    .setTimestamp();
+
+  return sendDM(discordUserId, embed);
+}

@@ -97,6 +97,37 @@ class DiscordBot {
         await this.checkBotPermissions();
       });
 
+      // Événement: Nouveau membre rejoint le serveur Discord
+      this.client.on("guildMemberAdd", async (member) => {
+        logger.info(
+          `New member joined: ${member.user.tag} (${member.user.id})`,
+        );
+
+        try {
+          // Importer dynamiquement la fonction de message de bienvenue
+          const { sendWelcomeMessage } = await import("./dm-notifications");
+
+          // Envoyer le message de bienvenue en DM
+          const success = await sendWelcomeMessage(
+            member.user.id,
+            member.user.username,
+          );
+
+          if (success) {
+            logger.info(`✅ Welcome message sent to ${member.user.tag}`);
+          } else {
+            logger.warn(
+              `⚠️ Failed to send welcome message to ${member.user.tag}`,
+            );
+          }
+        } catch (error) {
+          logger.error(
+            `Error sending welcome message to ${member.user.tag}:`,
+            error,
+          );
+        }
+      });
+
       // Connexion au bot
       // Read directly from process.env to get live values (important for standalone script)
       const token = process.env.DISCORD_BOT_TOKEN;

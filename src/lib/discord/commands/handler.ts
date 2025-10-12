@@ -13,6 +13,7 @@ import {
   handleAdminBotInfo,
   handleAdminAssignRole,
   handleAdminTestSignal,
+  handleAdminTestWelcome,
 } from "./admin-commands";
 
 /**
@@ -75,6 +76,10 @@ export async function handleCommand(
 
       case "admin-test-signal":
         await handleAdminTestSignal(interaction);
+        break;
+
+      case "admin-test-welcome":
+        await handleAdminTestWelcome(interaction);
         break;
 
       default:
