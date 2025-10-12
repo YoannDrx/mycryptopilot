@@ -7,6 +7,7 @@ import {
 } from "@/lib/discord/dm-notifications";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
+import SubscriptionReminderEmail from "@email/subscription-reminder";
 
 /**
  * Expiration Reminders
@@ -14,10 +15,15 @@ import MarkdownEmail from "@email/markdown.email";
  * Système de rappels automatiques pour les abonnements qui expirent bientôt.
  * Envoie des notifications Discord DM et/ou Email aux utilisateurs.
  *
+ * Améliorations (Phase 5 - Discord Integration):
+ * - Ajout rappel 7 jours avant expiration
+ * - Utilisation template email React professionnel
+ * - Maintien DMs Discord (critique pour engagement)
+ *
  * @module expiration-reminders
  */
 
-type ReminderType = "3_DAYS" | "1_DAY" | "EXPIRED";
+type ReminderType = "7_DAYS" | "3_DAYS" | "1_DAY" | "EXPIRED";
 
 /**
  * Obtenir tous les utilisateurs dont l'abonnement expire dans X jours
@@ -119,6 +125,8 @@ async function getUsersWithExpiredSubscriptions(): Promise<
 /**
  * Envoyer un email de rappel d'expiration
  *
+ * Utilise le template React professionnel avec design élaboré
+ *
  * @param params - User et type de rappel
  */
 async function sendExpirationReminderEmail(params: {
@@ -139,50 +147,32 @@ async function sendExpirationReminderEmail(params: {
         ? "Ultra"
         : "Free";
 
+  const urgencyEmoji =
+    daysLeft === 7 ? "ℹ️" : daysLeft === 3 ? "⚠️" : daysLeft === 1 ? "🚨" : "⏰";
+
   const urgencyText =
-    daysLeft === 3 ? "dans 3 jours" : daysLeft === 1 ? "demain" : "bientôt";
-
-  const markdown = `
-# ⏰ Ton abonnement ${planDisplayName} expire ${urgencyText}
-
-Bonjour ${user.name},
-
-Ton abonnement **${planDisplayName}** expire le **${expiresAt.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}**.
-
-**Il te reste ${daysLeft} jour${daysLeft > 1 ? "s" : ""} pour renouveler et continuer à profiter de tes avantages** ! 🚀
-
-## 📊 Rappel de tes avantages ${planDisplayName}
-
-${getPlanFeatures(user.planName as "free" | "pro" | "ultra")}
-
-## 🔄 Comment renouveler ?
-
-1. Visite notre [page de pricing](${SiteConfig.prodUrl}/pricing)
-2. Sélectionne ton plan **${planDisplayName}**
-3. Effectue le paiement en crypto (USDC ou USDT)
-4. Ton accès est renouvelé automatiquement ! ✅
-
-## ⚠️ Que se passe-t-il après expiration ?
-
-Si tu ne renouvelles pas avant l'expiration :
-- Ton compte sera downgraded vers le plan **Free**
-- Tu perdras l'accès aux fonctionnalités premium
-- Tes données seront conservées (tu peux upgrader à tout moment)
-
-## 💬 Besoin d'aide ?
-
-Notre équipe est disponible sur [Discord](${SiteConfig.prodUrl}/discord) pour toute question.
-
-À bientôt sur ${SiteConfig.title} !
-`;
+    daysLeft === 7
+      ? "dans 7 jours"
+      : daysLeft === 3
+        ? "dans 3 jours"
+        : daysLeft === 1
+          ? "demain"
+          : "bientôt";
 
   await sendEmail({
     to: user.email,
-    subject: `⏰ Ton abonnement ${planDisplayName} expire ${urgencyText}`,
-    html: MarkdownEmail({ markdown }),
+    subject: `${urgencyEmoji} Ton abonnement ${planDisplayName} expire ${urgencyText}`,
+    html: SubscriptionReminderEmail({
+      userName: user.name,
+      planName: user.planName ?? "pro",
+      expiresAt: expiresAt,
+      daysRemaining: daysLeft,
+    }),
   });
 
-  logger.info(`Expiration reminder email sent to ${user.email}`);
+  logger.info(
+    `Expiration reminder email sent to ${user.email} (${daysLeft} days left)`,
+  );
 }
 
 /**
@@ -285,7 +275,7 @@ Merci d'avoir utilisé ${SiteConfig.title} ! 🙏
 /**
  * Traiter les rappels d'expiration pour une période donnée
  *
- * @param reminderType - Type de rappel ("3_DAYS" | "1_DAY" | "EXPIRED")
+ * @param reminderType - Type de rappel ("7_DAYS" | "3_DAYS" | "1_DAY" | "EXPIRED")
  */
 export async function processExpirationReminders(
   reminderType: ReminderType,
@@ -300,7 +290,10 @@ export async function processExpirationReminders(
   let users: Awaited<ReturnType<typeof getUsersWithExpiringSubscriptions>> = [];
   let daysLeft = 0;
 
-  if (reminderType === "3_DAYS") {
+  if (reminderType === "7_DAYS") {
+    users = await getUsersWithExpiringSubscriptions(7);
+    daysLeft = 7;
+  } else if (reminderType === "3_DAYS") {
     users = await getUsersWithExpiringSubscriptions(3);
     daysLeft = 3;
   } else if (reminderType === "1_DAY") {
@@ -403,26 +396,4 @@ export async function processExpirationReminders(
     dmsSent,
     downgrades,
   };
-}
-
-/**
- * Helper: Obtenir les features d'un plan
- */
-function getPlanFeatures(plan: "free" | "pro" | "ultra"): string {
-  const features = {
-    free: `• 5 signaux par jour
-• 1 trader à suivre
-• Screener refresh 5min`,
-    pro: `• 50 signaux par jour
-• Jusqu'à 5 traders à suivre
-• Console de risque & Journal de trading
-• Screener refresh 1min`,
-    ultra: `• Signaux illimités
-• Traders illimités à suivre
-• Console de risque & Journal de trading
-• Alertes custom & Filtres avancés
-• Screener refresh 5sec`,
-  };
-
-  return features[plan];
 }

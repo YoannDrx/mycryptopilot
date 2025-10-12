@@ -32,6 +32,21 @@ export const DISCORD_CONFIG = {
     PRO: 0xf59e0b, // Amber (brand color)
     ULTRA: 0x8b5cf6, // Purple
   } as const,
+
+  /**
+   * IDs des channels Discord fixes (Phase 0.2)
+   * Get IDs: Right-click channel → Copy ID (Developer Mode required)
+   */
+  channels: {
+    FREE_SIGNALS: process.env.DISCORD_FREE_SIGNALS_CHANNEL_ID ?? "",
+    LOGS: process.env.DISCORD_LOG_CHANNEL_ID ?? "",
+  } as const,
+
+  /**
+   * ID du rôle Admin (Phase 0.2)
+   * Get ID: Right-click role → Copy ID (Developer Mode required)
+   */
+  adminRoleId: process.env.DISCORD_ROLE_ADMIN_ID ?? "",
 } as const;
 
 export type DiscordRoleName = keyof typeof DISCORD_CONFIG.roles;

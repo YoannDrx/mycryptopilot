@@ -5,11 +5,12 @@ import { processExpirationReminders } from "@/lib/subscription/expiration-remind
  * Cron Job: Expiration Reminders
  *
  * Ce job doit être exécuté quotidiennement pour:
- * 1. Envoyer des rappels 3 jours avant expiration
- * 2. Envoyer des rappels 1 jour avant expiration
- * 3. Downgrader automatiquement les abonnements expirés vers FREE
+ * 1. Envoyer des rappels 7 jours avant expiration (Amélioré Phase 5)
+ * 2. Envoyer des rappels 3 jours avant expiration
+ * 3. Envoyer des rappels 1 jour avant expiration
+ * 4. Downgrader automatiquement les abonnements expirés vers FREE
  *
- * Recommandation: Exécuter à 9h00 UTC chaque jour via Vercel Cron ou service externe
+ * Recommandation: Exécuter à 9h00 UTC chaque jour via Vercel Cron
  *
  * @example
  * // Dans vercel.json:
@@ -23,6 +24,7 @@ import { processExpirationReminders } from "@/lib/subscription/expiration-remind
 export async function runExpirationReminderJob(): Promise<{
   success: boolean;
   results: {
+    sevenDays: { processed: number; emailsSent: number; dmsSent: number };
     threeDays: { processed: number; emailsSent: number; dmsSent: number };
     oneDay: { processed: number; emailsSent: number; dmsSent: number };
     expired: {
@@ -37,28 +39,37 @@ export async function runExpirationReminderJob(): Promise<{
   logger.info("Starting expiration reminder cron job");
 
   try {
-    // 1. Traiter les rappels 3 jours avant expiration
+    // 1. Traiter les rappels 7 jours avant expiration (Amélioré Phase 5)
+    const sevenDaysResults = await processExpirationReminders("7_DAYS");
+    logger.info("7-day reminders completed", sevenDaysResults);
+
+    // 2. Traiter les rappels 3 jours avant expiration
     const threeDaysResults = await processExpirationReminders("3_DAYS");
     logger.info("3-day reminders completed", threeDaysResults);
 
-    // 2. Traiter les rappels 1 jour avant expiration
+    // 3. Traiter les rappels 1 jour avant expiration
     const oneDayResults = await processExpirationReminders("1_DAY");
     logger.info("1-day reminders completed", oneDayResults);
 
-    // 3. Traiter les abonnements expirés (downgrade automatique)
+    // 4. Traiter les abonnements expirés (downgrade automatique)
     const expiredResults = await processExpirationReminders("EXPIRED");
     logger.info("Expired subscriptions processed", expiredResults);
 
     const totalProcessed =
+      sevenDaysResults.processed +
       threeDaysResults.processed +
       oneDayResults.processed +
       expiredResults.processed;
     const totalEmails =
+      sevenDaysResults.emailsSent +
       threeDaysResults.emailsSent +
       oneDayResults.emailsSent +
       expiredResults.emailsSent;
     const totalDMs =
-      threeDaysResults.dmsSent + oneDayResults.dmsSent + expiredResults.dmsSent;
+      sevenDaysResults.dmsSent +
+      threeDaysResults.dmsSent +
+      oneDayResults.dmsSent +
+      expiredResults.dmsSent;
     const totalDowngrades = expiredResults.downgrades;
 
     logger.info("✅ Expiration reminder job completed successfully", {
@@ -71,6 +82,7 @@ export async function runExpirationReminderJob(): Promise<{
     return {
       success: true,
       results: {
+        sevenDays: sevenDaysResults,
         threeDays: threeDaysResults,
         oneDay: oneDayResults,
         expired: expiredResults,
@@ -81,6 +93,7 @@ export async function runExpirationReminderJob(): Promise<{
     return {
       success: false,
       results: {
+        sevenDays: { processed: 0, emailsSent: 0, dmsSent: 0 },
         threeDays: { processed: 0, emailsSent: 0, dmsSent: 0 },
         oneDay: { processed: 0, emailsSent: 0, dmsSent: 0 },
         expired: { processed: 0, emailsSent: 0, dmsSent: 0, downgrades: 0 },
