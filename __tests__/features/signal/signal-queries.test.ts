@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // Mock dependencies
@@ -79,8 +80,8 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.symbol).toBe("BTC-USDT");
-      expect(call[0].where.expiresAt).toEqual({ gt: expect.any(Date) });
+      expect(call?.[0]?.where?.symbol).toBe("BTC-USDT");
+      expect(call?.[0]?.where?.expiresAt).toEqual({ gt: expect.any(Date) });
     });
 
     it("should filter by multiple symbols", async () => {
@@ -96,7 +97,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.symbol).toEqual({
+      expect(call?.[0]?.where?.symbol).toEqual({
         in: ["BTC-USDT", "ETH-USDT"],
       });
     });
@@ -114,7 +115,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.AND).toEqual([
+      expect(call?.[0]?.where?.AND).toEqual([
         { payloadJson: { path: ["bias"], equals: "LONG" } },
       ]);
     });
@@ -132,7 +133,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.AND).toEqual([
+      expect(call?.[0]?.where?.AND).toEqual([
         { payloadJson: { path: ["bias"], equals: "SHORT" } },
       ]);
     });
@@ -150,7 +151,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.expiresAt).toEqual({ gt: expect.any(Date) });
+      expect(call?.[0]?.where?.expiresAt).toEqual({ gt: expect.any(Date) });
     });
 
     it("should filter by status (EXPIRED)", async () => {
@@ -166,7 +167,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.expiresAt).toEqual({ lte: expect.any(Date) });
+      expect(call?.[0]?.where?.expiresAt).toEqual({ lte: expect.any(Date) });
     });
 
     it("should filter by instrumentType (SPOT)", async () => {
@@ -182,7 +183,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.AND).toEqual([
+      expect(call?.[0]?.where?.AND).toEqual([
         { payloadJson: { path: ["instrumentType"], equals: "SPOT" } },
       ]);
     });
@@ -200,7 +201,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.AND).toEqual([
+      expect(call?.[0]?.where?.AND).toEqual([
         { payloadJson: { path: ["instrumentType"], equals: "PERP" } },
       ]);
     });
@@ -218,7 +219,7 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.trader.traderProfile.displayName).toEqual({
+      expect(call?.[0]?.where?.trader?.traderProfile?.displayName).toEqual({
         contains: "Pro Trader",
         mode: "insensitive",
       });
@@ -352,8 +353,8 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].cursor).toEqual({ id: "signal_cursor_123" });
-      expect(call[0].skip).toBe(1);
+      expect(call?.[0]?.cursor).toEqual({ id: "signal_cursor_123" });
+      expect(call?.[0]?.skip).toBe(1);
     });
 
     it("should detect hasNextPage correctly when more items exist", async () => {
@@ -436,14 +437,14 @@ describe("signal-queries", () => {
 
       expect(prisma.signal.findMany).toHaveBeenCalled();
       const call = vi.mocked(prisma.signal.findMany).mock.calls[0];
-      expect(call[0].where.symbol).toEqual({
+      expect(call?.[0]?.where?.symbol).toEqual({
         in: ["BTC-USDT", "ETH-USDT"],
       });
-      expect(call[0].where.AND).toEqual([
+      expect(call?.[0]?.where?.AND).toEqual([
         { payloadJson: { path: ["bias"], equals: "LONG" } },
         { payloadJson: { path: ["instrumentType"], equals: "PERP" } },
       ]);
-      expect(call[0].where.trader.traderProfile.verified).toBe(true);
+      expect(call?.[0]?.where?.trader?.traderProfile?.verified).toBe(true);
     });
   });
 
