@@ -1,6 +1,5 @@
 import {
   ChannelType,
-  type Guild,
   PermissionFlagsBits,
   type TextChannel,
 } from "discord.js";
@@ -63,6 +62,12 @@ export async function createTraderChannel(
       return existingChannel.id;
     }
 
+    // Vérifier que le bot user est disponible
+    if (!client.user) {
+      logger.error("Discord bot user not available");
+      return null;
+    }
+
     // Récupérer le trader depuis la DB pour son discordId
     const trader = await prisma.user.findUnique({
       where: { id: traderId },
@@ -76,7 +81,7 @@ export async function createTraderChannel(
         deny: [PermissionFlagsBits.ViewChannel], // Caché par défaut
       },
       {
-        id: client.user!.id, // Bot
+        id: client.user.id, // Bot
         allow: [
           PermissionFlagsBits.ViewChannel,
           PermissionFlagsBits.SendMessages,
@@ -290,13 +295,11 @@ export async function archiveTraderChannel(
       (ch) => ch.name === "archive" && ch.type === ChannelType.GuildCategory,
     );
 
-    if (!archiveCategory) {
-      archiveCategory = await guild.channels.create({
-        name: "archive",
-        type: ChannelType.GuildCategory,
-        reason: "MyCryptoPilot - Archived trader channels",
-      });
-    }
+    archiveCategory ??= await guild.channels.create({
+      name: "archive",
+      type: ChannelType.GuildCategory,
+      reason: "MyCryptoPilot - Archived trader channels",
+    });
 
     // Déplacer vers ARCHIVE
     await channel.setParent(archiveCategory.id);

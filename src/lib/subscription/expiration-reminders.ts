@@ -397,25 +397,3 @@ export async function processExpirationReminders(
     downgrades,
   };
 }
-
-/**
- * Helper: Obtenir les features d'un plan
- */
-function getPlanFeatures(plan: "free" | "pro" | "ultra"): string {
-  const features = {
-    free: `• 5 signaux par jour
-• 1 trader à suivre
-• Screener refresh 5min`,
-    pro: `• 50 signaux par jour
-• Jusqu'à 5 traders à suivre
-• Console de risque & Journal de trading
-• Screener refresh 1min`,
-    ultra: `• Signaux illimités
-• Traders illimités à suivre
-• Console de risque & Journal de trading
-• Alertes custom & Filtres avancés
-• Screener refresh 5sec`,
-  };
-
-  return features[plan];
-}
