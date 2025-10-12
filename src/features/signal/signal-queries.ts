@@ -275,3 +275,187 @@ export const signalHashExists = async (hash: string): Promise<boolean> => {
 
   return !!signal;
 };
+
+/**
+ * Récupère un feed de signaux avec filtres avancés
+ *
+ * Utilisé pour la page /signals avec tous les filtres possibles
+ */
+export const getSignalsFeed = async (params?: {
+  traderId?: string;
+  traderName?: string;
+  symbol?: string;
+  symbols?: string[];
+  bias?: "LONG" | "SHORT";
+  status?: "ACTIVE" | "EXPIRED";
+  instrumentType?: "SPOT" | "PERP";
+  verifiedOnly?: boolean;
+  createdAfter?: Date;
+  createdBefore?: Date;
+  cursor?: string;
+  limit?: number;
+}) => {
+  const {
+    traderId,
+    traderName,
+    symbol,
+    symbols,
+    bias,
+    status,
+    instrumentType,
+    verifiedOnly = false,
+    createdAfter,
+    createdBefore,
+    cursor,
+    limit = 20,
+  } = params ?? {};
+
+  // Construire les conditions where
+  const where: {
+    traderId?: string;
+    symbol?: string | { in: string[] };
+    expiresAt?: { gt: Date } | { lte: Date };
+    createdAt?: { gte: Date; lte?: Date } | { lte: Date };
+    trader?: {
+      traderProfile?: {
+        verified?: boolean;
+        displayName?: { contains: string; mode: "insensitive" };
+      };
+    };
+    AND?: {
+      payloadJson?: {
+        path: string[];
+        equals: string;
+      };
+    }[];
+  } = {};
+
+  // Filter by trader ID
+  if (traderId) {
+    where.traderId = traderId;
+  }
+
+  // Filter by trader name (search in displayName)
+  if (traderName) {
+    where.trader = {
+      traderProfile: {
+        displayName: {
+          contains: traderName,
+          mode: "insensitive",
+        },
+      },
+    };
+  }
+
+  // Filter by symbol (single or multiple)
+  if (symbol) {
+    where.symbol = symbol;
+  } else if (symbols && symbols.length > 0) {
+    where.symbol = {
+      in: symbols,
+    };
+  }
+
+  // Filter by status (ACTIVE/EXPIRED)
+  if (status === "ACTIVE") {
+    where.expiresAt = {
+      gt: new Date(),
+    };
+  } else if (status === "EXPIRED") {
+    where.expiresAt = {
+      lte: new Date(),
+    };
+  } else {
+    // Default: only show active signals
+    where.expiresAt = {
+      gt: new Date(),
+    };
+  }
+
+  // Filter by verified traders only
+  if (verifiedOnly) {
+    where.trader = {
+      ...where.trader,
+      traderProfile: {
+        ...where.trader?.traderProfile,
+        verified: true,
+      },
+    };
+  }
+
+  // Filter by date range
+  if (createdAfter && createdBefore) {
+    where.createdAt = {
+      gte: createdAfter,
+      lte: createdBefore,
+    };
+  } else if (createdAfter) {
+    where.createdAt = {
+      gte: createdAfter,
+    };
+  } else if (createdBefore) {
+    where.createdAt = {
+      lte: createdBefore,
+    };
+  }
+
+  // Filter by bias (LONG/SHORT) and instrumentType (SPOT/PERP) in JSON payload
+  const andConditions = [];
+
+  if (bias) {
+    andConditions.push({
+      payloadJson: {
+        path: ["bias"],
+        equals: bias,
+      },
+    });
+  }
+
+  if (instrumentType) {
+    andConditions.push({
+      payloadJson: {
+        path: ["instrumentType"],
+        equals: instrumentType,
+      },
+    });
+  }
+
+  if (andConditions.length > 0) {
+    where.AND = andConditions;
+  }
+
+  // Execute query with pagination
+  const signals = await prisma.signal.findMany({
+    where,
+    take: limit + 1, // Fetch one more to check if there's a next page
+    skip: cursor ? 1 : 0,
+    cursor: cursor ? { id: cursor } : undefined,
+    orderBy: { createdAt: "desc" },
+    include: {
+      trader: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          traderProfile: {
+            select: {
+              displayName: true,
+              verified: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Check if there are more results
+  const hasNextPage = signals.length > limit;
+  const items = hasNextPage ? signals.slice(0, -1) : signals;
+  const nextCursor = hasNextPage ? items[items.length - 1]?.id : undefined;
+
+  return {
+    items,
+    hasNextPage,
+    nextCursor,
+  };
+};

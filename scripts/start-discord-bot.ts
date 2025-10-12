@@ -22,8 +22,10 @@ import path from "node:path";
 if (process.env.NODE_ENV !== "production") {
   const envFile = ".env.development";
   dotenv.config({ path: path.join(process.cwd(), envFile), override: true });
+  // eslint-disable-next-line no-console
   console.log(`Loaded environment from ${envFile}`);
 } else {
+  // eslint-disable-next-line no-console
   console.log(
     "Production mode: Using environment variables from Railway/platform",
   );

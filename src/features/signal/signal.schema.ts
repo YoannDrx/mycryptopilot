@@ -107,9 +107,13 @@ export type CreateSignalType = z.infer<typeof CreateSignalSchema>;
  */
 export const SignalFiltersSchema = z.object({
   traderId: z.string().optional(),
-  symbol: z.string().optional(),
+  traderName: z.string().optional(), // Search by trader display name
+  symbol: z.string().optional(), // Single symbol filter
+  symbols: z.array(z.string()).optional(), // Multiple symbols filter
   bias: z.enum(["LONG", "SHORT"]).optional(),
   status: z.enum(["ACTIVE", "EXPIRED"]).optional(),
+  instrumentType: z.enum(["SPOT", "PERP"]).optional(),
+  verifiedOnly: z.boolean().optional(), // Only verified traders
   createdAfter: z.date().optional(),
   createdBefore: z.date().optional(),
   limit: z.number().int().min(1).max(100).default(20),
