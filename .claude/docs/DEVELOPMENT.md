@@ -1,7 +1,7 @@
 # Development Status & Roadmap - MyCryptoPilot
 
-**Dernière mise à jour**: 11 octobre 2025
-**Audit complet via /project-audit**: 11 octobre 2025
+**Dernière mise à jour**: 12 octobre 2025
+**Audit complet via /project-audit**: 12 octobre 2025
 
 ## 📊 Progression Globale
 
@@ -21,7 +21,7 @@
 
 - ✅ PostgreSQL (Neon) configuré
 - ✅ Prisma ORM + 5 modèles MyCryptoPilot
-- ✅ **6 migrations appliquées** (11 oct 2025)
+- ✅ **8 migrations appliquées** (12 oct 2025)
 - ✅ Client Prisma généré (`src/generated/prisma`)
 - ✅ Better Auth avec extensions User
 
@@ -61,7 +61,7 @@
 
 ### ✅ Base de Données (100%)
 
-**Status**: **OPÉRATIONNELLE** (6 migrations appliquées)
+**Status**: **OPÉRATIONNELLE** (8 migrations appliquées)
 
 ```bash
 npx prisma migrate status
@@ -75,7 +75,9 @@ npx prisma migrate status
 3. `20250813021925_admin_add_admin_control_of_better_auth` ✅
 4. `20251003143237_add_mycryptopilot_models` ✅
 5. `20251010090500_add_user_plan_and_discord_fields` ✅
-6. `20251011??????_migration_6` ✅
+6. `20251010152445_add_discord_integration_enabled` ✅
+7. `20251011170618_add_trader_invitations` ✅
+8. `20251011174405_add_follow_source_tracking` ✅
 
 **Modèles disponibles**: User, TraderProfile, Signal, Follow, CryptoAddress, CryptoPayment, Subscription
 
