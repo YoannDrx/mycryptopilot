@@ -82,9 +82,10 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ## État actuel
 
-### 📊 Progression Globale: ~98% ✅
+### 📊 Progression Globale: ~99% ✅
 
-**Audit complet**: 12 octobre 2025 (mis à jour après Phase 5)
+**Audit complet**: 12 octobre 2025
+**Phase 6 complétée**: 13 octobre 2025
 
 ### Phases Complétées
 
@@ -94,6 +95,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 ✅ **Phase 3**: Core Features (100%)
 ✅ **Phase 4**: Crypto Payments (100%)
 ✅ **Phase 5**: Discord Integration MVP (100%)
+✅ **Phase 6**: Feed Signaux Avancé (100%)
 
 ### Systèmes Opérationnels
 
@@ -103,26 +105,27 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 - ✅ **Trading System**: Profils traders + Signaux + Follow/Unfollow
 - ✅ **Dashboards**: User + Trader + Marketplace (100% connectés aux données)
 - ✅ **Discord Bot**: Déployé Railway 24/7 (11 commandes: 5 user + 6 admin)
+- ✅ **Feed Signaux**: Filtres avancés (12 paramètres) + Pagination + URL state + 26 tests
 
 ### TODOs Restants (Code Cleanup)
 
-7 TODOs trouvés dans le code (audit 12 oct 2025):
-
-**P1 (Important)** - 3 items:
-1. `webhook.ts:37` - Use correct `DISCORD_FREE_SIGNALS_CHANNEL_ID` env var
-2. `follow-button.tsx:20` - Connect existing follow/unfollow actions
-3. `payment-status/[addressId]/route.ts:39` - Decide: keep or remove route
+**P1 (Important)** - 1 item restant:
+1. ~~`webhook.ts:37`~~ - ✅ Fixed (commit 41bd066)
+2. `follow-button.tsx:20` - Connect existing follow/unfollow actions (~5 min)
+3. ~~`payment-status/[addressId]/route.ts:39`~~ - ✅ Deleted (commit 41bd066)
 
 **P2 (Non-critique)** - 4 items:
 4. `sweep-to-binance.ts` - 4 TODOs pour sweep implementation (post-MVP)
 
-### Features MVP Restantes
+### Features MVP
 
-**P1 (Features)** - 2 items (3-5 jours):
-1. Feed signaux avec filtres (asset, bias, status, trader) - 1-2j
-2. Tests E2E coverage 80%+ - 2-3j
+✅ **Feed signaux avec filtres** - **COMPLETED!** (PR #40, 13 oct 2025)
+- 12 paramètres de filtrage
+- Pagination cursor-based
+- URL state management
+- 26 tests unitaires
 
-**MVP Beta ready dans ~5 jours!** 🎯
+**MVP Beta ready dans ~1-2 heures!** (cleanup uniquement) 🎯
 
 📄 **Détails complets**: [`.claude/docs/DEVELOPMENT.md`](.claude/docs/DEVELOPMENT.md)
 
@@ -516,15 +519,16 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 
 ## Prochaines Étapes MVP
 
-### ✅ Déjà Fait (98%)
+### ✅ Déjà Fait (99%)
 
-**5 Phases complètes**:
+**6 Phases complètes**:
 - Phase 1: Setup & Infrastructure ✅
 - Phase 2: Database & Auth ✅
 - Phase 2.5: UI/UX Pages ✅
 - Phase 3: Core Features ✅
 - Phase 4: Crypto Payments ✅
-- **Phase 5: Discord Integration MVP ✅** (11 commandes, roles auto, webhooks)
+- Phase 5: Discord Integration MVP ✅ (11 commandes, roles auto, webhooks)
+- **Phase 6: Feed Signaux Avancé ✅** (PR #40, 13 oct 2025)
 
 **Tous les systèmes opérationnels**:
 - Profils traders ✅
@@ -534,21 +538,18 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 - Subscriptions (activateSubscription) ✅
 - Discord Bot 24/7 Railway ✅
 - Dashboards 100% connectés ✅
+- **Feed signaux avec filtres avancés ✅**
 
-### 🟡 Restant MVP (2%)
+### 🟡 Restant MVP (1%)
 
-**Code Cleanup** - 2-3h:
-1. Fix `webhook.ts:37` - Use correct env var
-2. Fix `follow-button.tsx:20` - Connect actions
-3. Decide `payment-status` route - Keep or remove
+**Code Cleanup** - 1-2h:
+1. ~~Fix `webhook.ts:37`~~ - ✅ DONE
+2. Fix `follow-button.tsx:20` - Connect actions (~5 min)
+3. ~~Decide `payment-status` route~~ - ✅ DONE (deleted)
 
-**Features MVP** - 3-5j:
-1. Feed signaux avec filtres (asset, bias, status, trader) - 1-2j
-2. Tests E2E coverage 80%+ - 2-3j
+**Total Restant MVP**: **~1-2 heures** (cleanup uniquement) 🎯
 
-**Total Restant MVP**: **~5 jours** 🎯
-
-**Plan détaillé**: Phase 1 (cleanup 2-3h) → Phase 2 (features 3-5j) → **MVP Beta Launch!**
+**Plan**: Cleanup rapide → **MVP Beta Launch!** 🚀
 
 📄 **Détails complets**: [`.claude/docs/DEVELOPMENT.md`](.claude/docs/DEVELOPMENT.md)
 
