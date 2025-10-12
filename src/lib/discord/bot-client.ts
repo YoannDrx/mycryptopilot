@@ -8,6 +8,7 @@ import {
 import { logger } from "../logger";
 import { DISCORD_CONFIG } from "./config";
 import { registerCommands } from "./commands/register-commands";
+import { ensureRolesExist } from "./roles";
 
 /**
  * Discord Bot Client (Singleton)
@@ -86,6 +87,9 @@ class DiscordBot {
       this.client.on("guildCreate", async (guild) => {
         logger.info(`Bot joined guild: ${guild.name} (${guild.id})`);
 
+        // Créer les rôles automatiquement
+        await ensureRolesExist(guild);
+
         // Republier les slash commands automatiquement
         await this.registerSlashCommandsForGuild(guild.id);
 
@@ -109,6 +113,16 @@ class DiscordBot {
 
       // Vérifier les permissions du bot
       await this.checkBotPermissions();
+
+      // Créer les rôles automatiquement (Free Member, Pro Trader, Ultra Trader)
+      const guild = this.client.guilds.cache.first();
+      if (guild) {
+        logger.info("Creating Discord roles automatically...");
+        await ensureRolesExist(guild);
+        logger.info("✅ Discord roles created successfully");
+      } else {
+        logger.warn("No guild found, skipping role creation");
+      }
 
       this.isInitialized = true;
 
