@@ -14,7 +14,7 @@ import Link from "next/link";
 
 type SignalsFeedProps = {
   orgSlug: string;
-  searchParams?: {
+  searchParams: {
     symbols?: string | string[];
     bias?: string;
     status?: string;
@@ -30,29 +30,29 @@ export const SignalsFeed = async ({
   searchParams,
 }: SignalsFeedProps) => {
   // Parse filters from URL
-  const symbols = Array.isArray(searchParams?.symbols)
-    ? searchParams?.symbols
-    : searchParams?.symbols
-      ? [searchParams?.symbols]
+  const symbols = Array.isArray(searchParams.symbols)
+    ? searchParams.symbols
+    : searchParams.symbols
+      ? [searchParams.symbols]
       : undefined;
 
   const bias =
-    searchParams?.bias === "LONG" || searchParams?.bias === "SHORT"
-      ? searchParams?.bias
+    searchParams.bias === "LONG" || searchParams.bias === "SHORT"
+      ? searchParams.bias
       : undefined;
 
   const status =
-    searchParams?.status === "ACTIVE" || searchParams?.status === "EXPIRED"
-      ? searchParams?.status
+    searchParams.status === "ACTIVE" || searchParams.status === "EXPIRED"
+      ? searchParams.status
       : undefined;
 
   const instrumentType =
-    searchParams?.instrumentType === "SPOT" ||
-    searchParams?.instrumentType === "PERP"
-      ? searchParams?.instrumentType
+    searchParams.instrumentType === "SPOT" ||
+    searchParams.instrumentType === "PERP"
+      ? searchParams.instrumentType
       : undefined;
 
-  const verifiedOnly = searchParams?.verifiedOnly === "true";
+  const verifiedOnly = searchParams.verifiedOnly === "true";
 
   // Fetch signals with advanced filters
   const { items: signals, hasNextPage, nextCursor } = await getSignalsFeed({
@@ -60,9 +60,9 @@ export const SignalsFeed = async ({
     bias,
     status,
     instrumentType,
-    traderName: searchParams?.traderName,
+    traderName: searchParams.traderName,
     verifiedOnly,
-    cursor: searchParams?.cursor,
+    cursor: searchParams.cursor,
     limit: 12,
   });
 
@@ -75,7 +75,7 @@ export const SignalsFeed = async ({
             No Signals Found
           </CardTitle>
           <CardDescription>
-            {symbols || bias || searchParams?.traderName || status || instrumentType
+            {symbols || bias || searchParams.traderName || status || instrumentType
               ? "Try adjusting your filters to see more results"
               : "No trading signals available at the moment"}
           </CardDescription>
@@ -97,9 +97,7 @@ export const SignalsFeed = async ({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {signals.map((signal) => {
           const traderName =
-            signal.trader.traderProfile?.displayName ??
-            signal.trader.name ??
-            "Unknown";
+            signal.trader.traderProfile?.displayName ?? signal.trader.name;
 
           return (
             <Link
