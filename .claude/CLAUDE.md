@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 11 octobre 2025 - Architecture documentaire optimisée
+**Dernière mise à jour**: 12 octobre 2025 - Audit complet via /project-audit
 
 ---
 
@@ -84,7 +84,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ### 📊 Progression Globale: ~97% ✅
 
-**Audit complet**: 11 octobre 2025
+**Audit complet**: 12 octobre 2025
 
 ### Phases Complétées
 
@@ -96,7 +96,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ### Systèmes Opérationnels
 
-- ✅ **Base de données**: 6 migrations appliquées, DB fonctionnelle
+- ✅ **Base de données**: 8 migrations appliquées, DB fonctionnelle
 - ✅ **Crypto Payments**: Backend + Frontend 100% (HD wallet + RPC + checkout UI)
 - ✅ **Subscriptions**: activateSubscription + Better Auth hook + UI components
 - ✅ **Trading System**: Profils traders + Signaux + Follow/Unfollow
@@ -383,7 +383,7 @@ Les détails techniques sont organisés en modules spécialisés:
 **Schémas Prisma + Migrations + Queries**
 
 - Modèles DB (TraderProfile, Signal, Follow, CryptoAddress, CryptoPayment)
-- Migrations history (6 migrations appliquées)
+- Migrations history (8 migrations appliquées)
 - Relations entre tables
 - Queries patterns courants
 - Better Auth extensions
