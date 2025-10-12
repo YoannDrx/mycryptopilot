@@ -96,9 +96,9 @@ async function main() {
   let errorMessage = "";
 
   if (tsErrors || eslintErrors) {
-    errorMessage = `Fix NOW the following errors AND warning detected in ${filePath
+    errorMessage = `There are some errors and/or warnings detected in ${filePath
       .split("/")
-      .pop()}:\\n`;
+      .pop()}:\\nPlease address these now if you are actively working on this file, or make a note to fix them soon.\\n`;
 
     if (tsErrors) {
       errorMessage += `\\n TypeScript errors:\\n${tsErrors}\\n`;

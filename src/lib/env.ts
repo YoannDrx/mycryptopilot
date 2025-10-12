@@ -37,6 +37,8 @@ export const env = createEnv({
     DISCORD_BOT_TOKEN: z.string().optional(),
     DISCORD_GUILD_ID: z.string().optional(),
     DISCORD_BOT_ENABLED: z.enum(["true", "false"]).optional().default("false"),
+    // Cron Jobs configuration
+    CRON_SECRET: z.string().optional(),
   },
   /**
    * If you add `client` environment variables, you need to add them to

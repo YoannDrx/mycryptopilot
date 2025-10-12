@@ -17,11 +17,14 @@ import {
   BarChart3,
   BookOpen,
   TrendingUp,
+  MessageCircle,
+  CheckCircle2,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SignalsFeed } from "./_components/signals-feed";
 import { prisma } from "@/lib/prisma";
+import { hasUserJoinedDiscord, generatePermanentInvite } from "@/lib/discord/invitations";
 
 export const metadata: Metadata = {
   title: "Dashboard - MyCryptoPilot",
@@ -31,6 +34,12 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   const org = await getRequiredCurrentOrgCache();
   const user = await getRequiredUser();
+
+  // Fetch full user with discordId from Prisma (Phase 3.4)
+  const fullUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { discordId: true },
+  });
 
   // Fetch user's followed traders count
   const followedTradersCount = await prisma.follow.count({
@@ -64,6 +73,12 @@ export default async function DashboardPage() {
       },
     });
   }
+
+  // Check if user has joined Discord (Phase 3.4)
+  const hasJoinedDiscord = await hasUserJoinedDiscord(fullUser?.discordId ?? null);
+  const discordInviteUrl = !hasJoinedDiscord
+    ? await generatePermanentInvite()
+    : null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -135,6 +150,81 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Discord Connection Status (Phase 3.4) */}
+        {process.env.DISCORD_BOT_ENABLED === "true" && (
+          <Card
+            className={
+              hasJoinedDiscord
+                ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20"
+                : "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20"
+            }
+          >
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <MessageCircle
+                    className={
+                      hasJoinedDiscord
+                        ? "size-5 text-green-600"
+                        : "size-5 text-amber-600"
+                    }
+                  />
+                  <CardTitle className="text-base">
+                    {hasJoinedDiscord
+                      ? "Discord Connecté"
+                      : "Rejoins notre Discord"}
+                  </CardTitle>
+                </div>
+                {hasJoinedDiscord && (
+                  <Badge
+                    variant="default"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <CheckCircle2 className="mr-1 size-3" />
+                    Actif
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {hasJoinedDiscord ? (
+                <p className="text-sm text-green-700 dark:text-green-400">
+                  Ton compte Discord est connecté ! Tu reçois maintenant les
+                  signaux de trading en temps réel et tu as accès aux channels
+                  privés des traders que tu suis. 🎉
+                </p>
+              ) : (
+                <>
+                  <p className="mb-4 text-sm text-amber-700 dark:text-amber-400">
+                    Rejoins notre communauté Discord pour recevoir des
+                    notifications en temps réel, accéder aux channels privés des
+                    traders, et échanger avec la communauté !
+                  </p>
+                  {discordInviteUrl && (
+                    <Button asChild variant="default" className="w-full">
+                      <a
+                        href={discordInviteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MessageCircle className="mr-2 size-4" />
+                        Rejoindre Discord
+                      </a>
+                    </Button>
+                  )}
+                  <p className="mt-3 text-xs text-amber-600 dark:text-amber-500">
+                    💡 Après avoir rejoint, utilise{" "}
+                    <code className="rounded bg-amber-100 px-1 py-0.5 dark:bg-amber-900">
+                      /status
+                    </code>{" "}
+                    pour lier ton compte.
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* No Traders Followed Alert */}
         {followedTradersCount === 0 && (

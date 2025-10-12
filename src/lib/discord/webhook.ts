@@ -5,6 +5,7 @@ import { logger } from "../logger";
 import { env } from "../env";
 import { notifyFollowerNewSignal } from "./dm-notifications";
 import { prisma } from "../prisma";
+import { postSignalTeaser } from "./signals-free";
 
 /**
  * Envoyer une notification Discord pour un nouveau signal
@@ -49,20 +50,32 @@ export async function notifyNewSignal(signal: {
       return false;
     }
 
-    // Trouver le channel "signals" (ou créer si n'existe pas)
+    // Trouver le channel privé du trader (Phase 2.4)
+    const traderChannelName = `trader-${signal.trader.id.slice(0, 8)}`;
     let channel = guild.channels.cache.find(
-      (ch) => ch.name === "signals" && ch.isTextBased(),
+      (ch) => ch.name === traderChannelName && ch.isTextBased(),
     ) as TextChannel | undefined;
 
+    // Fallback: Si channel trader pas trouvé, utiliser #signals global
     if (!channel) {
-      // Créer le channel signals s'il n'existe pas
-      logger.info("Creating #signals channel...");
-      channel = await guild.channels.create({
-        name: "signals",
-        type: 0, // Text channel
-        topic: "Trading signals from MyCryptoPilot verified traders",
-      });
-      logger.info("✅ #signals channel created");
+      logger.warn(
+        `Trader channel ${traderChannelName} not found, using #signals as fallback`,
+      );
+
+      channel = guild.channels.cache.find(
+        (ch) => ch.name === "signals" && ch.isTextBased(),
+      ) as TextChannel | undefined;
+
+      if (!channel) {
+        // Créer le channel signals s'il n'existe pas
+        logger.info("Creating #signals channel as fallback...");
+        channel = await guild.channels.create({
+          name: "signals",
+          type: 0, // Text channel
+          topic: "Trading signals from MyCryptoPilot verified traders (fallback)",
+        });
+        logger.info("✅ #signals channel created");
+      }
     }
 
     // Formatter le signal
@@ -175,10 +188,18 @@ export async function notifyNewSignal(signal: {
       });
     }
 
-    // Envoyer le message dans #signals
+    // Envoyer le message dans le channel privé du trader (ou #signals fallback)
     await channel.send({ embeds: [embed] });
 
-    logger.info(`✅ Signal notification sent to #signals: ${signal.id}`);
+    logger.info(
+      `✅ Signal notification sent to ${channel.name}: ${signal.id}`,
+    );
+
+    // Poster aussi un teaser dans #signals-free (Phase 4.2 - non-bloquant)
+    void postSignalTeaser(signal).catch((err) => {
+      logger.error("Failed to post signal teaser to #signals-free:", err);
+      // Ne pas bloquer si le teaser échoue
+    });
 
     // Envoyer des DMs aux followers de ce trader qui ont activé les notifications
     try {
