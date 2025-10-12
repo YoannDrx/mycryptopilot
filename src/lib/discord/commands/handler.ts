@@ -6,6 +6,14 @@ import { handleStatusCommand } from "./status";
 import { handleUpgradeCommand } from "./upgrade";
 import { handleSignalsCommand } from "./signals";
 import { handleFollowCommand } from "./follow";
+import {
+  handleAdminSyncRoles,
+  handleAdminStats,
+  handleAdminCheckPermissions,
+  handleAdminBotInfo,
+  handleAdminAssignRole,
+  handleAdminTestSignal,
+} from "./admin-commands";
 
 /**
  * Gestionnaire principal des commandes Discord
@@ -39,6 +47,34 @@ export async function handleCommand(
 
       case "follow":
         await handleFollowCommand(interaction);
+        break;
+
+      // ========================================================================
+      // COMMANDES ADMIN
+      // ========================================================================
+
+      case "admin-sync-roles":
+        await handleAdminSyncRoles(interaction);
+        break;
+
+      case "admin-stats":
+        await handleAdminStats(interaction);
+        break;
+
+      case "admin-check-permissions":
+        await handleAdminCheckPermissions(interaction);
+        break;
+
+      case "admin-bot-info":
+        await handleAdminBotInfo(interaction);
+        break;
+
+      case "admin-assign-role":
+        await handleAdminAssignRole(interaction);
+        break;
+
+      case "admin-test-signal":
+        await handleAdminTestSignal(interaction);
         break;
 
       default:

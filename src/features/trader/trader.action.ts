@@ -3,6 +3,8 @@
 import { authAction } from "@/lib/actions/safe-actions";
 import { ActionError } from "@/lib/errors/action-error";
 import { prisma } from "@/lib/prisma";
+import { createTraderChannel } from "@/lib/discord/trader-channels";
+import { logger } from "@/lib/logger";
 import {
   checkUserHasTraderProfile,
   getTraderProfileByUserId,
@@ -55,6 +57,19 @@ export const createTraderProfileAction = authAction
       where: { id: user.id },
       data: { userRole: newRole },
     });
+
+    // Créer le channel Discord privé pour le trader (Phase 2.2)
+    if (process.env.DISCORD_BOT_ENABLED === "true") {
+      try {
+        await createTraderChannel(user.id, parsedInput.displayName);
+        logger.info(
+          `Discord trader channel created for user ${user.id} (${parsedInput.displayName})`,
+        );
+      } catch (error) {
+        logger.error("Failed to create Discord trader channel:", error);
+        // Ne pas bloquer si Discord échoue
+      }
+    }
 
     return {
       traderProfile,

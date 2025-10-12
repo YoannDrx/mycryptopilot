@@ -6,6 +6,11 @@ import { getPlanLimits } from "@/lib/crypto/mycryptopilot-plans";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { prisma } from "@/lib/prisma";
 import {
+  addFollowerToTraderChannel,
+  removeFollowerFromTraderChannel,
+} from "@/lib/discord/trader-channels";
+import { logger } from "@/lib/logger";
+import {
   countFollowedTraders,
   getFollow,
   isFollowingTrader,
@@ -163,6 +168,22 @@ export const followTraderAction = authAction
       },
     });
 
+    // Ajouter follower au channel Discord trader (Phase 2.3)
+    if (
+      process.env.DISCORD_BOT_ENABLED === "true" &&
+      follow.user.discordId
+    ) {
+      try {
+        await addFollowerToTraderChannel(traderId, follow.user.discordId);
+        logger.info(
+          `Discord: Added follower ${user.id} to trader ${traderId} channel`,
+        );
+      } catch (error) {
+        logger.error("Failed to add follower to Discord trader channel:", error);
+        // Ne pas bloquer si Discord échoue
+      }
+    }
+
     // Send Discord notifications (non-blocking)
     const { notifyTraderNewFollower, notifyFollowerWelcome } = await import(
       "@/lib/discord/dm-notifications"
@@ -212,6 +233,12 @@ export const unfollowTraderAction = authAction
       throw new ActionError("This follow is not active");
     }
 
+    // Récupérer le discordId du user pour retirer du channel Discord
+    const fullUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { discordId: true },
+    });
+
     // Mettre à jour le status à CANCELLED (soft delete)
     await prisma.follow.update({
       where: {
@@ -221,6 +248,25 @@ export const unfollowTraderAction = authAction
         status: "CANCELLED",
       },
     });
+
+    // Retirer follower du channel Discord trader (Phase 2.3)
+    if (
+      process.env.DISCORD_BOT_ENABLED === "true" &&
+      fullUser?.discordId
+    ) {
+      try {
+        await removeFollowerFromTraderChannel(traderId, fullUser.discordId);
+        logger.info(
+          `Discord: Removed follower ${user.id} from trader ${traderId} channel`,
+        );
+      } catch (error) {
+        logger.error(
+          "Failed to remove follower from Discord trader channel:",
+          error,
+        );
+        // Ne pas bloquer si Discord échoue
+      }
+    }
 
     return {
       message: "You have unfollowed this trader",
