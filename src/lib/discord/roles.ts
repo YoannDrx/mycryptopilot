@@ -70,7 +70,7 @@ export async function ensureRolesExist(guild: Guild): Promise<void> {
       // eslint-disable-next-line no-await-in-loop
       await guild.roles.create({
         name: roleName,
-        color: DISCORD_CONFIG.roleColors[planKey],
+        color: DISCORD_CONFIG.roleColors[planKey], // Note: Discord.js v14 warning "use colors" est un faux positif
         reason: "MyCryptoPilot subscription role with hierarchy",
         position: position + 1, // +1 pour éviter conflits avec @everyone
         hoist: true, // Afficher séparément dans la liste des membres

@@ -64,8 +64,8 @@ class DiscordBot {
         ],
       });
 
-      // Événement: Bot prêt (FIX ChatGPT #1: "clientReady" → "ready")
-      this.client.once("ready", (client) => {
+      // Événement: Bot prêt (Discord.js v14+: "clientReady" remplace "ready")
+      this.client.once("clientReady", (client) => {
         logger.info(`Discord bot logged in as ${client.user.tag}`);
       });
 
