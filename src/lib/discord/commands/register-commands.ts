@@ -105,5 +105,14 @@ export function registerCommands() {
       .setDescription("[ADMIN] Envoyer un signal test dans #signals-free")
       .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
       .toJSON(),
+
+    // Commande /admin-test-welcome
+    new SlashCommandBuilder()
+      .setName("admin-test-welcome")
+      .setDescription(
+        "[ADMIN] Tester le message de bienvenue en s'envoyant le DM",
+      )
+      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .toJSON(),
   ];
 }
