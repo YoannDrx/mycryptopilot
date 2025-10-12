@@ -127,7 +127,7 @@ export async function handleAdminStats(
     }
 
     const client = discordBot.getClient();
-    if (!client || !client.user) {
+    if (!client?.user) {
       await interaction.editReply("❌ Bot non initialisé.");
       return;
     }
@@ -250,7 +250,7 @@ export async function handleAdminCheckPermissions(
     }
 
     const client = discordBot.getClient();
-    if (!client || !client.user) {
+    if (!client?.user) {
       await interaction.editReply("❌ Bot non initialisé.");
       return;
     }
@@ -342,7 +342,7 @@ export async function handleAdminBotInfo(
 
   try {
     const client = discordBot.getClient();
-    if (!client || !client.user) {
+    if (!client?.user) {
       await interaction.editReply("❌ Bot non initialisé.");
       return;
     }
