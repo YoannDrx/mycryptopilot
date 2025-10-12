@@ -34,10 +34,10 @@ export async function notifyNewSignal(signal: {
   }
 
   // Récupérer le channel de notification (configurable via env)
-  const channelId = env.DISCORD_GUILD_ID; // TODO: Créer une var DISCORD_SIGNALS_CHANNEL_ID
+  const channelId = env.DISCORD_FREE_SIGNALS_CHANNEL_ID;
 
   if (!channelId) {
-    logger.warn("No Discord channel configured for signal notifications");
+    logger.warn("No Discord channel configured for signal notifications (DISCORD_FREE_SIGNALS_CHANNEL_ID)");
     return false;
   }
 

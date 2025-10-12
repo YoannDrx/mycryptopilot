@@ -82,9 +82,9 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ## État actuel
 
-### 📊 Progression Globale: ~97% ✅
+### 📊 Progression Globale: ~98% ✅
 
-**Audit complet**: 12 octobre 2025
+**Audit complet**: 12 octobre 2025 (mis à jour après Phase 5)
 
 ### Phases Complétées
 
@@ -93,6 +93,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 ✅ **Phase 2.5**: UI/UX Pages (100%)
 ✅ **Phase 3**: Core Features (100%)
 ✅ **Phase 4**: Crypto Payments (100%)
+✅ **Phase 5**: Discord Integration MVP (100%)
 
 ### Systèmes Opérationnels
 
@@ -101,18 +102,27 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 - ✅ **Subscriptions**: activateSubscription + Better Auth hook + UI components
 - ✅ **Trading System**: Profils traders + Signaux + Follow/Unfollow
 - ✅ **Dashboards**: User + Trader + Marketplace (100% connectés aux données)
-- ✅ **Discord Bot**: Déployé Railway 24/7 (5 commandes slash)
+- ✅ **Discord Bot**: Déployé Railway 24/7 (11 commandes: 5 user + 6 admin)
 
-### TODOs Restants (Minimaux)
+### TODOs Restants (Code Cleanup)
 
-**P1 (Critique)** - 2 items (30 min):
+7 TODOs trouvés dans le code (audit 12 oct 2025):
 
-1. Fix plan user hardcodé (follow.action.ts lignes 19, 28)
-2. Fix 11 boutons cassés (CTAs sans liens)
+**P1 (Important)** - 3 items:
+1. `webhook.ts:37` - Use correct `DISCORD_FREE_SIGNALS_CHANNEL_ID` env var
+2. `follow-button.tsx:20` - Connect existing follow/unfollow actions
+3. `payment-status/[addressId]/route.ts:39` - Decide: keep or remove route
 
-**P2 (Important)** - 2 items (3-4j): 3. Feed signaux avec filtres (1-2j) 4. Tests E2E complets (2-3j)
+**P2 (Non-critique)** - 4 items:
+4. `sweep-to-binance.ts` - 4 TODOs pour sweep implementation (post-MVP)
 
-**MVP fonctionnel dans 4-6 jours!** 🎯
+### Features MVP Restantes
+
+**P1 (Features)** - 2 items (3-5 jours):
+1. Feed signaux avec filtres (asset, bias, status, trader) - 1-2j
+2. Tests E2E coverage 80%+ - 2-3j
+
+**MVP Beta ready dans ~5 jours!** 🎯
 
 📄 **Détails complets**: [`.claude/docs/DEVELOPMENT.md`](.claude/docs/DEVELOPMENT.md)
 
@@ -426,12 +436,34 @@ Les détails techniques sont organisés en modules spécialisés:
 
 **État Actuel + TODOs + Roadmap**
 
-- Progression globale (97%)
+- Progression globale (98%)
 - État détaillé par système
 - TODOs réels (minimaux)
 - Issues GitHub (ouvertes/fermées)
 - Roadmap MVP
 - Commandes utiles
+
+### 📦 Guides de Déploiement
+
+#### [`RAILWAY_SETUP.md`](../RAILWAY_SETUP.md)
+
+**Déploiement Discord Bot sur Railway**
+
+- Setup Railway project
+- Configuration build settings
+- Environment variables Discord Bot
+- Deployment et monitoring
+- Troubleshooting commun
+
+#### [`ENV_CHECKLIST.md`](../ENV_CHECKLIST.md)
+
+**Checklist Complète des Variables d'Environnement**
+
+- Vercel: 35+ variables (web app production)
+- Railway: 15+ variables (Discord bot production)
+- Local Dev: `.env.local` (development)
+- Comment obtenir les Discord IDs
+- Common issues et solutions
 
 ### 🔍 Quand Utiliser Quel Module?
 
@@ -440,6 +472,8 @@ Les détails techniques sont organisés en modules spécialisés:
 **Gérer abonnements?** → Lire `SUBSCRIPTIONS.md`
 **Ajouter features trading?** → Lire `TRADING-SYSTEM.md`
 **Voir état du projet?** → Lire `DEVELOPMENT.md`
+**Déployer sur Railway?** → Lire `RAILWAY_SETUP.md`
+**Configurer env vars?** → Lire `ENV_CHECKLIST.md`
 
 ---
 
@@ -482,31 +516,39 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 
 ## Prochaines Étapes MVP
 
-### ✅ Déjà Fait (97%)
+### ✅ Déjà Fait (98%)
 
-Tout le système est fonctionnel:
+**5 Phases complètes**:
+- Phase 1: Setup & Infrastructure ✅
+- Phase 2: Database & Auth ✅
+- Phase 2.5: UI/UX Pages ✅
+- Phase 3: Core Features ✅
+- Phase 4: Crypto Payments ✅
+- **Phase 5: Discord Integration MVP ✅** (11 commandes, roles auto, webhooks)
 
+**Tous les systèmes opérationnels**:
 - Profils traders ✅
 - Création signaux ✅
 - Follow/unfollow ✅
-- Crypto payments ✅
-- Subscriptions ✅
-- Discord Bot ✅
-- Dashboards connectés ✅
+- Crypto payments (HD wallet + RPC) ✅
+- Subscriptions (activateSubscription) ✅
+- Discord Bot 24/7 Railway ✅
+- Dashboards 100% connectés ✅
 
-### 🟡 Restant MVP (3%)
+### 🟡 Restant MVP (2%)
 
-**P1 (Critique)** - 30 min:
+**Code Cleanup** - 2-3h:
+1. Fix `webhook.ts:37` - Use correct env var
+2. Fix `follow-button.tsx:20` - Connect actions
+3. Decide `payment-status` route - Keep or remove
 
-1. Fix plan user hardcodé (follow.action.ts lignes 19, 28)
+**Features MVP** - 3-5j:
+1. Feed signaux avec filtres (asset, bias, status, trader) - 1-2j
+2. Tests E2E coverage 80%+ - 2-3j
 
-**P2 (Important)** - 1-2h: 2. Fix 11 boutons cassés (CTAs sans liens)
+**Total Restant MVP**: **~5 jours** 🎯
 
-**P1 (Features)** - 1-2j: 3. Feed signaux avec filtres (asset, bias, status, trader)
-
-**P1 (Testing)** - 2-3j: 4. Tests E2E complets (checkout, follow, signaux, dashboards)
-
-**Total Restant MVP**: **4-6 jours** 🎯
+**Plan détaillé**: Phase 1 (cleanup 2-3h) → Phase 2 (features 3-5j) → **MVP Beta Launch!**
 
 📄 **Détails complets**: [`.claude/docs/DEVELOPMENT.md`](.claude/docs/DEVELOPMENT.md)
 
