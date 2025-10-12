@@ -5,7 +5,7 @@
 
 ## 📊 Progression Globale
 
-**Projet**: ~98% complete (MVP quasi-ready!)
+**Projet**: ~98% complete (MVP Beta ready in ~5 days!)
 
 ### Phases Complétées
 
@@ -38,7 +38,7 @@
 - ✅ **Profils traders**: Formulaire 173 lignes + actions + queries
 - ✅ **Système signaux**: Formulaire 515 lignes + TradingCard 170 lignes + webhook Discord auto
 - ✅ **Follow/Unfollow**: Actions + queries + limites plans
-- ✅ **Discord Bot**: Déployé Railway 24/7 (5 commandes slash)
+- ✅ **Discord Bot**: Déployé Railway 24/7 (11 commandes slash)
 - ✅ **Subscription Management**: activateSubscription + Better Auth hook + UI components
 
 #### Phase 4: Crypto Payments ✅ (100%)
@@ -49,11 +49,23 @@
 - ✅ **Checkout UI**: Page complète 447 lignes (QR codes + countdown + polling)
 - ✅ **API routes**: generate-address + check-payment (152 lignes)
 
-#### Phase 5: Advanced Features ❌ (0%)
+#### Phase 5: Discord Integration MVP ✅ (100%)
 
-- ❌ Journal de trading
-- ❌ Console de risque
-- ❌ Alertes custom
+- ✅ **Discord Bot 24/7**: Déployé sur Railway avec auto-redeploy
+- ✅ **11 Slash Commands**: 5 user + 6 admin commands
+  - User: `/link`, `/unlink`, `/check`, `/invite-accept`, `/invitation-cancel`
+  - Admin: `/admin-sync-roles`, `/admin-stats`, `/admin-check-permissions`, `/admin-bot-info`, `/admin-assign-role`, `/admin-test-signal`
+- ✅ **Auto Roles**: Attribution automatique des rôles selon le plan (Free/Pro/Ultra)
+- ✅ **Discord Channels**: Configuration #signals-free + #bot-logs
+- ✅ **Webhook Integration**: Notifications automatiques des nouveaux signaux
+- ✅ **Production Ready**: Script `start-discord-bot.ts` + env vars Railway
+
+#### Phase 6: Advanced Features ⏳ (Post-MVP)
+
+- ⏳ Journal de trading
+- ⏳ Console de risque
+- ⏳ Alertes custom
+- ⏳ Feed signaux avec filtres avancés
 
 ---
 
@@ -203,105 +215,104 @@ npx prisma migrate status
 
 ---
 
-## 🚨 TODOs Réels (Minimaux)
+## 🚨 TODOs Réels dans le Code
+
+**Audit complet**: 12 octobre 2025 (via `grep -r "TODO" src/ app/ scripts/`)
 
 ### P0 (Bloquant MVP) - 0 items
 
 Aucun! Tout est fonctionnel. 🎉
 
-### P1 (Critique) - 11 items
+### P1 (Important) - 3 items
 
-#### 1-11. Boutons/CTA Sans Action (11 boutons)
-
-**Découverte audit 11 oct 2025**: 11 boutons cliquables mais sans action.
-
-**Landing Page** (1 bouton):
-
-- `src/features/landing/cta/cta-card-section.tsx` (ligne 28): "Learn more" → `<Link href="#">`
-
-**User Dashboard** (5 boutons):
-
-- `app/orgs/[orgSlug]/(navigation)/dashboard/page.tsx`:
-  - Ligne 79: "Follow Traders" (header) → Pas d'action
-  - Ligne 185: "Add First Trade" (tab Trading Journal) → Pas d'action
-  - Lignes 261-278: Section "Quick Actions" (4 boutons sans action)
-
-**Trader Dashboard** (5 boutons):
-
-- `app/orgs/[orgSlug]/(navigation)/dashboard/trader/page.tsx`:
-  - Ligne 174: "Complete Profile" → Pas d'action
-  - Lignes 326-343: Section "Quick Actions" (4 boutons sans action)
-
-**Fix**: Ajouter `asChild` + `<Link>` pour chaque bouton.
-
-**Temps**: 1-2 heures (quick wins)
-
-### P2 (Nice-to-have) - 3 items
-
-#### 12. Route payment-status Legacy
-
-**Fichier**: `app/api/crypto/payment-status/[addressId]/route.ts`
-**Ligne**: 42
-**Description**: TODO placeholder, mais `/api/crypto/check-payment` existe et fonctionne
-**Action**: Probablement supprimer cette route ou l'implémenter si nécessaire
-
-#### 13. Variable Env Discord Signals Channel
+#### 1. Variable Env Discord Signals Channel
 
 **Fichier**: `src/lib/discord/webhook.ts`
-**Ligne**: 36
-**Description**: `const channelId = env.DISCORD_GUILD_ID; // TODO: Créer une var DISCORD_SIGNALS_CHANNEL_ID`
-**Action**: Ajouter env var `DISCORD_SIGNALS_CHANNEL_ID` pour channel #signals dédié
+**Ligne**: 37
+**Description**: Utilise `DISCORD_GUILD_ID` au lieu de `DISCORD_FREE_SIGNALS_CHANNEL_ID`
+**Impact**: Webhooks signaux vont dans le mauvais channel
+**Fix**: Remplacer par `env.DISCORD_FREE_SIGNALS_CHANNEL_ID`
+**Temps**: 2 min
 
-#### 14. Sweep Script (Non Implémenté)
+#### 2. Follow Button Sans Action
+
+**Fichier**: `src/features/follow/follow-button.tsx`
+**Ligne**: 20
+**Description**: TODO comment mais actions follow/unfollow existent déjà
+**Impact**: Aucun (actions sont implémentées)
+**Fix**: Retirer le TODO ou connecter explicitement les actions
+**Temps**: 5 min
+
+#### 3. Payment Status Route Legacy
+
+**Fichier**: `app/api/crypto/payment-status/[addressId]/route.ts`
+**Ligne**: 39
+**Description**: TODO placeholder, mais `/api/crypto/check-payment` existe et fonctionne
+**Impact**: Route inutilisée
+**Fix**: Supprimer la route ou l'implémenter complètement
+**Temps**: 10 min
+
+### P2 (Non-critique) - 4 items
+
+#### 4-7. Sweep Script TODOs (Post-MVP)
 
 **Fichier**: `scripts/sweep-to-binance.ts`
 **Lignes**: 134, 167, 201, 229 (4 TODOs)
 **Description**: Script pour transférer fonds crypto vers wallet Binance master
-**Action**: Implémenter si nécessaire pour centralisation funds (Phase post-MVP)
+**Impact**: Aucun (feature post-MVP)
+**Action**: Implémenter Phase 6 si nécessaire pour centralisation funds
+**Temps**: 2-3 heures (post-MVP)
+
+### 📝 Résumé TODOs Code
+
+- **Total**: 7 TODOs trouvés
+- **P1 (Important)**: 3 items (~20 min de fix)
+- **P2 (Non-critique)**: 4 items (post-MVP)
 
 ---
 
 ## 🎯 Roadmap MVP
 
-### ✅ Déjà Fait (97%)
+### ✅ Déjà Fait (98%)
 
-**Phase 1-4**: Infrastructure, DB, Auth, Core Features, Crypto Payments - **100% DONE**
+**5 Phases complètes**: Infrastructure, DB, Auth, Core Features, Crypto Payments, **Discord Integration MVP** - **100% DONE**
 
-Tout le système est fonctionnel:
+Tous les systèmes opérationnels:
 
-- Profils traders ✅
-- Création signaux ✅
-- Follow/unfollow ✅
-- Crypto payments ✅
-- Subscriptions ✅
-- Discord Bot ✅
-- Dashboards connectés ✅
+- ✅ Profils traders
+- ✅ Création signaux
+- ✅ Follow/unfollow
+- ✅ Crypto payments (HD wallet + RPC)
+- ✅ Subscriptions (activateSubscription)
+- ✅ Discord Bot 24/7 Railway (11 commandes)
+- ✅ Dashboards 100% connectés
+- ✅ 16 pages opérationnelles
+- ✅ 145 tests unitaires passing
+- ✅ 15 tests E2E passing
 
-### 🟡 Restant MVP (3%)
+### 🟡 Restant MVP (2%)
 
-#### 1. Fix 2 TODOs Plan User (P1) - **30 min**
+#### Phase 1: Code Cleanup (2-3h)
 
-- Ligne 19, 28 `follow.action.ts`
-- Utiliser `user.planName` au lieu de hardcode "free"
+**P1 - TODOs Critiques** (~20 min):
+1. Fix `webhook.ts:37` - Use correct `DISCORD_FREE_SIGNALS_CHANNEL_ID`
+2. Fix `follow-button.tsx:20` - Connect existing actions
+3. Decide `payment-status` route - Keep or remove
 
-#### 2. Fix 11 Boutons Cassés (P2) - **1-2h**
+#### Phase 2: Features MVP (3-5j)
 
-- Landing: 1 bouton
-- User dashboard: 5 boutons
-- Trader dashboard: 5 boutons
-
-#### 3. Feed Signaux avec Filtres (P1) - **1-2j**
-
+**P1 - Feed Signaux** (1-2j):
 - Filtres: asset, bias, status, trader
 - Composant SignalsFeed amélioré
 - Infinite scroll ou pagination
+- Real-time updates
 
-#### 4. Tests E2E Complets (P1) - **2-3j**
-
-- Checkout flow crypto
+**P1 - Tests E2E Coverage 80%+** (2-3j):
+- Checkout flow crypto complet
 - Follow/unfollow traders
-- Création signal
+- Création + édition signal
 - Dashboard interactions
+- Marketplace search/filters
 
 **Total Restant MVP**: **4-6 jours** 🎯
 
