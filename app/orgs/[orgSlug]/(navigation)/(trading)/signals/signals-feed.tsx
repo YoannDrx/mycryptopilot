@@ -26,7 +26,6 @@ type SignalsFeedProps = {
 };
 
 export const SignalsFeed = async ({
-  orgSlug,
   searchParams,
 }: SignalsFeedProps) => {
   // Parse filters from URL
@@ -100,19 +99,15 @@ export const SignalsFeed = async ({
             signal.trader.traderProfile?.displayName ?? signal.trader.name;
 
           return (
-            <Link
+            <TradingCard
               key={signal.id}
-              href={`/orgs/${orgSlug}/traders/${signal.trader.id}`}
-              className="block transition-transform hover:scale-[1.02]"
-            >
-              <TradingCard
-                symbol={signal.symbol}
-                payload={signal.payloadJson as TradingCardPayloadType}
-                traderName={traderName}
-                expiresAt={signal.expiresAt}
-                className="h-full"
-              />
-            </Link>
+              symbol={signal.symbol}
+              payload={signal.payloadJson as TradingCardPayloadType}
+              traderName={traderName}
+              expiresAt={signal.expiresAt}
+              className="h-full"
+              compact={true}
+            />
           );
         })}
       </div>

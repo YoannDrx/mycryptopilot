@@ -1,14 +1,20 @@
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
+import type { SerializableGroup } from "./global-search-command";
 import {
+  AlertCircle,
   BarChart3,
   BookOpen,
   DollarSign,
   FileText,
+  FileUp,
   GraduationCap,
   Home,
+  Mail,
+  MessageSquare,
   TrendingUp,
+  User2,
   Users,
 } from "lucide-react";
 
@@ -42,6 +48,22 @@ export const getOrganizationNavigation = (
 };
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
+
+/**
+ * Convert NavigationGroup[] to SerializableGroup[] (without icons)
+ * for passing to Client Components
+ */
+export const toSerializableLinks = (
+  groups: NavigationGroup[],
+): SerializableGroup[] => {
+  return groups.map((group) => ({
+    title: group.title,
+    links: group.links.map((link) => ({
+      href: link.href,
+      label: link.label,
+    })),
+  }));
+};
 
 export const ORGANIZATION_LINKS: NavigationGroup[] = [
   {
@@ -87,15 +109,15 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
   },
   {
     title: "Crypto School",
-    defaultOpenStartPath: `${ORGANIZATION_PATH}/school/courses`,
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/courses`,
     links: [
       {
-        href: `${ORGANIZATION_PATH}/school/courses`,
+        href: `${ORGANIZATION_PATH}/courses`,
         Icon: BookOpen,
         label: "Courses",
       },
       {
-        href: `${ORGANIZATION_PATH}/school/progress`,
+        href: `${ORGANIZATION_PATH}/progress`,
         Icon: GraduationCap,
         label: "My Progress",
       },
@@ -103,17 +125,48 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
   },
   {
     title: "Tax & Declaration",
-    defaultOpenStartPath: `${ORGANIZATION_PATH}/tax/import`,
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/import`,
     links: [
       {
-        href: `${ORGANIZATION_PATH}/tax/import`,
-        Icon: FileText,
+        href: `${ORGANIZATION_PATH}/import`,
+        Icon: FileUp,
         label: "Import Transactions",
       },
       {
-        href: `${ORGANIZATION_PATH}/tax/reports`,
+        href: `${ORGANIZATION_PATH}/reports`,
         Icon: FileText,
         label: "Tax Reports",
+      },
+    ],
+  },
+  {
+    title: "Account",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/account`,
+    links: [
+      {
+        href: `${ORGANIZATION_PATH}/account`,
+        Icon: User2,
+        label: "Profile",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/account/discord`,
+        Icon: MessageSquare,
+        label: "Discord Integration",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/account/email`,
+        Icon: Mail,
+        label: "Email Preferences",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/account/following`,
+        Icon: Users,
+        label: "Following",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/account/danger`,
+        Icon: AlertCircle,
+        label: "Danger Zone",
       },
     ],
   },

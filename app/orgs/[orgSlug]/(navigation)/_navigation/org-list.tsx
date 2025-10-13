@@ -10,7 +10,6 @@ import {
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { AccountNavigation } from "../../../../(logged-in)/(account-layout)/account-navigation";
 import { OrgAutoSelect } from "./org-auto-select";
 
 /**
@@ -24,8 +23,7 @@ export const OrgList = async () => {
   });
 
   return (
-    <AccountNavigation>
-      <Layout size="lg">
+    <Layout size="lg">
         <LayoutHeader>
           <LayoutTitle>Your organizations</LayoutTitle>
           <LayoutDescription>
@@ -62,6 +60,5 @@ export const OrgList = async () => {
           ))}
         </LayoutContent>
       </Layout>
-    </AccountNavigation>
   );
 };

@@ -2,19 +2,19 @@ import { BaseSidebarLayout } from "../_navigation/base-sidebar-layout";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 import { getUsersOrgs } from "@/query/org/get-users-orgs.query";
 import type { PropsWithChildren } from "react";
-import { TaxSidebar } from "./_navigation/tax-sidebar";
+import { AccountSidebar } from "./_navigation/account-sidebar";
 import {
   getOrganizationNavigation,
   toSerializableLinks,
 } from "../_navigation/org-navigation.links";
 
 /**
- * Tax Layout
+ * Account Layout
  *
- * Layout pour l'espace Tax & Declaration avec sidebar dédiée
- * Contient: Import CSV, Tax Reports, Transaction History, Export
+ * Layout pour l'espace Account Settings avec sidebar dédiée
+ * Contient: Profile, Discord, Email, Following, Danger Zone
  */
-export default async function TaxLayout({ children }: PropsWithChildren) {
+export default async function AccountLayout({ children }: PropsWithChildren) {
   const org = await getRequiredCurrentOrgCache();
   const userOrganizations = await getUsersOrgs();
 
@@ -26,7 +26,7 @@ export default async function TaxLayout({ children }: PropsWithChildren) {
   return (
     <BaseSidebarLayout
       sidebar={
-        <TaxSidebar
+        <AccountSidebar
           slug={org.slug}
           userOrgs={userOrganizations}
           allLinks={allLinks}

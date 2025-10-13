@@ -22,6 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { TradingCard } from "@/components/nowts/trading-card";
 import { LoadingButton } from "@/features/form/submit-button";
+import { ImageFormItem } from "@/features/images/image-form-item";
 import { createSignalAction } from "@/features/signal/signal.action";
 import {
   CreateSignalSchema,
@@ -34,6 +35,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 
 const CRYPTO_SYMBOLS = [
   "BTC-USDT",
@@ -57,8 +59,9 @@ const REGIMES = [
   "Consolidation",
 ];
 
-export const CreateSignalForm = () => {
+export const CreateSignalForm = ({ traderName }: { traderName: string }) => {
   const router = useRouter();
+  const currentOrg = useCurrentOrg();
   const [tpInputs, setTpInputs] = useState<number[]>([0]);
   const [rationaleInputs, setRationaleInputs] = useState<string[]>([""]);
 
@@ -80,6 +83,7 @@ export const CreateSignalForm = () => {
         regime: "Bull",
         managedBy: "HUMAN",
         version: "1.0",
+        chartImage: undefined,
       },
     },
   });
@@ -95,8 +99,9 @@ export const CreateSignalForm = () => {
       return result.data;
     },
     onSuccess: () => {
-      toast.success("Signal cr�� avec succ�s !");
-      router.push("/dashboard/trader");
+      toast.success("Signal created successfully!");
+      const signalsPath = currentOrg?.slug ? `/orgs/${currentOrg.slug}/signals` : "/signals";
+      router.push(signalsPath);
       router.refresh();
     },
     onError: (error) => {
@@ -462,6 +467,29 @@ export const CreateSignalForm = () => {
               )}
             </div>
 
+            {/* Chart Image Upload */}
+            <FormField
+              control={form.control}
+              name="payload.chartImage"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Chart Image (optional)</FormLabel>
+                  <FormControl>
+                    <ImageFormItem
+                      className="w-full aspect-video"
+                      onChange={(url) => form.setValue("payload.chartImage", url)}
+                      onRemove={() => form.setValue("payload.chartImage", undefined)}
+                      imageUrl={form.watch("payload.chartImage")}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Upload a chart screenshot to show your market analysis (PNG, JPG - max 1MB)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Regime */}
             <FormField
               control={form.control}
@@ -560,7 +588,7 @@ export const CreateSignalForm = () => {
         <TradingCard
           symbol={previewSymbol}
           payload={previewPayload}
-          traderName="You"
+          traderName={traderName}
           expiresAt={new Date(Date.now() + form.watch("ttlSec") * 1000)}
         />
       </div>

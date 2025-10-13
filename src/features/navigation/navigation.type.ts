@@ -9,7 +9,7 @@ export type NavigationGroup = {
   defaultOpenStartPath?: string;
 };
 
-type NavigationLink = {
+export type NavigationLink = {
   href: string;
   Icon:
     | React.ForwardRefExoticComponent<

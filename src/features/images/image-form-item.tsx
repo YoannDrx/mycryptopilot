@@ -6,19 +6,24 @@ import type { PropsWithChildren } from "react";
 import { toast } from "sonner";
 import { NativeTargetBox } from "./native-target-box";
 import { uploadImageAction } from "./upload-image.action";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type ImageFormItemProps = {
   onChange: (url: string) => void;
+  onRemove?: () => void;
   imageUrl?: string | null;
   className?: string;
 };
 
 export const ImageFormItem = ({
   onChange,
+  onRemove,
   imageUrl,
   className,
 }: ImageFormItemProps) => {
   const currentImage = imageUrl;
+  const hasImage = currentImage && currentImage !== "/images/placeholder.svg";
 
   return (
     <div
@@ -27,12 +32,33 @@ export const ImageFormItem = ({
         className,
       )}
     >
-      <img
-        src={currentImage ?? "/images/placeholder.svg"}
-        className="absolute inset-0 object-contain object-center"
-        alt=""
-      />
-      <UseImageUpload onChange={onChange} />
+      {hasImage ? (
+        <img
+          src={currentImage}
+          className="absolute inset-0 object-contain object-center"
+          alt=""
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity">
+          <p className="text-sm text-muted-foreground">Click or drag to upload</p>
+        </div>
+      )}
+      <UseImageUpload onChange={onChange} hasImage={!!hasImage} />
+      {hasImage && onRemove && (
+        <Button
+          type="button"
+          variant="destructive"
+          size="icon"
+          className="absolute top-2 right-2 z-20 size-8 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
+          <Trash2 className="size-4" />
+        </Button>
+      )}
     </div>
   );
 };
@@ -54,13 +80,26 @@ const Overlay = (props: PropsWithChildren<{ isLoading?: boolean }>) => {
   );
 };
 
-const UseImageUpload = ({ onChange }: { onChange: (url: string) => void }) => {
+const UseImageUpload = ({ onChange }: { onChange: (url: string) => void; hasImage: boolean }) => {
   const uploadImageMutation = useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.set("files", file);
+      // Convert File to base64 on client side (FileReader is browser-only API)
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-      const result = await uploadImageAction({ formData });
+      const result = await uploadImageAction({
+        base64,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+      });
 
       if (!isActionSuccessful(result)) {
         toast.error(result.serverError ?? "Something went wrong");

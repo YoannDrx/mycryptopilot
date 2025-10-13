@@ -1,18 +1,20 @@
 import { Typography } from "@/components/nowts/typography";
 import { getRequiredUser } from "@/lib/auth/auth-user";
-import { checkUserHasTraderProfile } from "@/features/trader/trader-queries";
+import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
 import { redirect } from "next/navigation";
 import { CreateSignalForm } from "./create-signal-form";
+import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
 
 export default async function NewSignalPage() {
   const user = await getRequiredUser();
 
-  // V�rifier que l'utilisateur est un trader
-  const hasTraderProfile = await checkUserHasTraderProfile(user.id);
+  // Récupérer le profil trader
+  const traderProfile = await getTraderProfileByUserId(user.id);
 
-  if (!hasTraderProfile) {
-    // Rediriger vers la cr�ation de profil trader
-    redirect("/account/become-trader");
+  if (!traderProfile) {
+    // Rediriger vers la création de profil trader
+    const org = await getRequiredCurrentOrgCache();
+    redirect(`/orgs/${org.slug}/account/become-trader`);
   }
 
   return (
@@ -24,7 +26,7 @@ export default async function NewSignalPage() {
         </Typography>
       </div>
 
-      <CreateSignalForm />
+      <CreateSignalForm traderName={traderProfile.displayName} />
     </div>
   );
 }

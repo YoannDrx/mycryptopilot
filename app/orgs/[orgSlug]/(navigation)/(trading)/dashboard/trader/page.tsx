@@ -48,7 +48,7 @@ export default async function TraderDashboardPage() {
 
   if (!traderProfile) {
     // Redirect to become trader page if no profile
-    redirect("/account/become-trader");
+    redirect(`/orgs/${org.slug}/account/become-trader`);
   }
 
   // Fetch followers count
