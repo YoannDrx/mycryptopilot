@@ -3,14 +3,12 @@ import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
 import {
   BarChart3,
-  CreditCard,
+  BookOpen,
   DollarSign,
+  FileText,
+  GraduationCap,
   Home,
-  Settings,
   TrendingUp,
-  TriangleAlert,
-  User,
-  User2,
   Users,
 } from "lucide-react";
 
@@ -47,17 +45,28 @@ const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
 
 export const ORGANIZATION_LINKS: NavigationGroup[] = [
   {
-    title: "Menu",
+    title: "Home",
     links: [
       {
         href: ORGANIZATION_PATH,
         Icon: Home,
         label: "Dashboard",
       },
+    ],
+  },
+  {
+    title: "Trading",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/dashboard`,
+    links: [
       {
         href: `${ORGANIZATION_PATH}/dashboard`,
         Icon: BarChart3,
-        label: "Trading Dashboard",
+        label: "My Trading Dashboard",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/signals`,
+        Icon: TrendingUp,
+        label: "Signals Feed",
       },
       {
         href: `${ORGANIZATION_PATH}/traders`,
@@ -67,18 +76,8 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       {
         href: `${ORGANIZATION_PATH}/pricing`,
         Icon: DollarSign,
-        label: "Pricing",
+        label: "Pricing & Plans",
       },
-      {
-        href: `${ORGANIZATION_PATH}/users`,
-        Icon: User,
-        label: "Users",
-      },
-    ],
-  },
-  {
-    title: "Trader",
-    links: [
       {
         href: `${ORGANIZATION_PATH}/dashboard/trader`,
         Icon: TrendingUp,
@@ -87,32 +86,34 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
     ],
   },
   {
-    title: "Account",
-    defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
+    title: "Crypto School",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/school/courses`,
     links: [
       {
-        href: `${ORGANIZATION_PATH}/settings`,
-        Icon: Settings,
-        label: "Settings",
-        roles: ["admin"],
+        href: `${ORGANIZATION_PATH}/school/courses`,
+        Icon: BookOpen,
+        label: "Courses",
       },
       {
-        href: `${ORGANIZATION_PATH}/settings/members`,
-        Icon: User2,
-        label: "Members",
-        roles: ["admin"],
+        href: `${ORGANIZATION_PATH}/school/progress`,
+        Icon: GraduationCap,
+        label: "My Progress",
+      },
+    ],
+  },
+  {
+    title: "Tax & Declaration",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/tax/import`,
+    links: [
+      {
+        href: `${ORGANIZATION_PATH}/tax/import`,
+        Icon: FileText,
+        label: "Import Transactions",
       },
       {
-        href: `${ORGANIZATION_PATH}/settings/billing`,
-        Icon: CreditCard,
-        label: "Billing",
-        roles: ["admin"],
-      },
-      {
-        href: `${ORGANIZATION_PATH}/settings/danger`,
-        Icon: TriangleAlert,
-        label: "Danger Zone",
-        roles: ["owner"],
+        href: `${ORGANIZATION_PATH}/tax/reports`,
+        Icon: FileText,
+        label: "Tax Reports",
       },
     ],
   },
