@@ -82,14 +82,33 @@ export const auth = betterAuth({
             logger.error("Failed to setup Resend customer", { err });
           });
 
-          // Send Discord invite email (non-blocking)
+          // Send Discord invite email on first connection only (non-blocking)
           void (async () => {
             try {
-              const userName = user.name || user.email.split("@")[0];
-              await sendDiscordInviteEmail(user.email, userName);
-              logger.info(
-                `Discord invite email sent to ${user.email} (user: ${user.id})`,
-              );
+              // Check if this is the first connection
+              const userData = await prisma.user.findUnique({
+                where: { id: user.id },
+                select: { isFirstConnection: true },
+              });
+
+              if (userData?.isFirstConnection) {
+                const userName = user.name || user.email.split("@")[0];
+                await sendDiscordInviteEmail(user.email, userName);
+
+                // Mark as no longer first connection
+                await prisma.user.update({
+                  where: { id: user.id },
+                  data: { isFirstConnection: false },
+                });
+
+                logger.info(
+                  `Discord invite email sent to ${user.email} (user: ${user.id}) - first connection`,
+                );
+              } else {
+                logger.info(
+                  `Skipping Discord invite email for ${user.email} (user: ${user.id}) - not first connection`,
+                );
+              }
             } catch (err) {
               logger.error("Failed to send Discord invite email", { err });
             }
@@ -132,6 +151,94 @@ export const auth = betterAuth({
               }
             }
           }
+        },
+      },
+      delete: {
+        before: async (user: {
+          id: string;
+          email: string;
+          name: string;
+          discordId: string | null;
+        }) => {
+          // Handle complete user deletion
+          // This hook is called AFTER email confirmation, right before DB deletion
+          logger.info(
+            `[USER DELETE] Starting deletion flow for user ${user.id}`,
+          );
+
+          // 1. Remove Discord access (if linked) - non-blocking
+          if (user.discordId) {
+            const { removeUserFromDiscord } = await import(
+              "./discord/user-management"
+            );
+            void removeUserFromDiscord(user.discordId).catch((err) => {
+              logger.error(
+                `[USER DELETE] Failed to remove Discord access for user ${user.id}`,
+                { err },
+              );
+            });
+          }
+
+          // 2. Invalidate all sessions (logout) - critical, must complete
+          logger.info(
+            `[USER DELETE] Invalidating all sessions for user ${user.id}`,
+          );
+          await prisma.session.deleteMany({
+            where: { userId: user.id },
+          });
+
+          // 3. Send goodbye email - non-blocking
+          const { sendGoodbyeEmail } = await import("./mail/goodbye-email");
+          void sendGoodbyeEmail(user.email, user.name).catch((err) => {
+            logger.error(
+              `[USER DELETE] Failed to send goodbye email to ${user.email}`,
+              { err },
+            );
+          });
+
+          logger.info(
+            `✅ [USER DELETE] Pre-deletion tasks completed for user ${user.id}`,
+          );
+        },
+      },
+    },
+    session: {
+      create: {
+        after: async (session) => {
+          // Send Discord invite email on first login (OAuth flow)
+          // This handles the case where user logs in with OAuth for the first time
+          void (async () => {
+            try {
+              const user = await prisma.user.findUnique({
+                where: { id: session.userId },
+                select: {
+                  id: true,
+                  email: true,
+                  name: true,
+                  isFirstConnection: true,
+                },
+              });
+
+              if (user?.isFirstConnection) {
+                const userName = user.name || user.email.split("@")[0];
+                await sendDiscordInviteEmail(user.email, userName);
+
+                // Mark as no longer first connection
+                await prisma.user.update({
+                  where: { id: user.id },
+                  data: { isFirstConnection: false },
+                });
+
+                logger.info(
+                  `Discord invite email sent to ${user.email} (user: ${user.id}) - first login`,
+                );
+              }
+            } catch (err) {
+              logger.error("Failed to send Discord invite email on login", {
+                err,
+              });
+            }
+          })();
         },
       },
     },
