@@ -67,13 +67,28 @@ export async function sendDiscordInviteEmail(
   userName: string,
 ): Promise<boolean> {
   try {
-    // Générer invite link
-    const inviteUrl = await generatePermanentInvite();
+    // Utiliser le lien statique d'abord (DISCORD_INVITE_URL dans .env)
+    let inviteUrl: string | null | undefined = env.DISCORD_INVITE_URL;
+
+    // Si pas de lien statique, générer dynamiquement via le bot
+    if (!inviteUrl) {
+      logger.info(
+        "No static DISCORD_INVITE_URL found, generating via Discord bot...",
+      );
+      inviteUrl = await generatePermanentInvite();
+    }
 
     if (!inviteUrl) {
-      logger.error("Failed to generate invite URL");
+      logger.error(
+        "Failed to get Discord invite URL (neither static nor dynamic)",
+      );
+      logger.error(
+        "💡 Set DISCORD_INVITE_URL in .env for development, or ensure Discord bot is running",
+      );
       return false;
     }
+
+    logger.info(`Sending Discord invite email with URL: ${inviteUrl}`);
 
     // Envoyer email
     const { error } = await resend.emails.send({
@@ -88,10 +103,10 @@ export async function sendDiscordInviteEmail(
       return false;
     }
 
-    logger.info(`✅ Discord invite email sent to ${userEmail}`);
+    logger.info(`✅ Discord invite email sent successfully to ${userEmail}`);
     return true;
   } catch (error) {
-    logger.error("Error in sendDiscordInviteEmail:", error);
+    logger.error("Exception in sendDiscordInviteEmail:", error);
     return false;
   }
 }
