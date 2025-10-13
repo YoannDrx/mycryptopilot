@@ -85,6 +85,7 @@ export const EditProfileCardForm = ({
   return (
     <>
       <Form
+        key={defaultValues.id}
         form={form}
         onSubmit={async (v) => updateProfileMutation.mutateAsync(v)}
         disabled={updateProfileMutation.isPending}
