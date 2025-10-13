@@ -40,6 +40,7 @@ export const env = createEnv({
     DISCORD_FREE_SIGNALS_CHANNEL_ID: z.string().optional(),
     DISCORD_LOG_CHANNEL_ID: z.string().optional(),
     DISCORD_ROLE_ADMIN_ID: z.string().optional(),
+    DISCORD_INVITE_URL: z.string().url().optional(), // Permanent invite link for emails
     // Cron Jobs configuration
     CRON_SECRET: z.string().optional(),
   },

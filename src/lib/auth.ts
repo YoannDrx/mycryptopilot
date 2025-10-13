@@ -5,6 +5,7 @@ import {
   admin,
   emailOTP,
   lastLoginMethod,
+  multiSession,
   organization,
 } from "better-auth/plugins";
 import { ac, roles } from "./auth/auth-permissions";
@@ -81,6 +82,19 @@ export const auth = betterAuth({
             logger.error("Failed to setup Resend customer", { err });
           });
 
+          // Send Discord invite email (non-blocking)
+          void (async () => {
+            try {
+              const userName = user.name || user.email.split("@")[0];
+              await sendDiscordInviteEmail(user.email, userName);
+              logger.info(
+                `Discord invite email sent to ${user.email} (user: ${user.id})`,
+              );
+            } catch (err) {
+              logger.error("Failed to send Discord invite email", { err });
+            }
+          })();
+
           // Create organization with retry (critical but should not block user creation)
           // Better Auth hooks should never throw - log errors instead
           const maxRetries = 3;
@@ -117,17 +131,6 @@ export const auth = betterAuth({
                 );
               }
             }
-          }
-
-          // Envoyer invite Discord automatiquement (Phase 3.3 - non-blocking)
-          if (process.env.DISCORD_BOT_ENABLED === "true" && user.email) {
-            void sendDiscordInviteEmail(user.email, user.name).catch((err) => {
-              logger.error("Failed to send Discord invite email", {
-                err,
-                userId: user.id,
-              });
-              // Ne pas bloquer si l'email échoue
-            });
           }
         },
       },
@@ -331,6 +334,9 @@ export const auth = betterAuth({
     }),
     admin({}),
     lastLoginMethod({}),
+    multiSession({
+      maximumSessions: 5, // Allow up to 5 simultaneous sessions (different Discord accounts, etc.)
+    }),
     // Warning: always last plugin
     nextCookies(),
   ],
