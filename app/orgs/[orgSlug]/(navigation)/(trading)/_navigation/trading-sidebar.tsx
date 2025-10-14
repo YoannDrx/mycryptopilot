@@ -21,7 +21,11 @@ import {
 import { OrgsSelect } from "../../_navigation/orgs-select";
 import { UpgradeCard } from "../../_navigation/upgrade-org-card";
 import { getTradingNavigationGroups } from "./trading-links";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -60,11 +64,11 @@ export function TradingSidebar({
 
   // State for collapsible sections (all open by default)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
-    Object.fromEntries(groupsWithReplacedSlugs.map(g => [g.title, true]))
+    Object.fromEntries(groupsWithReplacedSlugs.map((g) => [g.title, true])),
   );
 
   const toggleSection = (title: string) => {
-    setOpenSections(prev => ({ ...prev, [title]: !prev[title] }));
+    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
   };
 
   return (
@@ -83,7 +87,7 @@ export function TradingSidebar({
           >
             <SidebarGroup suppressHydrationWarning>
               <CollapsibleTrigger className="w-full [&[data-state=open]>div>svg]:rotate-180">
-                <SidebarGroupLabel className="text-muted-foreground group/label flex w-full cursor-pointer items-center justify-between text-xs font-semibold uppercase tracking-wider transition-colors hover:text-foreground">
+                <SidebarGroupLabel className="text-muted-foreground group/label hover:text-foreground flex w-full cursor-pointer items-center justify-between text-xs font-semibold tracking-wider uppercase transition-colors">
                   <span>{group.title}</span>
                   <ChevronDown className="size-4 transition-transform duration-200" />
                 </SidebarGroupLabel>

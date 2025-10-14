@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
+import { ChevronsUpDown } from "lucide-react";
 import { UserDropdown } from "../auth/user-dropdown";
 
 export const SidebarUserButton = () => {
@@ -26,6 +27,7 @@ export const SidebarUserButton = () => {
           <span className="truncate font-semibold">{data?.name}</span>
           <span className="truncate text-xs">{data?.email}</span>
         </div>
+        <ChevronsUpDown className="ml-auto size-4" />
       </SidebarMenuButton>
     </UserDropdown>
   );
