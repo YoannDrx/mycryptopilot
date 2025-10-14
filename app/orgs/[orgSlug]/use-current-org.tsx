@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/promise-function-async */
+ 
 "use client";
 
 import type { PlanLimit } from "@/lib/auth/stripe/auth-plans";
 import { getPlanLimits } from "@/lib/auth/stripe/auth-plans";
 import type { CurrentOrgPayload } from "@/lib/organizations/get-org";
 import type { PropsWithChildren } from "react";
+import { useEffect } from "react";
 import { create } from "zustand";
 
 type CurrentOrgStore = {
@@ -41,17 +42,23 @@ export const InjectCurrentOrgStore = (
     org?: Omit<CurrentOrgStore, "limits">;
   }>,
 ) => {
-  if (!props.org) return props.children;
+  useEffect(() => {
+    if (!props.org) return;
 
-  if (useCurrentOrg.getState()) return props.children;
+    const currentState = useCurrentOrg.getState();
 
-  useCurrentOrg.setState({
-    id: props.org.id,
-    slug: props.org.slug,
-    name: props.org.name,
-    image: props.org.image,
-    subscription: props.org.subscription,
-    limits: getPlanLimits(props.org.subscription?.plan),
-  });
-  return props.children;
+    // Only update if org changed or not set
+    if (!currentState || currentState.id !== props.org.id) {
+      useCurrentOrg.setState({
+        id: props.org.id,
+        slug: props.org.slug,
+        name: props.org.name,
+        image: props.org.image,
+        subscription: props.org.subscription,
+        limits: getPlanLimits(props.org.subscription?.plan),
+      });
+    }
+  }, [props.org]);
+
+  return <>{props.children}</>;
 };
