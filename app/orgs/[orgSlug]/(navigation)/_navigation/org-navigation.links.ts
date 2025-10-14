@@ -1,15 +1,19 @@
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
 import type { AuthRole } from "@/lib/auth/auth-permissions";
 import { isInRoles } from "@/lib/organizations/is-in-roles";
+import type { SerializableGroup } from "./global-search-command";
 import {
+  AlertCircle,
   BarChart3,
-  CreditCard,
+  BookOpen,
   DollarSign,
+  FileText,
+  FileUp,
+  GraduationCap,
   Home,
-  Settings,
+  Mail,
+  MessageSquare,
   TrendingUp,
-  TriangleAlert,
-  User,
   User2,
   Users,
 } from "lucide-react";
@@ -45,19 +49,46 @@ export const getOrganizationNavigation = (
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
 
+/**
+ * Convert NavigationGroup[] to SerializableGroup[] (without icons)
+ * for passing to Client Components
+ */
+export const toSerializableLinks = (
+  groups: NavigationGroup[],
+): SerializableGroup[] => {
+  return groups.map((group) => ({
+    title: group.title,
+    links: group.links.map((link) => ({
+      href: link.href,
+      label: link.label,
+    })),
+  }));
+};
+
 export const ORGANIZATION_LINKS: NavigationGroup[] = [
   {
-    title: "Menu",
+    title: "Home",
     links: [
       {
         href: ORGANIZATION_PATH,
         Icon: Home,
         label: "Dashboard",
       },
+    ],
+  },
+  {
+    title: "Trading",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/dashboard`,
+    links: [
       {
         href: `${ORGANIZATION_PATH}/dashboard`,
         Icon: BarChart3,
-        label: "Trading Dashboard",
+        label: "My Trading Dashboard",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/signals`,
+        Icon: TrendingUp,
+        label: "Signals Feed",
       },
       {
         href: `${ORGANIZATION_PATH}/traders`,
@@ -67,18 +98,8 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       {
         href: `${ORGANIZATION_PATH}/pricing`,
         Icon: DollarSign,
-        label: "Pricing",
+        label: "Pricing & Plans",
       },
-      {
-        href: `${ORGANIZATION_PATH}/users`,
-        Icon: User,
-        label: "Users",
-      },
-    ],
-  },
-  {
-    title: "Trader",
-    links: [
       {
         href: `${ORGANIZATION_PATH}/dashboard/trader`,
         Icon: TrendingUp,
@@ -87,32 +108,65 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
     ],
   },
   {
-    title: "Account",
-    defaultOpenStartPath: `${ORGANIZATION_PATH}/settings`,
+    title: "Crypto School",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/courses`,
     links: [
       {
-        href: `${ORGANIZATION_PATH}/settings`,
-        Icon: Settings,
-        label: "Settings",
-        roles: ["admin"],
+        href: `${ORGANIZATION_PATH}/courses`,
+        Icon: BookOpen,
+        label: "Courses",
       },
       {
-        href: `${ORGANIZATION_PATH}/settings/members`,
+        href: `${ORGANIZATION_PATH}/progress`,
+        Icon: GraduationCap,
+        label: "My Progress",
+      },
+    ],
+  },
+  {
+    title: "Tax & Declaration",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/import`,
+    links: [
+      {
+        href: `${ORGANIZATION_PATH}/import`,
+        Icon: FileUp,
+        label: "Import Transactions",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/reports`,
+        Icon: FileText,
+        label: "Tax Reports",
+      },
+    ],
+  },
+  {
+    title: "Account",
+    defaultOpenStartPath: `${ORGANIZATION_PATH}/account`,
+    links: [
+      {
+        href: `${ORGANIZATION_PATH}/account`,
         Icon: User2,
-        label: "Members",
-        roles: ["admin"],
+        label: "Profile",
       },
       {
-        href: `${ORGANIZATION_PATH}/settings/billing`,
-        Icon: CreditCard,
-        label: "Billing",
-        roles: ["admin"],
+        href: `${ORGANIZATION_PATH}/account/discord`,
+        Icon: MessageSquare,
+        label: "Discord Integration",
       },
       {
-        href: `${ORGANIZATION_PATH}/settings/danger`,
-        Icon: TriangleAlert,
+        href: `${ORGANIZATION_PATH}/account/email`,
+        Icon: Mail,
+        label: "Email Preferences",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/account/following`,
+        Icon: Users,
+        label: "Following",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/account/danger`,
+        Icon: AlertCircle,
         label: "Danger Zone",
-        roles: ["owner"],
       },
     ],
   },

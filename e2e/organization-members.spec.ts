@@ -69,11 +69,11 @@ test.skip("invite and login as invited user", async ({ page }) => {
 
   await createTestAccount({
     page,
-    callbackURL: "/account",
+    callbackURL: "/orgs",
     initialUserData: invitedUserData,
   });
 
-  await page.waitForURL("/account");
+  await page.waitForURL(/\/orgs/);
 
   const lastInvitation = await prisma.invitation.findFirst({
     where: {

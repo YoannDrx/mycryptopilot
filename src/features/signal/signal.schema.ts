@@ -74,6 +74,9 @@ export const TradingCardPayloadSchema = z.object({
     .refine((v) => /^\d+\.\d+$/.test(v), {
       message: "Version must be in format X.Y",
     }),
+
+  // Chart image (optional) - base64 encoded image showing market analysis
+  chartImage: z.string().optional(),
 });
 
 export type TradingCardPayloadType = z.infer<typeof TradingCardPayloadSchema>;

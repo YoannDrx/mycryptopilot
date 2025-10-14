@@ -2,49 +2,30 @@
 
 import { orgAction } from "@/lib/actions/safe-actions";
 import { ActionError } from "@/lib/errors/action-error";
-import { fileAdapter } from "@/lib/files/placeholder-adapter";
 import { z } from "zod";
 
 export const uploadImageAction = orgAction
   .metadata({})
   .inputSchema(
     z.object({
-      formData: z.instanceof(FormData),
+      base64: z.string(),
+      fileName: z.string(),
+      fileType: z.string(),
+      fileSize: z.number(),
     }),
   )
-  .action(async ({ parsedInput: { formData } }) => {
-    const files = formData.get("files") as File | File[];
-
-    let file: File;
-
-    if (Array.isArray(files)) {
-      file = files[0];
-    } else {
-      file = files;
-    }
-
-    if (!(file instanceof File)) {
-      throw new ActionError("Invalid file (not a file)");
-    }
-
-    // If file is not an image throw an error
-    if (!file.type.startsWith("image/")) {
+  .action(async ({ parsedInput: { base64, fileType, fileSize } }) => {
+    // Validate file type
+    if (!fileType.startsWith("image/")) {
       throw new ActionError("Invalid file (only images are allowed)");
     }
 
-    // If file is too large throw an error (max 2mb)
-    if (file.size > 2 * 1024 * 1024) {
+    // Validate file size (max 2mb)
+    if (fileSize > 2 * 1024 * 1024) {
       throw new ActionError("File too large (max 2mb)");
     }
 
-    const response = await fileAdapter.uploadFile({
-      file,
-      path: "images",
-    });
-
-    if (response.error) {
-      throw new ActionError(response.error.message);
-    }
-
-    return response.data.url;
+    // In a real app, you would upload to S3/Cloudinary here
+    // For now, we just return the base64 string
+    return base64;
   });

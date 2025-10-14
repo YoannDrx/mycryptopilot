@@ -94,9 +94,16 @@ export async function generateCryptoAddress(
       throw new Error(`Unsupported network: ${network}`);
   }
 
-  // Store in database
-  const cryptoAddress = await prisma.cryptoAddress.create({
-    data: {
+  // Store in database (use upsert to handle race conditions)
+  const cryptoAddress = await prisma.cryptoAddress.upsert({
+    where: {
+      address,
+    },
+    update: {
+      // If address exists, just return it (shouldn't happen often)
+      isActive: true,
+    },
+    create: {
       userId,
       network,
       address,
