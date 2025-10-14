@@ -133,11 +133,18 @@ export async function signInAccount(options: {
 export async function signOutAccount(options: { page: Page }) {
   const { page } = options;
 
-  // Navigate to account page
+  // Navigate to any authenticated page
   await page.goto(`/account`);
 
-  // Click the sign out button
-  await page.getByRole("button", { name: /sign out/i }).click();
+  // Wait for page to be ready
+  await page.waitForLoadState("networkidle");
+
+  // Click on the user button in sidebar to open dropdown
+  const userButton = page.locator('[class*="SidebarMenuButton"]').first();
+  await userButton.click();
+
+  // Wait for dropdown to appear and click logout
+  await page.getByRole("menuitem", { name: /logout/i }).click();
 
   await page.waitForURL(/\/auth\/signin/, { timeout: 10000 });
 }

@@ -121,9 +121,8 @@ export const validateAdminAccess = async (request: NextRequest) => {
 
     const session = await auth.api.getSession({ headers: request.headers });
 
-    if (!session?.user || session.user.role !== "admin") {
-      return null;
-    }
+    if (!session?.user) return null;
+    if (session.user.role !== "admin") return null;
 
     return session.user;
   } catch (error) {
