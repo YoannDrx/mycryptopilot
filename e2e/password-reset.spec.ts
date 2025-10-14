@@ -2,7 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
-import { createTestAccount, signInAccount } from "./utils/auth-test";
+import {
+  createTestAccount,
+  signInAccount,
+  signOutAccount,
+} from "./utils/auth-test";
 
 test("password reset flow", async ({ page }) => {
   // 1. Create a test account
@@ -12,14 +16,10 @@ test("password reset flow", async ({ page }) => {
   });
 
   // Wait to be on the account page
-  // Wait 2 seconds to ensure everything is loaded
-
   await page.waitForURL(/\/account/, { timeout: 10000 });
 
   // 2. Sign out
-
-  await page.getByRole("button", { name: /sign out/i }).click();
-  await page.waitForURL(/\/auth\/signin/, { timeout: 10000 });
+  await signOutAccount({ page });
 
   // 3. Go to forget password page
   await page.goto(`${getServerUrl()}/auth/forget-password`);
@@ -53,7 +53,6 @@ test("password reset flow", async ({ page }) => {
   // 8. Set a new password
   const newPassword = faker.internet.password({ length: 12, memorable: true });
   await page.locator('input[name="password"]').fill(newPassword);
-  await page.pause();
   await page.getByRole("button", { name: /reset password/i }).click();
 
   await page.waitForURL(/\/auth\/signin/, { timeout: 10000 });
