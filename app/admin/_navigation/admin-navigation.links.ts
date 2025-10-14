@@ -1,5 +1,13 @@
 import type { NavigationGroup } from "@/features/navigation/navigation.type";
-import { Building2, Home, MessageSquare, Users } from "lucide-react";
+import {
+  Building2,
+  Home,
+  MessageSquare,
+  Users,
+  TrendingUp,
+  Signal,
+  DollarSign,
+} from "lucide-react";
 
 const ADMIN_PATH = `/admin`;
 
@@ -22,6 +30,36 @@ const ADMIN_LINKS: NavigationGroup[] = [
         Icon: Building2,
         label: "Organizations",
       },
+    ],
+  },
+  {
+    title: "Trading",
+    links: [
+      {
+        href: `${ADMIN_PATH}/traders`,
+        Icon: TrendingUp,
+        label: "Traders",
+      },
+      {
+        href: `${ADMIN_PATH}/signals`,
+        Icon: Signal,
+        label: "Signals",
+      },
+    ],
+  },
+  {
+    title: "Finance",
+    links: [
+      {
+        href: `${ADMIN_PATH}/payments`,
+        Icon: DollarSign,
+        label: "Crypto Payments",
+      },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
       {
         href: `${ADMIN_PATH}/feedback`,
         Icon: MessageSquare,
