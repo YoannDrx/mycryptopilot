@@ -3,7 +3,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth-client";
-import { ChevronsUpDown } from "lucide-react";
 import { UserDropdown } from "../auth/user-dropdown";
 
 export const SidebarUserButton = () => {
@@ -12,7 +11,11 @@ export const SidebarUserButton = () => {
 
   return (
     <UserDropdown>
-      <SidebarMenuButton variant="outline" className="h-12">
+      <SidebarMenuButton
+        variant="outline"
+        className="h-12"
+        data-testid="user-menu-button"
+      >
         <Avatar className="size-8 rounded-lg">
           <AvatarImage src={data?.image ?? ""} alt={data?.name[0]} />
           <AvatarFallback className="rounded-lg">
@@ -23,7 +26,6 @@ export const SidebarUserButton = () => {
           <span className="truncate font-semibold">{data?.name}</span>
           <span className="truncate text-xs">{data?.email}</span>
         </div>
-        <ChevronsUpDown className="ml-auto size-4" />
       </SidebarMenuButton>
     </UserDropdown>
   );
