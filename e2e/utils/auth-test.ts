@@ -139,8 +139,10 @@ export async function signOutAccount(options: { page: Page }) {
   // Wait for page to be ready
   await page.waitForLoadState("networkidle");
 
-  // Click on the user button in sidebar to open dropdown
-  const userButton = page.locator('[class*="SidebarMenuButton"]').first();
+  // Try to find and click the user dropdown button (with avatar and chevron)
+  // This button is in the sidebar footer
+  const userButton = page.locator('button:has(svg.lucide-chevrons-up-down)').first();
+  await userButton.waitFor({ state: "visible", timeout: 5000 });
   await userButton.click();
 
   // Wait for dropdown to appear and click logout
