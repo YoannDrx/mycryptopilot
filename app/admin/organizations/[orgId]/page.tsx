@@ -9,12 +9,11 @@ import {
 } from "@/features/page/layout";
 import { getRequiredAdmin } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OrganizationMembers } from "./_components/organization-members";
-import { OrganizationPayments } from "./_components/organization-payments";
-import { OrganizationSubscription } from "./_components/organization-subscription";
+import { OrganizationCryptoPayments } from "./_components/organization-crypto-payments";
+import { OrganizationCryptoSubscription } from "./_components/organization-crypto-subscription";
 
 export default async function OrganizationDetailPage(
   props: PageProps<"/admin/organizations/[orgId]">,
@@ -35,6 +34,8 @@ export default async function OrganizationDetailPage(
               name: true,
               email: true,
               image: true,
+              planName: true,
+              planExpiresAt: true,
             },
           },
         },
@@ -62,33 +63,15 @@ export default async function OrganizationDetailPage(
           <LayoutTitle>{organization.name}</LayoutTitle>
         </div>
         <LayoutDescription>
-          Manage {organization.name}'s members, payments, and subscription
+          Manage {organization.name}'s crypto subscription and payment history
         </LayoutDescription>
       </LayoutHeader>
-      <LayoutActions>
-        {organization.stripeCustomerId && (
-          <Button variant="outline" asChild>
-            <a
-              href={`https://dashboard.stripe.com/customers/${organization.stripeCustomerId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View Stripe Customer
-            </a>
-          </Button>
-        )}
-      </LayoutActions>
+      <LayoutActions />
 
       <LayoutContent>
         <div className="space-y-6">
-          <OrganizationMembers members={organization.members} />
-          <OrganizationPayments organizationId={organization.id} />
-          <OrganizationSubscription
-            organization={organization}
-            subscription={organization.subscription}
-          />
+          <OrganizationCryptoSubscription organization={organization} />
+          <OrganizationCryptoPayments organizationId={organization.id} />
         </div>
       </LayoutContent>
     </Layout>
