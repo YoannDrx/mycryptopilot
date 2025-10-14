@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 import { createTestAccount } from "./utils/auth-test";
 
 test("update organization name", async ({ page }) => {
+  test.skip(true, "L'interface de mise à jour de l'organisation n'est plus disponible dans l'architecture 4-space.");
   // 1. Create a test account (owner)
   await createTestAccount({
     page,

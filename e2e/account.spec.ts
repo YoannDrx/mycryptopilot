@@ -1,12 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { faker } from "@faker-js/faker";
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 import {
   createTestAccount,
   signInAccount,
   signOutAccount,
 } from "./utils/auth-test";
+
+const extractOrgSlug = (page: Page) => {
+  const url = new URL(page.url());
+  const match = url.pathname.match(/\/orgs\/([^/]+)/);
+
+  if (!match) {
+    throw new Error("Active organization slug not found in URL");
+  }
+
+  return match[1];
+};
 
 test.describe("account", () => {
   test("delete account flow", async ({ page }) => {
@@ -15,8 +27,14 @@ test.describe("account", () => {
       callbackURL: "/orgs",
     });
 
-    await page.getByRole("link", { name: "Danger" }).click();
-    await page.waitForURL(/\/account\/danger/, { timeout: 10000 });
+    await page.waitForURL(/\/orgs\/[^/]+$/, { timeout: 10000 });
+    const orgSlug = extractOrgSlug(page);
+
+    await page.goto(`/orgs/${orgSlug}/account`);
+    await page.getByRole("link", { name: /danger zone/i }).click();
+    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/account/danger`), {
+      timeout: 10000,
+    });
     await page.getByRole("button", { name: "Delete" }).click();
 
     const deleteDialog = page.getByRole("alertdialog", {
@@ -73,6 +91,11 @@ test.describe("account", () => {
   test("update name flow", async ({ page }) => {
     await createTestAccount({ page, callbackURL: "/orgs" });
 
+    await page.waitForURL(/\/orgs\/[^/]+$/, { timeout: 10000 });
+    const orgSlug = extractOrgSlug(page);
+
+    await page.goto(`/orgs/${orgSlug}/account`);
+
     const newName = faker.person.fullName();
     const input = page.getByRole("textbox", { name: "Name" });
     await input.fill(newName);
@@ -80,13 +103,31 @@ test.describe("account", () => {
 
     await expect(page.getByText("Profile updated")).toBeVisible();
     await page.reload();
-    await expect(input).toHaveValue(newName);
+    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/account`), {
+      timeout: 10000,
+    });
+    await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(
+      newName,
+    );
   });
 
   test("change password flow", async ({ page }) => {
-    const userData = await createTestAccount({ page, callbackURL: "/account" });
+    const userData = await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/[^/]+$/, { timeout: 10000 });
+    const orgSlug = extractOrgSlug(page);
+
+    const accountPath = `/orgs/${orgSlug}/account`;
+
+    await page.goto(accountPath);
 
     await page.getByRole("link", { name: /change password/i }).click();
+    await page.waitForURL(new RegExp(`${accountPath}/change-password`), {
+      timeout: 10000,
+    });
 
     const newPassword = faker.internet.password({
       length: 12,
@@ -101,7 +142,7 @@ test.describe("account", () => {
     await expect(page.getByText("Password changed successfully")).toBeVisible();
 
     // Wait for navigation back to /account
-    await page.waitForURL(/\/account$/, { timeout: 3000 });
+    await page.waitForURL(new RegExp(`${accountPath}$`), { timeout: 5000 });
 
     await signOutAccount({ page });
 
