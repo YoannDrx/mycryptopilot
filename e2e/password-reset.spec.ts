@@ -12,11 +12,11 @@ test("password reset flow", async ({ page }) => {
   // 1. Create a test account
   const userData = await createTestAccount({
     page,
-    callbackURL: "/account",
+    callbackURL: "/orgs",
   });
 
-  // Wait to be on the account page
-  await page.waitForURL(/\/account/, { timeout: 10000 });
+  // Wait to be on the orgs page (will redirect to user's org)
+  await page.waitForURL(/\/orgs/, { timeout: 10000 });
 
   // 2. Sign out
   await signOutAccount({ page });

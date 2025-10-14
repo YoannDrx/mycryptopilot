@@ -12,7 +12,7 @@ test.describe("account", () => {
   test("delete account flow", async ({ page }) => {
     const userData = await createTestAccount({
       page,
-      callbackURL: "/account",
+      callbackURL: "/orgs",
     });
 
     await page.getByRole("link", { name: "Danger" }).click();
@@ -71,7 +71,7 @@ test.describe("account", () => {
   });
 
   test("update name flow", async ({ page }) => {
-    await createTestAccount({ page, callbackURL: "/account" });
+    await createTestAccount({ page, callbackURL: "/orgs" });
 
     const newName = faker.person.fullName();
     const input = page.getByRole("textbox", { name: "Name" });

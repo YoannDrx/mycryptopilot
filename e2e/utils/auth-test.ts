@@ -133,10 +133,7 @@ export async function signInAccount(options: {
 export async function signOutAccount(options: { page: Page }) {
   const { page } = options;
 
-  // Navigate to any authenticated page
-  await page.goto(`/account`);
-
-  // Wait for page to be ready
+  // Wait for page to be ready (we're already on an authenticated page)
   await page.waitForLoadState("networkidle");
 
   // Find and click the user menu button in the sidebar
