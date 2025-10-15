@@ -13,9 +13,68 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: SiteConfig.title,
+  title: {
+    default: SiteConfig.title,
+    template: `%s | ${SiteConfig.title}`,
+  },
   description: SiteConfig.description,
   metadataBase: new URL(getServerUrl()),
+  keywords: [
+    "crypto trading signals",
+    "trading signals",
+    "crypto trading",
+    "bitcoin signals",
+    "ethereum signals",
+    "crypto education",
+    "trading risk management",
+    "verified traders",
+    "crypto marketplace",
+  ],
+  authors: [{ name: "MyCryptoPilot Team" }],
+  creator: "MyCryptoPilot",
+  publisher: "MyCryptoPilot",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: getServerUrl(),
+    title: SiteConfig.title,
+    description: SiteConfig.description,
+    siteName: SiteConfig.title,
+    images: [
+      {
+        url: `${getServerUrl()}/images/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "MyCryptoPilot - Professional Crypto Trading Signals",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SiteConfig.title,
+    description: SiteConfig.description,
+    images: [`${getServerUrl()}/images/twitter-image.png`],
+    creator: "@mycryptopilot",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 const CaptionFont = Space_Grotesk({

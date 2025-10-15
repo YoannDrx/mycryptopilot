@@ -52,9 +52,7 @@ test.describe("Crypto Checkout Flow", () => {
       });
 
       // 8. Verify payment instructions displayed
-      await expect(
-        page.getByText(/send.*usdc|transfer.*usdc/i),
-      ).toBeVisible();
+      await expect(page.getByText(/send.*usdc|transfer.*usdc/i)).toBeVisible();
 
       // 9. Verify crypto address was created in database
       const user = await prisma.user.findUniqueOrThrow({
@@ -76,7 +74,7 @@ test.describe("Crypto Checkout Flow", () => {
 
   test("user can switch between payment networks", async ({ page }) => {
     // 1. Create a user account
-    const userData = await createTestAccount({
+    await createTestAccount({
       page,
       callbackURL: "/orgs",
     });
@@ -199,9 +197,9 @@ test.describe("Crypto Checkout Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // 3. Verify upgrade CTA visible
-    await expect(
-      page.getByText(/upgrade.*unlock|upgrade.*pro/i),
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/upgrade.*unlock|upgrade.*pro/i)).toBeVisible({
+      timeout: 5000,
+    });
 
     // 4. Click upgrade CTA
     const upgradeButton = page.getByRole("link", { name: /upgrade/i }).first();

@@ -5,7 +5,7 @@ import { createTestTrader } from "./utils/trader-test";
 test.describe("Signal Creation Flow", () => {
   test("trader can create a complete trading signal", async ({ page }) => {
     // 1. Create a trader account
-    const { user, traderProfile } = await createTestTrader({ page });
+    const { user } = await createTestTrader({ page });
 
     // 2. Navigate to create signal page
     const currentUrl = page.url();
@@ -100,8 +100,8 @@ test.describe("Signal Creation Flow", () => {
     expect(createdSignal).not.toBeNull();
     expect(createdSignal?.symbol).toBe(signalData.asset);
     // Verify payloadJson contains the expected data
-    const payload = createdSignal?.payloadJson as any;
-    expect(payload?.bias).toBe(signalData.bias);
+    const payload = createdSignal?.payloadJson as Record<string, unknown>;
+    expect(payload.bias).toBe(signalData.bias);
 
     // 7. Verify signal appears in trader's signals list
     await page.waitForLoadState("networkidle");
@@ -111,7 +111,7 @@ test.describe("Signal Creation Flow", () => {
 
   test("signal creation validates required fields", async ({ page }) => {
     // 1. Create a trader account
-    const { user } = await createTestTrader({ page });
+    await createTestTrader({ page });
 
     // 2. Navigate to create signal page
     const currentUrl = page.url();
@@ -156,7 +156,7 @@ test.describe("Signal Creation Flow", () => {
     // 4. Upload a chart image (mock)
     // Note: This assumes there's a file input for chart upload
     const fileInput = page.locator('input[type="file"]');
-    if (await fileInput.count() > 0) {
+    if ((await fileInput.count()) > 0) {
       // Create a fake image buffer
       const buffer = Buffer.from("fake-image-data");
       await fileInput.setInputFiles({
