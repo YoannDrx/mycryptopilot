@@ -169,7 +169,7 @@ jobs:
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-      RESEND_API_KEY: "test-resend-key"
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       EMAIL_FROM: "test@example.com"
       STRIPE_SECRET_KEY: "sk_test_dummy_key_for_ci"
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_dummy_key_for_ci"
@@ -178,6 +178,25 @@ jobs:
       PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000"
       HEADLESS: "true"
       CI: "true"
+      # Discord OAuth & Bot
+      DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
+      DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+      DISCORD_FREE_ROLE_ID: ${{ secrets.DISCORD_FREE_ROLE_ID }}
+      DISCORD_PRO_ROLE_ID: ${{ secrets.DISCORD_PRO_ROLE_ID }}
+      DISCORD_ULTRA_ROLE_ID: ${{ secrets.DISCORD_ULTRA_ROLE_ID }}
+      DISCORD_WEBHOOK_SIGNALS_URL: ${{ secrets.DISCORD_WEBHOOK_SIGNALS_URL }}
+      # Crypto Payments
+      HD_WALLET_XPUB_BASE: ${{ secrets.HD_WALLET_XPUB_BASE }}
+      HD_WALLET_XPUB_TRON: ${{ secrets.HD_WALLET_XPUB_TRON }}
+      BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
+      TRON_RPC_URL: ${{ secrets.TRON_RPC_URL }}
+      # Optional OAuth providers for E2E
+      GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+      GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
     services:
       postgres:
