@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Conductor setup script for nowts app
+# Conductor setup script for MyCryptoPilot
 # Runs when a workspace is created. Used for copying .env files and installing dependencies.
 
 set -e
@@ -14,7 +14,7 @@ if [ -z "$WORKSPACE_NAME" ]; then
     exit 1
 fi
 
-echo "Setting up NowTS workspace: $WORKSPACE_NAME"
+echo "Setting up MyCryptoPilot workspace: $WORKSPACE_NAME"
 
 # Function to copy and update .env file with database URL replacement
 update_env_file() {
@@ -27,14 +27,14 @@ update_env_file() {
 
         # Update database URLs with workspace-specific names
         if grep -q "^DATABASE_URL=" "$env_path"; then
-            NEW_DB_NAME="now-ts-$WORKSPACE_NAME"
+            NEW_DB_NAME="mycryptopilot-$WORKSPACE_NAME"
 
             # Update main database URL
-            sed -i.bak "s|^DATABASE_URL=\"postgresql://melvynx:@localhost:5432/now-ts\"|DATABASE_URL=\"postgresql://melvynx:@localhost:5432/$NEW_DB_NAME\"|" "$env_path"
+            sed -i.bak "s|^DATABASE_URL=\"postgresql://yoannandrieux:@localhost:5432/mycryptopilot\"|DATABASE_URL=\"postgresql://yoannandrieux:@localhost:5432/$NEW_DB_NAME\"|" "$env_path"
 
             # Update unpooled database URL if it exists
             if grep -q "^DATABASE_URL_UNPOOLED=" "$env_path"; then
-                sed -i.bak "s|^DATABASE_URL_UNPOOLED=\"postgresql://melvynx:@localhost:5432/now-ts\"|DATABASE_URL_UNPOOLED=\"postgresql://melvynx:@localhost:5432/$NEW_DB_NAME\"|" "$env_path"
+                sed -i.bak "s|^DATABASE_URL_UNPOOLED=\"postgresql://yoannandrieux:@localhost:5432/mycryptopilot\"|DATABASE_URL_UNPOOLED=\"postgresql://yoannandrieux:@localhost:5432/$NEW_DB_NAME\"|" "$env_path"
             fi
 
             echo "✅ Updated DATABASE_URLs in $env_path to use: $NEW_DB_NAME"
@@ -66,21 +66,21 @@ echo "Generating Prisma client..."
 pnpm prisma generate
 
 # Create the new database
-NEW_DB_NAME="now-ts-$WORKSPACE_NAME"
+NEW_DB_NAME="mycryptopilot-$WORKSPACE_NAME"
 
 echo "Creating database: $NEW_DB_NAME"
-createdb -U melvynx "$NEW_DB_NAME"
+createdb -h localhost -p 5432 -U yoannandrieux "$NEW_DB_NAME"
 
 # Dump original database and import to new one
 echo "Copying data from original database..."
-ORIGINAL_DB="now-ts"
+ORIGINAL_DB="mycryptopilot"
 
 # Check if original database exists and copy data
-if psql -U melvynx -lqt | cut -d \| -f 1 | grep -qw "$ORIGINAL_DB"; then
+if psql -h localhost -p 5432 -U yoannandrieux -lqt | cut -d \| -f 1 | grep -qw "$ORIGINAL_DB"; then
     echo "Found original database '$ORIGINAL_DB', copying data..."
 
     # Dump original database and pipe directly to new database
-    pg_dump -U melvynx --no-owner --no-privileges "$ORIGINAL_DB" | psql -U melvynx "$NEW_DB_NAME"
+    pg_dump -h localhost -p 5432 -U yoannandrieux --no-owner --no-privileges "$ORIGINAL_DB" | psql -h localhost -p 5432 -U yoannandrieux "$NEW_DB_NAME"
 
     echo "✅ Data copied from '$ORIGINAL_DB' to '$NEW_DB_NAME'"
 else
@@ -89,6 +89,6 @@ else
     pnpm prisma migrate deploy
 fi
 
-echo "🎉 NowTS workspace '$WORKSPACE_NAME' setup completed successfully!"
+echo "🎉 MyCryptoPilot workspace '$WORKSPACE_NAME' setup completed successfully!"
 echo "Database: $NEW_DB_NAME"
 echo "Ready to start development with: pnpm dev"

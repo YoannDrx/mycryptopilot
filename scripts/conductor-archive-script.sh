@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Conductor archive script for nowts app
+# Conductor archive script for MyCryptoPilot
 # Runs when a workspace is archived. Used for cleaning up external resources.
 
 set -e
@@ -14,7 +14,7 @@ if [ -z "$WORKSPACE_NAME" ]; then
     exit 1
 fi
 
-echo "Archiving NowTS workspace: $WORKSPACE_NAME"
+echo "Archiving MyCryptoPilot workspace: $WORKSPACE_NAME"
 
 # Function to extract database name from .env file
 get_db_name_from_env() {
@@ -32,7 +32,7 @@ get_db_name_from_env() {
                 ;;
         esac
 
-        local db_name=$(grep "$pattern" "$env_file" | sed 's/.*postgresql:\/\/melvynx:@localhost:5432\///; s/".*//')
+        local db_name=$(grep "$pattern" "$env_file" | sed 's/.*postgresql:\/\/yoannandrieux:@localhost:5432\///; s/".*//')
         if [ -n "$db_name" ]; then
             echo "$db_name"
             return 0
@@ -54,14 +54,14 @@ drop_database_if_exists() {
     echo "Cleaning up $db_description: $db_name"
 
     # Check if database exists before trying to drop it
-    if psql -U melvynx -lqt | cut -d \| -f 1 | grep -qw "$db_name"; then
+    if psql -h localhost -p 5432 -U yoannandrieux -lqt | cut -d \| -f 1 | grep -qw "$db_name"; then
         echo "Database $db_name found, dropping..."
 
         # Terminate all connections to the database before dropping
-        psql -U melvynx -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$db_name';"
+        psql -h localhost -p 5432 -U yoannandrieux -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$db_name';"
 
         # Drop the database
-        dropdb -U melvynx "$db_name"
+        dropdb -h localhost -p 5432 -U yoannandrieux "$db_name"
 
         echo "✅ Database $db_name successfully deleted"
     else
@@ -89,7 +89,7 @@ fi
 
 # Fallback to expected names if not found in .env
 if [ -z "$MAIN_DB_NAME" ]; then
-    MAIN_DB_NAME="now-ts-$WORKSPACE_NAME"
+    MAIN_DB_NAME="mycryptopilot-$WORKSPACE_NAME"
     echo "Using expected main database name: $MAIN_DB_NAME"
 fi
 
@@ -101,4 +101,4 @@ if [ -n "$UNPOOLED_DB_NAME" ] && [ "$UNPOOLED_DB_NAME" != "$MAIN_DB_NAME" ]; the
     drop_database_if_exists "$UNPOOLED_DB_NAME" "unpooled database"
 fi
 
-echo "🗑️  NowTS workspace '$WORKSPACE_NAME' archived and cleaned up successfully!"
+echo "🗑️  MyCryptoPilot workspace '$WORKSPACE_NAME' archived and cleaned up successfully!"
