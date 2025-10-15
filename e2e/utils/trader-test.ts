@@ -62,18 +62,51 @@ export async function createTestSignal(options: {
   const ttlSec = options.expired ? -3600 : 86400; // -1h or +24h
   const expiresAt = new Date(createdAt.getTime() + ttlSec * 1000);
 
+  // Generate payload matching TradingCardPayloadSchema
+  const entry = faker.number.float({
+    min: 40000,
+    max: 50000,
+    fractionDigits: 2,
+  });
   const payload = {
-    symbol,
-    bias: faker.helpers.arrayElement(["LONG", "BULLISH", "SHORT", "BEARISH"]),
-    entry: faker.number.float({ min: 1, max: 100 }).toString(),
-    targets: [
-      faker.number.float({ min: 1, max: 100 }).toString(),
-      faker.number.float({ min: 1, max: 100 }).toString(),
+    instrumentType: faker.helpers.arrayElement(["SPOT", "PERP"]) as
+      | "SPOT"
+      | "PERP",
+    bias: faker.helpers.arrayElement(["LONG", "SHORT"]) as "LONG" | "SHORT",
+    entry,
+    invalidation: faker.number.float({
+      min: entry * 0.9,
+      max: entry * 0.95,
+      fractionDigits: 2,
+    }),
+    tps: [
+      faker.number.float({
+        min: entry * 1.05,
+        max: entry * 1.1,
+        fractionDigits: 2,
+      }),
+      faker.number.float({
+        min: entry * 1.1,
+        max: entry * 1.15,
+        fractionDigits: 2,
+      }),
+      faker.number.float({
+        min: entry * 1.15,
+        max: entry * 1.2,
+        fractionDigits: 2,
+      }),
     ],
-    stopLoss: faker.number.float({ min: 1, max: 100 }).toString(),
-    leverage: faker.number.int({ min: 1, max: 20 }).toString(),
-    timeframe: faker.helpers.arrayElement(["1H", "4H", "1D"]),
-    reasoning: faker.lorem.paragraph(),
+    leverageBand: `${faker.number.int({ min: 1, max: 3 })}-${faker.number.int({ min: 5, max: 10 })}x`,
+    risk: faker.number.int({ min: 1, max: 5 }),
+    confidence: faker.number.int({ min: 60, max: 95 }),
+    rationales: [
+      faker.lorem.sentence(),
+      faker.lorem.sentence(),
+      faker.lorem.sentence(),
+    ],
+    regime: faker.helpers.arrayElement(["Bull", "Bear", "Ranging", "Volatile"]),
+    managedBy: faker.helpers.arrayElement(["AI", "HUMAN"]) as "AI" | "HUMAN",
+    version: "1.0",
   };
 
   // Generate hash

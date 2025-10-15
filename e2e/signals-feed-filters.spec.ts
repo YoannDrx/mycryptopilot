@@ -8,10 +8,10 @@ test.describe("Signals Feed with Filters", () => {
     // 1. Create a trader with multiple signals
     const { user: trader } = await createTestTrader({ page });
 
-    // Create signals with different assets using helper
-    await createTestSignal({ traderId: trader.id, symbol: "BTCUSDT" });
-    await createTestSignal({ traderId: trader.id, symbol: "ETHUSDT" });
-    await createTestSignal({ traderId: trader.id, symbol: "SOLUSDT" });
+    // Create signals with different assets using helper (format: XXX-YYY)
+    await createTestSignal({ traderId: trader.id, symbol: "BTC-USDT" });
+    await createTestSignal({ traderId: trader.id, symbol: "ETH-USDT" });
+    await createTestSignal({ traderId: trader.id, symbol: "SOL-USDT" });
 
     // 2. Sign out and create follower
     await signOutAccount({ page });
