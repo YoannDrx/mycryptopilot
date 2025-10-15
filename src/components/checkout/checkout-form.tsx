@@ -185,6 +185,41 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
     }
   };
 
+  // Error state
+  if (generateMutation.isError) {
+    return (
+      <div className="container mx-auto max-w-4xl py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Unable to Generate Payment Addresses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert className="border-red-500 bg-red-50">
+              <AlertDescription className="text-red-800">
+                {generateMutation.error.message ||
+                  "Failed to generate payment addresses. Please try again or contact support."}
+              </AlertDescription>
+            </Alert>
+            <div className="mt-4 flex gap-2">
+              <Button
+                onClick={() => generateMutation.mutate()}
+                variant="default"
+              >
+                Retry
+              </Button>
+              <Button
+                onClick={() => router.push(`/orgs/${orgSlug}/pricing`)}
+                variant="outline"
+              >
+                Back to Pricing
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Loading state
   if (generateMutation.isPending || !addresses || !expiresAt) {
     return (
