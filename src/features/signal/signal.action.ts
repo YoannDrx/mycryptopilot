@@ -5,6 +5,7 @@ import { ActionError } from "@/lib/errors/action-error";
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
 import { notifyNewSignal } from "@/lib/discord/webhook";
+import { notifyFollowersOfNewSignal } from "@/lib/mail/send-signal-notification";
 import { logger } from "@/lib/logger";
 import { checkUserHasTraderProfile } from "../trader/trader-queries";
 import { signalHashExists } from "./signal-queries";
@@ -104,6 +105,50 @@ export const createSignalAction = authAction
     } catch (error) {
       logger.error(
         `Failed to send Discord notification for signal ${signal.id}:`,
+        error,
+      );
+      // Ne pas throw d'erreur car le signal a été créé avec succès
+    }
+
+    // Notifier les followers par email (ne pas bloquer en cas d'erreur)
+    try {
+      const payload = signal.payloadJson as {
+        asset?: string;
+        bias?: "LONG" | "SHORT";
+        instrumentType?: "SPOT" | "PERP";
+        entry?: string;
+        targets?: string[];
+        stopLoss?: string;
+        leverage?: number;
+        timeframe?: string;
+        riskLevel?: number;
+        confidence?: number;
+        rationales?: string[];
+      };
+
+      await notifyFollowersOfNewSignal({
+        traderId: user.id,
+        traderName:
+          signal.trader.traderProfile?.displayName ?? signal.trader.name,
+        signal: {
+          id: signal.id,
+          asset: payload.asset ?? signal.symbol,
+          bias: payload.bias ?? "LONG",
+          instrumentType: payload.instrumentType ?? "SPOT",
+          entry: payload.entry ?? "0",
+          targets: payload.targets ?? [],
+          stopLoss: payload.stopLoss ?? "0",
+          leverage: payload.leverage,
+          timeframe: payload.timeframe ?? "1H",
+          riskLevel: payload.riskLevel ?? 1,
+          confidence: payload.confidence ?? 50,
+          rationales: payload.rationales ?? [],
+        },
+      });
+      logger.info(`Email notifications sent for signal ${signal.id}`);
+    } catch (error) {
+      logger.error(
+        `Failed to send email notifications for signal ${signal.id}:`,
         error,
       );
       // Ne pas throw d'erreur car le signal a été créé avec succès
