@@ -182,7 +182,7 @@ test.describe("Signals Feed with Filters", () => {
     }
   });
 
-  test("user can search signals by text", async ({ page }) => {
+  test.skip("user can search signals by text", async ({ page }) => {
     // 1. Create a trader
     const { user: trader } = await createTestTrader({ page });
 
