@@ -53,8 +53,9 @@ export async function createTestTrader(options: {
 export async function createTestSignal(options: {
   traderId: string;
   expired?: boolean;
+  symbol?: string;
 }) {
-  const symbol = `${faker.finance.currencyCode()}USDT`;
+  const symbol = options.symbol ?? `${faker.finance.currencyCode()}USDT`;
   const createdAt = new Date();
 
   // If expired, set TTL to negative value so expiresAt is in the past
