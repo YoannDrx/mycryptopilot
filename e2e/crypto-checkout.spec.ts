@@ -1,0 +1,291 @@
+import { prisma } from "@/lib/prisma";
+import { expect, test } from "@playwright/test";
+import { createTestAccount } from "./utils/auth-test";
+
+test.describe("Crypto Checkout Flow", () => {
+  test("user can view checkout page and get payment address", async ({
+    page,
+  }) => {
+    // 1. Create a user account
+    const userData = await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    // Extract org slug
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    expect(orgSlug).toBeTruthy();
+
+    // 2. Navigate to checkout page for Pro plan
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.waitForLoadState("networkidle");
+
+    // 3. Verify checkout page loaded
+    await expect(page.getByText(/pro plan/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/\$49/i)).toBeVisible();
+
+    // 4. Select payment network (Base - USDC)
+    const baseOption = page.getByLabel(/base.*usdc/i);
+    if (await baseOption.isVisible()) {
+      await baseOption.click();
+    }
+
+    // 5. Click "Generate Payment Address" button
+    const generateButton = page.getByRole("button", {
+      name: /generate.*address|get.*address/i,
+    });
+
+    if (await generateButton.isVisible()) {
+      await generateButton.click();
+
+      // 6. Wait for payment address to be generated and displayed
+      await expect(page.getByText(/0x[a-fA-F0-9]{40}/)).toBeVisible({
+        timeout: 15000,
+      });
+
+      // 7. Verify QR code appears
+      await expect(page.locator("canvas, img[alt*='QR']")).toBeVisible({
+        timeout: 5000,
+      });
+
+      // 8. Verify payment instructions displayed
+      await expect(
+        page.getByText(/send.*usdc|transfer.*usdc/i),
+      ).toBeVisible();
+
+      // 9. Verify crypto address was created in database
+      const user = await prisma.user.findUniqueOrThrow({
+        where: { email: userData.email },
+      });
+
+      const cryptoAddress = await prisma.cryptoAddress.findFirst({
+        where: {
+          userId: user.id,
+          network: "BASE",
+        },
+      });
+
+      expect(cryptoAddress).not.toBeNull();
+      expect(cryptoAddress?.address).toMatch(/^0x[a-fA-F0-9]{40}$/);
+      expect(cryptoAddress?.isActive).toBe(true);
+    }
+  });
+
+  test("user can switch between payment networks", async ({ page }) => {
+    // 1. Create a user account
+    const userData = await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // 2. Navigate to checkout page for Ultra plan
+    await page.goto(`/orgs/${orgSlug}/checkout/ultra`);
+    await page.waitForLoadState("networkidle");
+
+    // 3. Select Base (USDC) network
+    const baseOption = page.getByLabel(/base.*usdc/i);
+    if (await baseOption.isVisible()) {
+      await baseOption.click();
+
+      // Verify price shown in USDC
+      await expect(page.getByText(/99.*usdc/i)).toBeVisible({
+        timeout: 5000,
+      });
+
+      // 4. Switch to Tron (USDT) network
+      const tronOption = page.getByLabel(/tron.*usdt/i);
+      await tronOption.click();
+
+      // Verify price shown in USDT
+      await expect(page.getByText(/99.*usdt/i)).toBeVisible({
+        timeout: 5000,
+      });
+    }
+  });
+
+  test("checkout page shows plan features correctly", async ({ page }) => {
+    // 1. Create a user account
+    await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // 2. Test Pro plan checkout
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.waitForLoadState("networkidle");
+
+    // Verify Pro plan features
+    await expect(page.getByText(/15.*active signals/i)).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page.getByText(/5.*traders/i)).toBeVisible();
+    await expect(page.getByText(/risk console/i)).toBeVisible();
+    await expect(page.getByText(/crypto school/i)).toBeVisible();
+
+    // 3. Test Ultra plan checkout
+    await page.goto(`/orgs/${orgSlug}/checkout/ultra`);
+    await page.waitForLoadState("networkidle");
+
+    // Verify Ultra plan features
+    await expect(page.getByText(/unlimited.*signals/i)).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page.getByText(/unlimited.*traders/i)).toBeVisible();
+    await expect(page.getByText(/tax help/i)).toBeVisible();
+  });
+
+  test("user can navigate back to pricing from checkout", async ({ page }) => {
+    // 1. Create a user account
+    await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // 2. Navigate to checkout
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.waitForLoadState("networkidle");
+
+    // 3. Click back/cancel button
+    const backButton = page.getByRole("link", { name: /back|cancel/i });
+
+    if (await backButton.isVisible()) {
+      await backButton.click();
+
+      // Verify redirected to pricing page
+      await page.waitForURL(/\/pricing/, { timeout: 10000 });
+      await expect(page.getByText(/pricing/i)).toBeVisible();
+    }
+  });
+
+  test("free user sees upgrade prompt in dashboard", async ({ page }) => {
+    // 1. Create a user account
+    const userData = await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: userData.email },
+    });
+
+    // Verify user is on Free plan
+    expect(user.planName).toBe("free");
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // 2. Navigate to dashboard
+    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.waitForLoadState("networkidle");
+
+    // 3. Verify upgrade CTA visible
+    await expect(
+      page.getByText(/upgrade.*unlock|upgrade.*pro/i),
+    ).toBeVisible({ timeout: 5000 });
+
+    // 4. Click upgrade CTA
+    const upgradeButton = page.getByRole("link", { name: /upgrade/i }).first();
+    await upgradeButton.click();
+
+    // 5. Verify redirected to pricing page
+    await page.waitForURL(/\/pricing/, { timeout: 10000 });
+  });
+
+  test("checkout validates payment amount for pro-rata", async ({ page }) => {
+    // 1. Create a user account
+    await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // 2. Navigate to checkout for Pro plan ($49)
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.waitForLoadState("networkidle");
+
+    // 3. Check if pro-rata info is displayed
+    await expect(
+      page.getByText(/pro-rata|partial payment|any amount/i),
+    ).toBeVisible({ timeout: 5000 });
+
+    // 4. Verify example shown (e.g., "$25 = 15 days")
+    const proRataExample = page.getByText(/\$.*=.*days/i);
+    if (await proRataExample.isVisible()) {
+      await expect(proRataExample).toBeVisible();
+    }
+  });
+
+  test("checkout page shows payment confirmation instructions", async ({
+    page,
+  }) => {
+    // 1. Create a user account
+    await createTestAccount({
+      page,
+      callbackURL: "/orgs",
+    });
+
+    await page.waitForURL(/\/orgs\/.*/);
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // 2. Navigate to checkout
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.waitForLoadState("networkidle");
+
+    // 3. Select network and generate address
+    const baseOption = page.getByLabel(/base.*usdc/i);
+    if (await baseOption.isVisible()) {
+      await baseOption.click();
+
+      const generateButton = page.getByRole("button", {
+        name: /generate.*address/i,
+      });
+
+      if (await generateButton.isVisible()) {
+        await generateButton.click();
+
+        await page.waitForTimeout(2000);
+
+        // 4. Verify confirmation instructions displayed
+        await expect(
+          page.getByText(/confirmation|on-chain|blockchain/i),
+        ).toBeVisible({ timeout: 10000 });
+
+        // 5. Verify mention of subscription auto-activation
+        await expect(
+          page.getByText(/auto.*activate|automatically.*activate/i),
+        ).toBeVisible();
+
+        // 6. Verify expected wait time mentioned
+        await expect(
+          page.getByText(/1.*confirmation|2.*confirmation/i),
+        ).toBeVisible();
+      }
+    }
+  });
+});

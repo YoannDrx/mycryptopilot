@@ -1,6 +1,6 @@
 # Subscription Management - MyCryptoPilot
 
-**Dernière mise à jour**: 11 octobre 2025
+**Dernière mise à jour**: 14 octobre 2025
 **Statut**: ✅ **100% FONCTIONNEL** (Issue #6 complétée)
 
 ## Vue d'ensemble

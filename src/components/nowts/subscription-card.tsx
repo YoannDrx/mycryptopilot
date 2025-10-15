@@ -148,10 +148,10 @@ export const SubscriptionCard = ({
           <ul className="text-muted-foreground space-y-1 text-sm">
             <li>
               •{" "}
-              {planData.limits.signalsPerDay === -1
+              {planData.limits.activeSignalsLimit === 999
                 ? "Unlimited"
-                : planData.limits.signalsPerDay}{" "}
-              signals per day
+                : planData.limits.activeSignalsLimit}{" "}
+              active signals tracked
             </li>
             <li>
               • Follow up to{" "}

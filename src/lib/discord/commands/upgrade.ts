@@ -22,21 +22,23 @@ export async function handleUpgradeCommand(
       {
         name: `💎 Plan PRO - ${proPlan.priceUSD}$/mois`,
         value:
-          `✅ ${proPlan.limits.signalsPerDay} signaux par jour\n` +
+          `✅ ${proPlan.limits.activeSignalsLimit} signaux actifs suivis\n` +
           `✅ Suis jusqu'à ${proPlan.limits.tradersFollow} traders vérifiés\n` +
           `✅ Screener temps réel (${proPlan.limits.screenerRefreshSec}s)\n` +
           `✅ Console de risque\n` +
-          `✅ Journal de trading`,
+          `✅ Journal de trading\n` +
+          `✅ Accès Crypto School`,
         inline: false,
       },
       {
         name: `🚀 Plan ULTRA - ${ultraPlan.priceUSD}$/mois`,
         value:
-          `✅ Signaux **illimités**\n` +
+          `✅ Signaux actifs **illimités**\n` +
           `✅ Suis **tous les traders** vérifiés\n` +
           `✅ Screener ultra-rapide (${ultraPlan.limits.screenerRefreshSec}s)\n` +
           `✅ Alertes personnalisées\n` +
           `✅ Filtres avancés\n` +
+          `✅ Crypto School + Tax Help\n` +
           `✅ Accès prioritaire au support`,
         inline: false,
       },
