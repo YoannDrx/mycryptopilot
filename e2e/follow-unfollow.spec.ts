@@ -98,9 +98,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(followRelationAfterUnfollow).toBeNull();
 
     // 11. Verify button changed back to "Follow"
-    await expect(
-      page.getByRole("button", { name: /^follow$/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /^follow$/i })).toBeVisible();
   });
 
   test("free user cannot follow more than 1 trader", async ({ page }) => {
@@ -172,16 +170,12 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     // 2. Sign out and create follower
     await signOutAccount({ page });
 
-    const followerData = await createTestAccount({
+    await createTestAccount({
       page,
       callbackURL: "/orgs",
     });
 
     await page.waitForURL(/\/orgs\/.*/);
-
-    const follower = await prisma.user.findUniqueOrThrow({
-      where: { email: followerData.email },
-    });
 
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
