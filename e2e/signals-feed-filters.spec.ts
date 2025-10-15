@@ -9,9 +9,9 @@ test.describe("Signals Feed with Filters", () => {
     const { user: trader } = await createTestTrader({ page });
 
     // Create signals with different assets using helper
-    await createTestSignal({ traderId: trader.id });
-    await createTestSignal({ traderId: trader.id });
-    await createTestSignal({ traderId: trader.id });
+    await createTestSignal({ traderId: trader.id, symbol: "BTCUSDT" });
+    await createTestSignal({ traderId: trader.id, symbol: "ETHUSDT" });
+    await createTestSignal({ traderId: trader.id, symbol: "SOLUSDT" });
 
     // 2. Sign out and create follower
     await signOutAccount({ page });
@@ -167,7 +167,10 @@ test.describe("Signals Feed with Filters", () => {
     const riskMinSlider = page.getByLabel(/risk.*min/i);
     const riskMaxSlider = page.getByLabel(/risk.*max/i);
 
-    if ((await riskMinSlider.count()) > 0 && (await riskMaxSlider.count()) > 0) {
+    if (
+      (await riskMinSlider.count()) > 0 &&
+      (await riskMaxSlider.count()) > 0
+    ) {
       await riskMinSlider.fill("1");
       await riskMaxSlider.fill("2");
 
@@ -223,9 +226,7 @@ test.describe("Signals Feed with Filters", () => {
       await page.waitForTimeout(1000);
 
       // Verify only signal with BREAKOUT visible
-      await expect(
-        page.getByText(/unique keyword.*breakout/i),
-      ).toBeVisible();
+      await expect(page.getByText(/unique keyword.*breakout/i)).toBeVisible();
       await expect(page.getByText("Regular analysis")).not.toBeVisible();
     }
   });
