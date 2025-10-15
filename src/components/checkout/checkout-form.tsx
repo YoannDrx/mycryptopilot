@@ -245,7 +245,8 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold">
-          Complete Your Payment - {planData.name} Plan
+          Complete Your Payment -{" "}
+          {planData.name.charAt(0).toUpperCase() + planData.name.slice(1)} Plan
         </h1>
         <p className="text-muted-foreground">
           Send ${planData.priceUSD} in USDC (Base) or USDT (Tron) to one of the
