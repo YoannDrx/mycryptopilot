@@ -42,10 +42,10 @@ test.describe("Signals Feed with Filters", () => {
     await page.goto(`/orgs/${orgSlug}/signals`);
     await page.waitForLoadState("networkidle");
 
-    // 4. Verify all signals visible initially
-    await expect(page.getByText("BTC")).toBeVisible();
-    await expect(page.getByText("ETH")).toBeVisible();
-    await expect(page.getByText("SOL")).toBeVisible();
+    // 4. Verify all signals visible initially (use full symbol to avoid filter buttons)
+    await expect(page.getByText("BTC-USDT").first()).toBeVisible();
+    await expect(page.getByText("ETH-USDT").first()).toBeVisible();
+    await expect(page.getByText("SOL-USDT").first()).toBeVisible();
 
     // 5. Apply asset filter for BTC
     const assetFilter = page.getByLabel(/assets/i);
@@ -59,10 +59,10 @@ test.describe("Signals Feed with Filters", () => {
       // Wait for filtering to apply
       await page.waitForTimeout(1000);
 
-      // Verify only BTC signal visible
-      await expect(page.getByText("BTC")).toBeVisible();
-      await expect(page.getByText("ETH")).not.toBeVisible();
-      await expect(page.getByText("SOL")).not.toBeVisible();
+      // Verify only BTC signal visible (check in signals grid, not filter buttons)
+      await expect(page.getByText("BTC-USDT").first()).toBeVisible();
+      await expect(page.getByText("ETH-USDT").first()).not.toBeVisible();
+      await expect(page.getByText("SOL-USDT").first()).not.toBeVisible();
     }
   });
 
