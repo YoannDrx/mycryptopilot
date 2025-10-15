@@ -1,8 +1,87 @@
+## 2025-10-14 - Phase 7: Navigation 4 Espaces + UI Polish
+
+### ✅ **Architecture Navigation Complétée (14 octobre 2025)**
+
+**MILESTONE**: Navigation refactorisée en 4 espaces indépendants avec sidebars dédiées + UI polish professionnel!
+
+**🏗️ Architecture 4 Espaces**:
+- **Trading Space**: Sidebar avec 6 liens (Dashboard, Signals, Traders, Pricing, Checkout, Trader Dashboard)
+- **Account Space**: Sidebar avec 5 liens (Profile, Discord, Email, Following, Danger Zone)
+- **Crypto School Space**: Sidebar avec 2 liens placeholder (Courses, Progress)
+- **Tax & Declaration Space**: Sidebar avec 2 liens placeholder (Import, Reports)
+
+**📦 Composants Créés**:
+- `base-sidebar-layout.tsx` - Layout wrapper partagé entre les 4 espaces
+- `global-search-command.tsx` - Recherche globale (cmd+k) affichant tous les liens
+- `trading-sidebar.tsx`, `account-sidebar.tsx`, `school-sidebar.tsx`, `tax-sidebar.tsx`
+- Chaque espace a ses propres `*-links.ts` et `layout.tsx`
+
+**🎨 UI Polish**:
+- Trading cards: Style professionnel et subtil (effets réduits de 60% pour look plus clean)
+- Chart image viewer avec zoom full-screen + watermark "MyCryptoPilot"
+- Suppression d'images dans formulaires signaux
+- Placeholder amélioré (texte au lieu d'image moche)
+- **Correction de 10 erreurs ESLint** (orgSlug, imports non utilisés, exports manquants)
+
+**🧹 Nettoyage Code**:
+- Supprimé l'ancien layout global avec sidebar unique
+- Supprimé `org-sidebar.tsx` et `org-command.tsx` (remplacés par composants spécialisés)
+- Mis à jour toutes les routes Account (`/account/*` → `/orgs/${slug}/account/*`)
+
+**Impact**: Navigation claire et professionnelle avec isolation complète par domaine métier.
+
+**PR**: #41 - Merged to main
+
+---
+
+## 2025-10-13 - Phase 6: Feed Signaux Avancé avec Filtres
+
+### ✅ **Système de Filtrage Complet (13 octobre 2025)**
+
+**FEATURE**: Feed signaux avec 12 paramètres de filtrage + pagination cursor-based + URL state management!
+
+**🔍 Filtres Implémentés**:
+1. **Search** - Recherche textuelle multi-champs (asset, rationales, trader name)
+2. **Status** - ACTIVE / TP_HIT / INVALIDATED / All
+3. **Bias** - LONG / SHORT / All
+4. **Instrument Type** - SPOT / PERP / All
+5. **Risk Level** - 1-5 avec range slider
+6. **Confidence** - 0-100% avec range slider
+7. **Assets** - Multi-select (BTC, ETH, SOL, etc.)
+8. **Sort By** - Recent / Risk / Confidence / Entry
+9. **Trader Filter** - Following only / All / Verified only
+10. **Date Range** - Published depuis (1j, 7j, 30j, all time)
+11. **Page Size** - 10, 20, 50 signaux par page
+12. **Pagination** - Cursor-based (next/previous)
+
+**📦 Composants Créés**:
+- `signal-filters.tsx` - Composant filtres (200+ lignes)
+- `signal-feed-with-filters.tsx` - Client component orchestrant tout
+- `getFilteredSignals()` - Server query avec Prisma (12 paramètres)
+- Hook `useSignalFilters()` - URL state management avec `nuqs`
+
+**🧪 Tests Unitaires**:
+- **26 tests Vitest** couvrant toutes les combinaisons de filtres
+- Tests de validation Zod schemas
+- Tests de logique métier (tri, pagination, search)
+
+**Performance**:
+- Pagination cursor-based (scalable à millions de signaux)
+- Indexes DB optimisés ([traderId, status], [asset, status], [publishedAt])
+- Debounce sur search input (300ms)
+- URL state pour partage de filtres
+
+**Impact**: Feed signaux production-ready avec UX moderne et performante.
+
+**PR**: #40 - Merged to main
+
+---
+
 ## 2025-10-11 - Project Audit Completion & Documentation Update
 
 ### ✅ **Project Status (11 octobre 2025)**
 
-**PROJECT STATUS**: 6 Prisma migrations applied, all core systems 100% functional!
+**PROJECT STATUS**: 8 Prisma migrations applied, all core systems 100% functional!
 
 ---
 

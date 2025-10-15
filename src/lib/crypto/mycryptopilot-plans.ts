@@ -11,13 +11,15 @@ export type MyCryptoPilotPlan = {
     usdt: number; // Price in USDT (Tron network)
   };
   limits: {
-    signalsPerDay: number;
+    activeSignalsLimit: number; // Nombre de signaux actifs suivis simultanément
     tradersFollow: number;
     screenerRefreshSec: number;
     customAlerts: boolean;
     riskConsole: boolean;
     journaling: boolean;
     advancedFilters: boolean; // Funding, OI, correlations
+    cryptoSchool: boolean; // Accès à la Crypto School (cours, quiz, progression)
+    taxHelp: boolean; // Accès aux outils d'aide fiscale (import CSV, calculs, rapports)
   };
   features: {
     icon: React.ElementType;
@@ -34,13 +36,15 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     priceUSD: 0,
     priceCrypto: { usdc: 0, usdt: 0 },
     limits: {
-      signalsPerDay: 5,
+      activeSignalsLimit: 3, // 3 signaux actifs max suivis
       tradersFollow: 1,
       screenerRefreshSec: 300, // 5min
       customAlerts: false,
       riskConsole: false,
       journaling: false,
       advancedFilters: false,
+      cryptoSchool: false, // Pas d'accès Crypto School en Free
+      taxHelp: false, // Pas d'accès Tax Help en Free
     },
     features: [
       {
@@ -66,13 +70,15 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     priceUSD: 49,
     priceCrypto: { usdc: 49, usdt: 49 },
     limits: {
-      signalsPerDay: 50,
+      activeSignalsLimit: 15, // 15 signaux actifs max suivis
       tradersFollow: 5,
       screenerRefreshSec: 60, // 1min
       customAlerts: false,
       riskConsole: true,
       journaling: true,
       advancedFilters: false,
+      cryptoSchool: true, // Accès Crypto School en Pro
+      taxHelp: false, // Pas d'accès Tax Help en Pro (feature Ultra)
     },
     features: [
       {
@@ -109,13 +115,15 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     priceUSD: 99,
     priceCrypto: { usdc: 99, usdt: 99 },
     limits: {
-      signalsPerDay: 999,
+      activeSignalsLimit: 999, // Signaux actifs illimités
       tradersFollow: 999,
       screenerRefreshSec: 5, // 5sec
       customAlerts: true,
       riskConsole: true,
       journaling: true,
       advancedFilters: true,
+      cryptoSchool: true, // Accès Crypto School en Ultra
+      taxHelp: true, // Accès Tax Help en Ultra (exclusif)
     },
     features: [
       {

@@ -21,8 +21,10 @@
 - ✅ **Profils Traders**: Création et gestion de profils traders vérifiés
 - ✅ **Signaux de Trading**: Publication de signaux au format TradingCard standardisé
 - ✅ **Follow/Unfollow System**: Suivre jusqu'à 5 traders (Pro) ou illimité (Ultra)
+- ✅ **Feed Signaux Avancé**: 12 paramètres de filtrage + pagination cursor-based (Phase 6 - PR #40)
 - ✅ **Marketplace**: Recherche, filtres et pagination des traders
 - ✅ **Dashboards**: Dashboards utilisateur et trader 100% connectés aux données
+- ✅ **Navigation 4 Espaces**: Trading, Account, School, Tax avec sidebars dédiées (Phase 7 - PR #41)
 
 ### 💳 Crypto Payments
 - ✅ **HD Wallet**: Génération d'adresses de paiement Base (USDC) et Tron (USDT)
@@ -43,11 +45,13 @@
 - ✅ **Session Management**: Gestion sécurisée des sessions utilisateur
 
 ### 🎨 UI/UX
-- ✅ **16 Pages**: Dashboard, Trader Dashboard, Marketplace, Pricing, Settings, etc.
+- ✅ **20+ Pages**: Dashboard, Trader Dashboard, Marketplace, Pricing, Settings, Account, School, Tax, etc.
+- ✅ **4 Espaces Navigation**: Trading, Account, School, Tax avec sidebars et recherche globale
 - ✅ **Shadcn/UI**: Composants UI modernes et accessibles
 - ✅ **TailwindCSS v4**: Styling moderne et responsive
 - ✅ **Dark Mode**: Support du mode sombre
 - ✅ **Mobile-First**: Design responsive pour tous les écrans
+- ✅ **UI Polish**: Trading cards professionnelles, chart viewer full-screen, watermark
 
 ### 🧪 Testing
 - ✅ **145 Unit Tests**: Tests Vitest pour la logique métier
@@ -95,7 +99,7 @@ pnpm prisma:seed
 pnpm dev
 ```
 
-**✅ Database Status (12 octobre 2025)**: 8 migrations Prisma appliquées avec succès. Base de données opérationnelle. Toutes les fonctionnalités (profils traders, signaux, follows, crypto payments, Discord bot) sont débloquées.
+**✅ Database Status (14 octobre 2025)**: 8 migrations Prisma appliquées avec succès. Base de données opérationnelle. Toutes les fonctionnalités (profils traders, signaux, follows, crypto payments, Discord bot) sont débloquées.
 
 ## 🛠️ Development Commands
 

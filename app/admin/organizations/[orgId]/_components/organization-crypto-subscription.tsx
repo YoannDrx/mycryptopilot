@@ -169,7 +169,7 @@ export function OrganizationCryptoSubscription({
             <div className="flex items-center gap-2">
               <Zap className="text-muted-foreground h-4 w-4" />
               <Typography variant="muted">
-                Signals/day: {currentPlan?.limits.signalsPerDay}
+                Active signals limit: {currentPlan?.limits.activeSignalsLimit}
               </Typography>
             </div>
             <div className="flex items-center gap-2">

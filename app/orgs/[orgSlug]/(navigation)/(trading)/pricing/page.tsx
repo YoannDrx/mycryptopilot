@@ -106,10 +106,10 @@ export default async function PricingPage() {
                   <div className="flex items-center gap-2 text-sm">
                     <Check className="text-primary size-4" />
                     <span>
-                      {plan.limits.signalsPerDay === 999
+                      {plan.limits.activeSignalsLimit === 999
                         ? "Unlimited"
-                        : plan.limits.signalsPerDay}{" "}
-                      signals per day
+                        : plan.limits.activeSignalsLimit}{" "}
+                      active signals tracked
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">

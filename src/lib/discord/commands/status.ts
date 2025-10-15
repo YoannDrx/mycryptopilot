@@ -47,12 +47,12 @@ export async function handleStatusCommand(
   const planName = (user.planName ?? "free") as MyCryptoPilotPlanName;
   const plan = getPlanByName(planName);
 
-  // Calculer les signaux restants aujourd'hui
-  const signalsUsedToday = user.dailySignalsUsed;
-  const signalsRemaining =
-    plan.limits.signalsPerDay === 999
+  // Calculer les signaux actifs suivis
+  const activeSignalsCount = user.follows.length; // Temporary - should count actual active signals
+  const signalsLimit =
+    plan.limits.activeSignalsLimit === 999
       ? "∞ (illimité)"
-      : `${Math.max(0, plan.limits.signalsPerDay - signalsUsedToday)}/${plan.limits.signalsPerDay}`;
+      : `${activeSignalsCount}/${plan.limits.activeSignalsLimit}`;
 
   // Date d'expiration
   const expiresAt = user.planExpiresAt;
@@ -87,8 +87,8 @@ export async function handleStatusCommand(
         inline: true,
       },
       {
-        name: "📊 Signaux restants aujourd'hui",
-        value: signalsRemaining,
+        name: "📊 Signaux actifs suivis",
+        value: signalsLimit,
         inline: false,
       },
       {

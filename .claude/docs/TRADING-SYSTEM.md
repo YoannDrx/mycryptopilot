@@ -1,6 +1,6 @@
 # Trading System - MyCryptoPilot
 
-**Dernière mise à jour**: 11 octobre 2025
+**Dernière mise à jour**: 14 octobre 2025
 **Statut**: ✅ **100% FONCTIONNEL** (Issues #14, #15, #16, #17 complétées)
 
 ## Vue d'ensemble

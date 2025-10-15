@@ -1,6 +1,6 @@
 # Database Architecture - MyCryptoPilot
 
-**Dernière mise à jour**: 11 octobre 2025
+**Dernière mise à jour**: 14 octobre 2025
 
 ## Vue d'ensemble
 
@@ -8,7 +8,7 @@ MyCryptoPilot utilise PostgreSQL (Neon) avec Prisma ORM. La structure étend le 
 
 ## État des Migrations
 
-✅ **6 migrations appliquées avec succès** (11 octobre 2025)
+✅ **8 migrations appliquées avec succès** (14 octobre 2025)
 
 ```
 20250806031537_initail_migration                        ✅
