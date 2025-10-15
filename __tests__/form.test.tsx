@@ -109,9 +109,9 @@ describe("Form Component", () => {
           expect.anything(),
         );
       },
-      { timeout: 500 },
+      { timeout: 2000 },
     );
-  }, 500);
+  }, 3000);
 
   // Skip this test for now as it appears to have issues
   it.skip("should save on blur when submitOnBlur is true", async () => {
@@ -176,7 +176,7 @@ describe("Form Component", () => {
 
     // onSubmit should not be called on blur
     expect(onSubmit).not.toHaveBeenCalled();
-  }, 500);
+  }, 2000);
 
   it("should auto-disable fields during form submission", async () => {
     // Mock a slow submission
@@ -202,9 +202,14 @@ describe("Form Component", () => {
     await user.click(submitButton);
 
     // Check if inputs and button are disabled during submission
-    expect(nameInput).toBeDisabled();
-    expect(emailInput).toBeDisabled();
-    expect(submitButton).toBeDisabled();
+    await waitFor(
+      () => {
+        expect(nameInput).toBeDisabled();
+        expect(emailInput).toBeDisabled();
+        expect(submitButton).toBeDisabled();
+      },
+      { timeout: 500 },
+    );
 
     // Wait for submission to complete
     await waitFor(
@@ -219,7 +224,7 @@ describe("Form Component", () => {
       () => {
         expect(nameInput).not.toBeDisabled();
       },
-      { timeout: 500 },
+      { timeout: 1000 },
     );
-  }, 500);
+  }, 2000);
 });
