@@ -54,18 +54,41 @@ export async function createTestAccount(options: {
     );
   }
 
-  if (options.admin) {
-    const user = await retry(
-      async () =>
-        prisma.user.findUniqueOrThrow({
-          where: { email: userData.email },
-        }),
-      {
-        maxAttempts: 5,
-        delayMs: 1000,
-        backoff: true,
-      },
+  // Wait for user creation and org setup (critical for E2E tests)
+  // The Better Auth hook creates an organization asynchronously after user creation
+  // We need to wait for this to complete before continuing with tests
+  const user = await retry(
+    async () =>
+      prisma.user.findUniqueOrThrow({
+        where: { email: userData.email },
+        include: {
+          members: {
+            include: {
+              organization: true,
+            },
+          },
+        },
+      }),
+    {
+      maxAttempts: 10,
+      delayMs: 500,
+      backoff: true,
+    },
+  );
+
+  // Verify organization was created
+  if (user.members.length === 0) {
+    throw new Error(
+      `Organization not created for user ${user.id} after account creation`,
     );
+  }
+
+  logger.info("User created with organization", {
+    userId: user.id,
+    orgCount: user.members.length,
+  });
+
+  if (options.admin) {
     logger.info("Creating admin user", user);
     await prisma.user.update({
       where: { id: user.id },
