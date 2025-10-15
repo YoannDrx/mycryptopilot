@@ -95,9 +95,15 @@ jobs:
 
     env:
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_build"
+      DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_build"
       BETTER_AUTH_SECRET: "test-secret-for-build"
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      RESEND_API_KEY: "test-resend-key"
+      EMAIL_FROM: "test@example.com"
+      STRIPE_SECRET_KEY: "sk_test_dummy_key_for_ci"
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_dummy_key_for_ci"
+      NEXT_PUBLIC_EMAIL_CONTACT: "contact@example.com"
 
     services:
       postgres:
