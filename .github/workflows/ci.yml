@@ -192,9 +192,7 @@ jobs:
       HD_WALLET_XPUB_TRON: ${{ secrets.HD_WALLET_XPUB_TRON }}
       BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
       TRON_RPC_URL: ${{ secrets.TRON_RPC_URL }}
-      # Optional OAuth providers for E2E
-      GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-      GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+      # Optional OAuth providers for E2E (GitHub OAuth not supported - reserved prefix)
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
