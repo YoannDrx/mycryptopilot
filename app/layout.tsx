@@ -1,4 +1,5 @@
 import { TailwindIndicator } from "@/components/utils/tailwind-indicator";
+import { DevDbIndicator } from "@/components/utils/dev-db-indicator";
 import { FloatingLegalFooter } from "@/features/legal/floating-legal-footer";
 import { NextTopLoader } from "@/features/page/next-top-loader";
 import { ServerToaster } from "@/features/server-sonner/server-toaster";
@@ -114,6 +115,7 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
             {children}
             {modal}
             <TailwindIndicator />
+            <DevDbIndicator />
             <FloatingLegalFooter />
             <Suspense>
               <ServerToaster />

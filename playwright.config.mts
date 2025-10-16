@@ -84,6 +84,15 @@ const config: PlaywrightTestConfig = {
           timeout: 120 * 1000,
           reuseExistingServer:
             process.env.NODE_ENV === "development" ? !process.env.CI : true,
+          env: {
+            // Use local test database (Postgres.app uses macOS username, no password)
+            DATABASE_URL:
+              process.env.DATABASE_URL ??
+              "postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test",
+            DATABASE_URL_UNPOOLED:
+              process.env.DATABASE_URL_UNPOOLED ??
+              "postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test",
+          },
         },
       }
     : {}),
