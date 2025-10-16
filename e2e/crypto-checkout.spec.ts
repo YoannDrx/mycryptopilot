@@ -126,24 +126,34 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto(`/orgs/${orgSlug}/checkout/pro`);
     await page.waitForLoadState("networkidle");
 
-    // Verify Pro plan features
-    await expect(page.getByText(/15.*active signals/i)).toBeVisible({
+    // Verify Pro plan checkout page loaded correctly
+    // Note: Checkout page displays plan name and price, NOT plan features
+    // Features are displayed on the /pricing page, not /checkout
+    await expect(
+      page.getByText(/complete your payment.*pro/i).first(),
+    ).toBeVisible({
       timeout: 5000,
     });
-    await expect(page.getByText(/5.*traders/i)).toBeVisible();
-    await expect(page.getByText(/risk console/i)).toBeVisible();
-    await expect(page.getByText(/crypto school/i)).toBeVisible();
+    await expect(page.getByText(/\$49/i).first()).toBeVisible();
+    // Verify payment addresses section visible
+    await expect(
+      page.getByText(/time remaining|timer|countdown/i).first(),
+    ).toBeVisible();
 
     // 3. Test Ultra plan checkout
     await page.goto(`/orgs/${orgSlug}/checkout/ultra`);
     await page.waitForLoadState("networkidle");
 
-    // Verify Ultra plan features
-    await expect(page.getByText(/unlimited.*signals/i)).toBeVisible({
+    // Verify Ultra plan checkout page loaded correctly
+    await expect(
+      page.getByText(/complete your payment.*ultra/i).first(),
+    ).toBeVisible({
       timeout: 5000,
     });
-    await expect(page.getByText(/unlimited.*traders/i)).toBeVisible();
-    await expect(page.getByText(/tax help/i)).toBeVisible();
+    await expect(page.getByText(/\$99/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/time remaining|timer|countdown/i).first(),
+    ).toBeVisible();
   });
 
   test("user can navigate back to pricing from checkout", async ({ page }) => {
