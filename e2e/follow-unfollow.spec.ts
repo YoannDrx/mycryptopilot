@@ -163,9 +163,15 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     // 1. Create a trader with signals
     const { user: trader, traderProfile } = await createTestTrader({ page });
 
-    // Create signals
-    const signal1 = await createTestSignal({ traderId: trader.id });
-    const signal2 = await createTestSignal({ traderId: trader.id });
+    // Create signals with specific symbols
+    const signal1 = await createTestSignal({
+      traderId: trader.id,
+      symbol: "BTC",
+    });
+    const signal2 = await createTestSignal({
+      traderId: trader.id,
+      symbol: "ETH",
+    });
 
     // 2. Sign out and create follower
     await signOutAccount({ page });

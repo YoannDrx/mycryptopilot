@@ -25,7 +25,8 @@ test.describe("Crypto Checkout Flow", () => {
 
     // 3. Verify checkout page loaded
     await expect(page.getByText(/pro plan/i)).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/\$49/i)).toBeVisible();
+    // Use .first() to avoid strict mode violation (multiple "$49" on page)
+    await expect(page.getByText(/\$49/i).first()).toBeVisible();
 
     // 4. Select payment network (Base - USDC)
     const baseOption = page.getByLabel(/base.*usdc/i);

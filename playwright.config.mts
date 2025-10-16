@@ -34,8 +34,9 @@ const config: PlaywrightTestConfig = {
   // 50 seconds
   timeout: 70 * 1000,
   // Expect timeout for assertions (e.g., toBeVisible, toHaveText)
+  // Increased to 30s for CI environment which is slower
   expect: {
-    timeout: 15000,
+    timeout: process.env.CI ? 30000 : 15000,
   },
   projects: [
     {
@@ -71,28 +72,22 @@ const config: PlaywrightTestConfig = {
     viewport: { width: 1280, height: 720 },
     geolocation: { longitude: 2.3488, latitude: 48.8534 },
     permissions: ["geolocation", "clipboard-read", "clipboard-write"],
-    actionTimeout: 15000,
-    navigationTimeout: 15000,
+    // Increased timeouts for CI environment which is slower
+    actionTimeout: process.env.CI ? 30000 : 15000,
+    navigationTimeout: process.env.CI ? 30000 : 15000,
   },
   testDir: "e2e",
   // Only start the web server if PLAYWRIGHT_TEST_BASE_URL is not set
   ...(!process.env.PLAYWRIGHT_TEST_BASE_URL
     ? {
         webServer: {
-          command: "pnpm run build; pnpm run start",
+          // CRITICAL: Pass NODE_ENV=test so Next.js loads .env.test.local
+          command: "NODE_ENV=test pnpm run build && NODE_ENV=test pnpm run start",
           url: SERVER_URL,
-          timeout: 120 * 1000,
+          // Increased timeout for CI environment where build can be slower
+          timeout: process.env.CI ? 240 * 1000 : 120 * 1000,
           reuseExistingServer:
             process.env.NODE_ENV === "development" ? !process.env.CI : true,
-          env: {
-            // Use local test database (Postgres.app uses macOS username, no password)
-            DATABASE_URL:
-              process.env.DATABASE_URL ??
-              "postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test",
-            DATABASE_URL_UNPOOLED:
-              process.env.DATABASE_URL_UNPOOLED ??
-              "postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test",
-          },
         },
       }
     : {}),

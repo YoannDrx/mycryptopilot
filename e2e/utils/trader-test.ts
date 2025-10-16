@@ -53,8 +53,11 @@ export async function createTestTrader(options: {
 export async function createTestSignal(options: {
   traderId: string;
   expired?: boolean;
+  symbol?: string;
+  bias?: string;
+  rationale?: string;
 }) {
-  const symbol = `${faker.finance.currencyCode()}USDT`;
+  const symbol = options.symbol ?? `${faker.finance.currencyCode()}USDT`;
   const createdAt = new Date();
 
   // If expired, set TTL to negative value so expiresAt is in the past
@@ -63,7 +66,9 @@ export async function createTestSignal(options: {
 
   const payload = {
     symbol,
-    bias: faker.helpers.arrayElement(["LONG", "BULLISH", "SHORT", "BEARISH"]),
+    bias:
+      options.bias ??
+      faker.helpers.arrayElement(["LONG", "BULLISH", "SHORT", "BEARISH"]),
     entry: faker.number.float({ min: 1, max: 100 }).toString(),
     targets: [
       faker.number.float({ min: 1, max: 100 }).toString(),
@@ -72,7 +77,7 @@ export async function createTestSignal(options: {
     stopLoss: faker.number.float({ min: 1, max: 100 }).toString(),
     leverage: faker.number.int({ min: 1, max: 20 }).toString(),
     timeframe: faker.helpers.arrayElement(["1H", "4H", "1D"]),
-    reasoning: faker.lorem.paragraph(),
+    reasoning: options.rationale ?? faker.lorem.paragraph(),
   };
 
   // Generate hash

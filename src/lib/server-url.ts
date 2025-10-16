@@ -1,4 +1,10 @@
-import { env } from "./env";
+// Import env only in non-test environment to avoid ES Module issues with Playwright
+type EnvType = { BETTER_AUTH_URL?: string };
+let env: EnvType | undefined;
+if (process.env.NODE_ENV !== "test") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  env = require("./env").env;
+}
 
 /**
  * This method return the server URL based on the environment.
@@ -13,7 +19,7 @@ export const getServerUrl = () => {
   }
 
   // Priority 1: Use BETTER_AUTH_URL if explicitly set (for OAuth callbacks)
-  if (env.BETTER_AUTH_URL) {
+  if (env?.BETTER_AUTH_URL) {
     return env.BETTER_AUTH_URL;
   }
 
