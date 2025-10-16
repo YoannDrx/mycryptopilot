@@ -47,6 +47,7 @@ const config: PlaywrightTestConfig = {
   retries: 1,
   // Add delay between retries
   workers: 3,
+  globalSetup: new URL("./e2e/global-setup.ts", import.meta.url).pathname,
   globalTeardown: new URL("./e2e/global-teardown.ts", import.meta.url).pathname,
   // Enable console logs in CI
   reporter: process.env.CI ? [["list"], ["html"]] : "list",
@@ -84,6 +85,11 @@ const config: PlaywrightTestConfig = {
           timeout: 120 * 1000,
           reuseExistingServer:
             process.env.NODE_ENV === "development" ? !process.env.CI : true,
+          env: {
+            // Use local test database (Conductor uses macOS username, no password)
+            DATABASE_URL: "postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test",
+            DATABASE_URL_UNPOOLED: "postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test",
+          },
         },
       }
     : {}),
