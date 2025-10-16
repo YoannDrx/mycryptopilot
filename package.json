@@ -29,7 +29,11 @@
     "prisma:migrate": "pnpm prisma migrate dev",
     "prisma:generate": "pnpm prism generate",
     "db:setup-test": "./scripts/setup-test-db.sh",
-    "db:check": "./scripts/check-test-env.sh"
+    "db:check": "./scripts/check-test-env.sh",
+    "worktree:setup": "./.claude/scripts/setup-worktree.sh",
+    "worktree:clean": "./.claude/scripts/clean-worktree.sh",
+    "worktree:list": "git worktree list",
+    "worktree:check": "./.claude/scripts/worktree-check.sh"
   },
   "prisma": {
     "seed": "pnpm tsx prisma/seed.ts"
