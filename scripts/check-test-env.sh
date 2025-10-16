@@ -2,6 +2,9 @@
 
 # Script de diagnostic pour l'environnement de test
 
+# Ajouter Postgres.app au PATH (requis pour pg_isready, psql)
+export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+
 echo "🔍 Diagnostic de l'environnement de test"
 echo "========================================"
 echo ""
