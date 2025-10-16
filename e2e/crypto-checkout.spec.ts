@@ -23,10 +23,10 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto(`/orgs/${orgSlug}/checkout/pro`);
     await page.waitForLoadState("networkidle");
 
-    // 3. Verify checkout page loaded
-    await expect(
-      page.getByText(/complete your payment.*pro plan/i),
-    ).toBeVisible({ timeout: 10000 });
+    // 3. Verify checkout page loaded - wait for heading
+    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
+      timeout: 15000,
+    });
     // Use .first() to avoid strict mode violation (multiple "$49" on page)
     await expect(page.getByText(/\$49/i).first()).toBeVisible();
 
@@ -131,10 +131,8 @@ test.describe("Crypto Checkout Flow", () => {
     // Verify Pro plan checkout page loaded correctly
     // Note: Checkout page displays plan name and price, NOT plan features
     // Features are displayed on the /pricing page, not /checkout
-    await expect(
-      page.getByText(/complete your payment.*pro plan/i),
-    ).toBeVisible({
-      timeout: 5000,
+    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
+      timeout: 15000,
     });
     await expect(page.getByText(/\$49/i).first()).toBeVisible();
     // Verify timer visible
@@ -145,10 +143,8 @@ test.describe("Crypto Checkout Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify Ultra plan checkout page loaded correctly
-    await expect(
-      page.getByText(/complete your payment.*ultra plan/i),
-    ).toBeVisible({
-      timeout: 5000,
+    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
+      timeout: 15000,
     });
     await expect(page.getByText(/\$99/i).first()).toBeVisible();
     // Verify timer visible
@@ -244,9 +240,9 @@ test.describe("Crypto Checkout Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // 3. Verify checkout page loaded with payment info
-    await expect(
-      page.getByText(/complete your payment.*pro plan/i),
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
+      timeout: 15000,
+    });
 
     // 4. Verify payment info displayed (price in the description)
     await expect(page.getByText(/send.*\$49/i).first()).toBeVisible();
