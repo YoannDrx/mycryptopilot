@@ -27,7 +27,9 @@
     "better-auth:migrate": "pnpm dlx @better-auth/cli generate --output prisma/better-auth.prisma",
     "prisma:seed": "NODE_ENV=development prisma db seed",
     "prisma:migrate": "pnpm prisma migrate dev",
-    "prisma:generate": "pnpm prism generate"
+    "prisma:generate": "pnpm prism generate",
+    "db:setup-test": "./scripts/setup-test-db.sh",
+    "db:check": "./scripts/check-test-env.sh"
   },
   "prisma": {
     "seed": "pnpm tsx prisma/seed.ts"
