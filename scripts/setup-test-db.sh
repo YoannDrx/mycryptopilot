@@ -5,6 +5,9 @@
 
 set -e
 
+# Ajouter Postgres.app au PATH (requis pour pg_isready, psql, createdb)
+export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+
 echo "🔍 Vérification de PostgreSQL..."
 
 # Vérifier que PostgreSQL est accessible
