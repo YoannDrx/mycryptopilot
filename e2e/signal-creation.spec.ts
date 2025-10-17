@@ -152,8 +152,7 @@ test.describe("Signal Creation Flow", () => {
     });
   });
 
-  // Same page loading issues
-  test.skip("trader can upload chart image to signal", async ({ page }) => {
+  test("trader can upload chart image to signal", async ({ page }) => {
     // 1. Create a trader account
     const { user } = await createTestTrader({ page });
 
@@ -164,18 +163,25 @@ test.describe("Signal Creation Flow", () => {
     await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
     await page.waitForLoadState("networkidle");
 
+    // Wait for form to be visible
+    await expect(page.getByText(/create new signal/i)).toBeVisible({
+      timeout: 10000,
+    });
+
     // 3. Fill minimal required fields
-    await page.getByLabel(/asset/i).fill("ETH");
+    await page.getByLabel(/^symbol/i).click();
+    await page.getByRole("option", { name: "ETH-USDT" }).click();
 
     await page.getByLabel(/instrument type/i).click();
     await page.getByRole("option", { name: /spot/i }).click();
 
-    await page.getByLabel(/bias/i).click();
+    await page.getByLabel(/bias.*direction/i).click();
     await page.getByRole("option", { name: /^long$/i }).click();
 
     await page.getByLabel(/entry price/i).fill("3000");
-    await page.getByLabel(/take profit 1/i).fill("3100");
-    await page.getByLabel(/stop loss/i).fill("2900");
+    await page.getByPlaceholder(/^TP1$/i).fill("3100");
+    await page.getByLabel(/invalidation level/i).fill("2900");
+    await page.getByPlaceholder(/^rationale 1$/i).fill("Test rationale");
 
     // 4. Upload a chart image (mock)
     // Note: This assumes there's a file input for chart upload
@@ -194,8 +200,15 @@ test.describe("Signal Creation Flow", () => {
     }
 
     // 5. Submit and verify
-    await page.getByRole("button", { name: /publish signal/i }).click();
-    await page.waitForURL(/\/dashboard\/trader/, { timeout: 15000 });
+    await page.getByRole("button", { name: /create signal/i }).click();
+
+    // Wait for success toast
+    await expect(page.getByText(/signal created successfully/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Wait for redirect to signals page
+    await page.waitForURL(/\/signals/, { timeout: 15000 });
 
     // Verify signal was created
     const createdSignal = await prisma.signal.findFirst({
@@ -208,7 +221,7 @@ test.describe("Signal Creation Flow", () => {
     });
 
     expect(createdSignal).not.toBeNull();
-    expect(createdSignal?.symbol).toBe("ETH");
+    expect(createdSignal?.symbol).toBe("ETH-USDT");
   });
 
   // Same page loading issues
