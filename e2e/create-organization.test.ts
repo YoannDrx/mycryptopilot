@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
-import { nanoid } from "nanoid";
+// import { nanoid } from "nanoid"; // Commented out - ES Module issue with Playwright
 import { createTestAccount } from "./utils/auth-test";
 
 test.describe("Create Organization", () => {
@@ -27,7 +27,8 @@ test.describe("Create Organization", () => {
     await page.getByText("Add a new organization").click();
 
     // Fill organization form
-    const orgName = `${faker.animal.bear()}-${nanoid(3)}`.toLowerCase();
+    const orgName =
+      `${faker.animal.bear()}-${faker.string.alphanumeric(3)}`.toLowerCase();
     const expectedSlug = orgName.split(" ").join("-");
 
     await page.getByLabel(/organization name/i).fill(orgName);

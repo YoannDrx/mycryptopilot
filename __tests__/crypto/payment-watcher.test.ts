@@ -76,7 +76,6 @@ describe("payment-watcher", () => {
     it("should return empty array when BASE_RPC_URL is not configured", async () => {
       const { env } = await import("@/lib/env");
       const originalBaseRpcUrl = env.BASE_RPC_URL;
-      // @ts-expect-error - Mocking env for test
       env.BASE_RPC_URL = undefined;
 
       const { checkAddressForPayments } = await import(
@@ -90,14 +89,12 @@ describe("payment-watcher", () => {
 
       expect(payments).toEqual([]);
 
-      // @ts-expect-error - Restore env
       env.BASE_RPC_URL = originalBaseRpcUrl;
     });
 
     it("should return empty array when TRON_RPC_URL is not configured", async () => {
       const { env } = await import("@/lib/env");
       const originalTronRpcUrl = env.TRON_RPC_URL;
-      // @ts-expect-error - Mocking env for test
       env.TRON_RPC_URL = undefined;
 
       const { checkAddressForPayments } = await import(
@@ -111,7 +108,6 @@ describe("payment-watcher", () => {
 
       expect(payments).toEqual([]);
 
-      // @ts-expect-error - Restore env
       env.TRON_RPC_URL = originalTronRpcUrl;
     });
 
