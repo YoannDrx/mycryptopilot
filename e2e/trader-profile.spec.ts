@@ -35,7 +35,9 @@ test.describe("Trader Public Profile", () => {
 
     // 4. Verify all trader info is displayed
     // Display name
-    await expect(page.getByText(traderProfile.displayName)).toBeVisible();
+    await expect(
+      page.getByText(traderProfile.displayName).first(),
+    ).toBeVisible();
 
     // Bio (if exists)
     if (traderProfile.bio) {
@@ -51,10 +53,10 @@ test.describe("Trader Public Profile", () => {
     }
 
     // Followers count label
-    await expect(page.getByText(/followers/i)).toBeVisible();
+    await expect(page.getByText(/followers/i).first()).toBeVisible();
 
     // Signals count label
-    await expect(page.getByText(/signals/i)).toBeVisible();
+    await expect(page.getByText(/signals/i).first()).toBeVisible();
 
     // 5. Verify Follow button is visible
     await expect(

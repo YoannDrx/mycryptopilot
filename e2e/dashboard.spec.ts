@@ -291,9 +291,9 @@ test.describe("User Dashboard", () => {
 
     // Verify Performance tab is active
     await expect(performanceTab).toHaveAttribute("data-state", "active");
-    await expect(page.getByText(/win rate/i)).toBeVisible();
-    await expect(page.getByText(/profit factor/i)).toBeVisible();
-    await expect(page.getByText(/equity curve/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
+    await expect(page.getByText(/profit factor/i).first()).toBeVisible();
+    await expect(page.getByText(/equity curve/i).first()).toBeVisible();
 
     // 6. Navigate back to Signals Feed tab
     await signalsTab.click();

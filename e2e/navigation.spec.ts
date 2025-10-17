@@ -102,7 +102,7 @@ test.describe("Navigation System", () => {
 
     // 3. Try to access global search (Cmd+K / Ctrl+K or search button)
     // Check if there's a search input or button in the sidebar
-    const searchInput = page.getByPlaceholder(/search/i);
+    const searchInput = page.getByPlaceholder(/search/i).first();
     const searchButton = page.getByRole("button", { name: /search/i });
 
     if ((await searchInput.count()) > 0) {
