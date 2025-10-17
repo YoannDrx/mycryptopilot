@@ -263,8 +263,7 @@ test.describe("Signals Feed with Filters", () => {
     }
   });
 
-  // TODO: Fix auth timeout during test setup
-  test.skip("filters persist in URL when applied", async ({ page }) => {
+  test("filters persist in URL when applied", async ({ page }) => {
     // 1. Create a trader
     const { user: trader } = await createTestTrader({ page });
 
@@ -288,6 +287,7 @@ test.describe("Signals Feed with Filters", () => {
       data: {
         userId: follower.id,
         traderId: trader.id,
+        status: "ACTIVE",
       },
     });
 
