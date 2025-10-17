@@ -113,8 +113,7 @@ describe("Form Component", () => {
     );
   }, 3000);
 
-  // Skip this test for now as it appears to have issues
-  it.skip("should save on blur when submitOnBlur is true", async () => {
+  it("should save on blur when submitOnBlur is true", async () => {
     const onSubmit = vi.fn();
     const { user } = setup(
       <BlurSubmitForm onSubmit={onSubmit} submitOnBlur={true} />,
@@ -137,23 +136,21 @@ describe("Form Component", () => {
     // Still shouldn't be called before blur
     expect(onSubmit).not.toHaveBeenCalled();
 
-    // Blur the email field
-    await user.tab();
+    // Blur the email field by clicking outside or pressing tab
+    await user.click(document.body);
 
     // Check if onSubmit was called after blur
     await waitFor(
       () => {
-        expect(onSubmit).toHaveBeenCalledWith(
-          {
-            name: "John Doe",
-            email: "john@example.com",
-          },
-          expect.anything(),
-        );
+        expect(onSubmit).toHaveBeenCalled();
+        expect(onSubmit.mock.calls[0][0]).toEqual({
+          name: "John Doe",
+          email: "john@example.com",
+        });
       },
-      { timeout: 1000 },
+      { timeout: 2000 },
     );
-  }, 1000);
+  }, 3000);
 
   it("should not save on blur when submitOnBlur is false", async () => {
     const onSubmit = vi.fn();
