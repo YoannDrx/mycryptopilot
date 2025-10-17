@@ -164,20 +164,44 @@ jobs:
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[e2e]'))
 
     env:
+      # Core
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
       DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-      RESEND_API_KEY: "test-resend-key"
-      EMAIL_FROM: "test@example.com"
-      STRIPE_SECRET_KEY: "sk_test_dummy_key_for_ci"
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_dummy_key_for_ci"
-      NEXT_PUBLIC_EMAIL_CONTACT: "contact@example.com"
-      NODE_ENV: "test"
+      # Email
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      EMAIL_FROM: "MyCryptoPilot <contact@mycryptopilot.app>"
+      NEXT_PUBLIC_EMAIL_CONTACT: "contact@mycryptopilot.app"
+      # Stripe
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID }}
+      STRIPE_PRO_YEARLY_PLAN_ID: ${{ secrets.STRIPE_PRO_YEARLY_PLAN_ID }}
+      STRIPE_ULTRA_PLAN_ID: ${{ secrets.STRIPE_ULTRA_PLAN_ID }}
+      STRIPE_ULTRA_YEARLY_PLAN_ID: ${{ secrets.STRIPE_ULTRA_YEARLY_PLAN_ID }}
+      # OAuth
+      GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+      GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      # Analytics
+      NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+      NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
+      # Crypto payments (required for E2E checkout tests)
+      BASE_RPC_URL: "https://mainnet.base.org"
+      TRON_RPC_URL: "https://api.trongrid.io"
+      CRYPTO_XPUB_BASE: "xpub6MuBJVs8PxXAbxb7nB2SL2iKPwZZq598gCLW9UHHHrrxxBeCdnEB7tdohvDobh9tadUjJE6VoTRDWezqMVHehxfB3fw4RW2J1QHCaFDhPzP"
+      CRYPTO_XPUB_TRON: "xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8jrGhg9u6mVDjK7UGjFGXXSwxuLdF2AW1hX2LpjcCiyytCcMDR9"
+      BINANCE_MASTER_WALLET_BASE: "0x0000000000000000000000000000000000000000"
+      BINANCE_MASTER_WALLET_TRON: "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"
+      # Playwright specific
       PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000"
       HEADLESS: "true"
       CI: "true"
+      PORT: 3000
 
     services:
       postgres:
@@ -228,14 +252,14 @@ jobs:
       - name: Deploy database migrations
         run: pnpm prisma migrate deploy
 
-      - name: Build application
-        run: pnpm build
+      - name: Build application for testing
+        run: NODE_ENV=production pnpm build
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium --with-deps
 
-      - name: Start application
-        run: pnpm start &
+      - name: Start application in production mode with test env
+        run: NODE_ENV=test pnpm start &
 
       - name: Wait for application
         run: pnpm dlx wait-on@latest http://localhost:3000 --timeout 60000
