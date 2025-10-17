@@ -224,12 +224,17 @@ test.describe("Signal Creation Flow", () => {
     expect(createdSignal?.symbol).toBe("ETH-USDT");
   });
 
-  // Same page loading issues
-  test.skip("creating signal notifies followers via email", async ({
-    page,
-  }) => {
-    // 1. Create a trader
-    const { user: trader } = await createTestTrader({ page });
+  test("creating signal notifies followers via email", async ({ page }) => {
+    // 1. Create a trader with fixed password
+    const traderPassword = "TestPassword123!";
+    const { user: trader } = await createTestTrader({
+      page,
+      initialUserData: {
+        name: "Test Trader",
+        email: `playwright-test-trader-${Date.now()}@example.com`,
+        password: traderPassword,
+      },
+    });
     await signOutAccount({ page });
 
     // 2. Create a follower account
@@ -258,9 +263,20 @@ test.describe("Signal Creation Flow", () => {
 
     // Sign in as trader (reuse trader credentials)
     await page.goto("/auth/signin");
-    await page.getByPlaceholder(/email/i).fill(trader.email);
-    await page.getByPlaceholder(/password/i).fill("TestPassword123!");
-    await page.getByRole("button", { name: /sign in/i }).click();
+    await page.waitForLoadState("networkidle");
+
+    // Click "Use password" to show password form
+    await page.getByRole("button", { name: /use password/i }).click();
+
+    // Wait for password form to appear
+    await expect(page.getByLabel(/^password/i)).toBeVisible({
+      timeout: 5000,
+    });
+
+    // Fill in credentials
+    await page.getByLabel(/^email/i).fill(trader.email);
+    await page.getByLabel(/^password/i).fill(traderPassword);
+    await page.getByRole("button", { name: /^sign in$/i }).click();
     await page.waitForURL(/\/orgs\/.*/);
 
     // 5. Navigate to create signal page
@@ -270,22 +286,36 @@ test.describe("Signal Creation Flow", () => {
     await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
     await page.waitForLoadState("networkidle");
 
+    // Wait for form to be visible
+    await expect(page.getByText(/create new signal/i)).toBeVisible({
+      timeout: 10000,
+    });
+
     // 6. Fill signal form
-    await page.getByLabel(/asset/i).fill("BTC");
+    await page.getByLabel(/^symbol/i).click();
+    await page.getByRole("option", { name: "BTC-USDT" }).click();
 
     await page.getByLabel(/instrument type/i).click();
-    await page.getByRole("option", { name: /perpetual/i }).click();
+    await page.getByRole("option", { name: /perp.*perpetual/i }).click();
 
-    await page.getByLabel(/bias/i).click();
+    await page.getByLabel(/bias.*direction/i).click();
     await page.getByRole("option", { name: /^long$/i }).click();
 
     await page.getByLabel(/entry price/i).fill("45000");
-    await page.getByLabel(/take profit 1/i).fill("46000");
-    await page.getByLabel(/stop loss/i).fill("44000");
+    await page.getByPlaceholder(/^TP1$/i).fill("46000");
+    await page.getByLabel(/invalidation level/i).fill("44000");
+    await page.getByPlaceholder(/^rationale 1$/i).fill("Test signal");
 
     // 7. Submit signal
-    await page.getByRole("button", { name: /publish signal/i }).click();
-    await page.waitForURL(/\/dashboard\/trader/, { timeout: 15000 });
+    await page.getByRole("button", { name: /create signal/i }).click();
+
+    // Wait for success toast
+    await expect(page.getByText(/signal created successfully/i)).toBeVisible({
+      timeout: 10000,
+    });
+
+    // Wait for redirect to signals page
+    await page.waitForURL(/\/signals/, { timeout: 15000 });
 
     // 8. Wait a bit for email notification to be processed
     await page.waitForTimeout(2000);
@@ -301,7 +331,7 @@ test.describe("Signal Creation Flow", () => {
     });
 
     expect(createdSignal).not.toBeNull();
-    expect(createdSignal?.symbol).toBe("BTC");
+    expect(createdSignal?.symbol).toBe("BTC-USDT");
 
     // Note: We cannot easily verify email was sent in E2E without mock
     // This test verifies the integration is wired correctly
