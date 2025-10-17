@@ -86,7 +86,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await followingBtn.click();
 
     // Wait for unfollow confirmation dialog to appear
-    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("alertdialog")).toBeVisible({ timeout: 5000 });
 
     // Click Unfollow button in the confirmation dialog
     const unfollowBtn = page.getByRole("button", { name: /^unfollow$/i });
@@ -95,10 +95,10 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     // Wait for success message
     await expect(
-      page.getByText(/successfully unfollowed|no longer following/i),
+      page.getByText(/unfollowed this trader|no longer following/i),
     ).toBeVisible({ timeout: 10000 });
 
-    // 10. Verify follow relationship removed from database
+    // 10. Verify follow relationship status changed to CANCELLED (soft delete)
     const followRelationAfterUnfollow = await prisma.follow.findFirst({
       where: {
         userId: follower.id,
@@ -106,7 +106,8 @@ test.describe("Follow/Unfollow Trader Flow", () => {
       },
     });
 
-    expect(followRelationAfterUnfollow).toBeNull();
+    expect(followRelationAfterUnfollow).not.toBeNull();
+    expect(followRelationAfterUnfollow?.status).toBe("CANCELLED");
 
     // 11. Verify trader no longer appears in following list
     await page.goto(`/orgs/${orgSlug}/account/following`);
@@ -206,7 +207,9 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
-    await page.getByRole("button", { name: /follow/i }).click();
+    const followBtn = page.getByRole("button", { name: /follow/i }).first();
+    await expect(followBtn).toBeVisible({ timeout: 10000 });
+    await followBtn.click();
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
@@ -220,6 +223,8 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await expect(page.getByText(signal2.symbol)).toBeVisible({ timeout: 5000 });
 
     // 6. Verify trader's name appears
-    await expect(page.getByText(traderProfile.displayName)).toBeVisible();
+    await expect(
+      page.getByText(traderProfile.displayName).first(),
+    ).toBeVisible();
   });
 });
