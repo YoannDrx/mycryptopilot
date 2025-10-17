@@ -124,8 +124,7 @@ test.describe("Signal Creation Flow", () => {
     await expect(page.getByText(signalData.rationale1).first()).toBeVisible();
   });
 
-  // Same page loading issues
-  test.skip("signal creation validates required fields", async ({ page }) => {
+  test("signal creation validates required fields", async ({ page }) => {
     // 1. Create a trader account
     await createTestTrader({ page });
 
@@ -136,11 +135,19 @@ test.describe("Signal Creation Flow", () => {
     await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
     await page.waitForLoadState("networkidle");
 
-    // 3. Try to submit empty form
-    await page.getByRole("button", { name: /publish signal/i }).click();
+    // Wait for form to be visible
+    await expect(page.getByText(/create new signal/i)).toBeVisible({
+      timeout: 10000,
+    });
 
-    // 4. Verify validation errors appear
-    await expect(page.getByText(/asset.*required/i)).toBeVisible({
+    // 3. Try to submit empty form
+    await page.getByRole("button", { name: /create signal/i }).click();
+
+    // 4. Verify validation errors appear (form has default values, so check for price validation)
+    await expect(page.getByText(/entry price must be positive/i)).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page.getByText(/rationale cannot be empty/i)).toBeVisible({
       timeout: 5000,
     });
   });
