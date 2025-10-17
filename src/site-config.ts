@@ -22,7 +22,7 @@ export const SiteConfig = {
   },
   email: {
     from: "MyCryptoPilot <noreply@mycryptopilot.app>",
-    contact: "support@mycryptopilot.app",
+    contact: "contact@mycryptopilot.app",
   },
   features: {
     /**

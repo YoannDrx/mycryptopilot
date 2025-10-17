@@ -4,16 +4,17 @@ import { createTestAccount, signOutAccount } from "./utils/auth-test";
 import { createTestSignal, createTestTrader } from "./utils/trader-test";
 
 test.describe("Signals Feed with Filters", () => {
-  // TODO: Fix signals not loading on feed page - "BTC" text not found
-  // Possible causes: data not loading, incorrect query, rendering issue
   test.skip("user can filter signals by asset", async ({ page }) => {
+    // TODO: Asset filter button doesn't work in the app - this is an application bug, not a test bug
+    // The filter buttons appear but clicking them doesn't filter the signals feed
+    // See: signals feed implementation needs to wire up asset filter button clicks
     // 1. Create a trader with multiple signals
     const { user: trader } = await createTestTrader({ page });
 
     // Create signals with different assets using helper
-    await createTestSignal({ traderId: trader.id, symbol: "BTC" });
-    await createTestSignal({ traderId: trader.id, symbol: "ETH" });
-    await createTestSignal({ traderId: trader.id, symbol: "SOL" });
+    await createTestSignal({ traderId: trader.id, symbol: "BTC-USDT" });
+    await createTestSignal({ traderId: trader.id, symbol: "ETH-USDT" });
+    await createTestSignal({ traderId: trader.id, symbol: "SOL-USDT" });
 
     // 2. Sign out and create follower
     await signOutAccount({ page });
@@ -34,6 +35,7 @@ test.describe("Signals Feed with Filters", () => {
       data: {
         userId: follower.id,
         traderId: trader.id,
+        status: "ACTIVE",
       },
     });
 
@@ -45,26 +47,32 @@ test.describe("Signals Feed with Filters", () => {
     await page.waitForLoadState("networkidle");
 
     // 4. Verify all signals visible initially
-    await expect(page.getByText("BTC")).toBeVisible();
-    await expect(page.getByText("ETH")).toBeVisible();
-    await expect(page.getByText("SOL")).toBeVisible();
+    await expect(page.getByText("BTC-USDT").first()).toBeVisible();
+    await expect(page.getByText("ETH-USDT").first()).toBeVisible();
+    await expect(page.getByText("SOL-USDT").first()).toBeVisible();
 
-    // 5. Apply asset filter for BTC
-    const assetFilter = page.getByLabel(/assets/i);
-    if (await assetFilter.isVisible()) {
-      await assetFilter.click();
-      await page.getByRole("option", { name: /^btc$/i }).click();
+    // 5. Apply asset filter for BTC-USDT (click the asset button in filters)
+    const btcAssetButton = page.getByRole("button", { name: "BTC-USDT" });
+    if (await btcAssetButton.isVisible()) {
+      await btcAssetButton.click();
 
-      // Click outside to close dropdown
-      await page.keyboard.press("Escape");
+      // Wait for filtering to apply - URL should update with query params
+      await page.waitForTimeout(2000);
+      await page.waitForLoadState("networkidle");
 
-      // Wait for filtering to apply
-      await page.waitForTimeout(1000);
+      // Verify only BTC signal visible - need to check in the signals list area only
+      // ETH and SOL signals should NOT be in the results
+      const signalsList = page.locator('[role="main"]');
+      await expect(signalsList.getByText("BTC-USDT").first()).toBeVisible();
 
-      // Verify only BTC signal visible
-      await expect(page.getByText("BTC")).toBeVisible();
-      await expect(page.getByText("ETH")).not.toBeVisible();
-      await expect(page.getByText("SOL")).not.toBeVisible();
+      // These should not be in the filtered results
+      const ethCount = await signalsList.getByText("ETH-USDT").count();
+      const solCount = await signalsList.getByText("SOL-USDT").count();
+
+      // ETH and SOL should only appear in the filter buttons, not in results
+      // Filter buttons area has 1 occurrence each, so if count > 1, they're in results too
+      expect(ethCount).toBeLessThanOrEqual(1);
+      expect(solCount).toBeLessThanOrEqual(1);
     }
   });
 
@@ -198,9 +206,7 @@ test.describe("Signals Feed with Filters", () => {
     }
   });
 
-  // TODO: Fix strict mode violation - 2 search inputs on page
-  // Need to select specific search input with more precise selector
-  test.skip("user can search signals by text", async ({ page }) => {
+  test("user can search signals by text", async ({ page }) => {
     // 1. Create a trader
     const { user: trader } = await createTestTrader({ page });
 
@@ -232,6 +238,7 @@ test.describe("Signals Feed with Filters", () => {
       data: {
         userId: follower.id,
         traderId: trader.id,
+        status: "ACTIVE",
       },
     });
 
@@ -242,21 +249,24 @@ test.describe("Signals Feed with Filters", () => {
     await page.goto(`/orgs/${orgSlug}/signals`);
     await page.waitForLoadState("networkidle");
 
-    // 4. Search for "BREAKOUT"
-    const searchInput = page.getByPlaceholder(/search/i);
+    // 4. Search for "BREAKOUT" - use more specific selector for signals page search
+    const searchInput = page
+      .locator('[role="main"]')
+      .getByPlaceholder(/search/i);
     if (await searchInput.isVisible()) {
       await searchInput.fill("BREAKOUT");
 
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(1500);
 
       // Verify only signal with BREAKOUT visible
-      await expect(page.getByText(/unique keyword.*breakout/i)).toBeVisible();
+      await expect(
+        page.getByText(/unique keyword.*breakout/i).first(),
+      ).toBeVisible();
       await expect(page.getByText("Regular analysis")).not.toBeVisible();
     }
   });
 
-  // TODO: Fix auth timeout during test setup
-  test.skip("filters persist in URL when applied", async ({ page }) => {
+  test("filters persist in URL when applied", async ({ page }) => {
     // 1. Create a trader
     const { user: trader } = await createTestTrader({ page });
 
@@ -280,6 +290,7 @@ test.describe("Signals Feed with Filters", () => {
       data: {
         userId: follower.id,
         traderId: trader.id,
+        status: "ACTIVE",
       },
     });
 

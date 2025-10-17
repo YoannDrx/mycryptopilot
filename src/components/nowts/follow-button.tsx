@@ -8,6 +8,7 @@ import {
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -42,6 +43,7 @@ export const FollowButton = ({
   onFollowSuccess,
   className,
 }: FollowButtonProps) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
 
@@ -61,6 +63,8 @@ export const FollowButton = ({
       // Invalider les queries pour rafraîchir les données
       void queryClient.invalidateQueries({ queryKey: ["traders"] });
       void queryClient.invalidateQueries({ queryKey: ["following"] });
+      // Force Server Component revalidation
+      router.refresh();
       // Call custom success handler if provided
       if (onFollowSuccess) {
         onFollowSuccess();
@@ -87,6 +91,8 @@ export const FollowButton = ({
       // Invalider les queries pour rafraîchir les données
       void queryClient.invalidateQueries({ queryKey: ["traders"] });
       void queryClient.invalidateQueries({ queryKey: ["following"] });
+      // Force Server Component revalidation
+      router.refresh();
       setShowUnfollowDialog(false);
     },
     onError: (error: Error) => {

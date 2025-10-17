@@ -4,12 +4,7 @@ import { createTestAccount, signOutAccount } from "./utils/auth-test";
 import { createTestSignal, createTestTrader } from "./utils/trader-test";
 
 test.describe("Follow/Unfollow Trader Flow", () => {
-  // TODO: Fix Server Component refresh issue - isFollowing prop not updating after mutation
-  // Issue: TraderProfilePage (Server Component) fetches isFollowing once on load,
-  // but FollowButton (Client Component) mutations don't trigger page refresh.
-  // Solution: Add router.refresh() in FollowButton onSuccess, or convert to client component
-  // See: app/orgs/[orgSlug]/(navigation)/(trading)/traders/[traderId]/page.tsx:122
-  test.skip("user can follow and unfollow a trader", async ({ page }) => {
+  test("user can follow and unfollow a trader", async ({ page }) => {
     // 1. Create a trader with signals
     const { user: trader, traderProfile } = await createTestTrader({ page });
 
@@ -91,7 +86,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await followingBtn.click();
 
     // Wait for unfollow confirmation dialog to appear
-    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("alertdialog")).toBeVisible({ timeout: 5000 });
 
     // Click Unfollow button in the confirmation dialog
     const unfollowBtn = page.getByRole("button", { name: /^unfollow$/i });
@@ -100,10 +95,10 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     // Wait for success message
     await expect(
-      page.getByText(/successfully unfollowed|no longer following/i),
+      page.getByText(/unfollowed this trader|no longer following/i),
     ).toBeVisible({ timeout: 10000 });
 
-    // 10. Verify follow relationship removed from database
+    // 10. Verify follow relationship status changed to CANCELLED (soft delete)
     const followRelationAfterUnfollow = await prisma.follow.findFirst({
       where: {
         userId: follower.id,
@@ -111,7 +106,8 @@ test.describe("Follow/Unfollow Trader Flow", () => {
       },
     });
 
-    expect(followRelationAfterUnfollow).toBeNull();
+    expect(followRelationAfterUnfollow).not.toBeNull();
+    expect(followRelationAfterUnfollow?.status).toBe("CANCELLED");
 
     // 11. Verify trader no longer appears in following list
     await page.goto(`/orgs/${orgSlug}/account/following`);
@@ -122,8 +118,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(hasTraders).toBe(0);
   });
 
-  // Same Server Component refresh issue as above
-  test.skip("free user cannot follow more than 1 trader", async ({ page }) => {
+  test("free user cannot follow more than 1 trader", async ({ page }) => {
     // 1. Create two traders
     const { user: trader1 } = await createTestTrader({ page });
     await signOutAccount({ page });
@@ -179,8 +174,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(followCount).toBe(1);
   });
 
-  // Same Server Component refresh issue as above
-  test.skip("following trader shows their signals in user dashboard", async ({
+  test("following trader shows their signals in user dashboard", async ({
     page,
   }) => {
     // 1. Create a trader with signals
@@ -213,7 +207,9 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
-    await page.getByRole("button", { name: /follow/i }).click();
+    const followBtn = page.getByRole("button", { name: /follow/i }).first();
+    await expect(followBtn).toBeVisible({ timeout: 10000 });
+    await followBtn.click();
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
@@ -227,6 +223,8 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await expect(page.getByText(signal2.symbol)).toBeVisible({ timeout: 5000 });
 
     // 6. Verify trader's name appears
-    await expect(page.getByText(traderProfile.displayName)).toBeVisible();
+    await expect(
+      page.getByText(traderProfile.displayName).first(),
+    ).toBeVisible();
   });
 });

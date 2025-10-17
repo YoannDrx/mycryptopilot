@@ -81,8 +81,8 @@ const config: PlaywrightTestConfig = {
   ...(!process.env.PLAYWRIGHT_TEST_BASE_URL
     ? {
         webServer: {
-          // CRITICAL: Pass NODE_ENV=test so Next.js loads .env.test.local
-          command: "NODE_ENV=test pnpm run build && NODE_ENV=test pnpm run start",
+          // CRITICAL: Build in production mode for performance, run in test mode for env vars
+          command: "NODE_ENV=production pnpm run build && NODE_ENV=test pnpm run start",
           url: SERVER_URL,
           // Increased timeout for CI environment where build can be slower
           timeout: process.env.CI ? 240 * 1000 : 120 * 1000,

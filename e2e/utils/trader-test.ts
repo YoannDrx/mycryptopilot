@@ -66,18 +66,18 @@ export async function createTestSignal(options: {
 
   const payload = {
     symbol,
-    bias:
-      options.bias ??
-      faker.helpers.arrayElement(["LONG", "BULLISH", "SHORT", "BEARISH"]),
+    bias: options.bias ?? faker.helpers.arrayElement(["LONG", "SHORT"]),
     entry: faker.number.float({ min: 1, max: 100 }).toString(),
-    targets: [
+    tps: [
       faker.number.float({ min: 1, max: 100 }).toString(),
       faker.number.float({ min: 1, max: 100 }).toString(),
     ],
-    stopLoss: faker.number.float({ min: 1, max: 100 }).toString(),
+    sl: faker.number.float({ min: 1, max: 100 }).toString(),
     leverage: faker.number.int({ min: 1, max: 20 }).toString(),
     timeframe: faker.helpers.arrayElement(["1H", "4H", "1D"]),
-    reasoning: options.rationale ?? faker.lorem.paragraph(),
+    instrumentType: "PERP",
+    riskLevel: faker.number.int({ min: 1, max: 5 }),
+    rationales: [options.rationale ?? faker.lorem.sentence()],
   };
 
   // Generate hash
