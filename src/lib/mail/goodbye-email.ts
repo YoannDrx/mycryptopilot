@@ -1,6 +1,5 @@
-import { env } from "../env";
 import { logger } from "../logger";
-import { resend } from "./resend";
+import { sendEmail } from "./send-email";
 import GoodbyeEmail from "@email/goodbye";
 
 /**
@@ -17,17 +16,16 @@ export async function sendGoodbyeEmail(
   try {
     logger.info(`Sending goodbye email to ${userEmail}...`);
 
-    const { error } = await resend.emails.send({
-      from: env.EMAIL_FROM,
+    const result = await sendEmail({
       to: userEmail,
       subject: "Ton compte a été supprimé - MyCryptoPilot",
-      react: GoodbyeEmail({
+      html: GoodbyeEmail({
         userName: userName || userEmail.split("@")[0],
       }),
     });
 
-    if (error) {
-      logger.error("Error sending goodbye email:", error);
+    if (result.error) {
+      logger.error("Error sending goodbye email:", result.error);
       return false;
     }
 

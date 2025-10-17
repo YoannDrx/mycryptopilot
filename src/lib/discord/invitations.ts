@@ -1,10 +1,8 @@
 import { discordBot } from "./bot-client";
 import { logger } from "../logger";
-import { Resend } from "resend";
 import { env } from "../env";
+import { sendEmail } from "../mail/send-email";
 import DiscordInviteEmail from "@email/discord-invite";
-
-const resend = new Resend(env.RESEND_API_KEY);
 
 /**
  * Générer un lien d'invitation permanent pour le serveur Discord
@@ -66,6 +64,14 @@ export async function sendDiscordInviteEmail(
   userEmail: string,
   userName: string,
 ): Promise<boolean> {
+  // Skip email sending in test environment to avoid sending real emails
+  if (env.NODE_ENV === "test") {
+    logger.info(
+      `[TEST MODE] Skipping Discord invite email to ${userEmail} (would send in production)`,
+    );
+    return true;
+  }
+
   try {
     // Utiliser le lien statique d'abord (DISCORD_INVITE_URL dans .env)
     let inviteUrl: string | null | undefined = env.DISCORD_INVITE_URL;
@@ -90,16 +96,15 @@ export async function sendDiscordInviteEmail(
 
     logger.info(`Sending Discord invite email with URL: ${inviteUrl}`);
 
-    // Envoyer email
-    const { error } = await resend.emails.send({
-      from: env.EMAIL_FROM,
+    // Envoyer email via sendEmail() helper (centralise protections et config)
+    const result = await sendEmail({
       to: userEmail,
       subject: "🎉 Rejoins notre communauté Discord - MyCryptoPilot",
-      react: DiscordInviteEmail({ userName, inviteUrl }),
+      html: DiscordInviteEmail({ userName, inviteUrl }),
     });
 
-    if (error) {
-      logger.error("Error sending Discord invite email:", error);
+    if (result.error) {
+      logger.error("Error sending Discord invite email:", result.error);
       return false;
     }
 
