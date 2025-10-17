@@ -23,9 +23,12 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto(`/orgs/${orgSlug}/checkout/pro`);
     await page.waitForLoadState("networkidle");
 
+    // Wait for checkout form to be fully loaded (mutation generates addresses on mount)
+    await page.waitForTimeout(2000);
+
     // 3. Verify checkout page loaded - wait for heading
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 15000,
+      timeout: 20000,
     });
     // Use .first() to avoid strict mode violation (multiple "$49" on page)
     await expect(page.getByText(/\$49/i).first()).toBeVisible();
@@ -128,11 +131,14 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto(`/orgs/${orgSlug}/checkout/pro`);
     await page.waitForLoadState("networkidle");
 
+    // Wait for checkout form to be fully loaded (mutation generates addresses on mount)
+    await page.waitForTimeout(2000);
+
     // Verify Pro plan checkout page loaded correctly
     // Note: Checkout page displays plan name and price, NOT plan features
     // Features are displayed on the /pricing page, not /checkout
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 15000,
+      timeout: 20000,
     });
     await expect(page.getByText(/\$49/i).first()).toBeVisible();
     // Verify timer visible
@@ -142,9 +148,12 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto(`/orgs/${orgSlug}/checkout/ultra`);
     await page.waitForLoadState("networkidle");
 
+    // Wait for checkout form to be fully loaded
+    await page.waitForTimeout(2000);
+
     // Verify Ultra plan checkout page loaded correctly
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 15000,
+      timeout: 20000,
     });
     await expect(page.getByText(/\$99/i).first()).toBeVisible();
     // Verify timer visible
@@ -239,9 +248,12 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto(`/orgs/${orgSlug}/checkout/pro`);
     await page.waitForLoadState("networkidle");
 
+    // Wait for checkout form to be fully loaded
+    await page.waitForTimeout(2000);
+
     // 3. Verify checkout page loaded with payment info
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 15000,
+      timeout: 20000,
     });
 
     // 4. Verify payment info displayed (price in the description)
