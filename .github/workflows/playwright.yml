@@ -122,12 +122,12 @@ jobs:
         run: pnpm prisma migrate status
 
       - name: Build application for testing
-        run: NODE_ENV=production pnpm build
+        run: NODE_ENV=test pnpm build
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium --with-deps
 
-      - name: Start application in production mode with test env
+      - name: Start application in test mode
         run: NODE_ENV=test pnpm start &
 
       - name: Wait for application to be ready

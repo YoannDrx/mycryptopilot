@@ -238,7 +238,7 @@ These Terms, together with our Privacy Policy, constitute the entire agreement b
 
 If you have questions about these Terms, please contact us:
 
-**Email**: legal@mycryptopilot.app
+**Email**: contact@mycryptopilot.app
 **Website**: https://mycryptopilot.app/contact
 
 ---

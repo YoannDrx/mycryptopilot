@@ -207,13 +207,13 @@ You can control email notifications in your account settings:
 You can export your trading journal data as CSV from the Trading Journal page.
 
 ### 5.5 Data Access Request
-You may request a copy of your personal data by contacting privacy@mycryptopilot.app.
+You may request a copy of your personal data by contacting contact@mycryptopilot.app.
 
 ### 5.6 Correction
 If you believe any information we hold is inaccurate, you can update it in settings or contact us for assistance.
 
 ### 5.7 Right to Object
-You can object to certain processing of your data by contacting us at privacy@mycryptopilot.app.
+You can object to certain processing of your data by contacting us at contact@mycryptopilot.app.
 
 ## 6. Security Measures
 
@@ -272,7 +272,7 @@ MyCryptoPilot operates globally. Your information may be transferred to and proc
 
 MyCryptoPilot is NOT intended for users under 18 years old. We do not knowingly collect information from children.
 
-If you believe a child has provided us with information, please contact us immediately at privacy@mycryptopilot.app and we will delete the information.
+If you believe a child has provided us with information, please contact us immediately at contact@mycryptopilot.app and we will delete the information.
 
 ## 10. California Privacy Rights (CCPA)
 
@@ -296,7 +296,7 @@ You have the right to opt-out of the "sale" of personal information. **Note**: W
 We will not discriminate against you for exercising your CCPA rights.
 
 ### 10.5 How to Exercise Rights
-Email: privacy@mycryptopilot.app with subject "CCPA Request"
+Email: contact@mycryptopilot.app with subject "CCPA Request"
 
 ## 11. European Privacy Rights (GDPR)
 
@@ -319,7 +319,7 @@ We process your data based on:
 - Right to withdraw consent
 
 ### 11.3 Data Protection Officer
-Contact our Data Protection Officer at dpo@mycryptopilot.app
+Contact our Data Protection Officer at contact@mycryptopilot.app
 
 ### 11.4 Supervisory Authority
 You have the right to lodge a complaint with your local data protection authority.
@@ -342,15 +342,15 @@ Our platform may contain links to third-party websites or services (e.g., blockc
 
 If you have questions, concerns, or requests regarding this Privacy Policy or your personal information:
 
-**Email**: privacy@mycryptopilot.app
+**Email**: contact@mycryptopilot.app
 **General Contact**: https://mycryptopilot.app/contact
 
 **For specific requests**:
-- **Data Access**: privacy@mycryptopilot.app (subject: "Data Access Request")
-- **Data Deletion**: privacy@mycryptopilot.app (subject: "Data Deletion Request")
-- **CCPA Requests**: privacy@mycryptopilot.app (subject: "CCPA Request")
-- **GDPR Requests**: dpo@mycryptopilot.app (subject: "GDPR Request")
-- **Security Issues**: security@mycryptopilot.app
+- **Data Access**: contact@mycryptopilot.app (subject: "Data Access Request")
+- **Data Deletion**: contact@mycryptopilot.app (subject: "Data Deletion Request")
+- **CCPA Requests**: contact@mycryptopilot.app (subject: "CCPA Request")
+- **GDPR Requests**: contact@mycryptopilot.app (subject: "GDPR Request")
+- **Security Issues**: contact@mycryptopilot.app
 
 ## 15. Blockchain and Crypto Specific
 
@@ -377,7 +377,7 @@ While your transactions are public on the blockchain, we do not actively track o
 
 **By using MyCryptoPilot, you acknowledge that you have read and understood this Privacy Policy.**
 
-For questions, contact: privacy@mycryptopilot.app
+For questions, contact: contact@mycryptopilot.app
 `;
 
 export const metadata: Metadata = {

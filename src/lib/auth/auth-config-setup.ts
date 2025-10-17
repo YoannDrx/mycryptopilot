@@ -4,6 +4,11 @@ import { resend } from "../mail/resend";
 import { prisma } from "../prisma";
 
 export const setupResendCustomer = async (user: User) => {
+  // Skip Resend operations in test environment to avoid sending real emails
+  if (env.NODE_ENV === "test") {
+    return;
+  }
+
   if (!user.email) {
     return;
   }

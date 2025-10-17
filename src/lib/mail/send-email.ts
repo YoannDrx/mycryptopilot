@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { SiteConfig } from "@/site-config";
 import { pretty, render } from "@react-email/render";
 import { nanoid } from "nanoid";
 import { resendMailAdapter } from "./resend";
@@ -90,7 +91,7 @@ export const sendEmail = async (params: SendEmailParams) => {
 
   const result = await mailAdapter.send({
     ...params,
-    from: params.from ?? env.EMAIL_FROM,
+    from: params.from ?? SiteConfig.email.from,
     html,
   });
 
