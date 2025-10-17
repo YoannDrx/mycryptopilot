@@ -8,7 +8,7 @@
  *
  * Ce script va:
  * 1. Lister tous les contacts dans l'audience Resend
- * 2. Filtrer les contacts avec emails "playwright-test-*"
+ * 2. Filtrer les contacts de test E2E (playwright-test-* et follower-*@test.com)
  * 3. Supprimer ces contacts de l'audience
  * 4. Afficher un résumé des suppressions
  */
@@ -46,17 +46,21 @@ async function cleanResendAudience() {
 
     console.log(`   Nombre total de contacts: ${contacts.data.length}\n`);
 
-    // 2. Filtrer les contacts de test (playwright-test-*)
-    const testContacts = contacts.data.filter((contact) =>
-      contact.email.startsWith("playwright-test-"),
-    );
+    // 2. Filtrer les contacts de test E2E (playwright-test-* ET follower-*@test.com)
+    const testContacts = contacts.data.filter((contact) => {
+      const email = contact.email;
+      return (
+        email.startsWith("playwright-test-") ||
+        (email.startsWith("follower-") && email.endsWith("@test.com"))
+      );
+    });
 
     if (testContacts.length === 0) {
       console.log("✅ Aucun contact de test à supprimer");
       return;
     }
 
-    console.log(`🎯 Contacts de test trouvés: ${testContacts.length}`);
+    console.log(`🎯 Contacts de test E2E trouvés: ${testContacts.length}`);
     console.log("   Emails à supprimer:");
     testContacts.forEach((contact) => {
       console.log(`   - ${contact.email}`);
@@ -89,8 +93,8 @@ async function cleanResendAudience() {
         failedCount++;
       }
 
-      // Petite pause pour éviter de spam l'API Resend
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Pause de 600ms pour respecter la limite de 2 requêtes/sec de Resend
+      await new Promise((resolve) => setTimeout(resolve, 600));
     }
 
     // 4. Résumé
