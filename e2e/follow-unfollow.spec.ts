@@ -4,12 +4,7 @@ import { createTestAccount, signOutAccount } from "./utils/auth-test";
 import { createTestSignal, createTestTrader } from "./utils/trader-test";
 
 test.describe("Follow/Unfollow Trader Flow", () => {
-  // TODO: Fix Server Component refresh issue - isFollowing prop not updating after mutation
-  // Issue: TraderProfilePage (Server Component) fetches isFollowing once on load,
-  // but FollowButton (Client Component) mutations don't trigger page refresh.
-  // Solution: Add router.refresh() in FollowButton onSuccess, or convert to client component
-  // See: app/orgs/[orgSlug]/(navigation)/(trading)/traders/[traderId]/page.tsx:122
-  test.skip("user can follow and unfollow a trader", async ({ page }) => {
+  test("user can follow and unfollow a trader", async ({ page }) => {
     // 1. Create a trader with signals
     const { user: trader, traderProfile } = await createTestTrader({ page });
 
@@ -122,8 +117,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(hasTraders).toBe(0);
   });
 
-  // Same Server Component refresh issue as above
-  test.skip("free user cannot follow more than 1 trader", async ({ page }) => {
+  test("free user cannot follow more than 1 trader", async ({ page }) => {
     // 1. Create two traders
     const { user: trader1 } = await createTestTrader({ page });
     await signOutAccount({ page });
@@ -179,8 +173,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(followCount).toBe(1);
   });
 
-  // Same Server Component refresh issue as above
-  test.skip("following trader shows their signals in user dashboard", async ({
+  test("following trader shows their signals in user dashboard", async ({
     page,
   }) => {
     // 1. Create a trader with signals
