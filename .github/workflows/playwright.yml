@@ -36,7 +36,7 @@ jobs:
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-      NODE_ENV: "production"
+      NODE_ENV: "test"
       # Email
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       EMAIL_FROM: "MyCryptoPilot <contact@mycryptopilot.app>"
@@ -122,14 +122,11 @@ jobs:
       - name: Verify database schema
         run: pnpm prisma migrate status
 
-      - name: Build application
-        run: pnpm build
-
       - name: Install Playwright browsers
         run: pnpm exec playwright install chromium --with-deps
 
-      - name: Start application
-        run: pnpm start &
+      - name: Start application in development mode
+        run: pnpm dev &
 
       - name: Wait for application to be ready
         run: pnpm dlx wait-on@latest http://localhost:3000 --timeout 60000
