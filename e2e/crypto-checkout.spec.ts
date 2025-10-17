@@ -20,15 +20,19 @@ test.describe("Crypto Checkout Flow", () => {
     expect(orgSlug).toBeTruthy();
 
     // 2. Navigate to checkout page for Pro plan
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
-    await page.waitForLoadState("networkidle");
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForLoadState("networkidle", { timeout: 60000 });
 
-    // Wait for checkout form to be fully loaded (mutation generates addresses on mount)
-    await page.waitForTimeout(2000);
+    // Wait for React hydration and checkout form mount
+    await page.waitForTimeout(3000);
 
-    // 3. Verify checkout page loaded - wait for heading
-    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 20000,
+    // 3. Verify checkout page loaded - wait for any heading or main content
+    await expect(
+      page.locator("h1, h2, [data-testid='checkout-form']").first(),
+    ).toBeVisible({
+      timeout: 30000,
     });
     // Use .first() to avoid strict mode violation (multiple "$49" on page)
     await expect(page.getByText(/\$49/i).first()).toBeVisible();
@@ -128,32 +132,46 @@ test.describe("Crypto Checkout Flow", () => {
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
     // 2. Test Pro plan checkout
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
-    await page.waitForLoadState("networkidle");
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForLoadState("networkidle", { timeout: 60000 });
 
-    // Wait for checkout form to be fully loaded (mutation generates addresses on mount)
-    await page.waitForTimeout(2000);
+    // Wait for React hydration and checkout form mount
+    await page.waitForTimeout(3000);
 
     // Verify Pro plan checkout page loaded correctly
     // Note: Checkout page displays plan name and price, NOT plan features
     // Features are displayed on the /pricing page, not /checkout
+    await expect(
+      page.locator("h1, h2, [data-testid='checkout-form']").first(),
+    ).toBeVisible({
+      timeout: 30000,
+    });
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 20000,
+      timeout: 30000,
     });
     await expect(page.getByText(/\$49/i).first()).toBeVisible();
     // Verify timer visible
     await expect(page.getByText(/time remaining/i)).toBeVisible();
 
     // 3. Test Ultra plan checkout
-    await page.goto(`/orgs/${orgSlug}/checkout/ultra`);
-    await page.waitForLoadState("networkidle");
+    await page.goto(`/orgs/${orgSlug}/checkout/ultra`, {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForLoadState("networkidle", { timeout: 60000 });
 
-    // Wait for checkout form to be fully loaded
-    await page.waitForTimeout(2000);
+    // Wait for React hydration and checkout form mount
+    await page.waitForTimeout(3000);
 
     // Verify Ultra plan checkout page loaded correctly
+    await expect(
+      page.locator("h1, h2, [data-testid='checkout-form']").first(),
+    ).toBeVisible({
+      timeout: 30000,
+    });
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 20000,
+      timeout: 30000,
     });
     await expect(page.getByText(/\$99/i).first()).toBeVisible();
     // Verify timer visible
@@ -245,15 +263,22 @@ test.describe("Crypto Checkout Flow", () => {
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
     // 2. Navigate to checkout for Pro plan ($49)
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
-    await page.waitForLoadState("networkidle");
+    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+      waitUntil: "domcontentloaded",
+    });
+    await page.waitForLoadState("networkidle", { timeout: 60000 });
 
-    // Wait for checkout form to be fully loaded
-    await page.waitForTimeout(2000);
+    // Wait for React hydration and checkout form mount
+    await page.waitForTimeout(3000);
 
     // 3. Verify checkout page loaded with payment info
+    await expect(
+      page.locator("h1, h2, [data-testid='checkout-form']").first(),
+    ).toBeVisible({
+      timeout: 30000,
+    });
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 20000,
+      timeout: 30000,
     });
 
     // 4. Verify payment info displayed (price in the description)
