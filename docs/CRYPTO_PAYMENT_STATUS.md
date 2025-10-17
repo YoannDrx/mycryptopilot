@@ -17,9 +17,9 @@ npx tsx scripts/generate-testnet-xpub.ts
 
 **Résultat** :
 
-- ✅ Base XPUB : `xpub6MuBJVs8PxXAbxb7nB2SL2iKPwZZq598gCLW9UHHHrrxxBeCdnEB7tdohvDobh9tadUjJE6VoTRDWezqMVHehxfB3fw4RW2J1QHCaFDhPzP`
-- ✅ Tron XPUB : `xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8jrGhg9u6mVDjK7UGjFGXXSwxuLdF2AW1hX2LpjcCiyytCcMDR9`
-- ✅ Mnemonic sauvegardé : `almost gas infant pyramid judge deliver myth pause link copper cabbage pulse`
+- ✅ Base XPUB : `xpub6XXXXXXXXXXXXXXXXXXXXXX...` (stored in GitHub secrets)
+- ✅ Tron XPUB : `xpub6XXXXXXXXXXXXXXXXXXXXXX...` (stored in GitHub secrets)
+- ✅ Mnemonic sauvegardé : `[REDACTED - NEVER COMMIT THIS]`
 
 **⚠️ IMPORTANT** : Mnemonic enregistré dans `.env.local` avec warning clair (testnet only)
 
@@ -40,8 +40,8 @@ BASE_RPC_URL="https://mainnet.base.org"
 TRON_RPC_URL="https://api.trongrid.io"
 
 ## HD Wallet Extended Public Keys (Testnet)
-CRYPTO_XPUB_BASE="xpub6MuBJVs8PxXAbxb7nB2SL2iKPwZZq598gCLW9UHHHrrxxBeCdnEB7tdohvDobh9tadUjJE6VoTRDWezqMVHehxfB3fw4RW2J1QHCaFDhPzP"
-CRYPTO_XPUB_TRON="xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8jrGhg9u6mVDjK7UGjFGXXSwxuLdF2AW1hX2LpjcCiyytCcMDR9"
+CRYPTO_XPUB_BASE="xpub6XXXXXXXXXXXXXXXXXXXXXX..."  # Get from GitHub secrets
+CRYPTO_XPUB_TRON="xpub6XXXXXXXXXXXXXXXXXXXXXX..."  # Get from GitHub secrets
 ```
 
 ---
@@ -53,8 +53,8 @@ CRYPTO_XPUB_TRON="xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8j
 ```bash
 BASE_RPC_URL=https://mainnet.base.org
 TRON_RPC_URL=https://api.trongrid.io
-CRYPTO_XPUB_BASE=xpub6MuBJVs8PxXAbxb7nB2SL2iKPwZZq598gCLW9UHHHrrxxBeCdnEB7tdohvDobh9tadUjJE6VoTRDWezqMVHehxfB3fw4RW2J1QHCaFDhPzP
-CRYPTO_XPUB_TRON=xpub6CixhtgNARqCJui2qDrRfCopwDmS2Ba8YZGK2VFkX1UkFJAh5PKaGPrf8jrGhg9u6mVDjK7UGjFGXXSwxuLdF2AW1hX2LpjcCiyytCcMDR9
+CRYPTO_XPUB_BASE=<redacted - stored in Vercel environment variables>
+CRYPTO_XPUB_TRON=<redacted - stored in Vercel environment variables>
 ```
 
 **Vérification** :
