@@ -46,7 +46,7 @@ export const TradingCard = ({
   const isExpired = timeLeft !== null && timeLeft <= 0;
 
   return (
-    <div className={cn("group relative", className)}>
+    <div className={cn("group relative", className)} data-testid="trading-card">
       {/* Subtle gradient border effect */}
       <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-r from-violet-600/40 via-purple-600/30 to-fuchsia-600/40 opacity-0 blur-[2px] transition-all duration-300 group-hover:opacity-100" />
 
