@@ -32,7 +32,7 @@ export const ACCOUNT_LINKS: NavigationLink[] = [
   {
     href: `${ORGANIZATION_PATH}/account/following`,
     Icon: Users,
-    label: "Following",
+    label: "Manage Following",
   },
   {
     href: `${ORGANIZATION_PATH}/account/danger`,

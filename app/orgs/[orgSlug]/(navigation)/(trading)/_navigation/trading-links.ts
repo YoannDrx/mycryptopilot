@@ -1,5 +1,17 @@
-import type { NavigationGroup, NavigationLink } from "@/features/navigation/navigation.type";
-import { BarChart3, TrendingUp, Users, DollarSign, Home, LineChart, PlusCircle, UserCheck } from "lucide-react";
+import type {
+  NavigationGroup,
+  NavigationLink,
+} from "@/features/navigation/navigation.type";
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Home,
+  LineChart,
+  PlusCircle,
+  UserCheck,
+} from "lucide-react";
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
 
@@ -37,7 +49,7 @@ const SIGNALS_LINKS: NavigationLink[] = [
   {
     href: `${ORGANIZATION_PATH}/dashboard`,
     Icon: UserCheck,
-    label: "Following",
+    label: "My Signals",
   },
 ];
 
@@ -77,7 +89,9 @@ const SETTINGS_LINKS: NavigationLink[] = [
  * Get trading navigation groups
  * @param hasTraderProfile - Whether user has a trader profile (to show TRADER TOOLS section)
  */
-export function getTradingNavigationGroups(hasTraderProfile: boolean): NavigationGroup[] {
+export function getTradingNavigationGroups(
+  hasTraderProfile: boolean,
+): NavigationGroup[] {
   const groups: NavigationGroup[] = [
     {
       title: "OVERVIEW",
@@ -105,7 +119,7 @@ export function getTradingNavigationGroups(hasTraderProfile: boolean): Navigatio
     {
       title: "SETTINGS",
       links: SETTINGS_LINKS,
-    }
+    },
   );
 
   return groups;
