@@ -1,13 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { expect, test } from "@playwright/test";
-import { createTestAccount, signOutAccount } from "./utils/auth-test";
-import { createTestTrader, createTestSignal } from "./utils/trader-test";
+import { createTestAccount } from "./utils/auth-test";
+import {
+  createTestTraderDirectly,
+  createTestSignal,
+} from "./utils/trader-test";
 
 test.describe("Traders Marketplace", () => {
   test("marketplace displays all traders with stats", async ({ page }) => {
-    // 1. Create 5 traders with different stats
+    // 1. Create 5 traders directly in DB (faster, no UI interaction)
     const createTrader = async () => {
-      const { user, traderProfile } = await createTestTrader({ page });
+      const { user, traderProfile } = await createTestTraderDirectly();
 
       // Create 2-3 signals for each trader
       await Promise.all([
@@ -18,21 +21,18 @@ test.describe("Traders Marketplace", () => {
       return { user, traderProfile };
     };
 
-    // Create traders sequentially (can't parallelize due to page navigation)
-    const trader1 = await createTrader();
-    await signOutAccount({ page });
-    const trader2 = await createTrader();
-    await signOutAccount({ page });
-    const trader3 = await createTrader();
-    await signOutAccount({ page });
-    const trader4 = await createTrader();
-    await signOutAccount({ page });
-    const trader5 = await createTrader();
+    // Create traders in parallel (no page navigation needed)
+    const [trader1, trader2, trader3, trader4, trader5] = await Promise.all([
+      createTrader(),
+      createTrader(),
+      createTrader(),
+      createTrader(),
+      createTrader(),
+    ]);
 
     const traders = [trader1, trader2, trader3, trader4, trader5];
 
-    // 2. Sign out last trader and create a follower account
-    await signOutAccount({ page });
+    // 2. Create a follower account
 
     await createTestAccount({
       page,
@@ -58,7 +58,9 @@ test.describe("Traders Marketplace", () => {
     // 5. Verify all 5 traders are displayed
     await Promise.all(
       traders.map(async (trader) =>
-        expect(page.getByText(trader.traderProfile.displayName)).toBeVisible(),
+        expect(
+          page.getByText(trader.traderProfile.displayName).first(),
+        ).toBeVisible(),
       ),
     );
 
@@ -73,10 +75,10 @@ test.describe("Traders Marketplace", () => {
     const followButtons = page.getByRole("button", { name: /follow/i });
     const viewProfileLinks = page.getByRole("link", { name: /view profile/i });
 
-    // Should have at least 5 follow buttons (one per trader)
+    // Should have at least 5 follow buttons (one per trader) - allow more due to data pollution from other tests
     expect(await followButtons.count()).toBeGreaterThanOrEqual(5);
-    // Should have exactly 5 view profile links
-    expect(await viewProfileLinks.count()).toBe(5);
+    // Should have at least 5 view profile links - allow more due to data pollution from other tests
+    expect(await viewProfileLinks.count()).toBeGreaterThanOrEqual(5);
 
     // 8. Verify stats overview cards
     const activeTradersStat = page.getByText(/active traders/i).first();
@@ -87,47 +89,41 @@ test.describe("Traders Marketplace", () => {
       .locator("..")
       .locator("..")
       .locator("..");
-    await expect(statsCard.getByText(/\d+/)).toBeVisible();
+    await expect(statsCard.getByText(/\d+/).first()).toBeVisible();
   });
 
   test("marketplace search and filters work", async ({ page }) => {
-    // 1. Create 3 traders with distinct names for search testing
-    const trader1Data = await createTestTrader({ page });
-    // Update trader1 name to something searchable
+    // 1. Create 3 traders directly in DB with UNIQUE names (using timestamp to avoid duplicates from previous test runs)
+    const timestamp = Date.now();
+    const trader1Data = await createTestTraderDirectly();
     await prisma.traderProfile.update({
       where: { id: trader1Data.traderProfile.id },
       data: {
-        displayName: "Crypto Whale Trader",
+        displayName: `Crypto Whale Trader ${timestamp}`,
         verified: true,
         statsJson: { winrate: 75.5, payoff: 2.5, totalTrades: 100 },
       },
     });
 
-    await signOutAccount({ page });
-
-    const trader2Data = await createTestTrader({ page });
+    const trader2Data = await createTestTraderDirectly();
     await prisma.traderProfile.update({
       where: { id: trader2Data.traderProfile.id },
       data: {
-        displayName: "Bitcoin Expert",
+        displayName: `Bitcoin Expert ${timestamp}`,
         verified: false,
         statsJson: { winrate: 60.0, payoff: 1.8, totalTrades: 50 },
       },
     });
 
-    await signOutAccount({ page });
-
-    const trader3Data = await createTestTrader({ page });
+    const trader3Data = await createTestTraderDirectly();
     await prisma.traderProfile.update({
       where: { id: trader3Data.traderProfile.id },
       data: {
-        displayName: "Altcoin Master",
+        displayName: `Altcoin Master ${timestamp}`,
         verified: true,
         statsJson: { winrate: 80.0, payoff: 3.0, totalTrades: 150 },
       },
     });
-
-    await signOutAccount({ page });
 
     // 2. Create a follower account
     await createTestAccount({
@@ -145,49 +141,69 @@ test.describe("Traders Marketplace", () => {
     await page.waitForLoadState("networkidle");
 
     // 4. Verify all 3 traders are visible initially
-    await expect(page.getByText("Crypto Whale Trader")).toBeVisible();
-    await expect(page.getByText("Bitcoin Expert")).toBeVisible();
-    await expect(page.getByText("Altcoin Master")).toBeVisible();
+    await expect(
+      page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText(`Bitcoin Expert ${timestamp}`).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText(`Altcoin Master ${timestamp}`).first(),
+    ).toBeVisible();
 
     // 5. Test search functionality - search for "Whale"
     const searchInput = page.getByPlaceholder(/search traders/i);
     await expect(searchInput).toBeVisible();
     await searchInput.fill("Whale");
 
-    // Wait for search to apply (debounced or triggered on submit)
-    await page.waitForTimeout(1500);
+    // Wait for page to reload with new search params (nuqs shallow:false reloads page)
+    await page.waitForLoadState("networkidle");
 
-    // Verify only Crypto Whale Trader is visible
-    await expect(page.getByText("Crypto Whale Trader")).toBeVisible();
-    await expect(page.getByText("Bitcoin Expert")).not.toBeVisible();
-    await expect(page.getByText("Altcoin Master")).not.toBeVisible();
+    // Verify only Crypto Whale Trader is visible (search filters out others)
+    await expect(
+      page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+    ).toBeVisible();
+    // Bitcoin Expert and Altcoin Master should NOT be visible
+    await expect(
+      page.getByText(`Bitcoin Expert ${timestamp}`),
+    ).not.toBeVisible();
+    await expect(
+      page.getByText(`Altcoin Master ${timestamp}`),
+    ).not.toBeVisible();
 
     // 6. Clear search and test "Verified Only" filter
     await searchInput.clear();
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState("networkidle");
 
     // Apply verified filter
     const filterSelect = page.getByLabel(/filter/i);
     if ((await filterSelect.count()) > 0) {
       await filterSelect.click();
       await page.getByRole("option", { name: /verified/i }).click();
-      await page.waitForTimeout(1000);
+      await page.waitForLoadState("networkidle");
 
       // Should show only verified traders (Crypto Whale Trader, Altcoin Master)
-      await expect(page.getByText("Crypto Whale Trader")).toBeVisible();
-      await expect(page.getByText("Altcoin Master")).toBeVisible();
+      await expect(
+        page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+      ).toBeVisible();
+      await expect(
+        page.getByText(`Altcoin Master ${timestamp}`).first(),
+      ).toBeVisible();
       // Bitcoin Expert is NOT verified, should not be visible
-      await expect(page.getByText("Bitcoin Expert")).not.toBeVisible();
+      await expect(
+        page.getByText(`Bitcoin Expert ${timestamp}`),
+      ).not.toBeVisible();
     }
 
     // 7. Test combined search + filter
     await searchInput.fill("Trader");
-    await page.waitForTimeout(1500);
+    await page.waitForLoadState("networkidle");
 
     // Should show only "Crypto Whale Trader" (verified + contains "Trader")
-    await expect(page.getByText("Crypto Whale Trader")).toBeVisible();
+    await expect(
+      page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+    ).toBeVisible();
     // Altcoin Master doesn't contain "Trader", should not be visible
-    const altcoinCount = await page.getByText("Altcoin Master").count();
-    expect(altcoinCount).toBe(0);
+    expect(await page.getByText(`Altcoin Master ${timestamp}`).count()).toBe(0);
   });
 });
