@@ -3,8 +3,34 @@ import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
 import { createTestAccount } from "./utils/auth-test";
 
+/**
+ * ⏭️ SKIPPED - UI removed in 4-space architecture refactoring
+ *
+ * Reason: Organization slug editing UI no longer exists
+ *
+ * Same reasoning as org-details-update.spec.ts:
+ * - MyCryptoPilot uses 1 org = 1 user (B2C model)
+ * - Organization slug is auto-generated (org-{random})
+ * - No need for users to customize organization slug
+ * - Organization exists only for Better Auth compatibility
+ *
+ * Previous behavior:
+ * - /orgs/[orgSlug]/settings had slug edit form
+ * - Users could update org slug with validation
+ *
+ * Current behavior:
+ * - /orgs/[orgSlug]/settings redirects to account settings
+ * - No organization management UI
+ *
+ * This test is from NOW.TS template and not relevant for MyCryptoPilot.
+ *
+ * Priority: N/A (feature intentionally removed)
+ */
 test("update organization slug", async ({ page }) => {
-  test.skip(true, "L'édition de slug d'organisation est temporairement indisponible dans la nouvelle navigation.");
+  test.skip(
+    true,
+    "L'édition de slug d'organisation est temporairement indisponible dans la nouvelle navigation.",
+  );
   // 1. Create a test account (owner)
   await createTestAccount({ page, callbackURL: "/orgs" });
 
