@@ -26,6 +26,10 @@ export const metadata: Metadata = {
     "Discover and follow verified crypto traders. Access professional trading signals.",
 };
 
+// Force dynamic rendering on every request (no caching)
+// This ensures search/filter params are always fresh
+export const dynamic = "force-dynamic";
+
 type TradersMarketplacePageProps = {
   searchParams: Promise<{
     search?: string;
@@ -199,7 +203,10 @@ export default async function TradersMarketplacePage({
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            data-testid="traders-grid"
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
             {traders.map((trader) => {
               const stats =
                 (trader.statsJson as Record<

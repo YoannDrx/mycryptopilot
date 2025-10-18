@@ -97,7 +97,108 @@
 - ⏳ Journal de trading
 - ⏳ Console de risque
 - ⏳ Alertes custom
-- ⏳ Tests E2E complets
+
+---
+
+## 🧪 Tests E2E Coverage (Issue #39)
+
+**Dernière mise à jour**: 17 octobre 2025 - Inventaire complet tests manquants
+
+### État Actuel
+
+**Tests existants**: **35 tests actifs** + **1 skipped** = **36 total**
+**Coverage estimée**: **~65-70%**
+**Cible**: **100% coverage** (61 tests total)
+**Tests à ajouter**: **26 tests** (30-40h effort)
+
+### Tests Existants par Module
+
+| Module | Tests | Fichier | Status |
+|--------|-------|---------|--------|
+| Auth & Account | ~8 tests | `signup.spec.ts`, `account.spec.ts`, `password-reset.spec.ts` | ✅ Complet |
+| Crypto Checkout | 8 tests | `crypto-checkout.spec.ts` | ⚠️ Partiel (activation manquante) |
+| Follow/Unfollow | 3 tests | `follow-unfollow.spec.ts` | ✅ Complet |
+| Signal Creation | 4 tests | `signal-creation.spec.ts` | ✅ Complet |
+| Signals Feed Filters | 5 tests (1 skipped) | `signals-feed-filters.spec.ts` | ⚠️ Presque complet |
+| Trader Invitation | 3 tests | `trader-invitation.spec.ts` | ✅ Complet |
+| Trader Referral | 4 tests | `trader-referral.spec.ts` | ✅ Complet |
+
+### Tests Manquants pour 100% Coverage
+
+#### 🔴 P0 - CRITIQUE (MVP Beta) - 12 tests - 16-22h
+
+**1. Subscription Activation** (`e2e/subscription-activation.spec.ts`) - 4 tests - 6-8h
+- Complete payment flow activates subscription
+- Pro-rata payment grants correct days
+- Payment activates Discord role automatically
+- Payment triggers confirmation email
+
+**2. Dashboard Interactions** (`e2e/dashboard.spec.ts`) - 4 tests - 4-6h
+- User dashboard displays correct stats
+- User dashboard shows signals from followed traders
+- Free user sees blurred signals after limit
+- Dashboard tabs navigation works
+
+**3. Trader Dashboard** (`e2e/trader-dashboard.spec.ts`) - 2 tests - 3-4h
+- Trader dashboard shows published signals
+- Trader dashboard shows followers list
+
+**4. Marketplace** (`e2e/marketplace.spec.ts`) - 2 tests - 3-4h
+- Marketplace displays all traders with stats
+- Marketplace search and filters work
+
+#### 🟡 P1 - IMPORTANT (Post-Beta) - 8 tests - 8-11h
+
+**5. Trader Profile** (`e2e/trader-profile.spec.ts`) - 3 tests - 3-4h
+- Trader public profile displays all info
+- Non-logged user sees sign-in prompt on follow
+- Trader profile shows only active signals
+
+**6. Signal Expiration** (`e2e/signal-expiration.spec.ts`) - 2 tests - 2-3h
+- Signal shows TTL countdown
+- Expired signal shows EXPIRED status
+
+**7. Plan Limits** (`e2e/plan-limits.spec.ts`) - 3 tests - 3-4h
+- Free user limited to 5 signals per day
+- Pro user can follow up to 5 traders
+- Ultra user has unlimited follows and signals
+
+#### 🟢 P2 - NICE TO HAVE (Polish) - 6 tests - 5-8h
+
+**8. Pricing Page** (`e2e/pricing.spec.ts`) - 2 tests - 1-2h
+- Pricing page displays all plans correctly
+- Pricing page subscribe button redirects to checkout
+
+**9. Settings** (`e2e/settings.spec.ts`) - 2 tests - 2-3h
+- User can edit profile settings
+- User can view billing settings
+
+**10. Navigation** (`e2e/navigation.spec.ts`) - 2 tests - 2-3h
+- Navigation sidebars switch correctly
+- Global search works across all spaces
+
+### Roadmap Tests E2E
+
+**Phase 1 - MVP Beta** (Issue #39 - Sprint 1):
+- ✅ 12 tests P0 (16-22h) → **Coverage ~85%** → **READY FOR BETA LAUNCH**
+
+**Phase 2 - Post-Beta** (Sprint 2):
+- ✅ 8 tests P1 (8-11h) → **Coverage ~95%** → **Production Ready**
+
+**Phase 3 - Polish** (Sprint 3):
+- ✅ 6 tests P2 (5-8h) → **Coverage 100%** 🎉
+
+### Issues & Blocages
+
+**Test Skipped à Fix**:
+- `signals-feed-filters.spec.ts:7` - Asset filter button ne fonctionne pas (app bug)
+- **Action**: Fixer bug asset filter AVANT d'unskip le test
+
+**Helpers à Créer**:
+- `e2e/utils/payment-test.ts` - Mock crypto payment helper
+- `e2e/utils/plan-test.ts` - Upgrade user to plan helper
+
+**Lien Issue GitHub**: [#39 - Tests E2E Coverage 80%+](https://github.com/YoannDrx/mycryptopilot/issues/39)
 
 ---
 

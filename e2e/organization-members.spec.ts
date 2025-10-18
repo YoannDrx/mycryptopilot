@@ -8,7 +8,32 @@ import {
   signOutAccount,
 } from "./utils/auth-test";
 
-// MyCryptoPilot: Skipped - 1 organization = 1 user (no invitations/members in B2C model)
+/**
+ * ⏭️ SKIPPED - Not applicable to MyCryptoPilot B2C model
+ *
+ * Reason: No organization invitations/members in B2C architecture
+ *
+ * Background:
+ * - NOW.TS supports multi-tenant B2B (users can invite others to organizations)
+ * - MyCryptoPilot is B2C with 1 org = 1 user
+ * - No concept of organization members or invitations
+ * - Organization exists only for Better Auth compatibility
+ *
+ * Features not implemented:
+ * - Organization invitations (email-based)
+ * - Member management UI
+ * - Role-based access control within organizations
+ * - Multiple users per organization
+ *
+ * MyCryptoPilot collaboration model:
+ * - Traders publish signals publicly
+ * - Users follow traders (not join their organizations)
+ * - Follow/unfollow is the collaboration mechanism
+ *
+ * This test is from NOW.TS template and not relevant for MyCryptoPilot.
+ *
+ * Priority: N/A (feature intentionally not implemented)
+ */
 test.skip("invite and login as invited user", async ({ page }) => {
   // 1. Create a test account (owner)
   const ownerData = await createTestAccount({
