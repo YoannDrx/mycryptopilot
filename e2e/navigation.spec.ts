@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { createTestAccount, signOutAccount } from "./utils/auth-test";
-import { createTestTrader } from "./utils/trader-test";
+import { createTestAccount } from "./utils/auth-test";
 
 test.describe("Navigation System", () => {
   test("navigation sidebars switch correctly between spaces", async ({
@@ -79,12 +78,7 @@ test.describe("Navigation System", () => {
   });
 
   test("global search works across all spaces", async ({ page }) => {
-    // 1. Create a trader with a signal for search testing
-    const { traderProfile } = await createTestTrader({ page });
-
-    // Sign out and create a regular user
-    await signOutAccount({ page });
-
+    // 1. Create a user account
     await createTestAccount({
       page,
       callbackURL: "/orgs",
@@ -100,94 +94,60 @@ test.describe("Navigation System", () => {
     await page.goto(`/orgs/${orgSlug}/dashboard`);
     await page.waitForLoadState("networkidle");
 
-    // 3. Try to access global search (Cmd+K / Ctrl+K or search button)
-    // Check if there's a search input or button in the sidebar
-    const searchInput = page.getByPlaceholder(/search/i).first();
-    const searchButton = page.getByRole("button", { name: /search/i });
+    // 3. Test global search command dialog (Cmd+K)
+    // Click on the readonly search input to open command dialog
+    const searchInput = page.getByPlaceholder("Search...").first();
+    await expect(searchInput).toBeVisible();
+    await searchInput.click();
 
-    if ((await searchInput.count()) > 0) {
-      // If search input exists, test it
-      await searchInput.click();
-      await searchInput.fill(traderProfile.displayName);
+    // Wait for command dialog to open
+    await page.waitForTimeout(500);
 
-      // Wait for search results
-      await page.waitForTimeout(1000);
+    // Verify command dialog is visible
+    const dialogInput = page.getByPlaceholder(/type to search/i);
+    await expect(dialogInput).toBeVisible();
 
-      // Should find the trader in results
-      const hasTraderInResults =
-        (await page.getByText(traderProfile.displayName).count()) > 0;
+    // Search for a navigation link (GlobalSearchCommand only searches nav links, not traders)
+    await dialogInput.fill("Traders");
 
-      expect(hasTraderInResults).toBe(true);
+    // Wait for search results
+    await page.waitForTimeout(500);
 
-      // Clear search
-      await searchInput.clear();
-    } else if ((await searchButton.count()) > 0) {
-      // If search button exists, click it to open search dialog/panel
-      await searchButton.click();
-      await page.waitForTimeout(500);
+    // Should find "Traders" link in results
+    const tradersLink = page.getByRole("option", { name: /traders/i });
+    await expect(tradersLink).toBeVisible();
 
-      // Try to find search input in opened dialog
-      const dialogSearchInput = page.getByPlaceholder(/search/i);
-      if ((await dialogSearchInput.count()) > 0) {
-        await dialogSearchInput.fill(traderProfile.displayName);
-        await page.waitForTimeout(1000);
+    // Click on the result to navigate
+    await tradersLink.click();
 
-        const hasTraderInResults =
-          (await page.getByText(traderProfile.displayName).count()) > 0;
+    // Verify navigation happened
+    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/traders`));
 
-        expect(hasTraderInResults).toBe(true);
-      }
-    } else {
-      // Alternative: Test keyboard shortcut (Cmd+K or Ctrl+K)
-      // This opens the global search command palette
-      const isMac = process.platform === "darwin";
-      if (isMac) {
-        await page.keyboard.press("Meta+k");
-      } else {
-        await page.keyboard.press("Control+k");
-      }
-
-      await page.waitForTimeout(500);
-
-      // Check if search dialog opened
-      const searchDialog = page.getByRole("dialog");
-      if ((await searchDialog.count()) > 0) {
-        const dialogSearchInput = searchDialog.getByPlaceholder(/search/i);
-        await dialogSearchInput.fill(traderProfile.displayName);
-        await page.waitForTimeout(1000);
-
-        const hasTraderInResults =
-          (await searchDialog.getByText(traderProfile.displayName).count()) > 0;
-
-        expect(hasTraderInResults).toBe(true);
-      } else {
-        // If no global search UI exists yet, just verify navigation works
-        // Navigate to traders page and search manually
-        await page.goto(`/orgs/${orgSlug}/traders`);
-        await page.waitForLoadState("networkidle");
-
-        const marketplaceSearchInput = page.getByPlaceholder(/search/i);
-        if ((await marketplaceSearchInput.count()) > 0) {
-          await marketplaceSearchInput.fill(traderProfile.displayName);
-          await page.waitForTimeout(1500);
-
-          await expect(page.getByText(traderProfile.displayName)).toBeVisible();
-        }
-      }
-    }
-
-    // 4. Verify navigation still works after search
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    // 4. Try global search from another space (Account)
+    await page.goto(`/orgs/${orgSlug}/settings`);
     await page.waitForLoadState("networkidle");
 
-    await expect(
-      page.getByRole("link", { name: /signals/i }).first(),
-    ).toBeVisible();
+    // Open search again
+    const searchInput2 = page.getByPlaceholder("Search...").first();
+    await searchInput2.click();
+    await page.waitForTimeout(500);
 
-    // 5. Navigate to Account space and verify sidebar changed
-    await page.goto(`/orgs/${orgSlug}/account`);
-    await page.waitForLoadState("networkidle");
+    // Verify command dialog is visible again
+    const dialogInput2 = page.getByPlaceholder(/type to search/i);
+    await expect(dialogInput2).toBeVisible();
 
-    await expect(page.getByLabel(/name/i)).toBeVisible();
+    // Search for another navigation link
+    await dialogInput2.fill("Dashboard");
+    await page.waitForTimeout(500);
+
+    // Should find "Dashboard" link in results
+    const dashboardLink = page.getByRole("option", { name: /dashboard/i });
+    await expect(dashboardLink).toBeVisible();
+
+    // Click on the result to navigate
+    await dashboardLink.click();
+
+    // Verify navigation happened
+    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard`));
   });
 });
