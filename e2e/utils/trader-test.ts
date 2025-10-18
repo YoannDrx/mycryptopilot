@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker";
 import type { Page } from "@playwright/test";
 import { createTestAccount } from "./auth-test";
+import { retry } from "./retry";
 
 /**
  * Helper function to create a test trader with a complete profile
@@ -20,10 +21,18 @@ export async function createTestTrader(options: {
   // Wait for URL to settle
   await options.page.waitForURL(/\/orgs\/.*/);
 
-  // Get user from database
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { email: userData.email },
-  });
+  // Get user from database (with retry to handle DB transaction timing)
+  const user = await retry(
+    async () =>
+      prisma.user.findUniqueOrThrow({
+        where: { email: userData.email },
+      }),
+    {
+      maxAttempts: 5,
+      delayMs: 1000,
+      backoff: true,
+    },
+  );
 
   // Create trader profile directly in database
   const traderProfile = await prisma.traderProfile.create({
