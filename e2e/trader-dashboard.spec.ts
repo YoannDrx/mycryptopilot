@@ -60,13 +60,9 @@ test.describe("Trader Dashboard", () => {
     await expect(page.getByText("MATIC-USDT").first()).toBeVisible();
 
     // 6. Verify Active Signals stat card shows 5
-    const activeSignalsCard = page
-      .locator('[role="main"]')
-      .getByText("Active Signals")
-      .locator("..")
-      .locator("..")
-      .locator("..");
-    await expect(activeSignalsCard.getByText("5")).toBeVisible();
+    await expect(
+      page.getByText("Active Signals").locator("..").locator("..").first(),
+    ).toContainText("5");
   });
 
   test("trader dashboard shows followers count", async ({ page }) => {
@@ -147,16 +143,13 @@ test.describe("Trader Dashboard", () => {
 
     // 5. Verify Followers stat card shows 3
     const followersCard = page
-      .locator('[role="main"]')
       .getByText("Followers")
       .locator("..")
       .locator("..")
-      .locator("..");
-    await expect(followersCard.getByText("3")).toBeVisible();
+      .first();
+    await expect(followersCard).toContainText("3");
 
     // 6. Verify text shows "Growing your audience" instead of "No followers yet"
-    await expect(
-      followersCard.getByText(/growing your audience/i),
-    ).toBeVisible();
+    await expect(followersCard).toContainText(/growing your audience/i);
   });
 });

@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { expect, test } from "@playwright/test";
 import { createTestAccount } from "./utils/auth-test";
-import { createTestTrader, createTestSignal } from "./utils/trader-test";
+import {
+  createTestTraderDirectly,
+  createTestSignal,
+} from "./utils/trader-test";
 
 test.describe("User Dashboard", () => {
   test("user dashboard displays correct stats", async ({ page }) => {
@@ -22,14 +25,9 @@ test.describe("User Dashboard", () => {
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
     expect(orgSlug).toBeTruthy();
 
-    // 2. Create 2 traders and make user follow them
-    const { user: trader1 } = await createTestTrader({
-      page,
-    });
-
-    const { user: trader2 } = await createTestTrader({
-      page,
-    });
+    // 2. Create 2 traders directly in DB (faster, no UI interaction)
+    const { user: trader1 } = await createTestTraderDirectly();
+    const { user: trader2 } = await createTestTraderDirectly();
 
     // Create follow relationships
     await prisma.follow.createMany({
@@ -56,37 +54,25 @@ test.describe("User Dashboard", () => {
     await createTestSignal({ traderId: trader2.id, symbol: "MATIC-USDT" });
     await createTestSignal({ traderId: trader2.id, symbol: "DOT-USDT" });
 
-    // 4. Navigate to dashboard
+    // 4. Navigate to dashboard (already logged in as follower user)
     await page.goto(`/orgs/${orgSlug}/dashboard`);
     await page.waitForLoadState("networkidle");
 
     // 5. Verify stats cards display correct information
-    // Active Signals card
-    const activeSignalsCard = page
-      .locator('[role="main"]')
-      .getByText("Active Signals")
-      .locator("..")
-      .locator("..")
-      .locator("..");
-    await expect(activeSignalsCard.getByText("6")).toBeVisible();
+    // Verify Active Signals shows 6
+    await expect(
+      page.getByText("Active Signals").locator("..").locator(".."),
+    ).toContainText("6");
 
-    // Traders Followed card
-    const tradersFollowedCard = page
-      .locator('[role="main"]')
-      .getByText("Traders Followed")
-      .locator("..")
-      .locator("..")
-      .locator("..");
-    await expect(tradersFollowedCard.getByText("2")).toBeVisible();
+    // Verify Traders Followed shows 2
+    await expect(
+      page.getByText("Traders Followed").locator("..").locator(".."),
+    ).toContainText("2");
 
-    // Your Plan card (should show Free for new user)
-    const yourPlanCard = page
-      .locator('[role="main"]')
-      .getByText("Your Plan")
-      .locator("..")
-      .locator("..")
-      .locator("..");
-    await expect(yourPlanCard.getByText(/free/i)).toBeVisible();
+    // Verify Your Plan shows Free
+    await expect(
+      page.getByText("Your Plan").locator("..").locator(".."),
+    ).toContainText(/free/i);
   });
 
   test("user dashboard shows signals from followed traders", async ({
@@ -107,14 +93,9 @@ test.describe("User Dashboard", () => {
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
-    // 2. Create 2 traders
-    const { user: trader1 } = await createTestTrader({
-      page,
-    });
-
-    const { user: trader2 } = await createTestTrader({
-      page,
-    });
+    // 2. Create 2 traders directly in DB (faster, no UI interaction)
+    const { user: trader1 } = await createTestTraderDirectly();
+    const { user: trader2 } = await createTestTraderDirectly();
 
     // Follow both traders
     await prisma.follow.createMany({
@@ -165,7 +146,7 @@ test.describe("User Dashboard", () => {
       rationale: "Trader2 Signal 3",
     });
 
-    // 4. Navigate to dashboard
+    // 4. Navigate to dashboard (already logged in as follower user)
     await page.goto(`/orgs/${orgSlug}/dashboard`);
     await page.waitForLoadState("networkidle");
 
@@ -217,10 +198,8 @@ test.describe("User Dashboard", () => {
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
-    // Create a trader with 10 signals
-    const { user: trader } = await createTestTrader({
-      page,
-    });
+    // Create a trader directly in DB with 10 signals
+    const { user: trader } = await createTestTraderDirectly();
 
     await prisma.follow.create({
       data: {
