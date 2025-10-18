@@ -319,7 +319,8 @@ mycryptopilot/
 │       ├── CRYPTO-PAYMENTS.md       # HD wallet + RPC + checkout
 │       ├── SUBSCRIPTIONS.md         # Subscription management
 │       ├── TRADING-SYSTEM.md        # Traders + Signals + Follow
-│       └── DEVELOPMENT.md           # État actuel + roadmap
+│       ├── DEVELOPMENT.md           # État actuel + roadmap
+│       └── CONTEXT7-GUIDE.md        # Context7 MCP usage guide
 ├── emails/                          # React Email templates
 ├── e2e/                            # Playwright tests
 └── __tests__/                      # Unit tests (Vitest)
@@ -464,6 +465,17 @@ Les détails techniques sont organisés en modules spécialisés:
 - Roadmap MVP
 - Commandes utiles
 
+#### 6. [`.claude/docs/CONTEXT7-GUIDE.md`](.claude/docs/CONTEXT7-GUIDE.md)
+
+**Context7 MCP - Documentation à jour pour libraries**
+
+- Configuration Context7 (déjà installé)
+- Comment utiliser ("use context7 for [library]")
+- Les 2 outils MCP (resolve-library-id, get-library-docs)
+- Bibliothèques clés de MyCryptoPilot
+- Exemples d'usage pratiques
+- Performance tips & troubleshooting
+
 ### 📦 Guides de Déploiement
 
 #### [`RAILWAY_SETUP.md`](../RAILWAY_SETUP.md)
@@ -493,6 +505,7 @@ Les détails techniques sont organisés en modules spécialisés:
 **Gérer abonnements?** → Lire `SUBSCRIPTIONS.md`
 **Ajouter features trading?** → Lire `TRADING-SYSTEM.md`
 **Voir état du projet?** → Lire `DEVELOPMENT.md`
+**Utiliser Context7 MCP?** → Lire `CONTEXT7-GUIDE.md`
 **Déployer sur Railway?** → Lire `RAILWAY_SETUP.md`
 **Configurer env vars?** → Lire `ENV_CHECKLIST.md`
 

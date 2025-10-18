@@ -1,0 +1,703 @@
+[2m[WebServer] [22m
+[2m[WebServer] [22m [33m[1m⚠[22m[39m The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+Running 65 tests using 3 workers
+
+  -   1 [chromium] › e2e/create-organization.test.ts:8:8 › Create Organization › should create a new organization after account creation
+[37m2025-10-18 18:34:05.346[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/e2e/utils/auth-test.ts:69[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating admin user {
+  id: [32m'moTyWQ3fDUTcJPTbADo7ndZGatHzLFlJ'[39m,
+  name: [32m'Grant Muller-Gorczany'[39m,
+  email: [32m'playwright-test-henry_frami@yahoo.com'[39m,
+  emailVerified: [33mfalse[39m,
+  image: [32m''[39m,
+  createdAt: [35m2025-10-18T18:34:00.981Z[39m,
+  updatedAt: [35m2025-10-18T18:34:00.981Z[39m,
+  resendContactId: [1mnull[22m,
+  role: [32m'user'[39m,
+  banned: [33mfalse[39m,
+  banReason: [1mnull[22m,
+  banExpires: [1mnull[22m,
+  userRole: [32m'USER'[39m,
+  planName: [32m'free'[39m,
+  planExpiresAt: [1mnull[22m,
+  dailySignalsUsed: [33m0[39m,
+  lastSignalReset: [35m2025-10-18T18:34:00.983Z[39m,
+  discordId: [1mnull[22m,
+  discordIntegrationEnabled: [33mtrue[39m,
+  isFirstConnection: [33mfalse[39m
+}
+  ✓   4 [chromium] › e2e/account.spec.ts:24:7 › account › delete account flow (9.8s)
+  ✓   3 [chromium] › e2e/crypto-checkout.spec.ts:6:7 › Crypto Checkout Flow › user can view checkout page and get payment address (12.2s)
+  ✓   2 [chromium] › e2e/admin.spec.ts:5:7 › admin › verify admin navigation and pages (14.0s)
+  ✓   5 [chromium] › e2e/account.spec.ts:91:7 › account › update name flow (6.2s)
+[37m2025-10-18 18:34:16.080[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/e2e/utils/auth-test.ts:69[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating admin user {
+  id: [32m'islA8BzBaRWkfwhn93mbocbat8YL6e19'[39m,
+  name: [32m'Lamar Altenwerth'[39m,
+  email: [32m'playwright-test-arturo49@yahoo.com'[39m,
+  emailVerified: [33mfalse[39m,
+  image: [32m''[39m,
+  createdAt: [35m2025-10-18T18:34:14.905Z[39m,
+  updatedAt: [35m2025-10-18T18:34:14.905Z[39m,
+  resendContactId: [1mnull[22m,
+  role: [32m'user'[39m,
+  banned: [33mfalse[39m,
+  banReason: [1mnull[22m,
+  banExpires: [1mnull[22m,
+  userRole: [32m'USER'[39m,
+  planName: [32m'free'[39m,
+  planExpiresAt: [1mnull[22m,
+  dailySignalsUsed: [33m0[39m,
+  lastSignalReset: [35m2025-10-18T18:34:14.906Z[39m,
+  discordId: [1mnull[22m,
+  discordIntegrationEnabled: [33mtrue[39m,
+  isFirstConnection: [33mfalse[39m
+}
+  ✓   6 [chromium] › e2e/crypto-checkout.spec.ts:85:7 › Crypto Checkout Flow › user can switch between payment networks (6.2s)
+  ✓   7 [chromium] › e2e/admin.spec.ts:50:7 › admin › verify traders page displays correctly (11.9s)
+[37m2025-10-18 18:34:28.244[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/e2e/utils/auth-test.ts:69[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating admin user {
+  id: [32m'Q0iwSgPeUIugUXhDUoDZ1SuY3de0VEB9'[39m,
+  name: [32m'Manuel Rutherford'[39m,
+  email: [32m'playwright-test-shanel_hintz45@yahoo.com'[39m,
+  emailVerified: [33mfalse[39m,
+  image: [32m''[39m,
+  createdAt: [35m2025-10-18T18:34:26.108Z[39m,
+  updatedAt: [35m2025-10-18T18:34:26.108Z[39m,
+  resendContactId: [1mnull[22m,
+  role: [32m'user'[39m,
+  banned: [33mfalse[39m,
+  banReason: [1mnull[22m,
+  banExpires: [1mnull[22m,
+  userRole: [32m'USER'[39m,
+  planName: [32m'free'[39m,
+  planExpiresAt: [1mnull[22m,
+  dailySignalsUsed: [33m0[39m,
+  lastSignalReset: [35m2025-10-18T18:34:26.109Z[39m,
+  discordId: [1mnull[22m,
+  discordIntegrationEnabled: [33mtrue[39m,
+  isFirstConnection: [33mfalse[39m
+}
+  ✓   8 [chromium] › e2e/account.spec.ts:114:7 › account › change password flow (14.9s)
+  ✓   9 [chromium] › e2e/crypto-checkout.spec.ts:122:7 › Crypto Checkout Flow › checkout page shows plan features correctly (16.5s)
+  ✓  10 [chromium] › e2e/admin.spec.ts:73:7 › admin › verify signals page displays correctly (9.9s)
+  ✓  11 [chromium] › e2e/dashboard.spec.ts:10:7 › User Dashboard › user dashboard displays correct stats (5.5s)
+[37m2025-10-18 18:34:37.303[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/e2e/utils/auth-test.ts:69[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating admin user {
+  id: [32m'fQse9nBYWTRbgwqiqIQCAvGiLWpdY9Ap'[39m,
+  name: [32m'Velma Sanford-Schamberger II'[39m,
+  email: [32m'playwright-test-yvette.ohara@hotmail.com'[39m,
+  emailVerified: [33mfalse[39m,
+  image: [32m''[39m,
+  createdAt: [35m2025-10-18T18:34:36.314Z[39m,
+  updatedAt: [35m2025-10-18T18:34:36.314Z[39m,
+  resendContactId: [1mnull[22m,
+  role: [32m'user'[39m,
+  banned: [33mfalse[39m,
+  banReason: [1mnull[22m,
+  banExpires: [1mnull[22m,
+  userRole: [32m'USER'[39m,
+  planName: [32m'free'[39m,
+  planExpiresAt: [1mnull[22m,
+  dailySignalsUsed: [33m0[39m,
+  lastSignalReset: [35m2025-10-18T18:34:36.314Z[39m,
+  discordId: [1mnull[22m,
+  discordIntegrationEnabled: [33mtrue[39m,
+  isFirstConnection: [33mfalse[39m
+}
+  ✓  12 [chromium] › e2e/crypto-checkout.spec.ts:181:7 › Crypto Checkout Flow › user can navigate back to pricing from checkout (7.1s)
+  ✓  14 [chromium] › e2e/dashboard.spec.ts:78:7 › User Dashboard › user dashboard shows signals from followed traders (7.3s)
+  -  16 [chromium] › e2e/dashboard.spec.ts:165:8 › User Dashboard › free user sees blurred signals after limit
+  ✓  13 [chromium] › e2e/admin.spec.ts:88:7 › admin › verify payments page displays correctly (9.0s)
+  ✓  15 [chromium] › e2e/crypto-checkout.spec.ts:209:7 › Crypto Checkout Flow › free user sees upgrade prompt in dashboard (7.2s)
+  ✓  17 [chromium] › e2e/dashboard.spec.ts:234:7 › User Dashboard › dashboard tabs navigation works (7.2s)
+  ✘  18 [chromium] › e2e/follow-unfollow.spec.ts:7:7 › Follow/Unfollow Trader Flow › user can follow and unfollow a trader (12.7s)
+  ✓  20 [chromium] › e2e/marketplace.spec.ts:10:7 › Traders Marketplace › marketplace displays all traders with stats (7.0s)
+  ✓  19 [chromium] › e2e/crypto-checkout.spec.ts:249:7 › Crypto Checkout Flow › checkout validates payment amount for pro-rata (10.4s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  23 [chromium] › e2e/crypto-checkout.spec.ts:291:7 › Crypto Checkout Flow › checkout page shows payment confirmation instructions (6.9s)
+  ✓  22 [chromium] › e2e/follow-unfollow.spec.ts:7:7 › Follow/Unfollow Trader Flow › user can follow and unfollow a trader (retry #1) (17.6s)
+  ✓  24 [chromium] › e2e/navigation.spec.ts:6:7 › Navigation System › navigation sidebars switch correctly between spaces (10.7s)
+  ✘  21 [chromium] › e2e/marketplace.spec.ts:95:7 › Traders Marketplace › marketplace search and filters work (22.7s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  25 [chromium] › e2e/follow-unfollow.spec.ts:121:7 › Follow/Unfollow Trader Flow › free user cannot follow more than 1 trader (20.9s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✘  27 [chromium] › e2e/marketplace.spec.ts:95:7 › Traders Marketplace › marketplace search and filters work (retry #1) (23.2s)
+  -  29 [chromium] › e2e/org-details-update.spec.ts:6:5 › update organization name
+  -  30 [chromium] › e2e/org-slug-update.spec.ts:6:5 › update organization slug
+  -  31 [chromium] › e2e/organization-members.spec.ts:12:6 › invite and login as invited user
+  ✘  26 [chromium] › e2e/navigation.spec.ts:81:7 › Navigation System › global search works across all spaces (28.3s)
+  ✓  28 [chromium] › e2e/follow-unfollow.spec.ts:177:7 › Follow/Unfollow Trader Flow › following trader shows their signals in user dashboard (14.3s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  32 [chromium] › e2e/password-reset.spec.ts:11:5 › password reset flow (13.6s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  35 [chromium] › e2e/pricing.spec.ts:5:7 › Pricing Page › pricing page displays all plans correctly (6.0s)
+  ✓  34 [chromium] › e2e/plan-limits.spec.ts:8:7 › Plan Limits › free user limited to 5 signals per day (16.5s)
+[37m2025-10-18 18:36:09.231[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'XovBsZQBudIFALVrycH9aJgVFeTEd1t7'[39m,
+  plan: [32m'pro'[39m,
+  daysGranted: [33m30[39m,
+  source: [32m'admin'[39m
+}
+[37m2025-10-18 18:36:09.372[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:122[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating new subscription {
+  userId: [32m'XovBsZQBudIFALVrycH9aJgVFeTEd1t7'[39m,
+  newExpiry: [35m2025-11-17T19:36:09.372Z[39m
+}
+[37m2025-10-18 18:36:09.409[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'XovBsZQBudIFALVrycH9aJgVFeTEd1t7'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-17T19:36:09.372Z[39m
+}
+[37m2025-10-18 18:36:09.447[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'39XpctdtaPaKM4wECFh2bliPmFE00lFM'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:36:09.447[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:194[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User has no Discord ID, skipping role assignment {
+  userId: [32m'XovBsZQBudIFALVrycH9aJgVFeTEd1t7'[39m
+}
+[37m2025-10-18 18:36:09.468[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Pro subscription has been activated'[39m,
+  to: [32m'playwright-test-josue_yost@gmail.com'[39m
+}
+[37m2025-10-18 18:36:09.472[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'XovBsZQBudIFALVrycH9aJgVFeTEd1t7'[39m,
+  organizationId: [32m'39XpctdtaPaKM4wECFh2bliPmFE00lFM'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-17T19:36:09.372Z[39m
+}
+[37m2025-10-18 18:36:09.473[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-josue_yost@gmail.com'[39m,
+  plan: [32m'pro'[39m
+}
+  ✘  33 [chromium] › e2e/navigation.spec.ts:81:7 › Navigation System › global search works across all spaces (retry #1) (28.4s)
+  ✓  36 [chromium] › e2e/pricing.spec.ts:74:7 › Pricing Page › pricing page subscribe button redirects to checkout (11.6s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  38 [chromium] › e2e/settings.spec.ts:6:7 › Settings Page › user can edit profile settings (9.5s)
+  ✓  39 [chromium] › e2e/signal-creation.spec.ts:7:7 › Signal Creation Flow › trader can create a complete trading signal (12.2s)
+  ✓  41 [chromium] › e2e/signal-creation.spec.ts:132:7 › Signal Creation Flow › signal creation validates required fields (6.2s)
+  ✓  40 [chromium] › e2e/settings.spec.ts:68:7 › Settings Page › user can view billing settings (14.3s)
+  ✓  42 [chromium] › e2e/signal-creation.spec.ts:160:7 › Signal Creation Flow › trader can upload chart image to signal (10.4s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  43 [chromium] › e2e/signal-expiration.spec.ts:6:7 › Signal Expiration › signal shows TTL countdown (13.4s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  45 [chromium] › e2e/signal-expiration.spec.ts:61:7 › Signal Expiration › expired signal shows EXPIRED status (14.7s)
+  -  46 [chromium] › e2e/signals-feed-filters.spec.ts:7:8 › Signals Feed with Filters › user can filter signals by asset
+  ✓  37 [chromium] › e2e/plan-limits.spec.ts:84:7 › Plan Limits › pro user can follow up to 5 traders (59.2s)
+  ✓  44 [chromium] › e2e/signal-creation.spec.ts:232:7 › Signal Creation Flow › creating signal notifies followers via email (23.5s)
+[37m2025-10-18 18:37:09.256[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'yPX65qEGnhjnbSIByn369UtKlW8K3uMW'[39m,
+  plan: [32m'ultra'[39m,
+  daysGranted: [33m30[39m,
+  source: [32m'admin'[39m
+}
+[37m2025-10-18 18:37:09.325[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:122[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating new subscription {
+  userId: [32m'yPX65qEGnhjnbSIByn369UtKlW8K3uMW'[39m,
+  newExpiry: [35m2025-11-17T19:37:09.325Z[39m
+}
+[37m2025-10-18 18:37:09.344[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'yPX65qEGnhjnbSIByn369UtKlW8K3uMW'[39m,
+  plan: [32m'ultra'[39m,
+  periodEnd: [35m2025-11-17T19:37:09.325Z[39m
+}
+[37m2025-10-18 18:37:09.365[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'okbVrV4usBXYuch83eokifIhCCpEXnXl'[39m,
+  plan: [32m'ultra'[39m
+}
+[37m2025-10-18 18:37:09.365[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:194[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User has no Discord ID, skipping role assignment {
+  userId: [32m'yPX65qEGnhjnbSIByn369UtKlW8K3uMW'[39m
+}
+[37m2025-10-18 18:37:09.366[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Ultra subscription has been activated'[39m,
+  to: [32m'playwright-test-hattie20@gmail.com'[39m
+}
+[37m2025-10-18 18:37:09.366[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'yPX65qEGnhjnbSIByn369UtKlW8K3uMW'[39m,
+  organizationId: [32m'okbVrV4usBXYuch83eokifIhCCpEXnXl'[39m,
+  plan: [32m'ultra'[39m,
+  periodEnd: [35m2025-11-17T19:37:09.325Z[39m
+}
+[37m2025-10-18 18:37:09.366[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-hattie20@gmail.com'[39m,
+  plan: [32m'ultra'[39m
+}
+  ✓  49 [chromium] › e2e/signup.spec.ts:5:5 › sign up and verify account creation (5.2s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  47 [chromium] › e2e/signals-feed-filters.spec.ts:79:7 › Signals Feed with Filters › user can filter signals by bias (LONG/SHORT) (14.5s)
+[37m2025-10-18 18:37:22.585[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'qOjQjVZRSjeAMmdt0koaanoenS0TZ9pV'[39m,
+  plan: [32m'pro'[39m,
+  daysGranted: [33m30[39m,
+  source: [32m'crypto_payment'[39m
+}
+[37m2025-10-18 18:37:22.700[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:122[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating new subscription {
+  userId: [32m'qOjQjVZRSjeAMmdt0koaanoenS0TZ9pV'[39m,
+  newExpiry: [35m2025-11-17T19:37:22.700Z[39m
+}
+[37m2025-10-18 18:37:22.734[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'qOjQjVZRSjeAMmdt0koaanoenS0TZ9pV'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-17T19:37:22.700Z[39m
+}
+[37m2025-10-18 18:37:22.767[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'hHs3P4RRJPI5NXp1ABa1JBvfeH3MaSje'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:37:22.768[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:194[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User has no Discord ID, skipping role assignment {
+  userId: [32m'qOjQjVZRSjeAMmdt0koaanoenS0TZ9pV'[39m
+}
+[37m2025-10-18 18:37:22.781[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Pro subscription has been activated'[39m,
+  to: [32m'playwright-test-janet62@hotmail.com'[39m
+}
+[37m2025-10-18 18:37:22.783[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'qOjQjVZRSjeAMmdt0koaanoenS0TZ9pV'[39m,
+  organizationId: [32m'hHs3P4RRJPI5NXp1ABa1JBvfeH3MaSje'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-17T19:37:22.700Z[39m
+}
+[37m2025-10-18 18:37:22.784[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-janet62@hotmail.com'[39m,
+  plan: [32m'pro'[39m
+}
+  ✓  50 [chromium] › e2e/subscription-activation.spec.ts:7:7 › Subscription Activation Flow › complete payment flow activates subscription (12.1s)
+[37m2025-10-18 18:37:30.303[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  plan: [32m'pro'[39m,
+  daysGranted: [33m15[39m,
+  source: [32m'crypto_payment'[39m
+}
+[37m2025-10-18 18:37:30.366[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:122[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating new subscription {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  newExpiry: [35m2025-11-02T19:37:30.366Z[39m
+}
+[37m2025-10-18 18:37:30.382[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-02T19:37:30.366Z[39m
+}
+[37m2025-10-18 18:37:30.400[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'wkuQnoz40LzGtPruk6kWZ6tDAYG6jemV'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:37:30.401[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:194[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User has no Discord ID, skipping role assignment {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m
+}
+[37m2025-10-18 18:37:30.402[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Pro subscription has been activated'[39m,
+  to: [32m'playwright-test-georgianna93@hotmail.com'[39m
+}
+[37m2025-10-18 18:37:30.402[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  organizationId: [32m'wkuQnoz40LzGtPruk6kWZ6tDAYG6jemV'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-02T19:37:30.366Z[39m
+}
+[37m2025-10-18 18:37:30.403[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-georgianna93@hotmail.com'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:37:30.488[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  plan: [32m'pro'[39m,
+  daysGranted: [33m6[39m,
+  source: [32m'crypto_payment'[39m
+}
+[37m2025-10-18 18:37:30.552[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:113[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Extending existing subscription {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  currentExpiry: [35m2025-11-02T19:37:30.366Z[39m,
+  newExpiry: [35m2025-11-08T19:37:30.366Z[39m
+}
+[37m2025-10-18 18:37:30.572[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-08T19:37:30.366Z[39m
+}
+[37m2025-10-18 18:37:30.589[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'wkuQnoz40LzGtPruk6kWZ6tDAYG6jemV'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:37:30.589[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:194[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User has no Discord ID, skipping role assignment {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m
+}
+[37m2025-10-18 18:37:30.589[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Pro subscription has been extended'[39m,
+  to: [32m'playwright-test-georgianna93@hotmail.com'[39m
+}
+[37m2025-10-18 18:37:30.590[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'TKmFTpKEnNZTYKRCKj5gIv1cKSGleCtj'[39m,
+  organizationId: [32m'wkuQnoz40LzGtPruk6kWZ6tDAYG6jemV'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-08T19:37:30.366Z[39m
+}
+[37m2025-10-18 18:37:30.590[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-georgianna93@hotmail.com'[39m,
+  plan: [32m'pro'[39m
+}
+  ✓  52 [chromium] › e2e/subscription-activation.spec.ts:97:7 › Subscription Activation Flow › pro-rata payment grants correct days (6.1s)
+  ✓  51 [chromium] › e2e/signals-feed-filters.spec.ts:148:7 › Signals Feed with Filters › user can filter by risk level range (12.4s)
+[37m2025-10-18 18:37:35.290[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'WSQCIQV0WRouVXhinUh9DNGXkXRtr3Pw'[39m,
+  plan: [32m'pro'[39m,
+  daysGranted: [33m30[39m,
+  source: [32m'crypto_payment'[39m
+}
+[37m2025-10-18 18:37:35.354[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:122[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating new subscription {
+  userId: [32m'WSQCIQV0WRouVXhinUh9DNGXkXRtr3Pw'[39m,
+  newExpiry: [35m2025-11-17T19:37:35.354Z[39m
+}
+[37m2025-10-18 18:37:35.371[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'WSQCIQV0WRouVXhinUh9DNGXkXRtr3Pw'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-17T19:37:35.354Z[39m
+}
+[37m2025-10-18 18:37:35.388[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'A8sy9RpXVyT1tpl7EcDT2sciVU4U5kO6'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:37:35.388[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m/src/lib/discord/roles.ts:113[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Discord bot not initialized
+[37m2025-10-18 18:37:35.392[39m[0m[0m	[33m[1mWARN[22m[39m[0m[0m	[37m/src/lib/discord/dm-notifications.ts:20[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Discord bot not initialized, skipping DM notification
+[37m2025-10-18 18:37:35.395[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Pro subscription has been activated'[39m,
+  to: [32m'playwright-test-selena.walker2@gmail.com'[39m
+}
+[37m2025-10-18 18:37:35.396[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'WSQCIQV0WRouVXhinUh9DNGXkXRtr3Pw'[39m,
+  organizationId: [32m'A8sy9RpXVyT1tpl7EcDT2sciVU4U5kO6'[39m,
+  plan: [32m'pro'[39m,
+  periodEnd: [35m2025-11-17T19:37:35.354Z[39m
+}
+[37m2025-10-18 18:37:35.396[39m[0m[0m	[33m[1mWARN[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:171[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Failed to assign Discord role to user WSQCIQV0WRouVXhinUh9DNGXkXRtr3Pw
+[37m2025-10-18 18:37:35.396[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-selena.walker2@gmail.com'[39m,
+  plan: [32m'pro'[39m
+}
+[37m2025-10-18 18:37:35.397[39m[0m[0m	[33m[1mWARN[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:184[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Failed to send Discord DM to user WSQCIQV0WRouVXhinUh9DNGXkXRtr3Pw
+  ✓  53 [chromium] › e2e/subscription-activation.spec.ts:155:7 › Subscription Activation Flow › payment activates Discord role automatically (4.8s)
+[37m2025-10-18 18:37:39.893[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:58[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Activating subscription {
+  userId: [32m'R0kl8b0iupuzev7HnfVmofWQU61GfwsD'[39m,
+  plan: [32m'ultra'[39m,
+  daysGranted: [33m30[39m,
+  source: [32m'crypto_payment'[39m
+}
+[37m2025-10-18 18:37:39.963[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:122[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Creating new subscription {
+  userId: [32m'R0kl8b0iupuzev7HnfVmofWQU61GfwsD'[39m,
+  newExpiry: [35m2025-11-17T19:37:39.963Z[39m
+}
+[37m2025-10-18 18:37:39.982[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:139[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User plan updated {
+  userId: [32m'R0kl8b0iupuzev7HnfVmofWQU61GfwsD'[39m,
+  plan: [32m'ultra'[39m,
+  periodEnd: [35m2025-11-17T19:37:39.963Z[39m
+}
+[37m2025-10-18 18:37:39.999[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:160[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription upserted {
+  organizationId: [32m'DH4LHpwHQOCdz5TWPiXpyI6IT05CS4ys'[39m,
+  plan: [32m'ultra'[39m
+}
+[37m2025-10-18 18:37:39.999[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:194[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	User has no Discord ID, skipping role assignment {
+  userId: [32m'R0kl8b0iupuzev7HnfVmofWQU61GfwsD'[39m
+}
+[37m2025-10-18 18:37:39.999[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/mail/send-email.ts:71[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	[sendEmail] Sending email to playwright-test {
+  subject: [32m'Your Ultra subscription has been activated'[39m,
+  to: [32m'playwright-test-nathanial64@yahoo.com'[39m
+}
+[37m2025-10-18 18:37:40.000[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:212[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	✅ Subscription activated successfully {
+  userId: [32m'R0kl8b0iupuzev7HnfVmofWQU61GfwsD'[39m,
+  organizationId: [32m'DH4LHpwHQOCdz5TWPiXpyI6IT05CS4ys'[39m,
+  plan: [32m'ultra'[39m,
+  periodEnd: [35m2025-11-17T19:37:39.963Z[39m
+}
+[37m2025-10-18 18:37:40.000[39m[0m[0m	[34m[1mINFO[22m[39m[0m[0m	[37m/src/lib/subscription/subscription-manager.ts:278[39m[0m[0m[1m[37m	AppLogger[39m[22m[0m[0m	Subscription activation email sent {
+  email: [32m'playwright-test-nathanial64@yahoo.com'[39m,
+  plan: [32m'ultra'[39m
+}
+  ✓  55 [chromium] › e2e/subscription-activation.spec.ts:200:7 › Subscription Activation Flow › payment triggers confirmation email (4.6s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  54 [chromium] › e2e/signals-feed-filters.spec.ts:209:7 › Signals Feed with Filters › user can search signals by text (14.4s)
+  ✓  56 [chromium] › e2e/trader-dashboard.spec.ts:6:7 › Trader Dashboard › trader dashboard shows published signals (6.5s)
+  ✓  48 [chromium] › e2e/plan-limits.spec.ts:181:7 › Plan Limits › ultra user has unlimited follows and signals (42.9s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  58 [chromium] › e2e/trader-dashboard.spec.ts:68:7 › Trader Dashboard › trader dashboard shows followers count (7.2s)
+  ✓  57 [chromium] › e2e/signals-feed-filters.spec.ts:269:7 › Signals Feed with Filters › filters persist in URL when applied (13.3s)
+  ✓  60 [chromium] › e2e/trader-profile.spec.ts:6:7 › Trader Public Profile › trader public profile displays all info (11.7s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  59 [chromium] › e2e/trader-invitation.spec.ts:7:7 › Trader Invitation System › complete invitation flow - send, accept, delete (30.7s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  62 [chromium] › e2e/trader-profile.spec.ts:75:7 › Trader Public Profile › non-logged user sees sign-in prompt on follow (16.7s)
+  ✓  63 [chromium] › e2e/trader-invitation.spec.ts:187:7 › Trader Invitation System › cannot accept own invitation (4.6s)
+  ✓  61 [chromium] › e2e/trader-referral.spec.ts:7:7 › Trader Referral System › complete referral flow - share link and follow (25.5s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  65 [chromium] › e2e/trader-invitation.spec.ts:224:7 › Trader Invitation System › expired invitation shows correct status (6.9s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  64 [chromium] › e2e/trader-profile.spec.ts:146:7 › Trader Public Profile › trader profile shows only active signals (13.6s)
+  ✓  66 [chromium] › e2e/trader-referral.spec.ts:116:7 › Trader Referral System › already following trader redirects to dashboard (11.0s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  67 [chromium] › e2e/trader-referral.spec.ts:167:7 › Trader Referral System › non-authenticated user redirects to signin (5.3s)
+[2m[WebServer] [22m [31m[1m⨯[22m[39m [Error [APIError]: ] {
+[2m[WebServer] [22m  status: [32m'UNAUTHORIZED'[39m,
+[2m[WebServer] [22m  body: [90mundefined[39m,
+[2m[WebServer] [22m  headers: {},
+[2m[WebServer] [22m  statusCode: [33m401[39m,
+[2m[WebServer] [22m  digest: [32m'223797055'[39m
+[2m[WebServer] [22m}
+  ✓  68 [chromium] › e2e/trader-referral.spec.ts:190:7 › Trader Referral System › referral link shows trader stats correctly (9.3s)
+Cleanup [object Object] test users
+
+
+  1) [chromium] › e2e/marketplace.spec.ts:95:7 › Traders Marketplace › marketplace search and filters work 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mnot[2m.[22mtoBeVisible[2m()[22m failed
+
+    Locator:  getByText('Bitcoin Expert 1760812495801')
+    Expected: not visible
+    Received: visible
+    Timeout:  15000ms
+
+    Call log:
+    [2m  - Expect "not toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for getByText('Bitcoin Expert 1760812495801')[22m
+    [2m    19 × locator resolved to <div data-slot="card-title" class="font-semibold text-lg">Bitcoin Expert 1760812495801</div>[22m
+    [2m       - unexpected value "visible"[22m
+
+
+      167 |     await expect(
+      168 |       page.getByText(`Bitcoin Expert ${timestamp}`),
+    > 169 |     ).not.toBeVisible();
+          |           ^
+      170 |     await expect(
+      171 |       page.getByText(`Altcoin Master ${timestamp}`),
+      172 |     ).not.toBeVisible();
+        at /Users/yoannandrieux/Projets/mycryptopilot/e2e/marketplace.spec.ts:169:11
+
+    Error Context: test-results/marketplace-Traders-Market-97b43-ace-search-and-filters-work-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mnot[2m.[22mtoBeVisible[2m()[22m failed
+
+    Locator:  getByText('Bitcoin Expert 1760812519209')
+    Expected: not visible
+    Received: visible
+    Timeout:  15000ms
+
+    Call log:
+    [2m  - Expect "not toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for getByText('Bitcoin Expert 1760812519209')[22m
+    [2m    19 × locator resolved to <div data-slot="card-title" class="font-semibold text-lg">Bitcoin Expert 1760812519209</div>[22m
+    [2m       - unexpected value "visible"[22m
+
+
+      167 |     await expect(
+      168 |       page.getByText(`Bitcoin Expert ${timestamp}`),
+    > 169 |     ).not.toBeVisible();
+          |           ^
+      170 |     await expect(
+      171 |       page.getByText(`Altcoin Master ${timestamp}`),
+      172 |     ).not.toBeVisible();
+        at /Users/yoannandrieux/Projets/mycryptopilot/e2e/marketplace.spec.ts:169:11
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/marketplace-Traders-Market-97b43-ace-search-and-filters-work-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/marketplace-Traders-Market-97b43-ace-search-and-filters-work-chromium-retry1/error-context.md
+
+  2) [chromium] › e2e/navigation.spec.ts:81:7 › Navigation System › global search works across all spaces 
+
+    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder(/search/i).first()[22m
+    [2m    - locator resolved to <input readonly type="search" data-slot="input" placeholder="Search..." class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 min-w-0 rounded-md border px-3 py-1 text-base transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visi…/>[22m
+    [2m    - fill("Keenan Trader")[22m
+    [2m  - attempting fill action[22m
+    [2m    2 × waiting for element to be visible, enabled and editable[22m
+    [2m      - element is not editable[22m
+    [2m    - retrying fill action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and editable[22m
+    [2m      - element is not editable[22m
+    [2m    - retrying fill action[22m
+    [2m      - waiting 100ms[22m
+    [2m    30 × waiting for element to be visible, enabled and editable[22m
+    [2m       - element is not editable[22m
+    [2m     - retrying fill action[22m
+    [2m       - waiting 500ms[22m
+
+
+      109 |       // If search input exists, test it
+      110 |       await searchInput.click();
+    > 111 |       await searchInput.fill(traderProfile.displayName);
+          |                         ^
+      112 |
+      113 |       // Wait for search results
+      114 |       await page.waitForTimeout(1000);
+        at /Users/yoannandrieux/Projets/mycryptopilot/e2e/navigation.spec.ts:111:25
+
+    Error Context: test-results/navigation-Navigation-Syst-81763-rch-works-across-all-spaces-chromium/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder(/search/i).first()[22m
+    [2m    - locator resolved to <input readonly type="search" data-slot="input" placeholder="Search..." class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 min-w-0 rounded-md border px-3 py-1 text-base transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visi…/>[22m
+    [2m    - fill("Kamren Trader")[22m
+    [2m  - attempting fill action[22m
+    [2m    2 × waiting for element to be visible, enabled and editable[22m
+    [2m      - element is not editable[22m
+    [2m    - retrying fill action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and editable[22m
+    [2m      - element is not editable[22m
+    [2m    - retrying fill action[22m
+    [2m      - waiting 100ms[22m
+    [2m    30 × waiting for element to be visible, enabled and editable[22m
+    [2m       - element is not editable[22m
+    [2m     - retrying fill action[22m
+    [2m       - waiting 500ms[22m
+
+
+      109 |       // If search input exists, test it
+      110 |       await searchInput.click();
+    > 111 |       await searchInput.fill(traderProfile.displayName);
+          |                         ^
+      112 |
+      113 |       // Wait for search results
+      114 |       await page.waitForTimeout(1000);
+        at /Users/yoannandrieux/Projets/mycryptopilot/e2e/navigation.spec.ts:111:25
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/navigation-Navigation-Syst-81763-rch-works-across-all-spaces-chromium-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/navigation-Navigation-Syst-81763-rch-works-across-all-spaces-chromium-retry1/error-context.md
+
+  3) [chromium] › e2e/follow-unfollow.spec.ts:7:7 › Follow/Unfollow Trader Flow › user can follow and unfollow a trader 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mnot[2m.[22mtoBeNull[2m()[22m
+
+    Received: [31mnull[39m
+
+      66 |     });
+      67 |
+    > 68 |     expect(followRelation).not.toBeNull();
+         |                                ^
+      69 |     expect(followRelation?.userId).toBe(follower.id);
+      70 |     expect(followRelation?.traderId).toBe(trader.id);
+      71 |
+        at /Users/yoannandrieux/Projets/mycryptopilot/e2e/follow-unfollow.spec.ts:68:32
+
+    Error Context: test-results/follow-unfollow-Follow-Unf-a7c14-ollow-and-unfollow-a-trader-chromium/error-context.md
+
+  2 failed
+    [chromium] › e2e/marketplace.spec.ts:95:7 › Traders Marketplace › marketplace search and filters work 
+    [chromium] › e2e/navigation.spec.ts:81:7 › Navigation System › global search works across all spaces 
+  1 flaky
+    [chromium] › e2e/follow-unfollow.spec.ts:7:7 › Follow/Unfollow Trader Flow › user can follow and unfollow a trader 
+  6 skipped
+  56 passed (5.6m)

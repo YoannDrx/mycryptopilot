@@ -199,7 +199,10 @@ export default async function TradersMarketplacePage({
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            data-testid="traders-grid"
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          >
             {traders.map((trader) => {
               const stats =
                 (trader.statsJson as Record<
