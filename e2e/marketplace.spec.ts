@@ -93,31 +93,24 @@ test.describe("Traders Marketplace", () => {
   });
 
   /**
-   * ⚠️ FAILING - Application bug: Search filter not working
+   * ⚠️ FAILING - Application bug: Marketplace search filter not working
    *
-   * Issue: Typing "Whale" in search doesn't filter traders
+   * Issue: Search filter doesn't filter traders correctly
    *
-   * Current behavior:
-   * - User types "Whale" in search input
-   * - URL updates to ?search=Whale (nuqs working)
-   * - Page reloads with updated search param
-   * - BUT: All traders still visible (Bitcoin Expert, Altcoin Master)
+   * Investigation done:
+   * 1. ✅ Added `dynamic = 'force-dynamic'` to force page re-render
+   * 2. ✅ URL updates correctly with ?search=Whale
+   * 3. ✅ searchTraders() receives search param correctly
+   * 4. ✅ Prisma query looks correct (OR with displayName/bio contains)
+   * 5. ❌ BUT: Traders are NOT filtered (all remain visible)
    *
-   * Expected behavior:
-   * - Only "Crypto Whale Trader" should be visible
-   * - "Bitcoin Expert" and "Altcoin Master" should NOT be visible
+   * Root cause unknown - needs deep debugging:
+   * - Test Prisma query directly in isolation
+   * - Add server-side logging to verify query execution
+   * - Check if Prisma where clause is being ignored
+   * - Verify database has correct data
    *
-   * Root cause investigation needed:
-   * - searchTraders() function in trader-queries.ts looks correct (lines 166-180)
-   * - Uses Prisma where OR with displayName/bio contains (insensitive)
-   * - Page receives search param correctly (page.tsx line 45)
-   * - But filtering doesn't apply on server-side render
-   *
-   * Possible causes:
-   * 1. searchTraders() not being called with correct params
-   * 2. Prisma query not filtering correctly
-   * 3. React server component not re-rendering after URL change
-   * 4. nuqs shallow:false causing cache issues
+   * This is a REAL application bug, not a test issue.
    *
    * Priority: P1 - Core marketplace feature broken
    */
@@ -188,22 +181,10 @@ test.describe("Traders Marketplace", () => {
     // Wait for URL to update (nuqs has throttleMs: 500)
     await page.waitForURL(/search=Whale/, { timeout: 2000 });
 
-    // Wait for page to fully reload and re-render (shallow: false causes hard navigation)
+    // Wait for page to fully reload (shallow: false causes hard navigation)
     await page.waitForLoadState("networkidle");
-    await page.waitForLoadState("domcontentloaded");
 
-    // Wait for the old traders to disappear first (Bitcoin Expert should be gone)
-    await page.waitForFunction(
-      (name) => {
-        const grid = document.querySelector('[data-testid="traders-grid"]');
-        if (!grid?.textContent) return false;
-        return !grid.textContent.includes(name);
-      },
-      `Bitcoin Expert ${timestamp}`,
-      { timeout: 5000 },
-    );
-
-    // Now verify only Crypto Whale Trader is visible
+    // Verify only Crypto Whale Trader is visible (search filters out others)
     await expect(
       page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
     ).toBeVisible();
@@ -218,12 +199,8 @@ test.describe("Traders Marketplace", () => {
       () => !window.location.search.includes("search="),
       { timeout: 2000 },
     );
-    // Wait for traders grid to reload with all traders
-    await expect(page.getByTestId("traders-grid")).toBeVisible({
-      timeout: 3000,
-    });
-    // Additional wait for React to finish re-rendering after page reload
-    await page.waitForTimeout(1000);
+    // Wait for page to reload with all traders
+    await page.waitForLoadState("networkidle");
 
     // Apply verified filter
     const filterSelect = page.getByLabel(/filter/i);
@@ -231,8 +208,6 @@ test.describe("Traders Marketplace", () => {
       await filterSelect.click();
       await page.getByRole("option", { name: /verified/i }).click();
       await page.waitForLoadState("networkidle");
-      // Additional wait for React to finish re-rendering after filter change
-      await page.waitForTimeout(1000);
 
       // Should show only verified traders (Crypto Whale Trader, Altcoin Master)
       await expect(

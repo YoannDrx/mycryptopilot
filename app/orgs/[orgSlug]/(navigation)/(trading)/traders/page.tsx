@@ -26,6 +26,10 @@ export const metadata: Metadata = {
     "Discover and follow verified crypto traders. Access professional trading signals.",
 };
 
+// Force dynamic rendering on every request (no caching)
+// This ensures search/filter params are always fresh
+export const dynamic = "force-dynamic";
+
 type TradersMarketplacePageProps = {
   searchParams: Promise<{
     search?: string;

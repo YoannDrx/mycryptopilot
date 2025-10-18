@@ -83,7 +83,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       {
         href: `${ORGANIZATION_PATH}/dashboard`,
         Icon: BarChart3,
-        label: "My Trading Dashboard",
+        label: "My Signals",
       },
       {
         href: `${ORGANIZATION_PATH}/signals`,
@@ -161,7 +161,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
       {
         href: `${ORGANIZATION_PATH}/account/following`,
         Icon: Users,
-        label: "Following",
+        label: "Manage Following",
       },
       {
         href: `${ORGANIZATION_PATH}/account/danger`,

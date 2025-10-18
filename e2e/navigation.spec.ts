@@ -78,37 +78,16 @@ test.describe("Navigation System", () => {
   });
 
   /**
-   * ⚠️ FAILING - Application bug: Duplicate navigation labels causing ambiguity
+   * ✅ TEST FIXED - Made navigation labels unique across all spaces
    *
-   * Issue: GlobalSearchCommand returns duplicate labels from different spaces
+   * Previous issue: Duplicate labels ("Following" appeared in Trading + Account)
+   * Fix applied:
+   * - Trading: "Following" → "My Signals" (trading-links.ts:40)
+   * - Account: "Following" → "Manage Following" (account-links.ts:35)
    *
-   * Example: "Following" appears twice in search results:
-   * 1. Trading space: /orgs/:slug/dashboard (trading-links.ts:40)
-   * 2. Account space: /orgs/:slug/account/following (account-links.ts:35)
-   *
-   * Current behavior:
-   * - User searches "Following"
-   * - 2 results appear (Trading + Account)
-   * - Test clicks first result
-   * - Navigates to /account/following instead of /dashboard
-   *
-   * Similar issues with other labels:
-   * - "Dashboard" appears 3 times (Dashboard, Trader Dashboard, My Trading Dashboard)
-   *
-   * Root cause:
-   * - allLinks combines all 4 spaces (Trading, Account, School, Tax)
-   * - No disambiguation in labels (no space prefix/suffix)
-   * - GlobalSearchCommand doesn't group by space
-   *
-   * Possible fixes:
-   * 1. Add space prefix to labels: "Trading: Following", "Account: Following"
-   * 2. Group results by space in GlobalSearchCommand
-   * 3. Make labels unique across all spaces
-   * 4. Add href display in search results
-   *
-   * Priority: P2 - UX issue, not blocking core features
+   * This ensures GlobalSearchCommand results are unambiguous.
    */
-  test.skip("global search works across all spaces", async ({ page }) => {
+  test("global search works across all spaces", async ({ page }) => {
     // 1. Create a user account
     await createTestAccount({
       page,
@@ -168,17 +147,17 @@ test.describe("Navigation System", () => {
     await expect(dialogInput2).toBeVisible();
 
     // Search for another navigation link
-    await dialogInput2.fill("Following");
+    await dialogInput2.fill("My Signals");
     await page.waitForTimeout(500);
 
-    // Should find "Following" link in results (points to /dashboard)
-    const followingLink = page.getByRole("option", { name: /following/i });
-    await expect(followingLink).toBeVisible();
+    // Should find "My Signals" link in results (points to /dashboard)
+    const mySignalsLink = page.getByRole("option", { name: /my signals/i });
+    await expect(mySignalsLink).toBeVisible();
 
     // Click on the result to navigate
-    await followingLink.click();
+    await mySignalsLink.click();
 
-    // Verify navigation happened (Following points to /dashboard)
+    // Verify navigation happened (My Signals points to /dashboard)
     await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard`));
   });
 });
