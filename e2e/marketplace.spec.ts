@@ -156,6 +156,8 @@ test.describe("Traders Marketplace", () => {
     await expect(searchInput).toBeVisible();
     await searchInput.fill("Whale");
 
+    // Wait for URL to update (nuqs has throttleMs: 500)
+    await page.waitForURL(/search=Whale/, { timeout: 2000 });
     // Wait for page to reload with new search params (nuqs shallow:false reloads page)
     await page.waitForLoadState("networkidle");
 
@@ -173,6 +175,11 @@ test.describe("Traders Marketplace", () => {
 
     // 6. Clear search and test "Verified Only" filter
     await searchInput.clear();
+    // Wait for URL to clear search param (nuqs has throttleMs: 500)
+    await page.waitForFunction(
+      () => !window.location.search.includes("search="),
+      { timeout: 2000 },
+    );
     await page.waitForLoadState("networkidle");
 
     // Apply verified filter
