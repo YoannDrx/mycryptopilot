@@ -162,25 +162,34 @@ test.describe("User Dashboard", () => {
     await expect(page.getByText(/recent signals.*\(6\)/i)).toBeVisible();
   });
 
+  /**
+   * ⏭️ SKIPPED - Feature not yet implemented
+   *
+   * Feature: Signal blurring for Free plan users after limit
+   *
+   * Current status: Free users can see all signals (no limit enforcement in UI)
+   * Expected behavior: Free users should only see first 3 signals clearly
+   * (activeSignalsLimit: 3 in mycryptopilot-plans.ts)
+   *
+   * Implementation needed in SignalsFeed component:
+   * - Check user's plan (Free/Pro/Ultra) from session
+   * - Get plan limits from mycryptopilot-plans.ts
+   * - Render first N signals normally (3 for Free)
+   * - Render remaining signals with CSS blur + opacity
+   * - Show "Upgrade to Pro" CTA overlay on blurred signals
+   *
+   * Test plan once implemented:
+   * 1. Create Free user
+   * 2. Follow trader with 10+ signals
+   * 3. Navigate to dashboard
+   * 4. Verify first 3 signals are clear (no blur/opacity)
+   * 5. Verify signals 4-10 have blur effect
+   * 6. Verify "Upgrade to Pro" CTA is visible on blurred signals
+   * 7. Click CTA should redirect to /pricing
+   *
+   * Priority: P2 (nice-to-have for MVP, important for monetization)
+   */
   test.skip("free user sees blurred signals after limit", async ({ page }) => {
-    // TODO: This test is skipped because the blurring functionality is not yet implemented
-    // Free users should see max 3 clear signals (activeSignalsLimit: 3 in mycryptopilot-plans.ts)
-    // Additional signals should be blurred with "Upgrade to Pro" CTA
-    //
-    // Implementation needed in SignalsFeed component:
-    // - Check user's plan (Free/Pro/Ultra)
-    // - Get plan limits (activeSignalsLimit)
-    // - Render first N signals normally
-    // - Render remaining signals with blur effect + upgrade CTA
-    //
-    // Once implemented, this test should:
-    // 1. Create Free user
-    // 2. Follow trader with 10+ signals
-    // 3. Navigate to dashboard
-    // 4. Verify first 3 signals are clear
-    // 5. Verify signals 4+ are blurred
-    // 6. Verify "Upgrade to Pro" CTA is visible
-
     const userData = await createTestAccount({
       page,
       callbackURL: "/orgs",

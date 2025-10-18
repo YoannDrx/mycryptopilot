@@ -4,10 +4,34 @@ import { createTestAccount, signOutAccount } from "./utils/auth-test";
 import { createTestSignal, createTestTrader } from "./utils/trader-test";
 
 test.describe("Signals Feed with Filters", () => {
+  /**
+   * ⏭️ SKIPPED - Application bug: Asset filter buttons not wired up
+   *
+   * Issue: Asset filter buttons appear in UI but clicking them doesn't filter signals
+   *
+   * Current status:
+   * - Asset filter buttons are rendered in SignalsFeed component
+   * - Clicking buttons has no effect on displayed signals
+   * - This is an application bug, not a test bug
+   *
+   * Root cause: Filter button onClick handlers not connected to feed state
+   *
+   * Implementation needed:
+   * - Wire up asset filter button clicks to update feed filters
+   * - Connect filters to signals query/display logic
+   * - Add visual feedback when filter is active
+   *
+   * Test plan once fixed:
+   * 1. Create trader with BTC, ETH, SOL signals
+   * 2. Create follower and navigate to dashboard
+   * 3. Click "BTC" asset filter button
+   * 4. Verify only BTC signal is visible
+   * 5. Click "All" to clear filter
+   * 6. Verify all signals visible again
+   *
+   * Priority: P2 (feature exists but not functional)
+   */
   test.skip("user can filter signals by asset", async ({ page }) => {
-    // TODO: Asset filter button doesn't work in the app - this is an application bug, not a test bug
-    // The filter buttons appear but clicking them doesn't filter the signals feed
-    // See: signals feed implementation needs to wire up asset filter button clicks
     // 1. Create a trader with multiple signals
     const { user: trader } = await createTestTrader({ page });
 

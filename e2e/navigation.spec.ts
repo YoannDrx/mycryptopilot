@@ -77,6 +77,29 @@ test.describe("Navigation System", () => {
     ).toBeVisible();
   });
 
+  /**
+   * ⚠️ FAILING TEST - Layout inconsistency across spaces
+   *
+   * Issue: GlobalSearchCommand n'est pas présent sur toutes les pages
+   *
+   * Symptôme: Après navigation vers /settings, getByPlaceholder("Search...") timeout
+   * car le composant GlobalSearchCommand n'existe pas sur cette page.
+   *
+   * Cause racine:
+   * - /dashboard utilise un layout avec GlobalSearchCommand dans la sidebar
+   * - /settings utilise un layout différent (Account space) sans ce composant
+   * - Le test assume que search est présent partout
+   *
+   * Solutions possibles:
+   * 1. Ajouter GlobalSearchCommand à tous les layouts (Trading, Account, School, Tax)
+   * 2. Modifier le test pour vérifier la présence de search avant de tester
+   * 3. Créer un layout de base commun avec GlobalSearchCommand
+   *
+   * Impact: Non-critique - GlobalSearchCommand fonctionne là où il est présent
+   *
+   * Note: Le composant GlobalSearchCommand cherche uniquement dans les liens de
+   * navigation statiques (allLinks), pas dans les traders ou autres données.
+   */
   test("global search works across all spaces", async ({ page }) => {
     // 1. Create a user account
     await createTestAccount({

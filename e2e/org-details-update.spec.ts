@@ -3,8 +3,34 @@ import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
 import { createTestAccount } from "./utils/auth-test";
 
+/**
+ * ⏭️ SKIPPED - UI removed in 4-space architecture refactoring
+ *
+ * Reason: Organization settings UI no longer exists
+ *
+ * Background:
+ * - During Phase 7 (Navigation 4 Espaces), organization settings were removed
+ * - MyCryptoPilot uses 1 org = 1 user (B2C model, not B2B multi-tenant)
+ * - No need for users to manage organization name/slug
+ * - Organization exists only for Better Auth compatibility
+ *
+ * Previous behavior:
+ * - /orgs/[orgSlug]/settings had organization name edit form
+ * - Users could update organization name
+ *
+ * Current behavior:
+ * - /orgs/[orgSlug]/settings redirects to account settings
+ * - No organization management UI
+ *
+ * This test is from NOW.TS template and not relevant for MyCryptoPilot.
+ *
+ * Priority: N/A (feature intentionally removed)
+ */
 test("update organization name", async ({ page }) => {
-  test.skip(true, "L'interface de mise à jour de l'organisation n'est plus disponible dans l'architecture 4-space.");
+  test.skip(
+    true,
+    "L'interface de mise à jour de l'organisation n'est plus disponible dans l'architecture 4-space.",
+  );
   // 1. Create a test account (owner)
   await createTestAccount({
     page,
