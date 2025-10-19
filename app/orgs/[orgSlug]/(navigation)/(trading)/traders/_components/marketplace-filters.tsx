@@ -9,7 +9,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
+
+const filterOptions = ["all", "verified"] as const;
+const sortOptions = ["recent", "winrate", "followers", "signals"] as const;
+
+const marketplaceSearchParams = {
+  search: parseAsString.withDefault(""),
+  filter: parseAsStringLiteral(filterOptions).withDefault("all"),
+  sort: parseAsStringLiteral(sortOptions).withDefault("recent"),
+};
 
 type MarketplaceFiltersProps = {
   defaultSearch?: string;
@@ -22,74 +31,11 @@ export function MarketplaceFilters({
   defaultFilter = "all",
   defaultSort = "recent",
 }: MarketplaceFiltersProps) {
-  // Local state for immediate UI updates
-  const [search, setSearch] = useState(defaultSearch);
-  const [filter, setFilter] = useState(defaultFilter);
-  const [sort, setSort] = useState(defaultSort);
-
-  // Refs for debouncing
-  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const filterTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-
-  // Build and navigate to new URL with hard redirect (inspired by now.ts PR #75)
-  // This ensures Server Component re-renders with new searchParams
-  const navigateToFilters = useCallback(
-    (newSearch: string, newFilter: string, newSort: string) => {
-      const params = new URLSearchParams();
-
-      if (newSearch) params.set("search", newSearch);
-      if (newFilter !== "all") params.set("filter", newFilter);
-      if (newSort !== "recent") params.set("sort", newSort);
-
-      const queryString = params.toString();
-      const newUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ""}`;
-
-      // Hard redirect to force Server Component refresh
-      window.location.href = newUrl;
-    },
-    [],
-  );
-
-  // Debounce search input (300ms)
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-
-    clearTimeout(searchTimeoutRef.current);
-
-    searchTimeoutRef.current = setTimeout(() => {
-      navigateToFilters(value, filter, sort);
-    }, 300);
-  };
-
-  // Immediate navigation for filter/sort changes
-  const handleFilterChange = (value: string) => {
-    setFilter(value);
-
-    clearTimeout(filterTimeoutRef.current);
-
-    // Small delay to avoid double navigation if user changes multiple things quickly
-    filterTimeoutRef.current = setTimeout(() => {
-      navigateToFilters(search, value, sort);
-    }, 100);
-  };
-
-  const handleSortChange = (value: string) => {
-    setSort(value);
-
-    clearTimeout(filterTimeoutRef.current);
-
-    filterTimeoutRef.current = setTimeout(() => {
-      navigateToFilters(search, filter, value);
-    }, 100);
-  };
-
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      clearTimeout(searchTimeoutRef.current);
-      clearTimeout(filterTimeoutRef.current);
-    };
-  }, []);
+  // Use nuqs with shallow: true (no navigation, just URL update)
+  const [filters, setFilters] = useQueryStates(marketplaceSearchParams, {
+    shallow: true, // ✅ No full page reload!
+    throttleMs: 300, // Debounce for search input
+  });
 
   return (
     <div
@@ -101,14 +47,23 @@ export function MarketplaceFilters({
         <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 transform" />
         <Input
           placeholder="Search traders by name or bio..."
-          value={search}
-          onChange={(e) => handleSearchChange(e.target.value)}
+          value={filters.search}
+          onChange={(e) => {
+            void setFilters({ search: e.target.value });
+          }}
           className="pl-10"
         />
       </div>
 
       {/* Filter Select */}
-      <Select value={filter} onValueChange={handleFilterChange}>
+      <Select
+        value={filters.filter}
+        onValueChange={(value) => {
+          void setFilters({
+            filter: value as (typeof filterOptions)[number],
+          });
+        }}
+      >
         <SelectTrigger className="w-full md:w-[180px]">
           <SelectValue placeholder="Filter traders" />
         </SelectTrigger>
@@ -119,7 +74,14 @@ export function MarketplaceFilters({
       </Select>
 
       {/* Sort Select */}
-      <Select value={sort} onValueChange={handleSortChange}>
+      <Select
+        value={filters.sort}
+        onValueChange={(value) => {
+          void setFilters({
+            sort: value as (typeof sortOptions)[number],
+          });
+        }}
+      >
         <SelectTrigger className="w-full md:w-[180px]">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>

@@ -93,12 +93,16 @@ test.describe("Traders Marketplace", () => {
   });
 
   /**
-   * ✅ FIXED - Marketplace search filter now working!
+   * ✅ FIXED - Marketplace search filter now working with hybrid architecture!
    *
-   * Root cause: nuqs with `shallow: false` wasn't triggering Server Component re-render
-   * Solution: Added router.refresh() in useEffect when filters change
+   * Root cause: Hard redirects were causing full page reloads (bad UX)
+   * Solution: Hybrid architecture with SSR initial + TanStack Query for client-side filtering
    *
-   * Fix applied in: marketplace-filters.tsx
+   * Architecture:
+   * - Initial load: SSR with searchTraders()
+   * - Filtering: Client-side fetch via /api/traders/search
+   * - URL state: nuqs with shallow: true (no navigation)
+   * - Result: No full page reload, fast filtering, SEO preserved
    */
   test("marketplace search and filters work", async ({ page }) => {
     // 1. Create 3 traders directly in DB with UNIQUE names (using timestamp to avoid duplicates from previous test runs)
@@ -164,10 +168,13 @@ test.describe("Traders Marketplace", () => {
     await expect(searchInput).toBeVisible();
     await searchInput.fill("Whale");
 
-    // Wait for debounce (300ms) + hard redirect navigation
-    await page.waitForTimeout(500);
+    // Wait for URL update (nuqs throttle: 300ms) + API call
     await page.waitForURL(/search=Whale/, { timeout: 2000 });
-    await page.waitForLoadState("networkidle");
+    // Wait for API response
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 2000 },
+    );
 
     // Verify only Crypto Whale Trader is visible (search filters out others)
     await expect(
@@ -179,13 +186,16 @@ test.describe("Traders Marketplace", () => {
 
     // 6. Clear search and test "Verified Only" filter
     await searchInput.clear();
-    // Wait for debounce (300ms) + hard redirect navigation
-    await page.waitForTimeout(500);
+    // Wait for URL to clear search param
     await page.waitForFunction(
       () => !window.location.search.includes("search="),
       { timeout: 2000 },
     );
-    await page.waitForLoadState("networkidle");
+    // Wait for API response
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 2000 },
+    );
 
     // Apply verified filter
     const filterSelect = page.getByLabel(/filter/i);
@@ -209,9 +219,11 @@ test.describe("Traders Marketplace", () => {
 
     // 7. Test combined search + filter
     await searchInput.fill("Trader");
-    // Wait for debounce (300ms) + navigation
-    await page.waitForTimeout(500);
-    await page.waitForLoadState("networkidle");
+    // Wait for API response
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 2000 },
+    );
 
     // Should show only "Crypto Whale Trader" (verified + contains "Trader")
     await expect(
