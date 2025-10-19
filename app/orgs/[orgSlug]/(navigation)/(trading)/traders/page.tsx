@@ -51,6 +51,7 @@ export default async function TradersMarketplacePage({
   const sortValue = params.sort ?? "recent";
   const cursor = params.cursor;
 
+
   // Map filter to verified boolean
   const verified =
     filterValue === "verified"
