@@ -63,7 +63,7 @@ export function TradersListClient({
   });
 
   // Fetch traders with TanStack Query
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["traders", filters],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -78,7 +78,7 @@ export function TradersListClient({
     initialData, // Use SSR data for first render
   });
 
-  const traders = data?.items ?? [];
+  const traders = data.items;
   const totalTraders = traders.length;
   const verifiedTraders = traders.filter((t) => t.verified).length;
 
@@ -154,7 +154,7 @@ export function TradersListClient({
         </div>
 
         {/* Loading State */}
-        {isLoading && (
+        {isFetching && (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted-foreground flex items-center gap-2">
               <div className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -164,7 +164,7 @@ export function TradersListClient({
         )}
 
         {/* Traders List */}
-        {!isLoading && traders.length === 0 ? (
+        {!isFetching && traders.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
               <Users className="text-muted-foreground mb-4 size-16 opacity-20" />
@@ -251,18 +251,21 @@ function TraderCard({ trader, userId }: TraderCardProps) {
   // Fetch trader data (followers, signals, isFollowing)
   const { data: followersCount } = useQuery({
     queryKey: ["trader-followers", trader.userId],
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
     queryFn: () => countTraderFollowers(trader.userId),
     initialData: 0,
   });
 
   const { data: signalsCount } = useQuery({
     queryKey: ["trader-signals", trader.userId],
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
     queryFn: () => countTotalSignalsByTrader(trader.userId),
     initialData: 0,
   });
 
   const { data: isFollowing } = useQuery({
     queryKey: ["is-following", userId, trader.userId],
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
     queryFn: () => isFollowingTrader(userId, trader.userId),
     initialData: false,
   });

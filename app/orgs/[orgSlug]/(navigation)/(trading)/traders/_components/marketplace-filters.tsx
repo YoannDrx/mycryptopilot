@@ -27,9 +27,9 @@ type MarketplaceFiltersProps = {
 };
 
 export function MarketplaceFilters({
-  defaultSearch = "",
-  defaultFilter = "all",
-  defaultSort = "recent",
+  defaultSearch: _defaultSearch = "",
+  defaultFilter: _defaultFilter = "all",
+  defaultSort: _defaultSort = "recent",
 }: MarketplaceFiltersProps) {
   // Use nuqs with shallow: true (no navigation, just URL update)
   const [filters, setFilters] = useQueryStates(marketplaceSearchParams, {
