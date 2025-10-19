@@ -99,7 +99,7 @@ pnpm prisma:seed
 pnpm dev
 ```
 
-**✅ Database Status (14 octobre 2025)**: 8 migrations Prisma appliquées avec succès. Base de données opérationnelle. Toutes les fonctionnalités (profils traders, signaux, follows, crypto payments, Discord bot) sont débloquées.
+**✅ Database Status (19 octobre 2025)**: 10 migrations Prisma appliquées avec succès. Base de données opérationnelle. Toutes les fonctionnalités (profils traders, signaux, follows, crypto payments, Discord bot) sont débloquées.
 
 ## 🛠️ Development Commands
 

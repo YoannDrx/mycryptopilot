@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 14 octobre 2025 - Refactoring navigation 4 espaces + UI polish
+**Dernière mise à jour**: 19 octobre 2025 - Project audit complet (état MVP final)
 
 ---
 
@@ -84,7 +84,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ### 📊 Progression Globale: 🎉 100% MVP COMPLETE! 🎉
 
-**Audit complet**: 12 octobre 2025
+**Audit complet**: 19 octobre 2025 (via /project-audit)
 **Phase 6 complétée**: 13 octobre 2025
 **Phase 7 complétée**: 14 octobre 2025
 **MVP 100% achevé**: 14 octobre 2025
