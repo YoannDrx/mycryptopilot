@@ -48,6 +48,7 @@ const config: PlaywrightTestConfig = {
   retries: 1,
   // Add delay between retries
   workers: 3,
+  globalSetup: new URL("./e2e/global-setup.ts", import.meta.url).pathname,
   globalTeardown: new URL("./e2e/global-teardown.ts", import.meta.url).pathname,
   // Enable console logs in CI
   reporter: process.env.CI ? [["list"], ["html"]] : "list",

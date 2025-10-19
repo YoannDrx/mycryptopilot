@@ -93,28 +93,18 @@ test.describe("Traders Marketplace", () => {
   });
 
   /**
-   * ⚠️ FAILING - Application bug: Marketplace search filter not working
+   * ✅ FIXED - Marketplace search filter now working with hybrid architecture!
    *
-   * Issue: Search filter doesn't filter traders correctly
+   * Root cause: Hard redirects were causing full page reloads (bad UX)
+   * Solution: Hybrid architecture with SSR initial + TanStack Query for client-side filtering
    *
-   * Investigation done:
-   * 1. ✅ Added `dynamic = 'force-dynamic'` to force page re-render
-   * 2. ✅ URL updates correctly with ?search=Whale
-   * 3. ✅ searchTraders() receives search param correctly
-   * 4. ✅ Prisma query looks correct (OR with displayName/bio contains)
-   * 5. ❌ BUT: Traders are NOT filtered (all remain visible)
-   *
-   * Root cause unknown - needs deep debugging:
-   * - Test Prisma query directly in isolation
-   * - Add server-side logging to verify query execution
-   * - Check if Prisma where clause is being ignored
-   * - Verify database has correct data
-   *
-   * This is a REAL application bug, not a test issue.
-   *
-   * Priority: P1 - Core marketplace feature broken
+   * Architecture:
+   * - Initial load: SSR with searchTraders()
+   * - Filtering: Client-side fetch via /api/traders/search
+   * - URL state: nuqs with shallow: true (no navigation)
+   * - Result: No full page reload, fast filtering, SEO preserved
    */
-  test.skip("marketplace search and filters work", async ({ page }) => {
+  test("marketplace search and filters work", async ({ page }) => {
     // 1. Create 3 traders directly in DB with UNIQUE names (using timestamp to avoid duplicates from previous test runs)
     const timestamp = Date.now();
     const trader1Data = await createTestTraderDirectly();
@@ -178,11 +168,13 @@ test.describe("Traders Marketplace", () => {
     await expect(searchInput).toBeVisible();
     await searchInput.fill("Whale");
 
-    // Wait for URL to update (nuqs has throttleMs: 500)
+    // Wait for URL update (nuqs throttle: 300ms) + API call
     await page.waitForURL(/search=Whale/, { timeout: 2000 });
-
-    // Wait for page to fully reload (shallow: false causes hard navigation)
-    await page.waitForLoadState("networkidle");
+    // Wait for API response
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 2000 },
+    );
 
     // Verify only Crypto Whale Trader is visible (search filters out others)
     await expect(
@@ -194,13 +186,16 @@ test.describe("Traders Marketplace", () => {
 
     // 6. Clear search and test "Verified Only" filter
     await searchInput.clear();
-    // Wait for URL to clear search param (nuqs has throttleMs: 500)
+    // Wait for URL to clear search param
     await page.waitForFunction(
       () => !window.location.search.includes("search="),
       { timeout: 2000 },
     );
-    // Wait for page to reload with all traders
-    await page.waitForLoadState("networkidle");
+    // Wait for API response
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 2000 },
+    );
 
     // Apply verified filter
     const filterSelect = page.getByLabel(/filter/i);
@@ -224,7 +219,11 @@ test.describe("Traders Marketplace", () => {
 
     // 7. Test combined search + filter
     await searchInput.fill("Trader");
-    await page.waitForLoadState("networkidle");
+    // Wait for API response
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 2000 },
+    );
 
     // Should show only "Crypto Whale Trader" (verified + contains "Trader")
     await expect(

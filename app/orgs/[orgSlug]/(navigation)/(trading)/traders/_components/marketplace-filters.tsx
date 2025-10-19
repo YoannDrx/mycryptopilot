@@ -31,9 +31,10 @@ export function MarketplaceFilters({
   defaultFilter: _defaultFilter = "all",
   defaultSort: _defaultSort = "recent",
 }: MarketplaceFiltersProps) {
+  // Use nuqs with shallow: true (no navigation, just URL update)
   const [filters, setFilters] = useQueryStates(marketplaceSearchParams, {
-    shallow: false,
-    throttleMs: 500,
+    shallow: true, // ✅ No full page reload!
+    throttleMs: 300, // Debounce for search input
   });
 
   return (
@@ -48,9 +49,7 @@ export function MarketplaceFilters({
           placeholder="Search traders by name or bio..."
           value={filters.search}
           onChange={(e) => {
-            void setFilters({
-              search: e.target.value,
-            });
+            void setFilters({ search: e.target.value });
           }}
           className="pl-10"
         />

@@ -1,4 +1,3 @@
-import { TradingCard } from "@/components/nowts/trading-card";
 import {
   Card,
   CardContent,
@@ -8,13 +7,26 @@ import {
 } from "@/components/ui/card";
 import { getSignalsFromFollowedTraders } from "@/features/signal/signal-queries";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
+import { getPlanLimits } from "@/lib/crypto/get-plan-limits";
+import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { prisma } from "@/lib/prisma";
 import { BarChart3 } from "lucide-react";
+import { BlurredSignalCard } from "./blurred-signal-card";
 
 type SignalsFeedProps = {
   userId: string;
 };
 
 export const SignalsFeed = async ({ userId }: SignalsFeedProps) => {
+  // Get user's plan to determine signal limit
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { planName: true },
+  });
+
+  const planLimits = getPlanLimits(user?.planName as MyCryptoPilotPlanName | null | undefined);
+  const activeSignalsLimit = planLimits.activeSignalsLimit;
+
   const signals = await getSignalsFromFollowedTraders(userId, {
     limit: 20,
     includeExpired: false,
@@ -51,12 +63,15 @@ export const SignalsFeed = async ({ userId }: SignalsFeedProps) => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {signals.map((signal) => {
+        {signals.map((signal, index) => {
           const traderName =
             signal.trader.traderProfile?.displayName ?? signal.trader.name;
 
+          // Blur signals after activeSignalsLimit (e.g., first 3 clear for FREE plan)
+          const isBlurred = index >= activeSignalsLimit;
+
           return (
-            <TradingCard
+            <BlurredSignalCard
               key={signal.id}
               symbol={signal.symbol}
               payload={signal.payloadJson as TradingCardPayloadType}
@@ -64,6 +79,7 @@ export const SignalsFeed = async ({ userId }: SignalsFeedProps) => {
               traderName={traderName}
               createdAt={signal.createdAt}
               expiresAt={signal.expiresAt}
+              isBlurred={isBlurred}
             />
           );
         })}
