@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { expect, test } from "@playwright/test";
 import { createTestAccount, signOutAccount } from "./utils/auth-test";
-import { createTestTrader, createTestSignal } from "./utils/trader-test";
+import {
+  createTestTraderDirectly,
+  createTestSignal,
+} from "./utils/trader-test";
 import { upgradeUserToPlan } from "./utils/payment-test";
 
 test.describe("Plan Limits", () => {
@@ -104,21 +107,11 @@ test.describe("Plan Limits", () => {
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
-    // 2. Create 6 traders sequentially (required due to page navigation)
-    const createTraders = async (count: number) => {
-      const result = [];
-
-      for (let i = 0; i < count; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        await signOutAccount({ page });
-        // eslint-disable-next-line no-await-in-loop
-        const { user: trader } = await createTestTrader({ page });
-        result.push(trader);
-      }
-      return result;
-    };
-
-    const traders = await createTraders(6);
+    // 2. Create 6 traders in parallel (DB direct, no UI navigation)
+    const tradersData = await Promise.all(
+      Array.from({ length: 6 }, async () => createTestTraderDirectly()),
+    );
+    const traders = tradersData.map((t) => t.user);
 
     // 3. Sign back in as Pro user
     await signOutAccount({ page });
@@ -201,22 +194,12 @@ test.describe("Plan Limits", () => {
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
-    // 2. Create 3 traders (enough to prove Ultra is unlimited, more than Free limit of 1)
-    // Note: Creating 10 traders sequentially causes test timeout. 3 is sufficient to prove unlimited access.
-    const createTraders = async (count: number) => {
-      const result = [];
-
-      for (let i = 0; i < count; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        await signOutAccount({ page });
-        // eslint-disable-next-line no-await-in-loop
-        const { user: trader } = await createTestTrader({ page });
-        result.push(trader);
-      }
-      return result;
-    };
-
-    const traders = await createTraders(3);
+    // 2. Create 3 traders in parallel (DB direct, no UI navigation)
+    // Note: 3 is sufficient to prove unlimited access (more than Free limit of 1)
+    const tradersData = await Promise.all(
+      Array.from({ length: 3 }, async () => createTestTraderDirectly()),
+    );
+    const traders = tradersData.map((t) => t.user);
 
     // 3. Sign back in as Ultra user
     await signOutAccount({ page });

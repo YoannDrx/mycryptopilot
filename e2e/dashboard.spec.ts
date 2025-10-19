@@ -163,33 +163,24 @@ test.describe("User Dashboard", () => {
   });
 
   /**
-   * ⏭️ SKIPPED - Feature not yet implemented
+   * ✅ Signal blurring for Free plan users after limit
    *
-   * Feature: Signal blurring for Free plan users after limit
-   *
-   * Current status: Free users can see all signals (no limit enforcement in UI)
-   * Expected behavior: Free users should only see first 3 signals clearly
+   * Feature: FREE plan users see first 3 signals clearly, remaining signals blurred
    * (activeSignalsLimit: 3 in mycryptopilot-plans.ts)
    *
-   * Implementation needed in SignalsFeed component:
-   * - Check user's plan (Free/Pro/Ultra) from session
-   * - Get plan limits from mycryptopilot-plans.ts
-   * - Render first N signals normally (3 for Free)
-   * - Render remaining signals with CSS blur + opacity
-   * - Show "Upgrade to Pro" CTA overlay on blurred signals
+   * Implementation:
+   * - SignalsFeed checks user's plan from database
+   * - BlurredSignalCard applies blur effect after limit
+   * - "Upgrade to Pro" CTA overlay on blurred signals
    *
-   * Test plan once implemented:
-   * 1. Create Free user
-   * 2. Follow trader with 10+ signals
-   * 3. Navigate to dashboard
-   * 4. Verify first 3 signals are clear (no blur/opacity)
-   * 5. Verify signals 4-10 have blur effect
-   * 6. Verify "Upgrade to Pro" CTA is visible on blurred signals
-   * 7. Click CTA should redirect to /pricing
-   *
-   * Priority: P2 (nice-to-have for MVP, important for monetization)
+   * Test verifies:
+   * 1. Free user created with 10 signals from followed trader
+   * 2. First 3 signals are clear (no blur/opacity)
+   * 3. Signals 4-10 have blur effect
+   * 4. "Upgrade to Pro" CTA is visible on blurred signals
+   * 5. CTA redirects to /pricing page
    */
-  test.skip("free user sees blurred signals after limit", async ({ page }) => {
+  test("free user sees blurred signals after limit", async ({ page }) => {
     const userData = await createTestAccount({
       page,
       callbackURL: "/orgs",
@@ -218,26 +209,80 @@ test.describe("User Dashboard", () => {
       },
     });
 
-    // Create 10 signals
-    await Promise.all(
-      Array.from({ length: 10 }, async (_, i) =>
-        createTestSignal({
-          traderId: trader.id,
-          symbol: `ASSET${i + 1}-USDT`,
-          rationale: `Signal ${i + 1}`,
-        }),
-      ),
-    );
+    // Create 10 signals (sequentially to avoid timestamp conflicts)
+    for (let i = 0; i < 10; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      await createTestSignal({
+        traderId: trader.id,
+        symbol: `ASSET${i + 1}-USDT`,
+        rationale: `Signal ${i + 1}`,
+      });
+    }
+
+    // Verify 10 signals were created in database
+    const dbSignals = await prisma.signal.count({
+      where: { traderId: trader.id },
+    });
+    expect(dbSignals).toBe(10);
 
     // Navigate to dashboard
     await page.goto(`/orgs/${orgSlug}/dashboard`);
     await page.waitForLoadState("networkidle");
 
-    // TODO: Once implemented, verify:
-    // - First 3 signals are clear (no blur/opacity)
-    // - Signals 4-10 have blur effect or reduced opacity
-    // - "Upgrade to Pro" or similar CTA is visible
-    // - CTA links to /pricing or /checkout
+    // Verify all 10 signal cards are rendered
+    const signalCards = page.locator('[data-testid="trading-card"]');
+    const totalCards = await signalCards.count();
+    expect(totalCards).toBe(10);
+
+    // Verify first 3 signals are NOT blurred (FREE plan activeSignalsLimit = 3)
+    for (let i = 0; i < 3; i++) {
+      const card = signalCards.nth(i);
+      // Check that card or its parents don't have blur class
+      // eslint-disable-next-line no-await-in-loop
+      const hasBlur = await card.evaluate((el) => {
+        // Check if any parent has blur-sm class
+        let current = el.parentElement;
+        while (current) {
+          if (current.classList.contains("blur-sm")) return true;
+          current = current.parentElement;
+        }
+        return false;
+      });
+      expect(hasBlur).toBe(false);
+    }
+
+    // Verify signals 4-10 ARE blurred (indices 3-9)
+    for (let i = 3; i < 10; i++) {
+      const card = signalCards.nth(i);
+      // Check that card or its parents have blur class
+      // eslint-disable-next-line no-await-in-loop
+      const hasBlur = await card.evaluate((el) => {
+        // Check if any parent has blur-sm class
+        let current = el.parentElement;
+        while (current) {
+          if (current.classList.contains("blur-sm")) return true;
+          current = current.parentElement;
+        }
+        return false;
+      });
+      expect(hasBlur).toBe(true);
+
+      // Verify "Upgrade to Pro" CTA is visible in blurred card area
+      // The CTA is in a sibling overlay div, not inside the card
+      const container = signalCards.nth(i).locator("..").locator("..");
+      const upgradeButton = container.getByRole("link", { name: /upgrade to pro/i });
+      // eslint-disable-next-line no-await-in-loop
+      await expect(upgradeButton).toBeVisible();
+    }
+
+    // Click first blurred signal's "Upgrade to Pro" CTA
+    // Since only blurred signals (4-10) have upgrade buttons, .first() gets button from signal #4
+    const upgradeButton = page.getByRole("link", { name: /upgrade to pro/i }).first();
+    await upgradeButton.click();
+
+    // Verify redirect to pricing page
+    await page.waitForURL(/\/pricing/, { timeout: 5000 });
+    expect(page.url()).toContain("/pricing");
   });
 
   test("dashboard tabs navigation works", async ({ page }) => {

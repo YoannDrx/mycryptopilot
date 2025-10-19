@@ -34,7 +34,11 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     // 3. Navigate to traders marketplace
     await page.goto(`/orgs/${orgSlug}/traders`);
-    await page.waitForLoadState("networkidle");
+    // Wait for TanStack Query API call (hybrid architecture)
+    await page.waitForResponse(
+      (response) => response.url().includes("/api/traders/search"),
+      { timeout: 5000 },
+    );
 
     // 4. Wait for trader card to be visible and click "View Profile"
     // Since we just created this trader, they should be the first/only one in the list
