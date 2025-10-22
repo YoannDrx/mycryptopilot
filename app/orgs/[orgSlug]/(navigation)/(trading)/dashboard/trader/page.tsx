@@ -31,6 +31,7 @@ import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
 import { InviteFollowerDialog } from "@/components/nowts/invite-follower-dialog";
 import { InvitationsTable } from "@/components/nowts/invitations-table";
 import { ConversionStatsCard } from "@/components/nowts/conversion-stats-card";
+import { CreditsSection } from "./_components/credits-section";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -150,11 +151,14 @@ export default async function TraderDashboardPage() {
           </Card>
         </div>
 
-        {/* Referral Link Card */}
-        <ReferralLinkCard
-          traderId={user.id}
-          traderName={traderProfile.displayName}
-        />
+        {/* Referral & Credits Section */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <ReferralLinkCard
+            traderId={user.id}
+            traderName={traderProfile.displayName}
+          />
+          <CreditsSection />
+        </div>
 
         {/* Trader Status Card */}
         <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
