@@ -24,7 +24,7 @@ export const ReferralLinkCard = ({
   traderName,
 }: ReferralLinkCardProps) => {
   const [copied, setCopied] = useState(false);
-  const referralUrl = `${SiteConfig.appUrl}/invite/${traderId}`;
+  const referralUrl = `${SiteConfig.appUrl}/follow/${traderId}`;
 
   const handleCopy = async () => {
     try {
