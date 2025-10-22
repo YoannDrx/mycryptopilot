@@ -21,17 +21,16 @@ model Feedback {
 }
 
 model TraderProfile {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  displayName     String
-  bio             String?
-  priceMonthlyUSD Int       @default(0)
-  statsJson       Json?
-  verified        Boolean   @default(false)
-  verifiedAt      DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  displayName String
+  bio         String?
+  statsJson   Json?
+  verified    Boolean   @default(false)
+  verifiedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("trader_profile")
 }

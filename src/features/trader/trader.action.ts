@@ -45,7 +45,6 @@ export const createTraderProfileAction = authAction
         userId: user.id,
         displayName: parsedInput.displayName,
         bio: parsedInput.bio,
-        priceMonthlyUSD: parsedInput.priceMonthlyUSD || 0,
       },
     });
 
@@ -100,7 +99,6 @@ export const updateTraderProfileAction = authAction
       data: {
         displayName: parsedInput.displayName,
         bio: parsedInput.bio,
-        priceMonthlyUSD: parsedInput.priceMonthlyUSD,
       },
     });
 

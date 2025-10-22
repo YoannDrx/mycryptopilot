@@ -33,7 +33,6 @@ export default async function BecomeTraderPage() {
               defaultValues={{
                 displayName: traderProfile.displayName,
                 bio: traderProfile.bio,
-                priceMonthlyUSD: traderProfile.priceMonthlyUSD,
                 image: fullUser.image,
               }}
             />

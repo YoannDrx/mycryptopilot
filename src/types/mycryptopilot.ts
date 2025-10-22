@@ -117,7 +117,6 @@ export type TraderProfileWithStats = {
   userId: string;
   displayName: string;
   bio?: string | null;
-  priceMonthlyUSD: number;
   stats?: TraderStats | null;
   verified: boolean;
   verifiedAt?: Date | null;
