@@ -51,7 +51,6 @@ describe("trader.action", () => {
         userId: "user_123",
         displayName: "Pro Trader",
         bio: "Expert BTC",
-        priceMonthlyUSD: 0,
         statsJson: null,
         verified: false,
         verifiedAt: null,
@@ -105,7 +104,6 @@ describe("trader.action", () => {
         userId: "user_123",
         displayName: "Old Name",
         bio: "Old bio",
-        priceMonthlyUSD: 0,
         statsJson: null,
         verified: false,
         verifiedAt: null,
@@ -170,7 +168,6 @@ describe("trader.action", () => {
           id: "trader_123",
           displayName: "Pro Trader",
           bio: null,
-          priceMonthlyUSD: 0,
           verified: false,
           statsJson: null,
           createdAt: new Date(),
@@ -208,7 +205,6 @@ describe("trader.action", () => {
           id: "trader_123",
           displayName: "Pro Trader",
           bio: null,
-          priceMonthlyUSD: 0,
           verified: false,
           statsJson: null,
           createdAt: new Date(),
@@ -263,7 +259,6 @@ describe("trader.action", () => {
       const validData = {
         displayName: "Pro Trader",
         bio: "Expert in BTC trading",
-        priceMonthlyUSD: 49,
         image: "https://example.com/avatar.jpg",
       };
 

@@ -23,7 +23,6 @@ const TRADER_PROFILES = [
   {
     displayName: "CryptoWhale",
     bio: "Professional Bitcoin trader since 2015. Specialized in macro trends and swing trading. Risk-first approach with 65% win rate.",
-    priceMonthlyUSD: 99,
     verified: true,
     avatar:
       "https://api.dicebear.com/7.x/avataaars/svg?seed=CryptoWhale&backgroundColor=b6e3f4",
@@ -38,7 +37,6 @@ const TRADER_PROFILES = [
   {
     displayName: "AltcoinMaster",
     bio: "DeFi specialist focusing on Layer 1 and Layer 2 opportunities. Technical analysis combined with on-chain metrics.",
-    priceMonthlyUSD: 79,
     verified: true,
     avatar:
       "https://api.dicebear.com/7.x/avataaars/svg?seed=AltcoinMaster&backgroundColor=c0aede",
@@ -53,7 +51,6 @@ const TRADER_PROFILES = [
   {
     displayName: "ScalpKing",
     bio: "High-frequency scalper on perpetual contracts. Quick in & out with tight risk management.",
-    priceMonthlyUSD: 149,
     verified: true,
     avatar:
       "https://api.dicebear.com/7.x/avataaars/svg?seed=ScalpKing&backgroundColor=ffd5dc",
@@ -68,7 +65,6 @@ const TRADER_PROFILES = [
   {
     displayName: "SwingTrader_Pro",
     bio: "Mid-term swing trader focusing on major cryptocurrencies. Patient approach, let winners run.",
-    priceMonthlyUSD: 69,
     verified: true,
     avatar:
       "https://api.dicebear.com/7.x/avataaars/svg?seed=SwingTrader&backgroundColor=d1d4f9",
@@ -83,7 +79,6 @@ const TRADER_PROFILES = [
   {
     displayName: "DeFiHunter",
     bio: "Specialized in DeFi tokens and emerging protocols. Early mover advantage with solid risk/reward ratios.",
-    priceMonthlyUSD: 89,
     verified: false,
     avatar:
       "https://api.dicebear.com/7.x/avataaars/svg?seed=DeFiHunter&backgroundColor=ffdfbf",
@@ -98,7 +93,6 @@ const TRADER_PROFILES = [
   {
     displayName: "TechAnalyst",
     bio: "Pure technical analysis trader. Chart patterns, support/resistance, volume analysis. No fundamentals.",
-    priceMonthlyUSD: 59,
     verified: true,
     avatar:
       "https://api.dicebear.com/7.x/avataaars/svg?seed=TechAnalyst&backgroundColor=b6e3f4",
@@ -283,7 +277,6 @@ async function main() {
           userId: user.id,
           displayName: profileData.displayName,
           bio: profileData.bio,
-          priceMonthlyUSD: profileData.priceMonthlyUSD,
           statsJson: profileData.stats,
           verified: profileData.verified,
           verifiedAt: profileData.verified ? faker.date.past() : null,

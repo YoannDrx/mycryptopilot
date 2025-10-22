@@ -61,12 +61,14 @@ export const auth = betterAuth({
       create: {
         after: async (user, _req) => {
           // Initialize user with FREE plan (MyCryptoPilot default)
+          // Note: Trial activation via referral is handled separately in the landing page flow
           try {
             await prisma.user.update({
               where: { id: user.id },
               data: {
                 planName: "free",
                 // planExpiresAt is null for free plan (no expiration)
+                // trialEndsAt and trialPlan will be set by activateReferralTrial if user came from invite
               },
             });
             logger.info(`User ${user.id} initialized with FREE plan`);

@@ -19,6 +19,9 @@ model User {
   discordId       String?         @unique
   discordIntegrationEnabled Boolean @default(true) // true = veut les notifications Discord, false = a explicitement unlinked
   isFirstConnection Boolean        @default(true) // true = première connexion, envoyer email Discord bienvenue
+  onboardingCompleted Boolean      @default(false) // true = a terminé l'onboarding wizard
+  trialEndsAt     DateTime? // Date de fin du trial (14 jours Pro gratuit)
+  trialPlan       String? // Plan du trial: "pro" ou "ultra"
   feedbacks        Feedback[]
   accounts         Account[]
   cryptoAddresses  CryptoAddress[]
@@ -31,6 +34,9 @@ model User {
   signals          Signal[]
   traderProfile    TraderProfile?
   traderInvitations TraderInvitation[]
+  referralCredits  ReferralCredit[]
+  referralRewards  ReferralReward[]
+  referralTier     ReferralTier?
 
   @@map("user")
 }

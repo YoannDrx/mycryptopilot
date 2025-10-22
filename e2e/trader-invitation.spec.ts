@@ -10,7 +10,7 @@ test.describe("Trader Invitation System", () => {
       page,
     });
 
-    // 2. Navigate to trader dashboard invitations tab
+    // 2. Navigate to referral program page
     await page.goto("/orgs");
     await page.waitForURL(/\/orgs\/.*/);
 
@@ -18,7 +18,7 @@ test.describe("Trader Invitation System", () => {
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1].split("/")[0];
 
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto(`/orgs/${orgSlug}/trader-tools/referral`);
     await page.waitForLoadState("networkidle");
 
     // Click on Invitations tab
@@ -147,7 +147,7 @@ test.describe("Trader Invitation System", () => {
     await page.waitForURL(/\/orgs\/.*/, { timeout: 10000 });
 
     // 9. Navigate back to invitations tab and delete invitation
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto(`/orgs/${orgSlug}/trader-tools/referral`);
     await page.waitForLoadState("networkidle");
     await page.getByRole("tab", { name: /invitations/i }).click();
 

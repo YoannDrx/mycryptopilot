@@ -19,6 +19,7 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { LoadingButton } from "@/features/form/submit-button";
 import { inviteFollowerByEmailAction } from "@/features/invitation/invitation.action";
 import {
@@ -47,6 +48,7 @@ export const InviteFollowerDialog = ({
     schema: InviteFollowerSchema,
     defaultValues: {
       email: "",
+      personalMessage: "",
     },
   });
 
@@ -105,6 +107,24 @@ export const InviteFollowerDialog = ({
                   <Input
                     placeholder="colleague@example.com"
                     type="email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="personalMessage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Personal Message (Optional)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Add a personal note to your invitation..."
+                    rows={3}
                     {...field}
                   />
                 </FormControl>
