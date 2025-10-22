@@ -35,6 +35,11 @@ export async function getExchangeConnectionById(connectionId: string) {
         select: {
           userId: true,
           displayName: true,
+          user: {
+            select: {
+              planName: true,
+            },
+          },
         },
       },
     },
