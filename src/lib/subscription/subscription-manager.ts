@@ -6,6 +6,7 @@ import { notifyPlanUpdated } from "@/lib/discord/dm-notifications";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
+import { awardUpgradeBonus } from "@/lib/referral/invitation-tracking-service";
 
 /**
  * Subscription Manager
@@ -158,6 +159,34 @@ export async function activateSubscription(
     });
 
     logger.info("Subscription upserted", { organizationId: org.id, plan });
+
+    // 4.5. Award upgrade bonus au trader referrer si applicable (non-bloquant)
+    if (plan === "pro" || plan === "ultra") {
+      void awardUpgradeBonus(userId, plan)
+        .then((result) => {
+          if (result.success) {
+            logger.info("Upgrade bonus awarded to referrer", {
+              inviteeId: userId,
+              plan,
+              creditsAwarded: result.creditsAwarded,
+            });
+          } else {
+            // Log warning mais ne pas fail - peut être normal si pas d'invitation
+            logger.info("No upgrade bonus awarded (no referrer found)", {
+              inviteeId: userId,
+              plan,
+              reason: result.error,
+            });
+          }
+        })
+        .catch((err) => {
+          logger.error("Error awarding upgrade bonus", {
+            userId,
+            plan,
+            err,
+          });
+        });
+    }
 
     // 5. Assigner rôle Discord (non-bloquant)
     if (user.discordId) {

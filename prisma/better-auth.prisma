@@ -32,6 +32,8 @@ model User {
   signals          Signal[]
   traderProfile    TraderProfile?
   traderInvitations TraderInvitation[]
+  referralCredits  ReferralCredit[]
+  referralRewards  ReferralReward[]
 
   @@map("user")
 }

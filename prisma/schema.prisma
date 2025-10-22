@@ -111,22 +111,67 @@ model Signal {
 }
 
 model TraderInvitation {
-  id         String           @id @default(cuid())
-  traderId   String
-  email      String
-  token      String           @unique
-  status     InvitationStatus @default(PENDING)
-  expiresAt  DateTime
-  acceptedAt DateTime?
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  trader     User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  id                  String           @id @default(cuid())
+  traderId            String
+  email               String
+  token               String           @unique
+  status              InvitationStatus @default(PENDING)
+  expiresAt           DateTime
+  acceptedAt          DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  // Nouveaux champs pour système de referral avancé
+  source              InvitationSource @default(EMAIL)
+  customMessage       String?
+  landingViews        Int              @default(0)
+  clickedAt           DateTime?        // Première visite landing page
+  creditsAwarded      Int              @default(0) // Total credits donnés pour cette invite
+  inviteeActive       Boolean          @default(false) // 30+ jours actif
+  inviteeUpgraded     Boolean          @default(false)
+  inviteeUpgradedPlan String?          // "pro" ou "ultra"
+  inviteeUpgradedAt   DateTime?
+
+  trader              User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
 
   @@unique([traderId, email])
   @@index([token])
   @@index([traderId])
   @@index([status])
+  @@index([source])
   @@map("trader_invitation")
+}
+
+model ReferralCredit {
+  id        String     @id @default(cuid())
+  traderId  String
+  amount    Int        // Peut être négatif (dépense)
+  type      CreditType
+  reason    String?
+  metadata  Json?      // { inviteeId, plan, etc. }
+  createdAt DateTime   @default(now())
+  trader    User       @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId])
+  @@index([createdAt])
+  @@index([type])
+  @@map("referral_credit")
+}
+
+model ReferralReward {
+  id             String   @id @default(cuid())
+  traderId       String
+  inviteeId      String?
+  action         String   // "signup", "active_30d", "upgrade_pro", etc.
+  creditsAwarded Int
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  trader         User     @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId])
+  @@index([createdAt])
+  @@index([action])
+  @@map("referral_reward")
 }
 
 enum UserRole {
@@ -170,4 +215,32 @@ enum InvitationStatus {
   PENDING
   ACCEPTED
   EXPIRED
+}
+
+enum InvitationSource {
+  EMAIL             // Invitation par email (60d trial + 25 credits)
+  LINK              // Referral link public (30d trial)
+  SOCIAL_TWITTER    // Via partage Twitter
+  SOCIAL_TELEGRAM   // Via partage Telegram
+  SOCIAL_WHATSAPP   // Via partage WhatsApp
+}
+
+enum CreditType {
+  // Credits earned
+  EARNED_SIGNUP           // +5 credits (invitation acceptée)
+  EARNED_ACTIVE           // +10 credits (30+ jours actif)
+  EARNED_UPGRADE_PRO      // +50 credits (upgrade Pro)
+  EARNED_UPGRADE_ULTRA    // +100 credits (upgrade Ultra)
+  EARNED_RETENTION_3M     // +25 credits (reste 3 mois)
+
+  // Credits spent
+  SPENT_PRO_MONTH         // -100 credits (1 mois Pro gratuit)
+  SPENT_ULTRA_MONTH       // -200 credits (1 mois Ultra gratuit)
+  SPENT_FEATURED          // -50 credits (Featured placement 1 semaine)
+  SPENT_ANALYTICS         // -30 credits (Analytics premium)
+  SPENT_PROFILE_BOOST     // -75 credits (Profile boost 2x visibility)
+  SPENT_CUSTOM_BADGE      // -150 credits (Custom badge)
+
+  // Clawback
+  CLAWBACK_FRAUD          // Retrait en cas de fraude détectée
 }

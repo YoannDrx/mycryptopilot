@@ -20,6 +20,8 @@ import {
 import { followTraderAction } from "../follow/follow.action";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { TraderInvitationEmail } from "@email/trader-invitation";
+import { trackInvitationAcceptance } from "@/lib/referral/invitation-tracking-service";
+import { logger } from "@/lib/logger";
 
 /**
  * Action to invite a follower by email
@@ -153,14 +155,26 @@ export const acceptInvitationByTokenAction = authAction
       );
     }
 
-    // Mark invitation as accepted
-    await prisma.traderInvitation.update({
-      where: { id: invitation.id },
-      data: {
-        status: "ACCEPTED",
-        acceptedAt: new Date(),
-      },
+    // Track invitation acceptance and award credits to trader
+    // Note: trackInvitationAcceptance va update le status ACCEPTED et acceptedAt
+    const trackingResult = await trackInvitationAcceptance({
+      invitationId: invitation.id,
+      inviteeId: user.id,
+      source: invitation.source,
     });
+
+    if (!trackingResult.success) {
+      logger.error("Failed to track invitation acceptance", {
+        invitationId: invitation.id,
+        error: trackingResult.error,
+      });
+      // Ne pas fail tout le flow si le tracking échoue, juste log
+    } else {
+      logger.info("Invitation acceptance tracked", {
+        invitationId: invitation.id,
+        creditsAwarded: trackingResult.creditsAwarded,
+      });
+    }
 
     const traderName =
       invitation.trader.traderProfile?.displayName ?? invitation.trader.name;
