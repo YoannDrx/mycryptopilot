@@ -22,6 +22,8 @@ import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { TraderInvitationEmail } from "@email/trader-invitation";
 import { trackInvitationAcceptance } from "@/lib/referral/invitation-tracking-service";
 import { logger } from "@/lib/logger";
+import { checkInvitationRateLimit } from "@/lib/referral/rate-limiter";
+import { checkDisposableEmail } from "@/lib/referral/fraud-detection-service";
 
 /**
  * Action to invite a follower by email
@@ -38,6 +40,15 @@ export const inviteFollowerByEmailAction = authAction
     if (!isTrader) {
       throw new ActionError(
         "You need to be a trader to invite followers. Create your trader profile first.",
+      );
+    }
+
+    // Check rate limit
+    const rateLimit = await checkInvitationRateLimit(user.id);
+    if (!rateLimit.allowed) {
+      throw new ActionError(
+        rateLimit.reason ??
+          "You have reached your invitation limit. Please try again later.",
       );
     }
 
@@ -89,6 +100,13 @@ export const inviteFollowerByEmailAction = authAction
         personalMessage: parsedInput.personalMessage,
       },
     });
+
+    // Run fraud detection checks (non-blocking, logs to database)
+    void checkDisposableEmail(parsedInput.email, user.id, invitation.id).catch(
+      (err) => {
+        logger.error("Fraud detection check failed", { err });
+      },
+    );
 
     // Send email via Resend
     const invitationUrl = `${SiteConfig.appUrl}/invite/${token}`;

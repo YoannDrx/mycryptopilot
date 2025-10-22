@@ -133,6 +133,13 @@ model TraderInvitation {
   inviteeUpgradedAt   DateTime?
   personalMessage     String?          // Message personnalisé du trader (optionnel)
 
+  // Anti-gaming & fraud detection
+  signupIp            String?          // IP address du signup (détection same IP)
+  isSuspicious        Boolean          @default(false) // Flagged for review
+  suspiciousReason    String?          // Reason for flagging
+  reviewedAt          DateTime?        // When admin reviewed
+  reviewedBy          String?          // Admin user ID who reviewed
+
   trader              User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
 
   @@unique([traderId, email])
@@ -188,6 +195,28 @@ model ReferralTier {
   @@index([tier])
   @@index([activeInvitesCount])
   @@map("referral_tier")
+}
+
+model FraudLog {
+  id          String   @id @default(cuid())
+  traderId    String?
+  userId      String?
+  type        String   // "SAME_IP", "DISPOSABLE_EMAIL", "RAPID_SIGNUPS", "INACTIVE_USER", etc.
+  description String
+  metadata    Json?    // Additional context (IP, email, etc.)
+  severity    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?  // Admin user ID
+  createdAt   DateTime @default(now())
+
+  @@index([traderId])
+  @@index([userId])
+  @@index([type])
+  @@index([severity])
+  @@index([resolved])
+  @@index([createdAt])
+  @@map("fraud_log")
 }
 
 enum UserRole {
