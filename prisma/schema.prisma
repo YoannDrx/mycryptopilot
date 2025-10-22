@@ -131,6 +131,7 @@ model TraderInvitation {
   inviteeUpgraded     Boolean          @default(false)
   inviteeUpgradedPlan String?          // "pro" ou "ultra"
   inviteeUpgradedAt   DateTime?
+  personalMessage     String?          // Message personnalisé du trader (optionnel)
 
   trader              User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
 

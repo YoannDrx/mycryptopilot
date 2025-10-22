@@ -86,11 +86,12 @@ export const inviteFollowerByEmailAction = authAction
         token,
         expiresAt,
         status: "PENDING",
+        personalMessage: parsedInput.personalMessage,
       },
     });
 
     // Send email via Resend
-    const invitationUrl = `${SiteConfig.appUrl}/invite/accept/${token}`;
+    const invitationUrl = `${SiteConfig.appUrl}/invite/${token}`;
 
     try {
       await resend.emails.send({
