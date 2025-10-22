@@ -59,19 +59,48 @@ export const POST = authRoute
       };
     }
 
-    // Soft delete: set isActive to false
-    await prisma.exchangeConnection.update({
-      where: { id: connectionId },
-      data: {
-        isActive: false,
-        updatedAt: new Date(),
-      },
+    // Soft delete: set isActive to false and update verified status
+    await prisma.$transaction(async (tx) => {
+      // Disconnect the connection
+      await tx.exchangeConnection.update({
+        where: { id: connectionId },
+        data: {
+          isActive: false,
+          updatedAt: new Date(),
+        },
+      });
+
+      // Check if trader has any remaining active connections
+      const remainingActiveConnections = await tx.exchangeConnection.count({
+        where: {
+          traderProfileId: connection.traderProfileId,
+          isActive: true,
+        },
+      });
+
+      // If no more active connections, remove verified status
+      if (remainingActiveConnections === 0) {
+        await tx.traderProfile.update({
+          where: { id: connection.traderProfileId },
+          data: {
+            verified: false,
+            verifiedAt: null,
+          },
+        });
+      }
     });
 
     logger.info("Exchange connection disconnected successfully", {
       userId,
       connectionId,
       exchange: connection.exchange,
+      traderStillVerified:
+        (await prisma.exchangeConnection.count({
+          where: {
+            traderProfileId: connection.traderProfileId,
+            isActive: true,
+          },
+        })) > 0,
     });
 
     return {

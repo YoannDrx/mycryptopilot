@@ -8,7 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { TraderPerformanceSnapshot } from "@/generated/prisma";
+import Link from "next/link";
 import {
   TrendingUp,
   TrendingDown,
@@ -21,12 +23,16 @@ import {
 type PerformanceStatsDisplayProps = {
   snapshot: TraderPerformanceSnapshot | null;
   loading?: boolean;
+  userPlanName?: string | null; // User's plan to determine what stats to show
 };
 
 export const PerformanceStatsDisplay = ({
   snapshot,
   loading = false,
+  userPlanName = null,
 }: PerformanceStatsDisplayProps) => {
+  // Free users can only see winrate (preview mode)
+  const isFreeUser = !userPlanName || userPlanName.toLowerCase() === "free";
   if (loading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -85,6 +91,56 @@ export const PerformanceStatsDisplay = ({
 
   const winrateBadge = getWinrateBadge();
 
+  // Free users: only show winrate + upgrade CTA
+  if (isFreeUser) {
+    return (
+      <div className="space-y-4">
+        {/* Winrate Card (Preview for FREE users) */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+            <Target className="text-muted-foreground size-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{winrate.toFixed(1)}%</div>
+            <Badge variant={winrateBadge.variant} className="mt-2">
+              {winrateBadge.label}
+            </Badge>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {snapshot.winningTrades} wins / {snapshot.losingTrades} losses
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Upgrade CTA */}
+        <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="size-5" />
+              Unlock Full Performance Stats
+            </CardTitle>
+            <CardDescription>
+              Upgrade to Pro or Ultra to view detailed performance metrics
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-muted-foreground space-y-2 text-sm">
+              <p>🔒 Net PnL & Profit Factor</p>
+              <p>🔒 Max Drawdown & Risk Metrics</p>
+              <p>🔒 Average Win/Loss Analysis</p>
+              <p>🔒 Sharpe & Sortino Ratios</p>
+              <p>🔒 Largest Trades History</p>
+            </div>
+            <Button asChild className="w-full">
+              <Link href="/pricing">Upgrade Now</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Pro/Ultra users: show all metrics
   return (
     <div className="space-y-4">
       {/* Key Metrics Grid */}

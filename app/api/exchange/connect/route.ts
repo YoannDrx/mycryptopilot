@@ -172,18 +172,32 @@ export async function POST(request: Request) {
     // Calculate next sync time based on plan
     const nextSyncAt = calculateNextSyncAt(planName);
 
-    // Store connection in DB
-    const connection = await prisma.exchangeConnection.create({
-      data: {
-        traderProfileId: traderProfile.id,
-        exchange,
-        encryptedApiKey: encryptedApiKey.encrypted,
-        encryptedSecretKey: encryptedSecretKey.encrypted,
-        keyIv: encryptedApiKey.iv,
-        keyTag: encryptedApiKey.tag,
-        isActive: true,
-        nextSyncAt,
-      },
+    // Store connection in DB and mark trader as verified
+    const connection = await prisma.$transaction(async (tx) => {
+      // Create connection
+      const newConnection = await tx.exchangeConnection.create({
+        data: {
+          traderProfileId: traderProfile.id,
+          exchange,
+          encryptedApiKey: encryptedApiKey.encrypted,
+          encryptedSecretKey: encryptedSecretKey.encrypted,
+          keyIv: encryptedApiKey.iv,
+          keyTag: encryptedApiKey.tag,
+          isActive: true,
+          nextSyncAt,
+        },
+      });
+
+      // Mark trader as verified (has at least one active exchange connection)
+      await tx.traderProfile.update({
+        where: { id: traderProfile.id },
+        data: {
+          verified: true,
+          verifiedAt: new Date(),
+        },
+      });
+
+      return newConnection;
     });
 
     logger.info("Exchange connection created successfully", {
@@ -191,6 +205,7 @@ export async function POST(request: Request) {
       traderProfileId: traderProfile.id,
       connectionId: connection.id,
       exchange,
+      traderVerified: true,
     });
 
     return NextResponse.json({
