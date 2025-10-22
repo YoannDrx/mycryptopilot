@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { expect, test } from "@playwright/test";
 import { createTestAccount, signOutAccount } from "./utils/auth-test";
 import {
+  createTestTrader,
   createTestTraderDirectly,
   createTestSignal,
 } from "./utils/trader-test";
