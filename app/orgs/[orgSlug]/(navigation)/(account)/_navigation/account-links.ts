@@ -1,14 +1,22 @@
 import type { NavigationLink } from "@/features/navigation/navigation.type";
-import { User2, MessageSquare, Mail, Users, AlertCircle } from "lucide-react";
+import {
+  User2,
+  MessageSquare,
+  Mail,
+  Users,
+  AlertCircle,
+  BarChart3,
+} from "lucide-react";
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
 
 /**
  * Account Space Links
  *
- * 5 liens pour la section Account Settings :
+ * 6 liens pour la section Account Settings :
  * - Profile (settings principal)
  * - Discord Integration
+ * - Exchanges (Portfolio Tracking)
  * - Email Preferences
  * - Following (traders suivis)
  * - Danger Zone (suppression compte)
@@ -23,6 +31,11 @@ export const ACCOUNT_LINKS: NavigationLink[] = [
     href: `${ORGANIZATION_PATH}/account/discord`,
     Icon: MessageSquare,
     label: "Discord Integration",
+  },
+  {
+    href: `${ORGANIZATION_PATH}/account/exchanges`,
+    Icon: BarChart3,
+    label: "Portfolio Tracking",
   },
   {
     href: `${ORGANIZATION_PATH}/account/email`,

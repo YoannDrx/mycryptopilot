@@ -31,6 +31,7 @@ import { decryptApiKey } from "@/lib/crypto/encryption-service";
 import { BinanceService } from "@/lib/exchange/binance-service";
 import type { ExchangeConnection } from "@/generated/prisma";
 import { calculateNextSyncAt } from "@/features/exchange/exchange-plan-limits";
+import { sendSyncFailureNotification } from "@/lib/exchange/email-notifications";
 
 type SyncResult = {
   success: boolean;
@@ -237,6 +238,23 @@ export async function syncConnectionTrades(
       logger.error("Failed to update sync error", {
         connectionId: connection.id,
         updateError,
+      });
+    }
+
+    // Send email notification (with rate limiting)
+    try {
+      await sendSyncFailureNotification({
+        connectionId: connection.id,
+        traderProfileId: connection.traderProfileId,
+        exchange: connection.exchange,
+        errorMessage,
+        lastSuccessfulSync: connection.lastSyncedAt ?? undefined,
+      });
+    } catch (emailError) {
+      // Email failure should not block sync result
+      logger.error("Failed to send sync failure email", {
+        connectionId: connection.id,
+        emailError,
       });
     }
 

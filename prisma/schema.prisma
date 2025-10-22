@@ -49,6 +49,7 @@ model ExchangeConnection {
   isActive           Boolean         @default(true)
   lastSyncedAt       DateTime?
   lastSyncError      String?         @db.Text
+  lastEmailSentAt    DateTime?       // Email rate limiting (max 1/day)
   nextSyncAt         DateTime?
   trades             ExchangeTrade[]
   createdAt          DateTime        @default(now())

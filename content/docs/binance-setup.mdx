@@ -1,0 +1,380 @@
+---
+title: "Binance API Setup Guide"
+description: "Complete guide to creating and configuring Binance API keys for Portfolio Tracking"
+keywords: ["binance", "api keys", "setup", "portfolio tracking", "exchange connection"]
+tags: ["guide", "binance", "api"]
+order: 4
+subcategory: "Guide"
+---
+
+# Binance API Setup Guide
+
+This guide will walk you through creating and configuring Binance API keys to enable **Portfolio Tracking** in MyCryptoPilot.
+
+## Why Connect Binance?
+
+Connecting your Binance account allows MyCryptoPilot to:
+
+- **Sync your trading history** automatically
+- **Calculate real performance metrics** (Win rate, Profit Factor, Sharpe Ratio)
+- **Display verified trading stats** to potential followers
+- **Earn the Verified Badge** when your stats meet criteria
+
+## Security First 🔒
+
+**Important security notes:**
+
+- ✅ API keys are **read-only** (no withdrawal or trading permissions)
+- ✅ Keys are **encrypted** using AES-256-GCM before storage
+- ✅ Encryption key is stored securely in environment variables
+- ✅ Keys **never appear in logs** or browser console
+- ✅ You can revoke API keys anytime from Binance settings
+
+**We NEVER:**
+- ❌ Request withdrawal permissions
+- ❌ Request trading permissions
+- ❌ Store your password
+- ❌ Have access to your funds
+
+## Step 1: Create Binance API Key
+
+### 1.1 Log in to Binance
+
+1. Go to [binance.com](https://www.binance.com)
+2. Log in to your account
+3. Complete 2FA verification if prompted
+
+### 1.2 Navigate to API Management
+
+1. Click on your **profile icon** (top right)
+2. Select **API Management**
+3. You may be asked to verify your identity (2FA code)
+
+**Note:** If you don't see "API Management", ensure your account has completed identity verification (KYC).
+
+### 1.3 Create New API Key
+
+1. Click **"Create API"** button
+2. Choose **"System-generated API Key"** (recommended)
+3. Enter a label: `MyCryptoPilot - Portfolio Tracking`
+4. Complete 2FA verification
+
+### 1.4 Configure Permissions ⚠️ CRITICAL
+
+**ONLY enable these permissions:**
+
+- ✅ **Enable Reading** (or "Read Only" / "Spot & Margin Trading - Read")
+- ❌ **DISABLE** Enable Spot & Margin Trading
+- ❌ **DISABLE** Enable Futures Trading
+- ❌ **DISABLE** Enable Withdrawals
+- ❌ **DISABLE** Enable Internal Transfers
+
+**Screenshot location:** [Screenshot showing correct permissions checkboxes]
+
+### 1.5 IP Whitelist (Optional but Recommended)
+
+For maximum security, you can restrict API key usage to specific IPs:
+
+**Option 1: Unrestricted Access (Not Recommended)**
+- Select **"Unrestricted"** if you want simplest setup
+- Less secure but easier for users with dynamic IPs
+
+**Option 2: IP Whitelist (Recommended)**
+- Select **"Restrict access to trusted IPs only"**
+- Add MyCryptoPilot server IPs:
+  ```
+  [IP addresses will be provided based on deployment]
+  ```
+
+### 1.6 Save Your Keys
+
+After creation, Binance will display:
+
+1. **API Key** (public) - Example: `xzY3k8mN...`
+2. **Secret Key** (private) - Example: `7hB9qW2v...`
+
+⚠️ **CRITICAL**: Copy both keys immediately. The **Secret Key** is shown only once and cannot be recovered.
+
+Store them temporarily in a secure location (password manager, encrypted note).
+
+## Step 2: Connect to MyCryptoPilot
+
+### 2.1 Navigate to Exchange Settings
+
+1. Log in to MyCryptoPilot
+2. Go to **Account → Exchanges**
+3. Click **"Connect Exchange"**
+
+### 2.2 Paste Your API Keys
+
+1. **Exchange**: Select "Binance"
+2. **API Key**: Paste your API Key
+3. **Secret Key**: Paste your Secret Key
+4. Click **"Validate & Connect"**
+
+**Screenshot location:** [Screenshot of the Connect Exchange form]
+
+### 2.3 Validation Process
+
+MyCryptoPilot will:
+
+1. Test your API keys with a simple API call
+2. Verify read-only permissions (no trading/withdrawal enabled)
+3. Encrypt keys using AES-256-GCM
+4. Store encrypted keys in database
+
+**Success message:** "✅ Exchange connected successfully!"
+
+### 2.4 Initial Sync
+
+After connection:
+
+- First sync starts **immediately**
+- Fetches trades from **last 30 days**
+- Syncs automatically every **5 minutes** (FREE), **1 minute** (PRO), **5 seconds** (ULTRA)
+- Performance metrics calculated for 4 periods (All-Time, 365D, 90D, 30D)
+
+## Step 3: View Your Stats
+
+### 3.1 Dashboard
+
+Go to **Trading → Dashboard** to see:
+
+- Connection status (Active, Last sync time)
+- Performance metrics:
+  - **Winrate** (%)
+  - **Profit Factor** (Gross Profit / Gross Loss)
+  - **Net PnL** (Total profit/loss)
+  - **Sharpe Ratio**, **Sortino Ratio**
+  - **Max Drawdown**, **Average Win/Loss**
+  - And 8 more metrics
+
+### 3.2 Verified Badge
+
+The **Verified Badge** is automatically managed:
+
+- ✅ **Activated** when exchange is connected and synced
+- ❌ **Removed** when exchange is disconnected
+
+Verification shows followers that your stats are real and backed by live trading data.
+
+## Troubleshooting
+
+### Error: "Invalid API Key"
+
+**Possible causes:**
+
+1. **Typo in API Key/Secret**: Copy-paste carefully, no extra spaces
+2. **Wrong permissions**: Ensure "Enable Reading" is checked
+3. **Keys revoked**: Check if keys still exist in Binance API Management
+4. **IP restriction mismatch**: Add MyCryptoPilot IPs to whitelist
+
+**Solution:**
+- Re-check both keys (no spaces before/after)
+- Verify permissions in Binance API Management
+- Try creating new API keys if issue persists
+
+### Error: "IP address not whitelisted"
+
+**Cause:** Your API keys have IP restrictions enabled, and MyCryptoPilot's server IPs are not whitelisted.
+
+**Solution:**
+
+1. Go to Binance → API Management
+2. Click **"Edit"** on your API key
+3. Add MyCryptoPilot server IPs to whitelist:
+   ```
+   [IP addresses will be provided]
+   ```
+4. Save changes
+5. Reconnect in MyCryptoPilot
+
+### Error: "Rate limit exceeded"
+
+**Cause:** Binance API has rate limits. Too many requests in short time.
+
+**Solution:**
+- Wait 1 minute
+- Retry connection
+- If persists, check if other apps are using the same API keys
+
+### Sync Not Working
+
+**Symptoms:** Last sync timestamp not updating, no new trades appearing
+
+**Solutions:**
+
+1. **Check connection status**: Go to Account → Exchanges
+2. **View last error**: Hover over warning icon if present
+3. **Manual sync**: Click "Sync Now" button
+4. **Check Binance**: Ensure you have trades in the last 30 days
+5. **Reconnect**: Try disconnecting and reconnecting
+
+### Missing Trades
+
+**Possible reasons:**
+
+1. **Trades older than 30 days**: First sync only fetches last 30 days
+2. **Different trading account**: Ensure API keys are from the correct Binance account
+3. **Futures vs Spot**: Currently supports both Spot and Futures trades
+4. **Sync delay**: Wait 5 minutes for next automatic sync
+
+### Performance Metrics Not Showing
+
+**Requirements:**
+
+- At least **10 trades** synced
+- Trades must have **realizedPnl** data (futures) or be calculable (spot)
+- Wait for initial sync to complete
+
+**Check:**
+- Go to Account → Exchanges
+- Look for "Last Synced" timestamp
+- Ensure it says "Active" status
+
+## Email Notifications
+
+MyCryptoPilot sends email notifications for sync failures:
+
+### Notification Triggers
+
+You'll receive an email if:
+- Sync fails due to invalid API keys
+- IP whitelist issues detected
+- Network/API errors occur
+
+### Rate Limiting
+
+To avoid spam:
+- **Maximum 1 email per 24 hours** per connection
+- Automatic retry every 5 minutes until sync succeeds
+- Email includes troubleshooting guidance
+
+### Opt-out
+
+To disable sync failure emails:
+1. Go to **Account → Email Preferences**
+2. Uncheck "Exchange sync notifications"
+
+## Managing Your Connection
+
+### Viewing Connection Details
+
+**Account → Exchanges** shows:
+
+- Exchange name (Binance)
+- Connection status (Active/Inactive)
+- Last sync timestamp
+- Next sync scheduled time
+- Total trades synced
+- Last error (if any)
+
+### Updating API Keys
+
+If you need to rotate API keys:
+
+1. Create new API keys in Binance (Step 1)
+2. Go to Account → Exchanges
+3. Click **"Disconnect"**
+4. Click **"Connect Exchange"** again
+5. Paste new API keys
+
+### Disconnecting Exchange
+
+⚠️ **Warning:** Disconnecting will:
+- Remove your Verified Badge
+- Stop automatic syncs
+- Keep historical trades (not deleted)
+- Hide performance stats from followers
+
+To disconnect:
+1. Go to Account → Exchanges
+2. Click **"Disconnect"**
+3. Confirm action
+
+You can reconnect anytime without data loss (historical trades remain).
+
+## Plan Limits
+
+Connection limits by plan:
+
+| Plan | Max Connections | Sync Frequency |
+|------|----------------|----------------|
+| **FREE** | 0 connections | N/A |
+| **PRO** | 1 connection | Every 1 minute |
+| **ULTRA** | 3 connections | Every 5 seconds |
+
+### Multiple Exchanges
+
+Ultra users can connect multiple Binance accounts (e.g., main account + futures-only account).
+
+**Coming soon:** Support for Bybit, OKX, Kraken APIs.
+
+## Advanced: API Key Rotation
+
+For maximum security, rotate API keys every 3-6 months:
+
+1. Create new API keys in Binance
+2. Disconnect old connection in MyCryptoPilot
+3. Reconnect with new keys
+4. Revoke old API keys in Binance
+
+## FAQ
+
+### Do you store my API keys?
+
+Yes, but **encrypted**:
+- Keys are encrypted using **AES-256-GCM** (military-grade)
+- Encryption key stored securely in environment variables (not in database)
+- Keys never appear in logs or error messages
+- Only decrypted in-memory during API calls
+
+### Can you trade on my behalf?
+
+**No.** API keys have **read-only permissions**. We cannot:
+- Place trades
+- Withdraw funds
+- Transfer assets
+- Modify account settings
+
+### What data do you fetch?
+
+We only fetch:
+- **Trade history** (spot + futures)
+- **Order details** (symbol, side, price, quantity, PnL)
+- **Account balances** (for future features)
+
+We **do not** fetch:
+- Withdrawal history
+- Deposit addresses
+- KYC documents
+- Login credentials
+
+### Is my data shared with third parties?
+
+**No.** Your trading data is:
+- **Private by default** (only you can see raw trades)
+- **Aggregated stats** are public if you're a verified trader (Win rate, Profit Factor, etc.)
+- **Never sold** to third parties
+- Used only for calculating performance metrics
+
+### What happens if my API keys are compromised?
+
+If you suspect compromise:
+
+1. **Immediately revoke keys** in Binance API Management
+2. **Disconnect** in MyCryptoPilot (Account → Exchanges)
+3. **Create new keys** with fresh credentials
+4. **Reconnect** with new keys
+
+**Impact:** Read-only keys cannot withdraw funds, so compromise risk is minimal.
+
+---
+
+## Need Help?
+
+- **Discord support**: Join our [Discord community](https://discord.gg/mycryptopilot)
+- **Email**: contact@mycryptopilot.app
+- **FAQ**: [Frequently Asked Questions](/docs/faq)
+
+**Ready to connect?** [Go to Account → Exchanges](/orgs/account/exchanges)

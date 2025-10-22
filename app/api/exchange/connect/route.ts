@@ -96,12 +96,23 @@ export async function POST(request: Request) {
     );
 
     if (existingConnection) {
-      return NextResponse.json(
-        {
-          error: `You already have a ${exchange} connection. Disconnect it first to reconnect.`,
-        },
-        { status: 409 },
-      );
+      // If connection exists but is inactive, we'll reactivate it (instead of creating new one)
+      if (!existingConnection.isActive) {
+        logger.info("Reactivating inactive connection", {
+          userId: user.id,
+          connectionId: existingConnection.id,
+          exchange,
+        });
+        // Will reactivate below after API validation
+      } else {
+        // Connection is still active - return error
+        return NextResponse.json(
+          {
+            error: `You already have an active ${exchange} connection. Disconnect it first to reconnect with different keys.`,
+          },
+          { status: 409 },
+        );
+      }
     }
 
     // Check current connection count
@@ -174,19 +185,44 @@ export async function POST(request: Request) {
 
     // Store connection in DB and mark trader as verified
     const connection = await prisma.$transaction(async (tx) => {
-      // Create connection
-      const newConnection = await tx.exchangeConnection.create({
-        data: {
-          traderProfileId: traderProfile.id,
+      let updatedConnection;
+
+      if (existingConnection && !existingConnection.isActive) {
+        // Reactivate existing inactive connection with new keys
+        updatedConnection = await tx.exchangeConnection.update({
+          where: { id: existingConnection.id },
+          data: {
+            encryptedApiKey: encryptedApiKey.encrypted,
+            encryptedSecretKey: encryptedSecretKey.encrypted,
+            keyIv: encryptedApiKey.iv,
+            keyTag: encryptedApiKey.tag,
+            isActive: true,
+            nextSyncAt,
+            lastSyncError: null, // Clear previous errors
+            updatedAt: new Date(),
+          },
+        });
+
+        logger.info("Connection reactivated with new keys", {
+          userId: user.id,
+          connectionId: existingConnection.id,
           exchange,
-          encryptedApiKey: encryptedApiKey.encrypted,
-          encryptedSecretKey: encryptedSecretKey.encrypted,
-          keyIv: encryptedApiKey.iv,
-          keyTag: encryptedApiKey.tag,
-          isActive: true,
-          nextSyncAt,
-        },
-      });
+        });
+      } else {
+        // Create new connection
+        updatedConnection = await tx.exchangeConnection.create({
+          data: {
+            traderProfileId: traderProfile.id,
+            exchange,
+            encryptedApiKey: encryptedApiKey.encrypted,
+            encryptedSecretKey: encryptedSecretKey.encrypted,
+            keyIv: encryptedApiKey.iv,
+            keyTag: encryptedApiKey.tag,
+            isActive: true,
+            nextSyncAt,
+          },
+        });
+      }
 
       // Mark trader as verified (has at least one active exchange connection)
       await tx.traderProfile.update({
@@ -197,16 +233,24 @@ export async function POST(request: Request) {
         },
       });
 
-      return newConnection;
+      return updatedConnection;
     });
 
-    logger.info("Exchange connection created successfully", {
-      userId: user.id,
-      traderProfileId: traderProfile.id,
-      connectionId: connection.id,
-      exchange,
-      traderVerified: true,
-    });
+    const wasReactivated = existingConnection && !existingConnection.isActive;
+
+    logger.info(
+      wasReactivated
+        ? "Exchange connection reactivated successfully"
+        : "Exchange connection created successfully",
+      {
+        userId: user.id,
+        traderProfileId: traderProfile.id,
+        connectionId: connection.id,
+        exchange,
+        traderVerified: true,
+        wasReactivated,
+      },
+    );
 
     return NextResponse.json({
       success: true,
@@ -217,7 +261,9 @@ export async function POST(request: Request) {
         isActive: connection.isActive,
         nextSyncAt: connection.nextSyncAt,
       },
-      message: `${exchange} connected successfully! First sync will start soon.`,
+      message: wasReactivated
+        ? `${exchange} reconnected successfully! Sync will start soon.`
+        : `${exchange} connected successfully! First sync will start soon.`,
     });
   } catch (error) {
     logger.error("Exchange connection error", { error });

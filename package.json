@@ -98,6 +98,7 @@
     "next-zod-route": "^1.0.0",
     "nprogress": "^0.2.0",
     "nuqs": "^2.6.0",
+    "protobufjs": "^7.5.4",
     "qrcode": "^1.5.4",
     "react": "19.1.1",
     "react-countdown": "^2.3.6",

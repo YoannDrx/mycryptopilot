@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { upfetch } from "@/lib/up-fetch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Link2, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type ConnectExchangeFormProps = {
   onSuccess?: () => void;
@@ -28,6 +29,7 @@ export const ConnectExchangeForm = ({
   onSuccess,
 }: ConnectExchangeFormProps) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const form = useZodForm({
     schema: ConnectExchangeSchema,
@@ -40,17 +42,13 @@ export const ConnectExchangeForm = ({
 
   const connectMutation = useMutation({
     mutationFn: async (values: ConnectExchangeInput) => {
-      const response = await upfetch("/api/exchange/connect", {
+      // upfetch automatically parses JSON and throws on error (status >= 400)
+      const data = await upfetch("/api/exchange/connect", {
         method: "POST",
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error ?? "Failed to connect exchange");
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: async (data) => {
       toast.success(
@@ -60,6 +58,8 @@ export const ConnectExchangeForm = ({
       await queryClient.invalidateQueries({
         queryKey: ["exchange-connections"],
       });
+      // Refresh Server Component data to update connection count
+      router.refresh();
       onSuccess?.();
     },
     onError: (error: Error) => {

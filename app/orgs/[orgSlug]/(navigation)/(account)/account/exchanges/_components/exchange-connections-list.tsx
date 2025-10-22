@@ -54,14 +54,12 @@ const ConnectionWithStats = ({ connection }: { connection: Connection }) => {
   const { data: statusData, isLoading } = useQuery({
     queryKey: ["exchange-status", connection.id],
     queryFn: async () => {
-      const response = await upfetch(`/api/exchange/${connection.id}/status`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch connection status");
-      }
-      return response.json() as Promise<{
+      // upfetch automatically parses JSON and throws on error
+      const data = await upfetch(`/api/exchange/${connection.id}/status`);
+      return data as {
         connection: Connection;
         stats: Stats;
-      }>;
+      };
     },
   });
 

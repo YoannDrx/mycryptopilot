@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { dialogManager } from "@/features/dialog-manager/dialog-manager";
+import { useRouter } from "next/navigation";
 
 type ExchangeConnectionCardProps = {
   connection: {
@@ -44,20 +45,17 @@ export const ExchangeConnectionCard = ({
   stats,
 }: ExchangeConnectionCardProps) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   // Manual sync mutation
   const syncMutation = useMutation({
     mutationFn: async () => {
-      const response = await upfetch(`/api/exchange/${connection.id}/sync`, {
+      // upfetch automatically parses JSON and throws on error
+      const data = await upfetch(`/api/exchange/${connection.id}/sync`, {
         method: "POST",
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error ?? "Failed to sync exchange");
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       toast.success(data.message ?? "Sync scheduled successfully!");
@@ -76,25 +74,19 @@ export const ExchangeConnectionCard = ({
   // Disconnect mutation
   const disconnectMutation = useMutation({
     mutationFn: async () => {
-      const response = await upfetch(
-        `/api/exchange/${connection.id}/disconnect`,
-        {
-          method: "POST",
-        },
-      );
+      // upfetch automatically parses JSON and throws on error
+      const data = await upfetch(`/api/exchange/${connection.id}/disconnect`, {
+        method: "POST",
+      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error ?? "Failed to disconnect exchange");
-      }
-
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       toast.success(data.message ?? "Exchange disconnected successfully!");
       void queryClient.invalidateQueries({
         queryKey: ["exchange-connections"],
       });
+      router.refresh(); // Refresh Server Component data to update connection count
     },
     onError: (error: Error) => {
       toast.error(error.message);
