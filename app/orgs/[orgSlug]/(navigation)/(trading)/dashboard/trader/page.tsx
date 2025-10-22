@@ -29,7 +29,10 @@ import { TraderSignalsList } from "./_components/trader-signals-list";
 import { redirect } from "next/navigation";
 import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
 import { InviteFollowerDialog } from "@/components/nowts/invite-follower-dialog";
-import { InvitationsTable } from "@/components/nowts/invitations-table";
+import { EnhancedInvitationsTable } from "@/components/nowts/enhanced-invitations-table";
+import { ReferralEarningsCard } from "@/components/nowts/referral-earnings-card";
+import { DetailedFunnelCard } from "@/components/nowts/detailed-funnel-card";
+import { TopInviteesCard } from "@/components/nowts/top-invitees-card";
 import { ConversionStatsCard } from "@/components/nowts/conversion-stats-card";
 import { CreditsSection } from "./_components/credits-section";
 import { Suspense } from "react";
@@ -216,20 +219,39 @@ export default async function TraderDashboardPage() {
 
           {/* Invitations Tab */}
           <TabsContent value="invitations" className="space-y-4">
-            {/* Conversion Stats */}
-            <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-              <ConversionStatsCard traderId={user.id} />
-            </Suspense>
+            {/* Revenue Impact Section */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                <ReferralEarningsCard traderId={user.id} />
+              </Suspense>
+              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                <ConversionStatsCard traderId={user.id} />
+              </Suspense>
+            </div>
 
-            {/* Invitations Table */}
+            {/* Funnel & Top Invitees */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Suspense
+                fallback={<Skeleton className="h-96 w-full md:col-span-2" />}
+              >
+                <div className="md:col-span-2">
+                  <DetailedFunnelCard traderId={user.id} />
+                </div>
+              </Suspense>
+              <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+                <TopInviteesCard traderId={user.id} />
+              </Suspense>
+            </div>
+
+            {/* Enhanced Invitations Table */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Follower Invitations</CardTitle>
                     <CardDescription>
-                      Invite people to follow you and receive your trading
-                      signals
+                      Detailed tracking of all your invitations and their
+                      performance
                     </CardDescription>
                   </div>
                   <InviteFollowerDialog />
@@ -245,7 +267,7 @@ export default async function TraderDashboardPage() {
                     </div>
                   }
                 >
-                  <InvitationsTable traderId={user.id} />
+                  <EnhancedInvitationsTable traderId={user.id} />
                 </Suspense>
               </CardContent>
             </Card>
