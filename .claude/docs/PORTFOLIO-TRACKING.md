@@ -1328,4 +1328,411 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 
 ---
 
-**Fin de documentation - Semaine 3 complétée** ✅
+## 📋 Remaining Work - Production Readiness
+
+**Status actuel** : Semaines 1-3 complétées (100% fonctionnel en dev)
+**Objectif** : Production-ready avec couverture Option B (Solide, 18-23h)
+**Date target** : Avant déploiement production
+
+### 🔴 Phase 0: BLOQUEURS PRODUCTION (P0) - Estimation: 8-10h
+
+**Statut**: ❌ **0/6 tâches complétées**
+
+#### 1. Tests (Priorité 1) - 4-6h
+
+**Tests E2E (Playwright)** - 2-3h :
+- [ ] **E2E complet**: Connect Binance → Auto-sync → View stats → Disconnect
+  - Fichier: `e2e/portfolio-tracking.spec.ts`
+  - Scénarios:
+    1. Trader PRO connect Binance (mock API keys)
+    2. Attendre premier sync (5 min)
+    3. Vérifier stats ALL_TIME affichées
+    4. Verified badge appear
+    5. Changer période (30D, 90D, 365D)
+    6. Disconnect → verified badge removed
+- [ ] **Free User Gating**: Voir uniquement winrate + upgrade CTA
+- [ ] **Verified Badge Auto-management**: Connect/disconnect hooks
+
+**Tests Unitaires (Vitest)** - 2-3h :
+- [ ] **PerformanceCalculator** (CRITIQUE - 15 métriques):
+  - Fichier: `__tests__/lib/exchange/performance-calculator.test.ts`
+  - Tests: winrate, profit factor, Sharpe, Sortino, MDD, avg win/loss
+  - Mock data: 100 trades (60% winrate scenario)
+- [ ] **BinanceService** (validateApiKeys + fetchTrades):
+  - Fichier: `__tests__/lib/exchange/binance-service.test.ts`
+  - Mock ccxt responses
+  - Test read-only enforcement
+- [ ] **SyncService** (sync flow):
+  - Fichier: `__tests__/lib/exchange/sync-service.test.ts`
+  - Mock Binance + DB
+  - Test idempotence (externalOrderId unique)
+
+**Tests API Routes** - 1h :
+- [ ] **POST /api/exchange/connect**:
+  - Validation + encryption
+  - Plan limits enforcement
+  - Read-only check
+- [ ] **GET /api/exchange/[id]/status**:
+  - Ownership verification
+- [ ] **POST /api/exchange/[id]/disconnect**:
+  - Soft delete + verified badge removal
+
+**Tests Components** - 1h :
+- [ ] **ConnectExchangeForm** (validation + submit)
+- [ ] **PerformanceStatsDisplay** (Free vs PRO rendering)
+
+---
+
+#### 2. Email Notifications - 2-3h
+
+**Status**: ❌ Non implémenté
+
+**Fichiers à créer**:
+- `emails/sync-failure.tsx` (React Email template)
+- `emails/weekly-stats-summary.tsx` (optionnel mais nice)
+- `src/lib/exchange/email-notifications.ts` (helper functions)
+
+**Templates requis**:
+
+1. **Sync Failure Email** (CRITIQUE):
+   ```tsx
+   Subject: "⚠️ Binance Sync Failed - Action Required"
+
+   Content:
+   - Nom du trader
+   - Exchange concerné (Binance)
+   - Erreur détaillée (API keys invalid, IP blocked, etc.)
+   - Action suggérée (regenerate keys, check IP whitelist)
+   - Lien direct vers /account/exchanges
+   - Support contact
+   ```
+
+2. **Weekly Summary Email** (Nice-to-have):
+   ```tsx
+   Subject: "📊 Your Trading Stats This Week"
+
+   Content:
+   - Trades synced (count)
+   - Winrate cette semaine
+   - Best trade / Worst trade
+   - Lien vers dashboard
+   ```
+
+**Intégration**:
+- Hook dans `SyncService.syncConnectionTrades()` catch block
+- Utiliser Resend API (déjà configuré)
+- Rate limiting (max 1 email/jour par erreur)
+
+---
+
+#### 3. Documentation Utilisateur - 1.5-2h
+
+**Status**: ⚠️ Partiellement fait (guide inline dans form)
+
+**Fichiers à créer/modifier**:
+
+1. **Guide Binance Setup** - 1h
+   - Fichier: `content/docs/binance-setup.mdx`
+   - Contenu:
+     - Comment créer compte Binance (si nouveau)
+     - Comment générer API keys READ-ONLY (avec screenshots annotés)
+     - Whitelist IP (optionnel mais expliqué)
+     - Troubleshooting (5-6 erreurs courantes)
+     - FAQ spécifique (temps sync, données après disconnect, etc.)
+   - Lien depuis ConnectExchangeForm
+
+2. **Update FAQ** - 15min
+   - Fichier: `content/docs/faq.mdx`
+   - Corriger ligne 465:
+     ```mdx
+     - **No financial data**: We don't store exchange API keys ❌ OBSOLÈTE!
+     ```
+   - Remplacer par:
+     ```mdx
+     - **Encrypted API keys**: We store read-only API keys encrypted with AES-256-GCM
+     - **No trading access**: Keys are validated to be read-only (no withdrawals/trading)
+     - **Your control**: Disconnect anytime, data preserved
+     ```
+
+3. **FAQ Portfolio Tracking** - 30min
+   - Section dans `faq.mdx` ou nouveau `content/docs/portfolio-faq.mdx`
+   - Questions:
+     - "How long does first sync take?" (5-10min)
+     - "Can I disconnect my exchange?" (Yes, data preserved)
+     - "What happens if my API keys expire?" (Email notification)
+     - "Why are my stats not updating?" (Check last sync time, manual sync)
+     - "Is my data safe?" (AES-256 encryption, read-only)
+     - "Can I hide my stats?" (Not yet, coming soon)
+
+---
+
+### 🟡 Phase 1: POST-LAUNCH IMMÉDIAT (P1) - Estimation: 10-13h
+
+**Statut**: ❌ **0/5 tâches complétées**
+
+#### 4. Monitoring Dashboard - 3-4h
+
+**Status**: ❌ Non implémenté
+
+**Objectif**: Admin dashboard pour monitoring en temps réel
+
+**Metrics à tracker**:
+- Total connections actives (gauge)
+- Sync success rate last 24h (%)
+- Average sync duration (ms)
+- Failed syncs table (trader, error, timestamp)
+- Trades imported today (count)
+- Top 5 traders by trade volume
+
+**Implémentation**:
+- Page: `app/admin/portfolio/page.tsx`
+- Queries: `src/features/exchange/admin-queries.ts`
+- Charts: Recharts (line chart sync rate, bar chart errors)
+- Auto-refresh: React Query (30s interval)
+
+**Vercel Integration**:
+- Analytics API (optional, coût extra)
+- Custom endpoint: `/api/admin/portfolio-stats`
+
+---
+
+#### 5. Audit Sécurité - 2h
+
+**Status**: ⚠️ Partiellement fait (encryption OK, logs ?)
+
+**Checklist**:
+
+1. **Verify No API Keys in Logs** - 1h:
+   - Grep all `logger.info/error/debug` calls
+   - Check aucun log de `apiKey`, `secretKey`, `encrypted*`
+   - Vérifier Vercel logs en staging
+   - Script: `scripts/audit-sensitive-logs.sh`
+
+2. **Tampering Tests** - 30min:
+   - Modifier `encrypted` en DB manuellement
+   - Doit fail avec "Auth tag verification failed"
+   - Test IV différent → fail
+   - Test tag différent → fail
+
+3. **Cleanup Tests** - 30min:
+   - Vérifier keys décryptées ne persistent pas en mémoire
+   - After `BinanceService.close()`, aucune ref restante
+   - Vérifier Node.js garbage collector (heap snapshots)
+
+---
+
+#### 6. Key Rotation Script - 2h
+
+**Status**: ❌ Non implémenté
+
+**Objectif**: Plan de mitigation si `ENCRYPTION_SECRET` compromise
+
+**Fichier**: `scripts/rotate-encryption-key.ts`
+
+**Algorithme**:
+1. Prendre nouveau `ENCRYPTION_SECRET_NEW` en input
+2. Fetch toutes les `ExchangeConnection` actives
+3. Pour chaque connection:
+   - Decrypt avec old key
+   - Re-encrypt avec new key
+   - Update DB (atomic transaction)
+4. Log progress (N/total connections rotated)
+5. Verify all keys décryptent correctement avec new key
+6. Instructions pour update env vars (Vercel + local)
+
+**Usage**:
+```bash
+ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
+```
+
+**Safety**:
+- Dry-run mode (preview sans modifier DB)
+- Backup DB avant rotation
+- Rollback automatique si erreur
+
+---
+
+#### 7. Load Testing - 2-3h
+
+**Status**: ❌ Non testé
+
+**Objectif**: Vérifier performance sous charge réaliste
+
+**Scénarios**:
+
+1. **100 traders, 10,000 trades each** - 1h:
+   - Seed DB avec fake data
+   - Query: `getAllPerformanceSnapshots()` x100
+   - Measure: P95 latency < 200ms
+   - Tool: k6 ou Artillery
+
+2. **Cron job stress test** - 1h:
+   - 100 connections ready to sync
+   - Measure: temps total sync < 4min (marge 1min)
+   - Check: aucun timeout Vercel (max 60s par invocation)
+   - Optimize: batch size si needed
+
+3. **Concurrent writes** - 1h:
+   - 10 traders sync simultanément
+   - Check: no DB deadlocks
+   - Check: idempotence (externalOrderId unique constraint)
+
+**Tools**:
+- k6 (load testing)
+- Prisma `EXPLAIN ANALYZE` (DB queries)
+- Vercel Analytics (production metrics)
+
+---
+
+#### 8. DB Optimization - 1-2h
+
+**Status**: ⚠️ Indexes basiques OK, EXPLAIN needed
+
+**Checklist**:
+
+1. **EXPLAIN ANALYZE Top Queries** - 1h:
+   ```sql
+   -- Query 1: Get all snapshots for trader
+   EXPLAIN ANALYZE
+   SELECT * FROM trader_performance_snapshot
+   WHERE trader_profile_id = 'xxx'
+   ORDER BY calculated_at DESC;
+
+   -- Query 2: Get connections to sync
+   EXPLAIN ANALYZE
+   SELECT * FROM exchange_connection
+   WHERE is_active = true
+     AND next_sync_at <= NOW()
+   ORDER BY last_synced_at ASC NULLS FIRST
+   LIMIT 50;
+
+   -- Query 3: Get trades for period
+   EXPLAIN ANALYZE
+   SELECT * FROM exchange_trade
+   WHERE connection_id = 'xxx'
+     AND executed_at >= NOW() - INTERVAL '30 days'
+   ORDER BY executed_at DESC;
+   ```
+
+2. **Add Missing Indexes** (si EXPLAIN montre seq scans):
+   - `CREATE INDEX IF NOT EXISTS idx_trades_executed_at ON exchange_trade(executed_at);`
+   - Déjà présents: `@@index([connectionId, executedAt])`
+
+3. **Snapshot Caching Strategy**:
+   - Verify cache hit rate
+   - Consider Redis (future, si DB load élevée)
+
+---
+
+## 📊 Progression Tracking
+
+### Phase 0 (P0) - BLOQUEURS
+
+| Tâche | Temps | Status | ETA |
+|-------|-------|--------|-----|
+| Tests E2E (4 scénarios) | 2-3h | ⬜ TODO | - |
+| Tests Unitaires (Services) | 2-3h | ⬜ TODO | - |
+| Email Notifications | 2-3h | ⬜ TODO | - |
+| Guide Binance Setup | 1h | ⬜ TODO | - |
+| Update FAQ | 15min | ⬜ TODO | - |
+| FAQ Portfolio Tracking | 30min | ⬜ TODO | - |
+| **TOTAL P0** | **8-10h** | **0%** | - |
+
+### Phase 1 (P1) - POST-LAUNCH
+
+| Tâche | Temps | Status | ETA |
+|-------|-------|--------|-----|
+| Monitoring Dashboard | 3-4h | ⬜ TODO | - |
+| Audit Sécurité | 2h | ⬜ TODO | - |
+| Key Rotation Script | 2h | ⬜ TODO | - |
+| Load Testing | 2-3h | ⬜ TODO | - |
+| DB Optimization | 1-2h | ⬜ TODO | - |
+| **TOTAL P1** | **10-13h** | **0%** | - |
+
+### GRAND TOTAL: 18-23h
+
+---
+
+## 🎯 Plan d'Exécution - Option B
+
+### Week 1: Phase 0 (P0)
+
+**Jour 1-2** (4-6h):
+- ✅ Tests E2E (Playwright)
+- ✅ Tests Unitaires (Vitest)
+
+**Jour 3** (2-3h):
+- ✅ Email Notifications
+
+**Jour 4** (2h):
+- ✅ Documentation Utilisateur
+- ✅ Update FAQ
+
+### Week 2: Phase 1 (P1)
+
+**Jour 1-2** (5-6h):
+- ✅ Monitoring Dashboard
+- ✅ Audit Sécurité
+
+**Jour 3** (2h):
+- ✅ Key Rotation Script
+
+**Jour 4-5** (4-5h):
+- ✅ Load Testing
+- ✅ DB Optimization
+
+### Week 3: Polish & Deploy
+
+**Jour 1-2**:
+- ✅ Fix issues trouvés en testing
+- ✅ Code review
+- ✅ Update documentation finale
+
+**Jour 3**:
+- ✅ Deploy staging
+- ✅ Beta testing avec 2-3 traders
+
+**Jour 4-5**:
+- ✅ Production deploy
+- ✅ Monitoring 48h post-launch
+- ✅ Quick fixes si needed
+
+---
+
+## ✅ Success Criteria - Production Ready
+
+**Avant déploiement, tout doit être ✅** :
+
+### Tests
+- [ ] E2E complet (connect → sync → stats → disconnect)
+- [ ] 80%+ code coverage (Services + Calculator)
+- [ ] Tous les tests passent en CI/CD
+- [ ] Zero flaky tests
+
+### Sécurité
+- [ ] Aucun log de sensitive data (audit complet)
+- [ ] Tampering tests passent (auth tag verification)
+- [ ] Key rotation script testé (dry-run)
+- [ ] Security review externe (optionnel, recommandé)
+
+### Performance
+- [ ] Load test 100 traders → P95 < 500ms
+- [ ] Cron sync 100 connections < 5min
+- [ ] DB queries optimisées (EXPLAIN ANALYZE)
+- [ ] Zero timeout Vercel
+
+### Documentation
+- [ ] Guide Binance Setup complet (screenshots)
+- [ ] FAQ à jour (no contradictions)
+- [ ] Troubleshooting guide
+- [ ] Admin runbook (monitoring, incidents)
+
+### Monitoring
+- [ ] Dashboard admin fonctionnel
+- [ ] Alertes configurées (error rate > 10%)
+- [ ] Metrics trackées (sync rate, latency, errors)
+- [ ] On-call runbook prêt
+
+---
+
+**Fin de documentation - Option B (Production Solide) définie** ✅
