@@ -21,18 +21,96 @@ model Feedback {
 }
 
 model TraderProfile {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  displayName String
-  bio         String?
-  statsJson   Json?
-  verified    Boolean   @default(false)
-  verifiedAt  DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String                       @id @default(cuid())
+  userId                String                       @unique
+  displayName           String
+  bio                   String?
+  statsJson             Json?
+  verified              Boolean                      @default(false)
+  verifiedAt            DateTime?
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchangeConnections   ExchangeConnection[]
+  performanceSnapshots  TraderPerformanceSnapshot[]
 
   @@map("trader_profile")
+}
+
+model ExchangeConnection {
+  id                 String          @id @default(cuid())
+  traderProfileId    String
+  trader             TraderProfile   @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+  exchange           Exchange
+  encryptedApiKey    String          @db.Text
+  encryptedSecretKey String          @db.Text
+  keyIv              String
+  keyTag             String
+  isActive           Boolean         @default(true)
+  lastSyncedAt       DateTime?
+  lastSyncError      String?         @db.Text
+  nextSyncAt         DateTime?
+  trades             ExchangeTrade[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@unique([traderProfileId, exchange])
+  @@index([traderProfileId])
+  @@index([isActive, nextSyncAt])
+  @@map("exchange_connection")
+}
+
+model ExchangeTrade {
+  id              String             @id @default(cuid())
+  connectionId    String
+  connection      ExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  externalOrderId String             @unique
+  symbol          String
+  side            TradeSide
+  type            OrderType
+  quantity        Decimal            @db.Decimal(20, 8)
+  price           Decimal            @db.Decimal(20, 8)
+  quoteQuantity   Decimal            @db.Decimal(20, 8)
+  fee             Decimal            @db.Decimal(20, 8)
+  feeAsset        String
+  realizedPnl     Decimal?           @db.Decimal(20, 8)
+  executedAt      DateTime
+  createdAt       DateTime           @default(now())
+
+  @@index([connectionId, executedAt])
+  @@index([symbol])
+  @@index([executedAt])
+  @@map("exchange_trade")
+}
+
+model TraderPerformanceSnapshot {
+  id              String            @id @default(cuid())
+  traderProfileId String
+  trader          TraderProfile     @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+  period          PerformancePeriod
+  totalTrades     Int
+  winningTrades   Int
+  losingTrades    Int
+  winrate         Decimal           @db.Decimal(5, 2)
+  totalProfits    Decimal           @db.Decimal(20, 8)
+  totalLosses     Decimal           @db.Decimal(20, 8)
+  netPnl          Decimal           @db.Decimal(20, 8)
+  profitFactor    Decimal           @db.Decimal(10, 4)
+  sharpeRatio     Decimal?          @db.Decimal(10, 4)
+  sortinoRatio    Decimal?          @db.Decimal(10, 4)
+  maxDrawdown     Decimal           @db.Decimal(10, 4)
+  averageWin      Decimal           @db.Decimal(20, 8)
+  averageLoss     Decimal           @db.Decimal(20, 8)
+  largestWin      Decimal           @db.Decimal(20, 8)
+  largestLoss     Decimal           @db.Decimal(20, 8)
+  calculatedAt    DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([traderProfileId, period])
+  @@index([traderProfileId])
+  @@index([calculatedAt])
+  @@map("trader_performance_snapshot")
 }
 
 model CryptoAddress {
@@ -295,4 +373,29 @@ enum TierLevel {
   SILVER                  // 10-49 invités actifs
   GOLD                    // 50-99 invités actifs
   DIAMOND                 // 100+ invités actifs
+}
+
+enum Exchange {
+  BINANCE
+}
+
+enum TradeSide {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
+  STOP_LOSS
+  STOP_LOSS_LIMIT
+  TAKE_PROFIT
+  TAKE_PROFIT_LIMIT
+}
+
+enum PerformancePeriod {
+  ALL_TIME
+  LAST_30D
+  LAST_90D
+  LAST_365D
 }
