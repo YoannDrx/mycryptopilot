@@ -33,6 +33,7 @@ import { EnhancedInvitationsTable } from "@/components/nowts/enhanced-invitation
 import { ReferralEarningsCard } from "@/components/nowts/referral-earnings-card";
 import { DetailedFunnelCard } from "@/components/nowts/detailed-funnel-card";
 import { TopInviteesCard } from "@/components/nowts/top-invitees-card";
+import { TierProgressCard } from "@/components/nowts/tier-progress-card";
 import { ConversionStatsCard } from "@/components/nowts/conversion-stats-card";
 import { CreditsSection } from "./_components/credits-section";
 import { Suspense } from "react";
@@ -155,12 +156,15 @@ export default async function TraderDashboardPage() {
         </div>
 
         {/* Referral & Credits Section */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <ReferralLinkCard
             traderId={user.id}
             traderName={traderProfile.displayName}
           />
           <CreditsSection />
+          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+            <TierProgressCard traderId={user.id} />
+          </Suspense>
         </div>
 
         {/* Trader Status Card */}
