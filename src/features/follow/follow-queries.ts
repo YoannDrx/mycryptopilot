@@ -80,7 +80,6 @@ export const getFollowedTraders = async (userId: string) => {
               displayName: true,
               bio: true,
               verified: true,
-              priceMonthlyUSD: true,
               statsJson: true,
             },
           },

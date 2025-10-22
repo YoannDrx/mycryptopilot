@@ -11,6 +11,7 @@ import {
   LineChart,
   PlusCircle,
   UserCheck,
+  Gift,
 } from "lucide-react";
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
@@ -64,6 +65,11 @@ const TRADER_TOOLS_LINKS: NavigationLink[] = [
     href: `${ORGANIZATION_PATH}/dashboard/trader/signals/new`,
     Icon: PlusCircle,
     label: "Create Signal",
+  },
+  {
+    href: `${ORGANIZATION_PATH}/trader-tools/referral`,
+    Icon: Gift,
+    label: "Referral Program",
   },
 ];
 

@@ -28,7 +28,6 @@ type EditTraderProfileFormProps = {
   defaultValues: {
     displayName: string;
     bio: string | null;
-    priceMonthlyUSD: number;
     image: string | null;
   };
 };
@@ -43,7 +42,6 @@ export const EditTraderProfileForm = ({
     defaultValues: {
       displayName: defaultValues.displayName,
       bio: defaultValues.bio ?? "",
-      priceMonthlyUSD: defaultValues.priceMonthlyUSD,
       image: defaultValues.image,
     },
   });
@@ -135,33 +133,6 @@ export const EditTraderProfileForm = ({
               </FormControl>
               <FormDescription>
                 Présentez-vous à vos futurs followers (max 500 caractères)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Price Monthly USD */}
-        <FormField
-          control={form.control}
-          name="priceMonthlyUSD"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Prix mensuel (USD)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  max={10000}
-                  placeholder="0"
-                  {...field}
-                  value={field.value ?? 0}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormDescription>
-                Laissez 0 pour un profil gratuit, ou définissez un prix pour
-                monétiser vos signaux
               </FormDescription>
               <FormMessage />
             </FormItem>

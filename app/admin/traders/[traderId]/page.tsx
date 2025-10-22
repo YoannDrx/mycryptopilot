@@ -141,10 +141,6 @@ export default async function TraderDetailPage(props: PageProps) {
                   {format(new Date(trader.createdAt), "MMM dd, yyyy")}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Monthly Price</span>
-                <span className="font-medium">${trader.priceMonthlyUSD}</span>
-              </div>
             </CardContent>
           </Card>
 

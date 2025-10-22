@@ -13,12 +13,6 @@ export const CreateTraderProfileSchema = z.object({
     .max(500, "Bio must be less than 500 characters")
     .optional()
     .nullable(),
-  priceMonthlyUSD: z
-    .number()
-    .int()
-    .min(0, "Price must be positive")
-    .max(10000, "Price must be less than 10000")
-    .default(0),
   image: z.string().url().optional().nullable(),
 });
 
@@ -38,12 +32,6 @@ export const UpdateTraderProfileSchema = z.object({
     .max(500, "Bio must be less than 500 characters")
     .optional()
     .nullable(),
-  priceMonthlyUSD: z
-    .number()
-    .int()
-    .min(0, "Price must be positive")
-    .max(10000, "Price must be less than 10000")
-    .optional(),
   image: z.string().url().optional().nullable(),
 });
 

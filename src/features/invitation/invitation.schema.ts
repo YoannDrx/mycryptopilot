@@ -9,6 +9,10 @@ export const InviteFollowerSchema = z.object({
     .email("Invalid email address")
     .toLowerCase()
     .transform((val) => val.trim()),
+  personalMessage: z
+    .string()
+    .max(500, "Message too long (max 500 characters)")
+    .optional(),
 });
 
 export type InviteFollowerType = z.infer<typeof InviteFollowerSchema>;

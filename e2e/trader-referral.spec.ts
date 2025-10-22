@@ -8,14 +8,14 @@ test.describe("Trader Referral System", () => {
     // 1. Create a trader
     const { user: trader, traderProfile } = await createTestTrader({ page });
 
-    // Navigate to trader dashboard
+    // Navigate to referral program page
     await page.goto("/orgs");
     await page.waitForURL(/\/orgs\/.*/);
 
     const currentUrl = page.url();
     const orgSlug = currentUrl.split("/orgs/")[1].split("/")[0];
 
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto(`/orgs/${orgSlug}/trader-tools/referral`);
     await page.waitForLoadState("networkidle");
 
     // 2. Get referral link

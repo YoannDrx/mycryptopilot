@@ -34,7 +34,6 @@ export const BecomeTraderForm = () => {
     defaultValues: {
       displayName: "",
       bio: "",
-      priceMonthlyUSD: 0,
       image: null,
     },
   });
@@ -51,7 +50,9 @@ export const BecomeTraderForm = () => {
     },
     onSuccess: () => {
       toast.success("Trader profile created successfully!");
-      const accountPath = currentOrg?.slug ? `/orgs/${currentOrg.slug}/account` : "/account";
+      const accountPath = currentOrg?.slug
+        ? `/orgs/${currentOrg.slug}/account`
+        : "/account";
       router.push(accountPath);
       router.refresh();
     },
@@ -104,7 +105,8 @@ export const BecomeTraderForm = () => {
                 />
               </FormControl>
               <FormDescription>
-                This name will be visible on your public profile (3-50 characters)
+                This name will be visible on your public profile (3-50
+                characters)
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -128,32 +130,6 @@ export const BecomeTraderForm = () => {
               </FormControl>
               <FormDescription>
                 Introduce yourself to your future followers (max 500 characters)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Price Monthly USD */}
-        <FormField
-          control={form.control}
-          name="priceMonthlyUSD"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Monthly Price (USD)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  max={10000}
-                  placeholder="0"
-                  {...field}
-                  value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormDescription>
-                Leave at 0 for a free profile, or set a price to monetize your signals
               </FormDescription>
               <FormMessage />
             </FormItem>

@@ -20,6 +20,10 @@ import {
 import { followTraderAction } from "../follow/follow.action";
 import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { TraderInvitationEmail } from "@email/trader-invitation";
+import { trackInvitationAcceptance } from "@/lib/referral/invitation-tracking-service";
+import { logger } from "@/lib/logger";
+import { checkInvitationRateLimit } from "@/lib/referral/rate-limiter";
+import { checkDisposableEmail } from "@/lib/referral/fraud-detection-service";
 
 /**
  * Action to invite a follower by email
@@ -36,6 +40,15 @@ export const inviteFollowerByEmailAction = authAction
     if (!isTrader) {
       throw new ActionError(
         "You need to be a trader to invite followers. Create your trader profile first.",
+      );
+    }
+
+    // Check rate limit
+    const rateLimit = await checkInvitationRateLimit(user.id);
+    if (!rateLimit.allowed) {
+      throw new ActionError(
+        rateLimit.reason ??
+          "You have reached your invitation limit. Please try again later.",
       );
     }
 
@@ -84,11 +97,19 @@ export const inviteFollowerByEmailAction = authAction
         token,
         expiresAt,
         status: "PENDING",
+        personalMessage: parsedInput.personalMessage,
       },
     });
 
+    // Run fraud detection checks (non-blocking, logs to database)
+    void checkDisposableEmail(parsedInput.email, user.id, invitation.id).catch(
+      (err) => {
+        logger.error("Fraud detection check failed", { err });
+      },
+    );
+
     // Send email via Resend
-    const invitationUrl = `${SiteConfig.appUrl}/invite/accept/${token}`;
+    const invitationUrl = `${SiteConfig.appUrl}/invite/${token}`;
 
     try {
       await resend.emails.send({
@@ -153,14 +174,26 @@ export const acceptInvitationByTokenAction = authAction
       );
     }
 
-    // Mark invitation as accepted
-    await prisma.traderInvitation.update({
-      where: { id: invitation.id },
-      data: {
-        status: "ACCEPTED",
-        acceptedAt: new Date(),
-      },
+    // Track invitation acceptance and award credits to trader
+    // Note: trackInvitationAcceptance va update le status ACCEPTED et acceptedAt
+    const trackingResult = await trackInvitationAcceptance({
+      invitationId: invitation.id,
+      inviteeId: user.id,
+      source: invitation.source,
     });
+
+    if (!trackingResult.success) {
+      logger.error("Failed to track invitation acceptance", {
+        invitationId: invitation.id,
+        error: trackingResult.error,
+      });
+      // Ne pas fail tout le flow si le tracking échoue, juste log
+    } else {
+      logger.info("Invitation acceptance tracked", {
+        invitationId: invitation.id,
+        creditsAwarded: trackingResult.creditsAwarded,
+      });
+    }
 
     const traderName =
       invitation.trader.traderProfile?.displayName ?? invitation.trader.name;
