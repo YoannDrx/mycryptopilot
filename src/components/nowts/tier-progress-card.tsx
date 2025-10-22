@@ -11,27 +11,11 @@ import {
   getTierProgress,
   TIER_REQUIREMENTS,
 } from "@/lib/referral/tier-service";
-import { cn } from "@/lib/utils";
-import { Trophy, TrendingUp, Users, CheckCircle2 } from "lucide-react";
+import { Trophy, TrendingUp, Users } from "lucide-react";
 
 type TierProgressCardProps = {
   traderId: string;
   className?: string;
-};
-
-const getTierColor = (tier: string) => {
-  switch (tier) {
-    case "BRONZE":
-      return "text-orange-700 bg-orange-50 border-orange-300";
-    case "SILVER":
-      return "text-gray-700 bg-gray-50 border-gray-300";
-    case "GOLD":
-      return "text-yellow-700 bg-yellow-50 border-yellow-300";
-    case "DIAMOND":
-      return "text-purple-700 bg-purple-50 border-purple-300";
-    default:
-      return "text-gray-700 bg-gray-50 border-gray-300";
-  }
 };
 
 const getTierIcon = (tier: string) => {
@@ -56,6 +40,21 @@ const getProgressColor = (percentage: number) => {
   return "bg-gray-400";
 };
 
+const getTierBadgeColor = (tier: string) => {
+  switch (tier) {
+    case "BRONZE":
+      return "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900 dark:bg-orange-950/30 dark:text-orange-300";
+    case "SILVER":
+      return "border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+    case "GOLD":
+      return "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-900 dark:bg-yellow-950/30 dark:text-yellow-300";
+    case "DIAMOND":
+      return "border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-900 dark:bg-cyan-950/30 dark:text-cyan-300";
+    default:
+      return "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
+  }
+};
+
 export const TierProgressCard = async ({
   traderId,
   className,
@@ -65,12 +64,12 @@ export const TierProgressCard = async ({
   const isMaxTier = progress.nextTier === null;
 
   return (
-    <Card className={cn("", className)}>
-      <CardHeader className={cn("pb-3", getTierColor(progress.currentTier))}>
+    <Card className={className}>
+      <CardHeader>
         <div className="flex items-start justify-between">
           {/* Title & Current Tier */}
           <div>
-            <CardTitle className="flex items-center gap-2 text-lg">
+            <CardTitle className="flex items-center gap-2">
               <Trophy className="size-5" />
               Referral Tier
             </CardTitle>
@@ -79,35 +78,30 @@ export const TierProgressCard = async ({
 
           {/* Current Tier Badge */}
           <Badge
-            variant="default"
-            className={cn(
-              "border-2 text-lg font-bold",
-              getTierColor(progress.currentTier),
-            )}
+            variant="outline"
+            className={`text-base font-bold ${getTierBadgeColor(progress.currentTier)}`}
           >
             {getTierIcon(progress.currentTier)} {progress.currentTier}
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 pt-4">
+      <CardContent className="space-y-4">
         {/* Current Stats */}
-        <div className="flex items-center justify-between rounded-lg border bg-gray-50/50 p-3">
+        <div className="bg-muted flex items-center justify-between rounded-lg p-4">
           <div className="flex items-center gap-2">
-            <Users className="size-5 text-blue-600" />
+            <Users className="size-5" />
             <span className="text-sm font-medium">Active Invitees</span>
           </div>
           <span className="text-2xl font-bold">{progress.currentCount}</span>
         </div>
 
         {/* Progress to Next Tier */}
-        {!isMaxTier ? (
+        {!isMaxTier && progress.nextTier ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">
-                Progress to{" "}
-                {progress.nextTier && getTierIcon(progress.nextTier)}{" "}
-                {progress.nextTier}
+                Progress to {getTierIcon(progress.nextTier)} {progress.nextTier}
               </span>
               <span className="text-muted-foreground">
                 {progress.progressPercentage}%
@@ -122,60 +116,42 @@ export const TierProgressCard = async ({
 
             <p className="text-muted-foreground text-xs">
               <TrendingUp className="mr-1 inline size-3" />
-              {progress.remaining} more active invitees needed for{" "}
-              {progress.nextTier}
+              {progress.remaining} more active invitees needed for SILVER
             </p>
           </div>
-        ) : (
-          /* Max Tier Reached */
-          <div className="flex items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 p-3">
-            <CheckCircle2 className="size-5 text-purple-600" />
-            <div>
-              <p className="text-sm font-medium text-purple-900">
-                Max Tier Reached!
-              </p>
-              <p className="text-xs text-purple-700">
-                You're at the highest tier level
-              </p>
-            </div>
-          </div>
-        )}
+        ) : null}
 
         {/* Current Tier Benefits */}
-        <div className="rounded-lg border bg-blue-50/50 p-3">
-          <p className="mb-2 text-sm font-medium text-blue-900">
-            {currentTierRewards.badge} Benefits
+        <div className="bg-muted rounded-lg p-4">
+          <p className="text-muted-foreground mb-2 text-sm font-medium">
+            {getTierIcon(progress.currentTier)} Bronze Benefits
           </p>
-          <ul className="space-y-1">
+          <ul className="text-muted-foreground space-y-1 text-sm">
             {currentTierRewards.benefits.map((benefit, index) => (
-              <li key={index} className="text-xs text-blue-700">
-                • {benefit}
-              </li>
+              <li key={index}>• {benefit}</li>
             ))}
           </ul>
         </div>
 
         {/* Next Tier Preview */}
         {!isMaxTier && progress.nextTier && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-            <p className="mb-2 text-sm font-medium text-amber-900">
+          <div className="bg-muted rounded-lg p-4">
+            <p className="text-muted-foreground mb-2 text-sm font-medium">
               {getTierIcon(progress.nextTier)} Next Tier:{" "}
-              {TIER_REQUIREMENTS[progress.nextTier].rewards.badge}
+              {getTierIcon(progress.nextTier)} Silver
             </p>
-            <p className="mb-2 text-xs text-amber-700">
+            <p className="text-muted-foreground mb-2 text-sm">
               {TIER_REQUIREMENTS[progress.nextTier].rewards.description}
             </p>
-            <ul className="space-y-1">
+            <ul className="text-muted-foreground space-y-1 text-sm">
               {TIER_REQUIREMENTS[progress.nextTier].rewards.benefits
                 .slice(0, 2)
                 .map((benefit, index) => (
-                  <li key={index} className="text-xs text-amber-700">
-                    • {benefit}
-                  </li>
+                  <li key={index}>• {benefit}</li>
                 ))}
               {TIER_REQUIREMENTS[progress.nextTier].rewards.benefits.length >
                 2 && (
-                <li className="text-xs font-medium text-amber-700">
+                <li className="font-medium">
                   +{" "}
                   {TIER_REQUIREMENTS[progress.nextTier].rewards.benefits
                     .length - 2}{" "}

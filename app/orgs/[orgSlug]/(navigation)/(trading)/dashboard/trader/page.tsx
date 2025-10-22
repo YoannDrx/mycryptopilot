@@ -27,17 +27,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TraderSignalsList } from "./_components/trader-signals-list";
 import { redirect } from "next/navigation";
-import { ReferralLinkCard } from "@/components/nowts/referral-link-card";
-import { InviteFollowerDialog } from "@/components/nowts/invite-follower-dialog";
-import { EnhancedInvitationsTable } from "@/components/nowts/enhanced-invitations-table";
-import { ReferralEarningsCard } from "@/components/nowts/referral-earnings-card";
-import { DetailedFunnelCard } from "@/components/nowts/detailed-funnel-card";
-import { TopInviteesCard } from "@/components/nowts/top-invitees-card";
-import { TierProgressCard } from "@/components/nowts/tier-progress-card";
-import { ConversionStatsCard } from "@/components/nowts/conversion-stats-card";
-import { CreditsSection } from "./_components/credits-section";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
   title: "Trader Dashboard - MyCryptoPilot",
@@ -155,18 +144,6 @@ export default async function TraderDashboardPage() {
           </Card>
         </div>
 
-        {/* Referral & Credits Section */}
-        <div className="grid gap-4 md:grid-cols-3">
-          <ReferralLinkCard
-            traderId={user.id}
-            traderName={traderProfile.displayName}
-          />
-          <CreditsSection />
-          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-            <TierProgressCard traderId={user.id} />
-          </Suspense>
-        </div>
-
         {/* Trader Status Card */}
         <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
           <CardHeader>
@@ -211,7 +188,6 @@ export default async function TraderDashboardPage() {
         <Tabs defaultValue="signals" className="space-y-4">
           <TabsList>
             <TabsTrigger value="signals">My Signals</TabsTrigger>
-            <TabsTrigger value="invitations">Invitations</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
           </TabsList>
@@ -219,62 +195,6 @@ export default async function TraderDashboardPage() {
           {/* Signals Tab */}
           <TabsContent value="signals" className="space-y-4">
             <TraderSignalsList traderId={user.id} />
-          </TabsContent>
-
-          {/* Invitations Tab */}
-          <TabsContent value="invitations" className="space-y-4">
-            {/* Revenue Impact Section */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-                <ReferralEarningsCard traderId={user.id} />
-              </Suspense>
-              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-                <ConversionStatsCard traderId={user.id} />
-              </Suspense>
-            </div>
-
-            {/* Funnel & Top Invitees */}
-            <div className="grid gap-4 md:grid-cols-3">
-              <Suspense
-                fallback={<Skeleton className="h-96 w-full md:col-span-2" />}
-              >
-                <div className="md:col-span-2">
-                  <DetailedFunnelCard traderId={user.id} />
-                </div>
-              </Suspense>
-              <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-                <TopInviteesCard traderId={user.id} />
-              </Suspense>
-            </div>
-
-            {/* Enhanced Invitations Table */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Follower Invitations</CardTitle>
-                    <CardDescription>
-                      Detailed tracking of all your invitations and their
-                      performance
-                    </CardDescription>
-                  </div>
-                  <InviteFollowerDialog />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Suspense
-                  fallback={
-                    <div className="space-y-2">
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-12 w-full" />
-                    </div>
-                  }
-                >
-                  <EnhancedInvitationsTable traderId={user.id} />
-                </Suspense>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* Performance Tab */}
