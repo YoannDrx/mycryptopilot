@@ -26,6 +26,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TraderSignalsList } from "./_components/trader-signals-list";
+import { PerformanceTabContent } from "./_components/performance-tab-content";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -35,7 +36,20 @@ export const metadata: Metadata = {
 
 export default async function TraderDashboardPage() {
   const org = await getRequiredCurrentOrgCache();
-  const user = await getRequiredUser();
+  const session = await getRequiredUser();
+
+  // Fetch full user from DB to get planName
+  const user = await prisma.user.findUnique({
+    where: { id: session.id },
+    select: {
+      id: true,
+      planName: true,
+    },
+  });
+
+  if (!user) {
+    redirect(`/orgs/${org.slug}`);
+  }
 
   // Fetch trader profile
   const traderProfile = await getTraderProfileByUserId(user.id);
@@ -199,66 +213,10 @@ export default async function TraderDashboardPage() {
 
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Performance Metrics</CardTitle>
-                  <CardDescription>Your trading track record</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <span className="text-sm font-medium">Win Rate</span>
-                    <span className="text-2xl font-bold">--%</span>
-                  </div>
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <span className="text-sm font-medium">Profit Factor</span>
-                    <span className="text-2xl font-bold">-.-</span>
-                  </div>
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <span className="text-sm font-medium">Max Drawdown</span>
-                    <span className="text-2xl font-bold">--%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Total Trades</span>
-                    <span className="text-2xl font-bold">0</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Follower Growth</CardTitle>
-                  <CardDescription>Track your audience growth</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
-                    <Users className="mb-4 size-12 opacity-20" />
-                    <p className="mb-2 font-medium">No follower data yet</p>
-                    <p className="text-sm">
-                      Start publishing signals to attract followers
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Performance Chart</CardTitle>
-                  <CardDescription>Your equity curve over time</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-muted-foreground flex flex-col items-center justify-center py-12 text-center">
-                    <BarChart3 className="mb-4 size-12 opacity-20" />
-                    <p className="mb-2 font-medium">
-                      Not enough data to display chart
-                    </p>
-                    <p className="text-sm">
-                      Complete at least 10 trades to see your performance chart
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <PerformanceTabContent
+              traderProfileId={traderProfile.id}
+              userPlanName={user.planName}
+            />
           </TabsContent>
 
           {/* Revenue Tab */}

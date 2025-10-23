@@ -23,6 +23,7 @@ async function getStats() {
         })
         .then((traders) => {
           const winrates = traders
+            .filter((t) => t.statsJson !== null) // Filter out null statsJson
             .map((t) => {
               const stats = t.statsJson as TraderStatsJson;
               return stats.winrate ?? 0;

@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 19 octobre 2025 - Project audit complet (état MVP final)
+**Dernière mise à jour**: 22 octobre 2025 - Portfolio Tracking Bybit complété
 
 ---
 
@@ -99,10 +99,11 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 ✅ **Phase 5**: Discord Integration MVP (100%)
 ✅ **Phase 6**: Feed Signaux Avancé (100%)
 ✅ **Phase 7**: Navigation 4 Espaces + UI Polish (100%)
+✅ **Phase 8**: Portfolio Tracking - Multi-Exchange Binance + Bybit (100%)
 
 ### Systèmes Opérationnels
 
-- ✅ **Base de données**: 8 migrations appliquées, DB fonctionnelle
+- ✅ **Base de données**: 9 migrations appliquées, DB fonctionnelle
 - ✅ **Crypto Payments**: Backend + Frontend 100% (HD wallet + RPC + checkout UI)
 - ✅ **Subscriptions**: activateSubscription + Better Auth hook + UI components
 - ✅ **Trading System**: Profils traders + Signaux + Follow/Unfollow
@@ -111,6 +112,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 - ✅ **Feed Signaux**: Filtres avancés (12 paramètres) + Pagination + URL state + 26 tests
 - ✅ **Navigation 4 Espaces**: Trading, Account, School, Tax avec sidebars dédiées + recherche globale
 - ✅ **UI/UX Polish**: Trading cards professionnelles + Chart viewer + Image management
+- ✅ **Portfolio Tracking**: Binance + Bybit integration (API validation, sync engine, encrypted keys, performance metrics)
 
 ### TODOs Restants
 
@@ -388,6 +390,19 @@ mycryptopilot/
 - `src/lib/discord/webhook.ts` - Signal notifications
 - `src/lib/discord/roles.ts` - Role assignment
 - `discord-bot/` - Discord bot source code (Railway deployment)
+
+**Portfolio Tracking / Exchange Integration** (✅ Binance + Bybit):
+
+- `src/lib/exchange/binance-service.ts` - Binance API integration
+- `src/lib/exchange/bybit-service.ts` - Bybit API integration (396 lignes)
+- `src/lib/exchange/exchange-service-factory.ts` - Multi-exchange factory pattern
+- `src/lib/exchange/sync-service.ts` - Automatic sync engine (supports both exchanges)
+- `src/lib/exchange/performance-calculator.ts` - Trading metrics calculations
+- `src/lib/crypto/encryption-service.ts` - AES-256-GCM API keys encryption
+- `app/orgs/[orgSlug]/(navigation)/(account)/account/exchanges/` - Exchange connections UI
+- `app/api/exchange/connect/route.ts` - Exchange connection API
+- `content/docs/binance-setup.mdx` - Binance setup guide
+- `content/docs/bybit-setup.mdx` - Bybit setup guide (234 lignes)
 
 ---
 
