@@ -56,5 +56,24 @@ export const SiteConfig = {
         contractAddress: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
       },
     },
+    // Testnet networks for development (Base Sepolia + Tron Shasta)
+    testnet: {
+      base: {
+        name: "Base Sepolia",
+        currency: "USDC",
+        confirmations: 1,
+        explorerUrl: "https://sepolia.basescan.org",
+        // USDC on Base Sepolia testnet
+        contractAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+      },
+      tron: {
+        name: "Tron Shasta",
+        currency: "USDT",
+        confirmations: 1, // Faster confirmation on testnet
+        explorerUrl: "https://shasta.tronscan.org",
+        // USDT TRC-20 on Tron Shasta testnet
+        contractAddress: "TG3XXyExBkPp9nzdajDZsozEu4BkaSJozs",
+      },
+    },
   },
 } as const;

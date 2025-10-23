@@ -46,7 +46,7 @@ export default async function PricingPage() {
 
         {/* Pricing Cards */}
         <div className="grid gap-8 md:grid-cols-3">
-          {MYCRYPTOPILOT_PLANS.map((plan) => (
+          {MYCRYPTOPILOT_PLANS.filter((p) => p.name !== "test").map((plan) => (
             <Card
               key={plan.name}
               className={
@@ -161,6 +161,27 @@ export default async function PricingPage() {
             </Card>
           ))}
         </div>
+
+        {/* Test Payment CTA */}
+        <Card className="bg-muted/30 mx-auto mt-12 max-w-3xl border-2 border-dashed">
+          <CardContent className="flex flex-col items-center justify-center gap-6 py-8 text-center sm:flex-row sm:text-left">
+            <div className="flex-1">
+              <h3 className="mb-2 text-lg font-semibold">
+                Test the Payment System First
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Not sure about crypto payments? Try our test payment for just $1
+                to verify everything works perfectly before subscribing to a
+                full plan.
+              </p>
+            </div>
+            <Button variant="outline" size="lg" className="shrink-0" asChild>
+              <Link href={`/orgs/${org.slug}/checkout/test`}>
+                Send $1 Test Payment
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Payment Methods */}
         <div className="mt-16 text-center">

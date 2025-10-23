@@ -18,7 +18,7 @@ import { logger } from "@/lib/logger";
 import { z } from "zod";
 
 const GenerateAddressSchema = z.object({
-  plan: z.enum(["pro", "ultra"]),
+  plan: z.enum(["test", "pro", "ultra"]),
 });
 
 export const generateAddressAction = authAction

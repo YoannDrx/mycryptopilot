@@ -135,6 +135,7 @@ export async function assignRoleToUser(
       keyof typeof DISCORD_CONFIG.roles
     > = {
       free: "FREE",
+      test: "FREE", // Test plan gets same role as free (but should not be called)
       pro: "PRO",
       ultra: "ULTRA",
     };

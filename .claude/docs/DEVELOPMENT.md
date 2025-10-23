@@ -1,7 +1,7 @@
 # Development Status & Roadmap - MyCryptoPilot
 
-**Dernière mise à jour**: 22 octobre 2025
-**Audit complet via /project-audit**: 19 octobre 2025
+**Dernière mise à jour**: 23 octobre 2025
+**Audit complet via /project-audit**: 23 octobre 2025 (18 migrations, 38 issues, 10 TODOs)
 **Phase 6 (Feed Signaux) complétée**: 13 octobre 2025
 **Phase 7 (Navigation 4 Espaces + UI Polish) complétée**: 14 octobre 2025
 **Phase 8 (Portfolio Tracking - Binance + Bybit) complétée**: 22 octobre 2025

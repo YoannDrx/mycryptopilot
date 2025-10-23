@@ -21,10 +21,19 @@ type TestEnv = {
   STRIPE_SECRET_KEY: string;
   NODE_ENV: "development" | "production" | "test";
   STRIPE_WEBHOOK_SECRET?: string;
+  // Crypto network mode (mainnet or testnet)
+  CRYPTO_NETWORK?: "mainnet" | "testnet";
+  // Mainnet configuration
   BASE_RPC_URL?: string;
   TRON_RPC_URL?: string;
   CRYPTO_XPUB_BASE?: string;
   CRYPTO_XPUB_TRON?: string;
+  // Testnet configuration
+  BASE_RPC_URL_TESTNET?: string;
+  TRON_RPC_URL_TESTNET?: string;
+  CRYPTO_XPUB_BASE_TESTNET?: string;
+  CRYPTO_XPUB_TRON_TESTNET?: string;
+  // Binance sweep wallets
   BINANCE_MASTER_WALLET_BASE?: string;
   BINANCE_MASTER_WALLET_TRON?: string;
   DISCORD_BOT_TOKEN?: string;
@@ -72,10 +81,20 @@ function createProductionEnv() {
         .default("development"),
       STRIPE_WEBHOOK_SECRET: z.string().optional(),
       // Crypto payment configuration
+      CRYPTO_NETWORK: z
+        .enum(["mainnet", "testnet"])
+        .optional()
+        .default("mainnet"),
+      // Mainnet RPC URLs and XPUBs
       BASE_RPC_URL: z.string().url().optional(),
       TRON_RPC_URL: z.string().url().optional(),
       CRYPTO_XPUB_BASE: z.string().optional(),
       CRYPTO_XPUB_TRON: z.string().optional(),
+      // Testnet RPC URLs and XPUBs (for development testing)
+      BASE_RPC_URL_TESTNET: z.string().url().optional(),
+      TRON_RPC_URL_TESTNET: z.string().url().optional(),
+      CRYPTO_XPUB_BASE_TESTNET: z.string().optional(),
+      CRYPTO_XPUB_TRON_TESTNET: z.string().optional(),
       // Binance master wallets for sweep (optional)
       BINANCE_MASTER_WALLET_BASE: z.string().optional(),
       BINANCE_MASTER_WALLET_TRON: z.string().optional(),

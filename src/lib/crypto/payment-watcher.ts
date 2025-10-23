@@ -7,19 +7,25 @@ import { Contract, JsonRpcProvider } from "ethers";
 import TronWeb from "tronweb";
 import { calculateDaysGranted, getPlanFromAmount } from "./mycryptopilot-plans";
 import { activateSubscription } from "@/lib/subscription/subscription-manager";
+import { sendEmail } from "@/lib/mail/send-email";
+import { TestPaymentSuccessEmail } from "@email/test-payment-success";
 
 /**
  * Crypto Payment Watcher
  *
  * Monitors on-chain transactions for incoming payments to user addresses.
- * Supports Base (USDC) and Tron (USDT) networks.
+ * Supports Base (USDC) and Tron (USDT) networks on both mainnet and testnet.
  *
  * Architecture:
  * - Polls blockchain RPCs for new transactions
  * - Validates confirmations (1 for Base, 2 for Tron)
  * - Auto-detects plan from amount paid
- * - Activates subscription when confirmed
+ * - Activates subscription when confirmed (except for 'test' plan)
  * - Supports pro-rata payments (partial amounts)
+ *
+ * Network Selection:
+ * - Set CRYPTO_NETWORK=testnet in .env for Base Sepolia + Tron Shasta
+ * - Defaults to mainnet in production
  *
  * @example
  * // Start watching for payments
@@ -28,6 +34,44 @@ import { activateSubscription } from "@/lib/subscription/subscription-manager";
  * // Manually check a specific address
  * await checkAddressForPayments("0x123...", "BASE");
  */
+
+/**
+ * Get the appropriate RPC URL based on network and testnet mode
+ */
+function getRpcUrl(network: CryptoNetwork): string | undefined {
+  const isTestnet = env.CRYPTO_NETWORK === "testnet";
+
+  if (network === "BASE") {
+    return isTestnet ? env.BASE_RPC_URL_TESTNET : env.BASE_RPC_URL;
+  }
+
+  if (network === "TRON") {
+    return isTestnet ? env.TRON_RPC_URL_TESTNET : env.TRON_RPC_URL;
+  }
+
+  return undefined;
+}
+
+/**
+ * Get network configuration (mainnet or testnet)
+ */
+function getNetworkConfig(network: CryptoNetwork) {
+  const isTestnet = env.CRYPTO_NETWORK === "testnet";
+
+  if (network === "BASE") {
+    return isTestnet
+      ? SiteConfig.crypto.testnet.base
+      : SiteConfig.crypto.networks.base;
+  }
+
+  if (network === "TRON") {
+    return isTestnet
+      ? SiteConfig.crypto.testnet.tron
+      : SiteConfig.crypto.networks.tron;
+  }
+
+  throw new Error(`Unknown network: ${network}`);
+}
 
 type PaymentDetection = {
   txHash: string;
@@ -72,18 +116,23 @@ export async function checkAddressForPayments(
  * @returns Promise<PaymentDetection[]>
  */
 async function checkBaseAddress(address: string): Promise<PaymentDetection[]> {
-  if (!env.BASE_RPC_URL) {
-    logger.warn("BASE_RPC_URL not configured, skipping Base check");
+  const rpcUrl = getRpcUrl("BASE");
+  if (!rpcUrl) {
+    const networkMode = env.CRYPTO_NETWORK ?? "mainnet";
+    logger.warn(
+      `BASE_RPC_URL${networkMode === "testnet" ? "_TESTNET" : ""} not configured, skipping Base check`,
+    );
     return [];
   }
 
   try {
-    // Connect to Base RPC
-    const provider = new JsonRpcProvider(env.BASE_RPC_URL);
+    // Connect to Base RPC (mainnet or testnet)
+    const provider = new JsonRpcProvider(rpcUrl);
     const currentBlock = await provider.getBlockNumber();
 
-    // USDC contract on Base
-    const usdcAddress = SiteConfig.crypto.networks.base.contractAddress;
+    // USDC contract on Base (mainnet or testnet)
+    const networkConfig = getNetworkConfig("BASE");
+    const usdcAddress = networkConfig.contractAddress;
 
     // ERC-20 Transfer event ABI
     const usdcAbi = [
@@ -152,18 +201,23 @@ async function checkBaseAddress(address: string): Promise<PaymentDetection[]> {
  * @returns Promise<PaymentDetection[]>
  */
 async function checkTronAddress(address: string): Promise<PaymentDetection[]> {
-  if (!env.TRON_RPC_URL) {
-    logger.warn("TRON_RPC_URL not configured, skipping Tron check");
+  const rpcUrl = getRpcUrl("TRON");
+  if (!rpcUrl) {
+    const networkMode = env.CRYPTO_NETWORK ?? "mainnet";
+    logger.warn(
+      `TRON_RPC_URL${networkMode === "testnet" ? "_TESTNET" : ""} not configured, skipping Tron check`,
+    );
     return [];
   }
 
   try {
-    // Connect to Tron network
+    // Connect to Tron network (mainnet or testnet)
     // @ts-expect-error - TronWeb types are incorrect, constructor accepts string
-    const tronWeb = new TronWeb(env.TRON_RPC_URL);
+    const tronWeb = new TronWeb(rpcUrl);
 
-    // USDT TRC-20 contract on Tron
-    const usdtAddress = SiteConfig.crypto.networks.tron.contractAddress;
+    // USDT TRC-20 contract on Tron (mainnet or testnet)
+    const networkConfig = getNetworkConfig("TRON");
+    const usdtAddress = networkConfig.contractAddress;
 
     // Get current block number
     const currentBlock = await tronWeb.trx.getCurrentBlock();
@@ -378,8 +432,8 @@ export async function processPayment(
     });
   }
 
-  // If payment is confirmed, activate subscription
-  if (isConfirmed) {
+  // If payment is confirmed, activate subscription (except for 'test' plan)
+  if (isConfirmed && plan !== "test") {
     const result = await activateSubscription({ userId, plan, daysGranted });
     if (!result.success) {
       logger.error("Failed to activate subscription", {
@@ -387,6 +441,48 @@ export async function processPayment(
         plan,
         error: result.error,
       });
+    }
+  } else if (isConfirmed && plan === "test") {
+    logger.info("Test payment confirmed, skipping subscription activation", {
+      userId,
+      txHash: payment.txHash,
+    });
+
+    // Send test payment success email
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, name: true },
+      });
+
+      if (user?.email) {
+        const pricingUrl = `${SiteConfig.appUrl}/pricing`;
+
+        await sendEmail({
+          to: user.email,
+          subject: `Test Payment Confirmed - ${SiteConfig.title}`,
+          html: TestPaymentSuccessEmail({
+            userName: user.name || "User",
+            txHash: payment.txHash,
+            network: payment.network as "BASE" | "TRON",
+            amountUSD: payment.amountUSD,
+            confirmedAt: new Date(),
+            pricingUrl,
+          }),
+        });
+
+        logger.info("Test payment success email sent", {
+          userId,
+          email: user.email,
+          txHash: payment.txHash,
+        });
+      }
+    } catch (emailError) {
+      logger.error("Failed to send test payment success email", {
+        userId,
+        error: emailError,
+      });
+      // Don't throw - email failure shouldn't block payment processing
     }
   }
 }

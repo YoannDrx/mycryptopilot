@@ -1,6 +1,6 @@
 import { Signal, TrendingUp, Zap, Lock, Clock, BarChart3 } from "lucide-react";
 
-export type MyCryptoPilotPlanName = "free" | "pro" | "ultra";
+export type MyCryptoPilotPlanName = "free" | "pro" | "ultra" | "test";
 
 export type MyCryptoPilotPlan = {
   name: MyCryptoPilotPlanName;
@@ -61,6 +61,30 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
         icon: Clock,
         label: "Screeners refresh 5min",
         description: "Données marché en différé",
+      },
+    ],
+  },
+  {
+    name: "test",
+    description: "Paiement de test pour vérifier le système crypto",
+    priceUSD: 1,
+    priceCrypto: { usdc: 1, usdt: 1 },
+    limits: {
+      activeSignalsLimit: 0,
+      tradersFollow: 0,
+      screenerRefreshSec: 0,
+      customAlerts: false,
+      riskConsole: false,
+      journaling: false,
+      advancedFilters: false,
+      cryptoSchool: false,
+      taxHelp: false,
+    },
+    features: [
+      {
+        icon: Lock,
+        label: "Paiement de test",
+        description: "Vérifiez le fonctionnement du système de paiement crypto",
       },
     ],
   },
@@ -197,6 +221,11 @@ export const calculateDaysGranted = (
   const planData = getPlanByName(plan);
   const baseDays = 30;
 
+  // Test plan grants 0 days (no subscription activation)
+  if (plan === "test") {
+    return 0;
+  }
+
   if (planData.priceUSD === 0) {
     return 0;
   }
@@ -210,11 +239,16 @@ export const calculateDaysGranted = (
  * Get plan from price amount (useful for payment detection)
  */
 export const getPlanFromAmount = (amountUSD: number): MyCryptoPilotPlanName => {
+  // Test payment: exactly 1 USD (with small tolerance for crypto precision)
+  if (amountUSD >= 0.95 && amountUSD <= 1.05) {
+    return "test";
+  }
+
   // Match to closest plan based on price (with 5% tolerance)
   const tolerance = 0.05;
 
   for (const plan of MYCRYPTOPILOT_PLANS) {
-    if (plan.priceUSD === 0) continue;
+    if (plan.priceUSD === 0 || plan.name === "test") continue;
 
     const minPrice = plan.priceUSD * (1 - tolerance);
     const maxPrice = plan.priceUSD * (1 + tolerance);
