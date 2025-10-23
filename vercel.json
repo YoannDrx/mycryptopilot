@@ -6,8 +6,7 @@
     },
     {
       "path": "/api/cron/sync-exchanges",
-      "schedule": "0 2 * * *",
-      "comment": "Sync exchange trades daily at 2am (Vercel Hobby plan limitation - upgrade to Pro for 5min interval)"
+      "schedule": "0 2 * * *"
     }
   ]
 }
