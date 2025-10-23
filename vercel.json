@@ -3,6 +3,11 @@
     {
       "path": "/api/cron/expiration-reminders",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/sync-exchanges",
+      "schedule": "*/5 * * * *",
+      "comment": "Sync exchange trades every 5 minutes (PRO plan interval)"
     }
   ]
 }

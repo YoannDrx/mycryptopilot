@@ -1,0 +1,230 @@
+---
+title: "Bybit API Setup Guide"
+description: "Complete guide to creating and configuring Bybit API keys for Portfolio Tracking"
+keywords: ["bybit", "api keys", "setup", "portfolio tracking", "exchange connection"]
+tags: ["guide", "bybit", "api"]
+order: 5
+subcategory: "Guide"
+---
+
+# Bybit API Setup Guide
+
+This guide will walk you through creating and configuring Bybit API keys to enable **Portfolio Tracking** in MyCryptoPilot.
+
+## Why Connect Bybit?
+
+Connecting your Bybit account allows MyCryptoPilot to:
+
+- **Sync your trading history** automatically
+- **Calculate real performance metrics** (Win rate, Profit Factor, Sharpe Ratio)
+- **Display verified trading stats** to potential followers
+- **Earn the Verified Badge** when your stats meet criteria
+
+## Security First 🔒
+
+**Important security notes:**
+
+- ✅ API keys are **read-only** (no withdrawal or trading permissions)
+- ✅ Keys are **encrypted** using AES-256-GCM before storage
+- ✅ Encryption key is stored securely in environment variables
+- ✅ Keys **never appear in logs** or browser console
+- ✅ You can revoke API keys anytime from Bybit settings
+
+**We NEVER:**
+- ❌ Request withdrawal permissions
+- ❌ Request trading permissions
+- ❌ Store your password
+- ❌ Have access to your funds
+
+## Step 1: Create Bybit API Key
+
+### 1.1 Log in to Bybit
+
+1. Go to [bybit.com](https://www.bybit.com)
+2. Log in to your account
+3. Complete 2FA verification if prompted
+
+### 1.2 Navigate to API Management
+
+1. Click on your **profile icon** (top right)
+2. Select **API** from the dropdown menu
+3. Click on **Create New Key**
+4. You may be asked to verify your identity (2FA code)
+
+**Note:** If you don't see "API", ensure your account has completed identity verification (KYC).
+
+### 1.3 Create New API Key
+
+1. Select **"API Transaction"** as the key type
+2. Enter a note: `MyCryptoPilot - Portfolio Tracking`
+3. Complete 2FA verification (Google Authenticator or Email)
+
+### 1.4 Configure Permissions ⚠️ CRITICAL
+
+**ONLY enable these permissions:**
+
+- ✅ **Read-Only** (or "Query Only")
+- ✅ **Positions** - Read
+- ✅ **Trade** - Read (for spot trading history)
+- ✅ **Derivatives** - Read (for futures trading history)
+- ❌ **DISABLE** Trade - Write
+- ❌ **DISABLE** Withdraw
+- ❌ **DISABLE** Transfer
+
+**Important:** Ensure that all "Write" permissions are disabled. Only "Read" permissions should be enabled.
+
+### 1.5 IP Whitelist (Optional but Recommended)
+
+For maximum security, you can restrict API key usage to specific IPs:
+
+**Option 1: No IP Restriction (Not Recommended)**
+- Leave IP whitelist empty
+- Less secure but easier for users with dynamic IPs
+
+**Option 2: IP Whitelist (Recommended)**
+- Add MyCryptoPilot server IPs:
+  ```
+  [IP addresses will be provided based on deployment]
+  ```
+- Click **Add IP Address** for each IP
+
+### 1.6 Save Your Keys
+
+After creation, Bybit will display:
+
+1. **API Key** (public) - Example: `xzY3k8mN...`
+2. **Secret Key** (private) - Example: `7hB9qW2v...`
+
+⚠️ **CRITICAL**: Copy both keys immediately. The **Secret Key** is shown only once and cannot be recovered.
+
+Store them temporarily in a secure location (password manager, encrypted note).
+
+## Step 2: Connect to MyCryptoPilot
+
+### 2.1 Navigate to Portfolio Tracking
+
+1. Go to your [MyCryptoPilot account](/account/exchanges)
+2. Click on **Portfolio Tracking** in the sidebar
+3. Click **"Connect Exchange"** button
+
+### 2.2 Select Bybit
+
+1. Choose **Bybit** from the exchange selector
+2. The form will update with Bybit-specific instructions
+
+### 2.3 Enter API Credentials
+
+1. **API Key**: Paste your Bybit API Key
+2. **Secret Key**: Paste your Bybit Secret Key
+3. Click **"Connect Exchange"**
+
+### 2.4 Validation
+
+MyCryptoPilot will:
+1. Validate your API keys
+2. Check that keys are **read-only**
+3. Start syncing your trading history
+4. Calculate your performance metrics
+
+**Success!** 🎉 You'll see a success message and your first sync will begin.
+
+## Step 3: Verify Your Connection
+
+### 3.1 Check Connection Status
+
+After connecting, you'll see:
+- ✅ **Connection status**: Active
+- 📊 **Last synced**: Timestamp of last sync
+- 🔄 **Next sync**: Scheduled time for next sync
+- 📈 **Total trades**: Number of trades imported
+
+### 3.2 Review Your Stats
+
+Navigate to your **Trader Dashboard** to see:
+- Win rate (percentage of profitable trades)
+- Total P&L (profit and loss)
+- Profit Factor (ratio of wins to losses)
+- Sharpe Ratio (risk-adjusted returns)
+
+## Troubleshooting
+
+### Error: "Invalid API keys"
+
+**Cause:** API key or secret key is incorrect
+
+**Solutions:**
+1. Check you copied the **full key** (no spaces or line breaks)
+2. Ensure API key is **enabled** in Bybit settings
+3. Try generating a new API key
+
+### Error: "API keys must be read-only"
+
+**Cause:** API key has trading or withdrawal permissions enabled
+
+**Solutions:**
+1. Go back to Bybit API Management
+2. Edit your API key
+3. **Disable all Write permissions** (Trade, Withdraw, Transfer)
+4. Only keep Read permissions enabled
+5. Try connecting again
+
+### Error: "IP address not whitelisted"
+
+**Cause:** Your API key has IP restrictions and MyCryptoPilot's IP is not whitelisted
+
+**Solutions:**
+1. Remove IP whitelist restrictions (Option 1)
+2. Or add MyCryptoPilot server IPs to whitelist (Option 2)
+
+### Sync Not Working
+
+**Cause:** Various (API rate limits, Bybit downtime, etc.)
+
+**Solutions:**
+1. Wait 5-10 minutes and check again
+2. Click **"Manual Sync"** button
+3. Check **Last Sync Error** message if any
+4. Contact support if issue persists
+
+## FAQ
+
+### How often does MyCryptoPilot sync my trades?
+
+**Pro Plan:** Every 5 minutes
+**Ultra Plan:** Every 1 minute
+
+### Can I connect multiple Bybit accounts?
+
+**Pro Plan:** 1 exchange connection (Binance OR Bybit)
+**Ultra Plan:** Up to 3 exchange connections (Binance + Bybit + more)
+
+### What happens if I disconnect Bybit?
+
+- Your **historical trades remain** in MyCryptoPilot
+- **Automatic syncing stops**
+- Your **performance metrics are preserved**
+- You can reconnect anytime with same or different API keys
+
+### Can I use the same API key on multiple platforms?
+
+Yes, but it's **not recommended** for security reasons. Create separate API keys for each platform.
+
+### How do I revoke API access?
+
+1. Go to [Bybit API Management](https://www.bybit.com/app/user/api-management)
+2. Find the API key you created for MyCryptoPilot
+3. Click **Delete**
+4. API key is immediately revoked
+5. Disconnect from MyCryptoPilot to clean up
+
+## Support
+
+Need help? We're here for you!
+
+- 📧 **Email:** support@mycryptopilot.com
+- 💬 **Discord:** [Join our community](https://discord.gg/mycryptopilot)
+- 📚 **Docs:** [Full documentation](/docs)
+
+---
+
+**Last updated:** October 2025

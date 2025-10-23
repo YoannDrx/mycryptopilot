@@ -1,274 +1,179 @@
-# Exchange Portfolio Tracking & Verified Stats - MyCryptoPilot
+# Portfolio Tracking & Verified Stats - Documentation Technique
 
-**Dernière mise à jour**: 19 octobre 2025
-**Statut**: 📋 Planification (Issue GitHub à créer)
-**Complexité**: 🔴 Élevée (10 semaines, feature majeure)
-**Impact Business**: 💰 +60% revenue estimé
+**Issue**: #66
+**Branche**: `feature/66-portfolio-tracking`
+**Date création**: 22 octobre 2025
+**Dernière mise à jour**: 22 octobre 2025
+**Statut**: ✅ Semaine 3 complétée (UI Components + Integration + Verified Badge + Free Gating)
 
 ---
 
 ## 📋 Table des Matières
 
-1. [Vision Stratégique](#vision-stratégique)
-2. [Proposition de Valeur](#proposition-de-valeur)
-3. [Architecture Technique](#architecture-technique)
-4. [UI/UX Features](#uiux-features)
-5. [Monétisation](#monétisation)
-6. [Analytics Uniques](#analytics-uniques)
-7. [Roadmap Implémentation](#roadmap-implémentation)
-8. [Risques & Mitigation](#risques--mitigation)
-9. [Recommandations](#recommandations)
+1. [Vue d'ensemble](#vue-densemble)
+2. [Architecture DB](#architecture-db)
+3. [Services Backend](#services-backend)
+4. [Sécurité](#sécurité)
+5. [Configuration](#configuration)
+6. [Tests](#tests)
+7. [Roadmap](#roadmap)
 
 ---
 
-## 🎯 Vision Stratégique
+## Vue d'ensemble
 
-### Contexte
+### Objectif
 
-Actuellement, les traders sur MyCryptoPilot créent manuellement leurs signaux et self-reportent leurs statistiques. Cela crée plusieurs problèmes:
+Permettre aux traders de connecter leurs comptes Binance en **read-only** pour sync automatique des trades et affichage de stats vérifiées publiques.
 
-**Problèmes identifiés:**
-- ❌ Stats non vérifiables (trust issues)
-- ❌ Effort manuel important (friction)
-- ❌ Pas de preuve on-chain
-- ❌ Difficile de comparer traders objectivement
-- ❌ Risk de fraude (fake stats)
+### Bénéfices Business
 
-### Solution Proposée
+- **+60% revenue mensuel estimé** (+$9,830/mois)
+- **Crédibilité traders** : Stats vérifiées on-chain
+- **Conversion Free → Pro** : Stats verified comme incentive
+- **Différenciation marché** : Unique dans l'écosystème
 
-**Exchange Portfolio Tracking**: Connexion read-only aux exchanges (Binance, Bybit) pour import automatique des trades et génération de stats vérifiées.
+### Décisions clés (User Research)
 
-**AVANT** (système actuel):
-```
-Trader → Crée signal manuellement → Paste screenshot chart
-                                   ↓
-                              Stats manuelles
-                              (self-reported)
-```
-
-**APRÈS** (avec tracking):
-```
-Trader → Trade sur Binance/Bybit → Auto-sync MyCryptoPilot
-                                   ↓
-                            Stats vérifiées ✓
-                            Preuves on-chain ✓
-                            Analytics auto ✓
-```
-
-### Différenciation vs Concurrents
-
-**3Commas/Wundertrading**: Focus automation, UI complexe
-**MyCryptoPilot**: Focus social proof + simplicity + transparency
-
-**Nos Unique Value Props:**
-1. **Social Trading Context**: Stats pas juste pour le trader, mais pour prouver crédibilité aux followers
-2. **Signal Correlation**: Compare signaux publiés vs trades réels (unique!)
-3. **Verified Trader Program**: Badge trust automatique basé sur volume/consistency
-4. **Educational Focus**: Users apprennent en analysant trades de winners vérifiés
+- ✅ **Historique sync**: 30 jours (suffisant pour stats récentes)
+- ✅ **Notifications erreurs**: Email immédiat uniquement
+- ✅ **Privacy**: Tout public par défaut (max transparence)
+- ✅ **Gating Free users**: Preview winrate only (équilibre conversion)
 
 ---
 
-## 💡 Proposition de Valeur
+## Architecture DB
 
-### Pour les Traders
+### Migration
 
-#### 1. Trading Journal Automatique
-```
-✅ Plus de saisie manuelle
-✅ Import trades temps réel (ou toutes les 5min)
-✅ Analytics avancées automatiques (Sharpe, Sortino, MDD)
-✅ Tax reports automatiques (export CSV)
-✅ Performance tracking vs BTC benchmark
-```
+**Fichier**: `prisma/migrations/20251022143912_add_portfolio_tracking_models/migration.sql`
 
-**Bénéfice**: Économie de 2-3h/semaine de journaling manuel
-
-#### 2. Social Proof Automatique
-```
-✅ Winrate vérifié on-chain
-✅ Badge "Verified Stats" ✓
-✅ Transparence totale pour followers
-✅ Confiance maximale = plus de followers
-```
-
-**Bénéfice**: +40% followers estimé (trust factor)
-
-#### 3. Dashboard Pro-Grade
-```
-✅ Equity curve real-time
-✅ Risk metrics live (Sharpe, Sortino, MDD)
-✅ Best/Worst trades highlights
-✅ Correlations multi-assets
-✅ Trading hours heatmap
-```
-
-**Bénéfice**: Insights pour améliorer performance
-
-### Pour les Users (Followers)
-
-#### 1. Transparence Totale
-```
-✅ Voir les VRAIS trades du trader
-✅ Stats impossibles à falsifier
-✅ Performance history complète
-✅ Drawdowns visibles (risk transparency)
-```
-
-**Bénéfice**: Décisions informées, zéro bullshit
-
-#### 2. Better Trader Selection
-```
-✅ Comparer traders avec vraies metrics
-✅ Voir corrélation signaux vs trades réels
-✅ Identifier les meilleurs moments pour follow
-✅ Risk assessment précis avant de follow
-```
-
-**Bénéfice**: ROI followers amélioré
-
-#### 3. Educational Value
-```
-✅ Étudier les setups gagnants des pros
-✅ Analyser leurs exits (TP/SL management)
-✅ Comprendre leur risk management
-✅ Learn by example concret
-```
-
-**Bénéfice**: Amélioration compétences trading
-
----
-
-## 🏗️ Architecture Technique
-
-### Stack Technologique
-
-**APIs Exchange:**
-- Binance: REST API v3 (Spot) + Futures API v1
-- Bybit: V5 Unified Trading Account API
-
-**Backend:**
-- Node.js + TypeScript
-- Prisma ORM
-- Cron jobs (BullMQ ou node-cron)
-- Encryption: crypto module (AES-256-GCM)
-
-**Frontend:**
-- React components (existing stack)
-- Recharts pour visualizations
-- TanStack Query pour data fetching
-
-### Modèles de Données
+### 3 Nouveaux Modèles
 
 #### 1. ExchangeConnection
 
-Stocke les connexions API des traders à leurs exchanges.
+Store les connexions exchange avec API keys encryptées.
 
 ```prisma
 model ExchangeConnection {
-  id            String          @id @default(cuid())
-  userId        String
-  exchange      ExchangeType    // BINANCE, BYBIT
+  id                 String          @id @default(cuid())
+  traderProfileId    String
+  trader             TraderProfile   @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+  exchange           Exchange        // BINANCE
+  encryptedApiKey    String          @db.Text
+  encryptedSecretKey String          @db.Text
+  keyIv              String          // Initialization Vector (16 bytes hex)
+  keyTag             String          // Auth Tag (16 bytes hex)
+  isActive           Boolean         @default(true)
+  lastSyncedAt       DateTime?
+  lastSyncError      String?         @db.Text
+  nextSyncAt         DateTime?       // Throttling: PRO (5min), ULTRA (1min)
+  trades             ExchangeTrade[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
-  // API Keys (ENCRYPTED!)
-  apiKey        String          @encrypted // ⚠️ AES-256-GCM encryption
-  apiSecret     String          @encrypted
-
-  // Métadonnées
-  label         String?         // "Mon compte principal"
-
-  // Permissions (read-only strict!)
-  canReadSpot      Boolean      @default(true)
-  canReadFutures   Boolean      @default(true)
-  canTrade         Boolean      @default(false) // ❌ JAMAIS activé
-
-  // Sync status
-  isActive         Boolean      @default(true)
-  lastSyncAt       DateTime?
-  lastSyncError    String?
-  syncIntervalMin  Int          @default(5) // 5 minutes pour Free/Pro, 1 min pour Ultra
-
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
-
-  // Relations
-  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  trades           ExchangeTrade[]
-
-  @@unique([userId, exchange])
-  @@index([userId])
-  @@index([isActive])
+  @@unique([traderProfileId, exchange])
+  @@index([traderProfileId])
+  @@index([isActive, nextSyncAt])
   @@map("exchange_connection")
-}
-
-enum ExchangeType {
-  BINANCE
-  BYBIT
 }
 ```
 
-**Notes importantes:**
-- ⚠️ **Encryption obligatoire**: API keys/secrets JAMAIS en clair dans DB
-- ⚠️ **Read-only strict**: `canTrade` toujours `false` (zéro risque)
-- ⚠️ **Un exchange par user**: `@@unique([userId, exchange])`
+**Contraintes**:
+- 1 connexion par exchange par trader
+- API keys TOUJOURS encryptées (AES-256-GCM)
+- Throttling via `nextSyncAt` (gating par plan)
 
 #### 2. ExchangeTrade
 
-Stocke tous les trades importés depuis les exchanges.
+Store tous les trades importés.
 
 ```prisma
 model ExchangeTrade {
-  id                String          @id @default(cuid())
-  connectionId      String
+  id              String             @id @default(cuid())
+  connectionId    String
+  connection      ExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  externalOrderId String             @unique   // Binance order ID (idempotence)
+  symbol          String                      // BTC/USDT, ETH/USDT, etc.
+  side            TradeSide                   // BUY or SELL
+  type            OrderType                   // MARKET, LIMIT, etc.
+  quantity        Decimal            @db.Decimal(20, 8)
+  price           Decimal            @db.Decimal(20, 8)
+  quoteQuantity   Decimal            @db.Decimal(20, 8)  // Total in USDT
+  fee             Decimal            @db.Decimal(20, 8)
+  feeAsset        String                                 // BNB, USDT, etc.
+  realizedPnl     Decimal?           @db.Decimal(20, 8)  // Futures only
+  executedAt      DateTime
+  createdAt       DateTime           @default(now())
 
-  // Trade identification
-  exchange          ExchangeType
-  symbol            String          // "BTCUSDT", "ETHUSDT"
-  category          TradeCategory   // SPOT, FUTURES, MARGIN
-
-  // Order details
-  side              TradeSide       // BUY, SELL
-  type              OrderType       // MARKET, LIMIT, STOP_MARKET, etc.
-
-  // Prices & Quantities (precision Decimal pour crypto)
-  entryPrice        Decimal         @db.Decimal(18, 8)
-  exitPrice         Decimal?        @db.Decimal(18, 8)
-  quantity          Decimal         @db.Decimal(18, 8)
-  quoteQuantity     Decimal         @db.Decimal(18, 8) // En USDT généralement
-
-  // Futures specific
-  leverage          Int?
-  positionSide      String?         // "LONG", "SHORT" (Binance hedge mode)
-
-  // P&L calculations
-  realizedPnl       Decimal?        @db.Decimal(18, 4)
-  realizedPnlPercent Decimal?       @db.Decimal(8, 4)
-  fees              Decimal?        @db.Decimal(18, 8)
-
-  // Status & Lifecycle
-  status            TradeStatus     // OPEN, CLOSED, CANCELLED, REJECTED
-  openedAt          DateTime
-  closedAt          DateTime?
-
-  // Exchange references (pour idempotence)
-  externalOrderId   String          // Binance/Bybit order ID
-  externalTradeId   String?         // Binance/Bybit trade ID
-
-  // Analytics calculés (cache)
-  holdingTimeHours  Int?            // Durée du trade
-  riskRewardRatio   Decimal?        @db.Decimal(8, 4) // RR ratio
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-
-  // Relations
-  connection        ExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
-
-  @@unique([connectionId, externalOrderId])
-  @@index([connectionId, status])
+  @@index([connectionId, executedAt])
   @@index([symbol])
-  @@index([openedAt])
-  @@index([closedAt])
+  @@index([executedAt])
   @@map("exchange_trade")
+}
+```
+
+**Features**:
+- **Idempotence**: `externalOrderId` unique (pas de doublons)
+- **Spot + Futures**: `realizedPnl` nullable (futures only)
+- **Indexes optimisés**: Queries par connexion + date
+
+#### 3. TraderPerformanceSnapshot
+
+Cache des stats précalculées (4 périodes).
+
+```prisma
+model TraderPerformanceSnapshot {
+  id              String            @id @default(cuid())
+  traderProfileId String
+  trader          TraderProfile     @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+  period          PerformancePeriod // ALL_TIME, LAST_30D, LAST_90D, LAST_365D
+
+  // Basic stats
+  totalTrades     Int
+  winningTrades   Int
+  losingTrades    Int
+  winrate         Decimal           @db.Decimal(5, 2)   // 0.00 - 100.00
+
+  // P&L
+  totalProfits    Decimal           @db.Decimal(20, 8)
+  totalLosses     Decimal           @db.Decimal(20, 8)
+  netPnl          Decimal           @db.Decimal(20, 8)
+
+  // Advanced metrics
+  profitFactor    Decimal           @db.Decimal(10, 4)  // totalProfits / totalLosses
+  sharpeRatio     Decimal?          @db.Decimal(10, 4)  // Risk-adjusted returns
+  sortinoRatio    Decimal?          @db.Decimal(10, 4)  // Downside risk only
+  maxDrawdown     Decimal           @db.Decimal(10, 4)  // Peak-to-trough %
+
+  // Win/Loss analysis
+  averageWin      Decimal           @db.Decimal(20, 8)
+  averageLoss     Decimal           @db.Decimal(20, 8)
+  largestWin      Decimal           @db.Decimal(20, 8)
+  largestLoss     Decimal           @db.Decimal(20, 8)
+
+  calculatedAt    DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([traderProfileId, period])
+  @@index([traderProfileId])
+  @@index([calculatedAt])
+  @@map("trader_performance_snapshot")
+}
+```
+
+**Pourquoi un cache ?**
+- Calculs expensive (Sharpe, Sortino, MDD) = lents
+- Recalculés après chaque sync (async background job)
+- Queries ultra-rapides (1 row = toutes les stats)
+
+### Enums
+
+```prisma
+enum Exchange {
+  BINANCE
+  // BYBIT (Phase 4 future)
 }
 
 enum TradeSide {
@@ -279,2220 +184,1555 @@ enum TradeSide {
 enum OrderType {
   MARKET
   LIMIT
-  STOP_MARKET
-  STOP_LIMIT
-  TAKE_PROFIT_MARKET
+  STOP_LOSS
+  STOP_LOSS_LIMIT
+  TAKE_PROFIT
   TAKE_PROFIT_LIMIT
-  TRAILING_STOP_MARKET
 }
 
-enum TradeCategory {
-  SPOT
-  FUTURES
-  MARGIN
-}
-
-enum TradeStatus {
-  OPEN
-  CLOSED
-  CANCELLED
-  REJECTED
-  EXPIRED
-}
-```
-
-**Notes:**
-- ⚠️ **Idempotence**: `@@unique([connectionId, externalOrderId])` évite doublons
-- ⚠️ **Precision**: Decimal pour montants crypto (float = erreurs arrondis)
-- 📊 **Analytics cache**: RR ratio, holding time calculés et stockés
-
-#### 3. TraderPerformanceSnapshot
-
-Stats précalculées par période pour performance (évite calculs lourds à chaque requête).
-
-```prisma
-model TraderPerformanceSnapshot {
-  id                String      @id @default(cuid())
-  userId            String
-  exchange          ExchangeType
-
-  // Période
-  period            Period      // DAY, WEEK, MONTH, QUARTER, YEAR, ALL_TIME
-  periodStart       DateTime
-  periodEnd         DateTime
-
-  // Stats globales
-  totalTrades       Int         @default(0)
-  winningTrades     Int         @default(0)
-  losingTrades      Int         @default(0)
-  breakEvenTrades   Int         @default(0)
-  winRate           Decimal     @db.Decimal(5, 2) // 68.50%
-
-  // P&L
-  totalPnl          Decimal     @db.Decimal(18, 4)
-  totalPnlPercent   Decimal     @db.Decimal(8, 4)
-  bestTrade         Decimal?    @db.Decimal(18, 4)
-  worstTrade        Decimal?    @db.Decimal(18, 4)
-
-  // Risk metrics (pro-grade)
-  profitFactor      Decimal?    @db.Decimal(8, 4) // Gross profit / Gross loss
-  sharpeRatio       Decimal?    @db.Decimal(8, 4) // Annualisé
-  sortinoRatio      Decimal?    @db.Decimal(8, 4) // Sharpe mais downside deviation only
-  maxDrawdown       Decimal?    @db.Decimal(18, 4) // Valeur absolue
-  maxDrawdownPercent Decimal?   @db.Decimal(8, 4) // Pourcentage
-  calmarRatio       Decimal?    @db.Decimal(8, 4) // Annual return / Max DD
-
-  // Moyennes
-  avgWinSize        Decimal?    @db.Decimal(18, 4)
-  avgLossSize       Decimal?    @db.Decimal(18, 4)
-  avgRR             Decimal?    @db.Decimal(8, 4) // Risk-Reward ratio moyen
-  avgHoldingHours   Decimal?    @db.Decimal(8, 2)
-
-  // Volume & Fees
-  totalVolume       Decimal     @db.Decimal(18, 2) // En USD
-  totalFees         Decimal?    @db.Decimal(18, 4)
-
-  // Metadata
-  calculatedAt      DateTime    @default(now())
-
-  // Relations
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, exchange, period, periodStart])
-  @@index([userId, period])
-  @@index([calculatedAt])
-  @@map("trader_performance_snapshot")
-}
-
-enum Period {
-  DAY
-  WEEK
-  MONTH
-  QUARTER
-  YEAR
+enum PerformancePeriod {
   ALL_TIME
+  LAST_30D
+  LAST_90D
+  LAST_365D
 }
 ```
 
-**Notes:**
-- 📊 **Cache intelligent**: Recalculé seulement quand nouveaux trades
-- ⚡ **Performance**: Requêtes ultra-rapides (pas de calculs runtime)
-- 📈 **Metrics pro**: Sharpe, Sortino, Calmar pour traders sérieux
+---
 
-### Services Backend
+## Services Backend
 
-#### 1. ExchangeService - Abstraction multi-exchange
+### 1. EncryptionService
 
-Interface commune pour tous les exchanges, facilite ajout futurs exchanges.
+**Fichier**: `src/lib/crypto/encryption-service.ts`
+
+#### Algorithme: AES-256-GCM
+
+- **Cipher**: `aes-256-gcm` (authenticated encryption)
+- **Key**: 32 bytes dérivés de `ENCRYPTION_SECRET`
+- **IV**: 16 bytes random (unique par encryption)
+- **Auth Tag**: 16 bytes (vérification intégrité)
+
+#### API
 
 ```typescript
-// src/lib/exchange/exchange-service.ts
+// Encrypt
+type EncryptedData = {
+  encrypted: string; // Hex-encoded
+  iv: string;        // Hex-encoded (16 bytes = 32 chars)
+  tag: string;       // Hex-encoded (16 bytes = 32 chars)
+};
 
-export interface IExchangeService {
-  /**
-   * Validate API keys (test connection)
-   */
-  validateApiKeys(apiKey: string, apiSecret: string): Promise<{
-    valid: boolean
-    permissions: {
-      spot: boolean
-      futures: boolean
-      canTrade: boolean
-    }
-    error?: string
-  }>
+encryptApiKey(plaintext: string): EncryptedData
 
-  /**
-   * Fetch trades history
-   */
-  getTradesHistory(params: {
-    apiKey: string
-    apiSecret: string
-    symbol?: string
-    category?: 'SPOT' | 'FUTURES'
-    startTime?: Date
-    endTime?: Date
-    limit?: number
-  }): Promise<ExchangeTrade[]>
+// Decrypt
+decryptApiKey(
+  encrypted: string,
+  iv: string,
+  tag: string
+): string
 
-  /**
-   * Get open positions (Futures only)
-   */
-  getOpenPositions(params: {
-    apiKey: string
-    apiSecret: string
-  }): Promise<Position[]>
-
-  /**
-   * Get account info (balance, permissions)
-   */
-  getAccountInfo(params: {
-    apiKey: string
-    apiSecret: string
-  }): Promise<AccountInfo>
-}
-
-/**
- * Binance implementation
- */
-export class BinanceService implements IExchangeService {
-  private spotClient: Spot
-  private futuresClient: USDMClient
-
-  constructor() {
-    this.spotClient = new Spot()
-    this.futuresClient = new USDMClient()
-  }
-
-  async validateApiKeys(apiKey: string, apiSecret: string) {
-    try {
-      const client = new Spot(apiKey, apiSecret)
-      const account = await client.account()
-
-      // Check permissions
-      const permissions = {
-        spot: account.permissions.includes('SPOT'),
-        futures: account.permissions.includes('FUTURES'),
-        canTrade: account.permissions.includes('TRADE')
-      }
-
-      return { valid: true, permissions }
-    } catch (error) {
-      return {
-        valid: false,
-        permissions: { spot: false, futures: false, canTrade: false },
-        error: error.message
-      }
-    }
-  }
-
-  async getTradesHistory(params) {
-    const { apiKey, apiSecret, symbol, category, startTime, endTime, limit = 1000 } = params
-
-    if (category === 'SPOT' || !category) {
-      // Spot trades
-      const client = new Spot(apiKey, apiSecret)
-      const trades = await client.myTrades(symbol, {
-        startTime: startTime?.getTime(),
-        endTime: endTime?.getTime(),
-        limit
-      })
-
-      return trades.map(this.mapSpotTrade)
-    }
-
-    if (category === 'FUTURES') {
-      // Futures trades
-      const client = new USDMClient({ api_key: apiKey, api_secret: apiSecret })
-      const trades = await client.getUserTrades({
-        symbol,
-        startTime: startTime?.getTime(),
-        endTime: endTime?.getTime(),
-        limit
-      })
-
-      return trades.map(this.mapFuturesTrade)
-    }
-  }
-
-  private mapSpotTrade(trade: BinanceSpotTrade): ExchangeTrade {
-    return {
-      exchange: 'BINANCE',
-      symbol: trade.symbol,
-      category: 'SPOT',
-      side: trade.isBuyer ? 'BUY' : 'SELL',
-      type: 'MARKET', // Binance ne retourne pas le type dans myTrades
-      entryPrice: parseFloat(trade.price),
-      quantity: parseFloat(trade.qty),
-      quoteQuantity: parseFloat(trade.quoteQty),
-      fees: parseFloat(trade.commission),
-      status: 'CLOSED',
-      openedAt: new Date(trade.time),
-      closedAt: new Date(trade.time),
-      externalOrderId: trade.orderId.toString(),
-      externalTradeId: trade.id.toString()
-    }
-  }
-
-  private mapFuturesTrade(trade: BinanceFuturesTrade): ExchangeTrade {
-    return {
-      exchange: 'BINANCE',
-      symbol: trade.symbol,
-      category: 'FUTURES',
-      side: trade.side === 'BUY' ? 'BUY' : 'SELL',
-      type: trade.type as OrderType,
-      entryPrice: parseFloat(trade.price),
-      quantity: parseFloat(trade.qty),
-      quoteQuantity: parseFloat(trade.quoteQty),
-      leverage: null, // Pas disponible dans trade history
-      positionSide: trade.positionSide,
-      realizedPnl: parseFloat(trade.realizedPnl),
-      fees: parseFloat(trade.commission),
-      status: 'CLOSED',
-      openedAt: new Date(trade.time),
-      closedAt: new Date(trade.time),
-      externalOrderId: trade.orderId.toString(),
-      externalTradeId: trade.id.toString()
-    }
-  }
-}
-
-/**
- * Bybit implementation
- */
-export class BybitService implements IExchangeService {
-  private client: RestClientV5
-
-  constructor() {
-    this.client = new RestClientV5()
-  }
-
-  async validateApiKeys(apiKey: string, apiSecret: string) {
-    try {
-      const client = new RestClientV5({ key: apiKey, secret: apiSecret })
-      const { result } = await client.getWalletBalance({ accountType: 'UNIFIED' })
-
-      return {
-        valid: true,
-        permissions: {
-          spot: true, // Unified account
-          futures: true,
-          canTrade: false // On check jamais les perms trade
-        }
-      }
-    } catch (error) {
-      return {
-        valid: false,
-        permissions: { spot: false, futures: false, canTrade: false },
-        error: error.message
-      }
-    }
-  }
-
-  async getTradesHistory(params) {
-    const { apiKey, apiSecret, symbol, category, startTime, endTime, limit = 1000 } = params
-
-    const client = new RestClientV5({ key: apiKey, secret: apiSecret })
-
-    const { result } = await client.getHistoricOrders({
-      category: category === 'SPOT' ? 'spot' : 'linear', // USDT perp
-      symbol,
-      startTime: startTime?.getTime(),
-      endTime: endTime?.getTime(),
-      limit
-    })
-
-    return result.list.map(this.mapBybitTrade)
-  }
-
-  private mapBybitTrade(trade: BybitTrade): ExchangeTrade {
-    return {
-      exchange: 'BYBIT',
-      symbol: trade.symbol,
-      category: trade.category === 'spot' ? 'SPOT' : 'FUTURES',
-      side: trade.side === 'Buy' ? 'BUY' : 'SELL',
-      type: trade.orderType as OrderType,
-      entryPrice: parseFloat(trade.avgPrice),
-      quantity: parseFloat(trade.qty),
-      quoteQuantity: parseFloat(trade.cumExecValue),
-      fees: parseFloat(trade.cumExecFee),
-      status: this.mapBybitStatus(trade.orderStatus),
-      openedAt: new Date(trade.createdTime),
-      closedAt: new Date(trade.updatedTime),
-      externalOrderId: trade.orderId,
-      externalTradeId: trade.orderId // Bybit utilise orderId
-    }
-  }
-
-  private mapBybitStatus(status: string): TradeStatus {
-    switch (status) {
-      case 'Filled': return 'CLOSED'
-      case 'New': case 'PartiallyFilled': return 'OPEN'
-      case 'Cancelled': return 'CANCELLED'
-      case 'Rejected': return 'REJECTED'
-      default: return 'CLOSED'
-    }
-  }
-}
-
-/**
- * Factory
- */
-export function createExchangeService(exchange: ExchangeType): IExchangeService {
-  switch (exchange) {
-    case 'BINANCE':
-      return new BinanceService()
-    case 'BYBIT':
-      return new BybitService()
-    default:
-      throw new Error(`Unsupported exchange: ${exchange}`)
-  }
-}
+// Health check
+verifyEncryptionSetup(): boolean
 ```
 
-#### 2. TradeSyncService - Synchronisation trades
+#### Sécurité
 
-Service principal pour fetch et sync trades depuis exchanges.
+- ✅ **IV unique**: Randomisé à chaque encryption (pas de pattern)
+- ✅ **Auth tag**: Détecte toute modification des données
+- ✅ **Jamais logguer**: Keys encryptées ou décryptées
+- ✅ **Key rotation**: Possible via re-encryption batch job
+
+#### Exemple d'usage
 
 ```typescript
-// src/lib/exchange/trade-sync-service.ts
-
-export class TradeSyncService {
-  /**
-   * Sync trades pour une connexion
-   */
-  async syncTradesForConnection(connectionId: string): Promise<{
-    success: boolean
-    tradesCount: number
-    error?: string
-  }> {
-    const connection = await prisma.exchangeConnection.findUnique({
-      where: { id: connectionId },
-      include: { user: true }
-    })
-
-    if (!connection || !connection.isActive) {
-      return { success: false, tradesCount: 0, error: 'Connection inactive' }
-    }
-
-    const service = createExchangeService(connection.exchange)
-
-    try {
-      // Décrypter API keys
-      const apiKey = decrypt(connection.apiKey)
-      const apiSecret = decrypt(connection.apiSecret)
-
-      // Déterminer période de sync
-      const startTime = connection.lastSyncAt
-        ? connection.lastSyncAt
-        : subDays(new Date(), 90) // 90 jours max initial
-
-      const endTime = new Date()
-
-      logger.info(`Syncing trades for connection ${connectionId} from ${startTime} to ${endTime}`)
-
-      // Fetch Spot trades
-      const spotTrades = await service.getTradesHistory({
-        apiKey,
-        apiSecret,
-        category: 'SPOT',
-        startTime,
-        endTime,
-        limit: 1000
-      })
-
-      // Fetch Futures trades (si permission)
-      let futuresTrades = []
-      if (connection.canReadFutures) {
-        futuresTrades = await service.getTradesHistory({
-          apiKey,
-          apiSecret,
-          category: 'FUTURES',
-          startTime,
-          endTime,
-          limit: 1000
-        })
-      }
-
-      const allTrades = [...spotTrades, ...futuresTrades]
-
-      // Upsert trades (idempotent)
-      let insertedCount = 0
-      for (const trade of allTrades) {
-        const result = await prisma.exchangeTrade.upsert({
-          where: {
-            connectionId_externalOrderId: {
-              connectionId,
-              externalOrderId: trade.externalOrderId
-            }
-          },
-          create: {
-            connectionId,
-            ...trade
-          },
-          update: {
-            ...trade,
-            updatedAt: new Date()
-          }
-        })
-
-        if (result) insertedCount++
-      }
-
-      // Update connection sync status
-      await prisma.exchangeConnection.update({
-        where: { id: connectionId },
-        data: {
-          lastSyncAt: endTime,
-          lastSyncError: null
-        }
-      })
-
-      // Recalculer les stats
-      await this.recalculateStats(connection.userId, connection.exchange)
-
-      logger.info(`Synced ${insertedCount} trades for connection ${connectionId}`)
-
-      return { success: true, tradesCount: insertedCount }
-
-    } catch (error) {
-      logger.error(`Sync failed for connection ${connectionId}:`, error)
-
-      // Update error status
-      await prisma.exchangeConnection.update({
-        where: { id: connectionId },
-        data: {
-          lastSyncError: error.message
-        }
-      })
-
-      return { success: false, tradesCount: 0, error: error.message }
-    }
-  }
-
-  /**
-   * Recalculer stats pour un user/exchange
-   */
-  async recalculateStats(userId: string, exchange: ExchangeType) {
-    const periods: Period[] = ['DAY', 'WEEK', 'MONTH', 'QUARTER', 'YEAR', 'ALL_TIME']
-
-    for (const period of periods) {
-      const { start, end } = getPeriodDates(period)
-
-      // Fetch closed trades dans la période
-      const trades = await prisma.exchangeTrade.findMany({
-        where: {
-          connection: { userId, exchange },
-          status: 'CLOSED',
-          closedAt: {
-            gte: start,
-            lte: end
-          }
-        },
-        orderBy: { closedAt: 'asc' }
-      })
-
-      if (trades.length === 0) continue
-
-      // Calculate stats
-      const stats = calculateTradeStatistics(trades)
-
-      // Upsert snapshot
-      await prisma.traderPerformanceSnapshot.upsert({
-        where: {
-          userId_exchange_period_periodStart: {
-            userId,
-            exchange,
-            period,
-            periodStart: start
-          }
-        },
-        create: {
-          userId,
-          exchange,
-          period,
-          periodStart: start,
-          periodEnd: end,
-          ...stats,
-          calculatedAt: new Date()
-        },
-        update: {
-          ...stats,
-          calculatedAt: new Date()
-        }
-      })
-    }
-
-    logger.info(`Recalculated stats for user ${userId} on ${exchange}`)
-  }
-}
-
-/**
- * Helper: Calculate statistics from trades
- */
-function calculateTradeStatistics(trades: ExchangeTrade[]) {
-  const wins = trades.filter(t => (t.realizedPnl ?? 0) > 0)
-  const losses = trades.filter(t => (t.realizedPnl ?? 0) < 0)
-  const breakEvens = trades.filter(t => (t.realizedPnl ?? 0) === 0)
-
-  const totalPnl = trades.reduce((sum, t) => sum + (t.realizedPnl ?? 0), 0)
-  const winRate = trades.length > 0 ? (wins.length / trades.length) * 100 : 0
-
-  // Gross profit/loss
-  const grossProfit = wins.reduce((sum, t) => sum + (t.realizedPnl ?? 0), 0)
-  const grossLoss = Math.abs(losses.reduce((sum, t) => sum + (t.realizedPnl ?? 0), 0))
-  const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : null
-
-  // Returns array (for Sharpe/Sortino)
-  const returns = trades.map(t => t.realizedPnlPercent ?? 0)
-  const avgReturn = mean(returns)
-  const stdDev = standardDeviation(returns)
-
-  // Sharpe Ratio (annualisé, assume 0% risk-free rate)
-  const sharpeRatio = stdDev > 0 ? (avgReturn / stdDev) * Math.sqrt(365) : null
-
-  // Sortino Ratio (downside deviation only)
-  const downsideReturns = returns.filter(r => r < 0)
-  const downsideStdDev = standardDeviation(downsideReturns)
-  const sortinoRatio = downsideStdDev > 0 ? (avgReturn / downsideStdDev) * Math.sqrt(365) : null
-
-  // Max Drawdown
-  const drawdowns = calculateDrawdowns(trades)
-  const maxDrawdown = Math.min(...drawdowns, 0)
-  const maxDrawdownPercent = maxDrawdown // Already in percent
-
-  // Calmar Ratio (annual return / max DD)
-  const annualReturn = avgReturn * 365 // Simplistic
-  const calmarRatio = maxDrawdown < 0 ? annualReturn / Math.abs(maxDrawdown) : null
-
-  // Best/Worst trades
-  const bestTrade = wins.length > 0 ? Math.max(...wins.map(t => t.realizedPnl ?? 0)) : null
-  const worstTrade = losses.length > 0 ? Math.min(...losses.map(t => t.realizedPnl ?? 0)) : null
-
-  // Averages
-  const avgWinSize = wins.length > 0 ? grossProfit / wins.length : null
-  const avgLossSize = losses.length > 0 ? grossLoss / losses.length : null
-  const avgRR = avgWinSize && avgLossSize ? avgWinSize / avgLossSize : null
-
-  const holdingTimes = trades.map(t => t.holdingTimeHours ?? 0).filter(h => h > 0)
-  const avgHoldingHours = holdingTimes.length > 0 ? mean(holdingTimes) : null
-
-  // Volume & fees
-  const totalVolume = trades.reduce((sum, t) => sum + (t.quoteQuantity ?? 0), 0)
-  const totalFees = trades.reduce((sum, t) => sum + (t.fees ?? 0), 0)
-
-  return {
-    totalTrades: trades.length,
-    winningTrades: wins.length,
-    losingTrades: losses.length,
-    breakEvenTrades: breakEvens.length,
-    winRate,
-    totalPnl,
-    totalPnlPercent: avgReturn * 100, // Approximate
-    bestTrade,
-    worstTrade,
-    profitFactor,
-    sharpeRatio,
-    sortinoRatio,
-    maxDrawdown,
-    maxDrawdownPercent,
-    calmarRatio,
-    avgWinSize,
-    avgLossSize,
-    avgRR,
-    avgHoldingHours,
-    totalVolume,
-    totalFees
-  }
-}
-
-/**
- * Helper: Calculate drawdowns
- */
-function calculateDrawdowns(trades: ExchangeTrade[]): number[] {
-  let peak = 0
-  let currentEquity = 0
-  const drawdowns: number[] = []
-
-  for (const trade of trades) {
-    currentEquity += trade.realizedPnl ?? 0
-
-    if (currentEquity > peak) {
-      peak = currentEquity
-    }
-
-    const drawdown = peak > 0 ? ((currentEquity - peak) / peak) * 100 : 0
-    drawdowns.push(drawdown)
-  }
-
-  return drawdowns
-}
-
-/**
- * Helper: Get period dates
- */
-function getPeriodDates(period: Period): { start: Date; end: Date } {
-  const end = new Date()
-  let start: Date
-
-  switch (period) {
-    case 'DAY':
-      start = startOfDay(end)
-      break
-    case 'WEEK':
-      start = startOfWeek(end)
-      break
-    case 'MONTH':
-      start = startOfMonth(end)
-      break
-    case 'QUARTER':
-      start = startOfQuarter(end)
-      break
-    case 'YEAR':
-      start = startOfYear(end)
-      break
-    case 'ALL_TIME':
-      start = new Date(0) // Epoch
-      break
-  }
-
-  return { start, end }
-}
-
-// Stats helpers
-function mean(arr: number[]): number {
-  return arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0
-}
-
-function standardDeviation(arr: number[]): number {
-  const avg = mean(arr)
-  const squareDiffs = arr.map(value => Math.pow(value - avg, 2))
-  return Math.sqrt(mean(squareDiffs))
-}
-```
-
-#### 3. EncryptionService - Sécurité API keys
-
-**CRITIQUE**: API keys JAMAIS en clair dans DB.
-
-```typescript
-// src/lib/crypto/encryption-service.ts
-
-import crypto from 'crypto'
-import { env } from '@/lib/env'
-
-const ALGORITHM = 'aes-256-gcm'
-const IV_LENGTH = 16
-const SALT_LENGTH = 64
-const TAG_LENGTH = 16
-const ITERATIONS = 100000
-
-/**
- * Derive encryption key from master secret
- */
-function deriveKey(salt: Buffer): Buffer {
-  return crypto.pbkdf2Sync(
-    env.ENCRYPTION_MASTER_KEY, // ⚠️ Must be in env vars
-    salt,
-    ITERATIONS,
-    32, // 256 bits
-    'sha512'
-  )
-}
-
-/**
- * Encrypt sensitive data (API keys)
- */
-export function encrypt(plaintext: string): string {
-  const salt = crypto.randomBytes(SALT_LENGTH)
-  const iv = crypto.randomBytes(IV_LENGTH)
-  const key = deriveKey(salt)
-
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv)
-
-  let encrypted = cipher.update(plaintext, 'utf8', 'hex')
-  encrypted += cipher.final('hex')
-
-  const tag = cipher.getAuthTag()
-
-  // Format: salt:iv:tag:encrypted
-  return `${salt.toString('hex')}:${iv.toString('hex')}:${tag.toString('hex')}:${encrypted}`
-}
-
-/**
- * Decrypt sensitive data
- */
-export function decrypt(ciphertext: string): string {
-  const parts = ciphertext.split(':')
-
-  if (parts.length !== 4) {
-    throw new Error('Invalid encrypted data format')
-  }
-
-  const salt = Buffer.from(parts[0], 'hex')
-  const iv = Buffer.from(parts[1], 'hex')
-  const tag = Buffer.from(parts[2], 'hex')
-  const encrypted = parts[3]
-
-  const key = deriveKey(salt)
-
-  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv)
-  decipher.setAuthTag(tag)
-
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8')
-  decrypted += decipher.final('utf8')
-
-  return decrypted
-}
-
-/**
- * Test encryption (dev only)
- */
-export function testEncryption() {
-  const testKey = 'test-api-key-12345'
-  const encrypted = encrypt(testKey)
-  const decrypted = decrypt(encrypted)
-
-  console.log('Original:', testKey)
-  console.log('Encrypted:', encrypted)
-  console.log('Decrypted:', decrypted)
-  console.log('Match:', testKey === decrypted)
-}
-```
-
-**Variables d'environnement requises:**
-```bash
-# .env (NEVER commit this!)
-ENCRYPTION_MASTER_KEY="your-very-long-random-secret-at-least-32-chars"
-```
-
-#### 4. Cron Job - Sync automatique
-
-```typescript
-// src/lib/cron/sync-exchanges.ts
-
-import { CronJob } from 'cron'
-import { TradeSyncService } from '@/lib/exchange/trade-sync-service'
-import { prisma } from '@/lib/prisma'
-import { logger } from '@/lib/logger'
-import { chunk } from 'lodash'
-
-const syncService = new TradeSyncService()
-
-/**
- * Sync all active connections
- * Runs every 5 minutes
- */
-export const syncExchangesJob = new CronJob(
-  '*/5 * * * *', // Every 5 minutes
-  async () => {
-    logger.info('Starting exchange sync cron job')
-
-    try {
-      // Fetch active connections
-      const connections = await prisma.exchangeConnection.findMany({
-        where: {
-          isActive: true,
-          user: {
-            // Only traders
-            traderProfile: { isNot: null }
-          }
-        },
-        include: {
-          user: {
-            select: { id: true, planName: true }
-          }
-        }
-      })
-
-      logger.info(`Found ${connections.length} active connections to sync`)
-
-      // Sync en parallèle (max 10 concurrent pour rate limits)
-      const batches = chunk(connections, 10)
-
-      for (const batch of batches) {
-        await Promise.allSettled(
-          batch.map(conn =>
-            syncService.syncTradesForConnection(conn.id)
-              .catch(err => {
-                logger.error(`Sync failed for connection ${conn.id}:`, err)
-                return { success: false, tradesCount: 0, error: err.message }
-              })
-          )
-        )
-
-        // Wait 1s between batches (rate limiting)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-
-      logger.info('Exchange sync cron job completed')
-
-    } catch (error) {
-      logger.error('Exchange sync cron job failed:', error)
-    }
+const encrypted = encryptApiKey("my-binance-api-key");
+// encrypted = {
+//   encrypted: "a3f2c1...",
+//   iv: "1a2b3c4d...",
+//   tag: "9z8y7x6w..."
+// }
+
+await prisma.exchangeConnection.create({
+  data: {
+    traderProfileId: trader.id,
+    exchange: "BINANCE",
+    encryptedApiKey: encrypted.encrypted,
+    encryptedSecretKey: encryptedSecret.encrypted,
+    keyIv: encrypted.iv,
+    keyTag: encrypted.tag,
   },
-  null, // onComplete
-  false, // start immediately
-  'UTC' // timezone
-)
+});
 
-/**
- * Start cron job
- */
-export function startExchangeSyncCron() {
-  syncExchangesJob.start()
-  logger.info('Exchange sync cron job started (every 5 minutes)')
-}
+// Later: decrypt
+const connection = await prisma.exchangeConnection.findUnique({...});
+const apiKey = decryptApiKey(
+  connection.encryptedApiKey,
+  connection.keyIv,
+  connection.keyTag
+);
 ```
 
-**Intégration dans app:**
+---
+
+### 2. BinanceService
+
+**Fichier**: `src/lib/exchange/binance-service.ts`
+
+#### Integration ccxt
+
 ```typescript
-// src/app.ts (ou server startup)
-import { startExchangeSyncCron } from '@/lib/cron/sync-exchanges'
+import ccxt from "ccxt";
 
-// Au démarrage serveur
-startExchangeSyncCron()
+class BinanceService {
+  private exchange: InstanceType<typeof ccxt.binance>;
+
+  constructor(apiKey: string, secretKey: string) {
+    this.exchange = new ccxt.binance({
+      apiKey,
+      secret: secretKey,
+      enableRateLimit: true,  // Automatic rate limiting
+      options: {
+        defaultType: "spot",
+      },
+    });
+  }
+}
+```
+
+#### API
+
+##### validateApiKeys()
+
+Valide les keys + vérifie read-only permissions.
+
+```typescript
+type ValidationResult = {
+  isValid: boolean;
+  isReadOnly: boolean;
+  hasSpotEnabled: boolean;
+  hasFuturesEnabled: boolean;
+  errorMessage?: string;
+};
+
+async validateApiKeys(): Promise<ValidationResult>
+```
+
+**Checks**:
+1. Keys valides (authentication test via `fetchBalance`)
+2. Read-only enforcement (call `sapiGetAccountApiRestrictions`)
+3. Spot enabled (toujours true si keys valides)
+4. Futures enabled (optionnel)
+
+**Error handling**:
+- Invalid API keys → `errorMessage: "Invalid API keys"`
+- IP not whitelisted → `errorMessage: "IP address not whitelisted"`
+
+##### fetchRecentTrades()
+
+Fetch trades spot + futures depuis une date.
+
+```typescript
+type BinanceTrade = {
+  externalOrderId: string;
+  symbol: string;
+  side: TradeSide;
+  type: OrderType;
+  quantity: number;
+  price: number;
+  quoteQuantity: number;
+  fee: number;
+  feeAsset: string;
+  realizedPnl: number | null;
+  executedAt: Date;
+};
+
+async fetchRecentTrades(
+  daysSince = 30,
+  sinceDate?: Date
+): Promise<BinanceTrade[]>
+```
+
+**Algorithme**:
+1. Load all markets (spot + futures)
+2. For each market, call `fetchMyTrades(symbol, sinceTimestamp)`
+3. Map ccxt format → internal `BinanceTrade`
+4. Merge spot + futures
+5. Sort by `executedAt` desc
+
+**Rate limiting**: Géré automatiquement par ccxt (`enableRateLimit: true`)
+
+#### Usage Example
+
+```typescript
+const binance = new BinanceService(apiKey, secretKey);
+
+// Validate
+const validation = await binance.validateApiKeys();
+if (!validation.isValid) {
+  throw new Error(validation.errorMessage);
+}
+if (!validation.isReadOnly) {
+  throw new Error("API keys must be read-only");
+}
+
+// Fetch trades
+const trades = await binance.fetchRecentTrades(30); // Last 30 days
+console.log(`Fetched ${trades.length} trades`);
+
+// Cleanup
+await binance.close();
 ```
 
 ---
 
-## 🎨 UI/UX Features
+## Sécurité
 
-### Dashboard Trader - Nouvel Onglet "Portfolio"
+### Threat Model
 
-Page: `app/orgs/[orgSlug]/(navigation)/(trading)/dashboard/trader/portfolio/page.tsx`
+| Threat | Impact | Mitigation |
+|--------|--------|------------|
+| **API keys leak** | CRITIQUE | AES-256-GCM encryption + never log |
+| **Write permissions abuse** | CRITIQUE | Strict read-only validation |
+| **Data tampering** | HIGH | Auth tag verification (GCM mode) |
+| **Binance API changes** | HIGH | ccxt abstraction + version pinning |
+| **Sync failures** | MEDIUM | Retry logic + email notifications |
+| **DB performance** | MEDIUM | Indexes + caching snapshots |
 
-#### Layout général
+### Best Practices
 
-```tsx
-export default async function TraderPortfolioPage() {
-  const user = await getRequiredUser()
-  const traderProfile = await getTraderProfileByUserId(user.id)
+#### 1. API Keys Storage
 
-  if (!traderProfile) redirect('/account/become-trader')
+- ✅ **NEVER store plaintext**
+- ✅ **AES-256-GCM encryption**
+- ✅ **IV unique par encryption**
+- ✅ **Auth tag pour intégrité**
+- ✅ **Key rotation possible** (re-encrypt batch)
 
-  // Fetch connections
-  const connections = await prisma.exchangeConnection.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' }
-  })
+#### 2. Read-Only Enforcement
 
-  // Fetch latest stats (ALL_TIME period)
-  const stats = await prisma.traderPerformanceSnapshot.findFirst({
-    where: {
-      userId: user.id,
-      period: 'ALL_TIME'
-    },
-    orderBy: { calculatedAt: 'desc' }
-  })
+```typescript
+// Validation stricte
+const restrictions = await exchange.sapiGetAccountApiRestrictions();
+const isReadOnly =
+  !restrictions.enableSpotAndMarginTrading &&
+  !restrictions.enableFutures &&
+  !restrictions.enableWithdrawals;
 
-  return (
-    <div className="container mx-auto py-8 space-y-8">
-      <PageHeader
-        title="Portfolio Tracking"
-        description="Connect your exchange accounts and track your trading performance"
-      />
-
-      {/* Section 1: Connections */}
-      <ExchangeConnectionsCard connections={connections} />
-
-      {/* Section 2: Performance Overview (si au moins 1 connexion) */}
-      {connections.length > 0 && stats && (
-        <>
-          <PerformanceOverviewCards stats={stats} />
-          <EquityCurveChart userId={user.id} />
-          <RecentTradesTable userId={user.id} />
-        </>
-      )}
-
-      {/* Empty state si pas de connexion */}
-      {connections.length === 0 && (
-        <EmptyStateConnectExchange />
-      )}
-    </div>
-  )
+if (!isReadOnly) {
+  throw new Error("API keys must be read-only");
 }
 ```
 
-#### Section 1: Exchange Connections
+#### 3. Error Handling
 
-```tsx
-'use client'
+- ❌ **NEVER log API keys** (même encryptées)
+- ✅ **Log errors uniquement** (pas de données sensibles)
+- ✅ **Email immédiat** si keys invalides
+- ✅ **Store lastSyncError** en DB pour debug
 
-export function ExchangeConnectionsCard({ connections }: Props) {
-  const [selectedConnection, setSelectedConnection] = useState<string | null>(null)
+#### 4. Rate Limiting
 
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Connected Exchanges</CardTitle>
-            <CardDescription>
-              Sync your trading activity from Binance and Bybit
-            </CardDescription>
-          </div>
-          <ConnectExchangeDialog>
-            <Button>
-              <PlusCircle className="mr-2 size-4" />
-              Connect Exchange
-            </Button>
-          </ConnectExchangeDialog>
-        </div>
-      </CardHeader>
+- ✅ **ccxt automatic rate limiting** (`enableRateLimit: true`)
+- ✅ **Exponential backoff** sur erreurs
+- ✅ **Max 10 connexions concurrent** (cron)
+- ✅ **Throttling par plan** (PRO 5min, ULTRA 1min)
 
-      <CardContent className="space-y-4">
-        {connections.map(conn => (
-          <div key={conn.id} className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="flex items-center gap-4">
-              {/* Exchange icon */}
-              <div className="flex size-12 items-center justify-center rounded-lg bg-muted">
-                {conn.exchange === 'BINANCE' ? (
-                  <BinanceIcon className="size-6" />
-                ) : (
-                  <BybitIcon className="size-6" />
-                )}
-              </div>
+---
 
-              {/* Info */}
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">{conn.label || conn.exchange}</p>
-                  {conn.isActive && (
-                    <Badge variant="outline" className="bg-green-50">
-                      <CheckCircle className="mr-1 size-3" />
-                      Active
-                    </Badge>
-                  )}
-                  {conn.lastSyncError && (
-                    <Badge variant="destructive">
-                      <AlertCircle className="mr-1 size-3" />
-                      Error
-                    </Badge>
-                  )}
-                </div>
+## Configuration
 
-                <p className="text-muted-foreground text-sm">
-                  {conn.lastSyncAt ? (
-                    <>Last sync: {formatDistanceToNow(conn.lastSyncAt, { addSuffix: true })}</>
-                  ) : (
-                    <>Never synced</>
-                  )}
-                </p>
+### Environment Variables
 
-                {conn.lastSyncError && (
-                  <p className="text-destructive text-xs mt-1">
-                    {conn.lastSyncError}
-                  </p>
-                )}
-              </div>
-            </div>
+#### `.env.local` (Development)
 
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <SyncNowButton connectionId={conn.id} />
-              <Button variant="ghost" size="sm" onClick={() => setSelectedConnection(conn.id)}>
-                <Settings className="size-4" />
-              </Button>
-              <DeleteConnectionButton connectionId={conn.id} />
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  )
+```bash
+# Encryption for sensitive data (API keys)
+# CRITICAL: Must be 32+ characters
+ENCRYPTION_SECRET="your-secure-32-char-random-key-here-min-32-chars"
+```
+
+**Générer une clé sécurisée**:
+
+```bash
+# Option 1: Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Option 2: OpenSSL
+openssl rand -hex 32
+```
+
+#### Validation
+
+La variable est validée dans `src/lib/env.ts`:
+
+```typescript
+env: {
+  ENCRYPTION_SECRET: z.string().min(32),
+  // ...
 }
 ```
 
-#### Dialog: Connect Exchange
-
-```tsx
-'use client'
-
-export function ConnectExchangeDialog({ children }: Props) {
-  const [open, setOpen] = useState(false)
-  const [step, setStep] = useState<'select' | 'credentials' | 'verify'>('select')
-  const [selectedExchange, setSelectedExchange] = useState<ExchangeType | null>(null)
-
-  const form = useForm({
-    defaultValues: {
-      exchange: 'BINANCE',
-      label: '',
-      apiKey: '',
-      apiSecret: ''
-    }
-  })
-
-  const connectMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const result = await connectExchangeAction(data)
-      return unwrapServerActionResult(result)
-    },
-    onSuccess: () => {
-      toast.success('Exchange connected successfully!')
-      setOpen(false)
-      router.refresh()
-    },
-    onError: (error) => {
-      toast.error(error.message)
-    }
-  })
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Connect Exchange Account</DialogTitle>
-          <DialogDescription>
-            Connect your Binance or Bybit account to sync your trades automatically
-          </DialogDescription>
-        </DialogHeader>
-
-        {step === 'select' && (
-          <div className="grid gap-4">
-            <SelectExchangeCard
-              exchange="BINANCE"
-              selected={selectedExchange === 'BINANCE'}
-              onSelect={() => {
-                setSelectedExchange('BINANCE')
-                setStep('credentials')
-              }}
-            />
-            <SelectExchangeCard
-              exchange="BYBIT"
-              selected={selectedExchange === 'BYBIT'}
-              onSelect={() => {
-                setSelectedExchange('BYBIT')
-                setStep('credentials')
-              }}
-            />
-          </div>
-        )}
-
-        {step === 'credentials' && (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(connectMutation.mutate)} className="space-y-4">
-              <FormField
-                name="label"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Label (optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="My main account" />
-                    </FormControl>
-                    <FormDescription>
-                      Give this connection a memorable name
-                    </FormDescription>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="apiKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>API Key</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Your API key" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="apiSecret"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>API Secret</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="password" placeholder="Your API secret" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <Alert>
-                <Shield className="size-4" />
-                <AlertTitle>Security Notice</AlertTitle>
-                <AlertDescription>
-                  Your API keys are encrypted and stored securely. We only request READ permissions.
-                  We will NEVER execute trades on your behalf.
-                </AlertDescription>
-              </Alert>
-
-              <div className="flex justify-between">
-                <Button type="button" variant="ghost" onClick={() => setStep('select')}>
-                  Back
-                </Button>
-                <Button type="submit" disabled={connectMutation.isPending}>
-                  {connectMutation.isPending ? 'Verifying...' : 'Connect'}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        )}
-      </DialogContent>
-    </Dialog>
-  )
-}
+**Erreur si non configuré**:
+```
+ENCRYPTION_SECRET not configured in environment variables
 ```
 
-#### Section 2: Performance Overview
-
-```tsx
-export function PerformanceOverviewCards({ stats }: Props) {
-  return (
-    <div className="grid gap-4 md:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Total Trades</CardTitle>
-          <Activity className="text-muted-foreground size-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{stats.totalTrades}</div>
-          <p className="text-muted-foreground text-xs">
-            {stats.winningTrades}W / {stats.losingTrades}L
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">
-            Win Rate
-            <Badge variant="outline" className="ml-2">
-              <CheckCircle className="mr-1 size-3" />
-              Verified
-            </Badge>
-          </CardTitle>
-          <TrendingUp className="text-muted-foreground size-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-green-600">
-            {stats.winRate.toFixed(1)}%
-          </div>
-          <p className="text-muted-foreground text-xs">
-            {stats.totalTrades} verified trades
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Total P&L</CardTitle>
-          <DollarSign className="text-muted-foreground size-4" />
-        </CardHeader>
-        <CardContent>
-          <div className={cn(
-            "text-2xl font-bold",
-            stats.totalPnl > 0 ? "text-green-600" : "text-red-600"
-          )}>
-            {formatCurrency(stats.totalPnl)}
-          </div>
-          <p className="text-muted-foreground text-xs">
-            {stats.totalPnlPercent > 0 ? '+' : ''}{stats.totalPnlPercent.toFixed(2)}% return
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Profit Factor</CardTitle>
-          <BarChart3 className="text-muted-foreground size-4" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">
-            {stats.profitFactor?.toFixed(2) ?? '-'}
-          </div>
-          <p className="text-muted-foreground text-xs">
-            Sharpe: {stats.sharpeRatio?.toFixed(2) ?? '-'}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+**Erreur si trop court**:
 ```
-
-#### Section 3: Equity Curve
-
-```tsx
-export function EquityCurveChart({ userId }: Props) {
-  const [timeframe, setTimeframe] = useState<'1D' | '1W' | '1M' | 'ALL'>('1M')
-
-  // Fetch equity data (TODO: implement query)
-  const { data: equityData } = useQuery({
-    queryKey: ['equity-curve', userId, timeframe],
-    queryFn: () => getEquityCurveData(userId, timeframe)
-  })
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Equity Curve</CardTitle>
-          <Tabs value={timeframe} onValueChange={(v) => setTimeframe(v as any)}>
-            <TabsList>
-              <TabsTrigger value="1D">1D</TabsTrigger>
-              <TabsTrigger value="1W">1W</TabsTrigger>
-              <TabsTrigger value="1M">1M</TabsTrigger>
-              <TabsTrigger value="ALL">ALL</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={equityData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(date) => format(new Date(date), 'MMM dd')}
-            />
-            <YAxis />
-            <Tooltip
-              labelFormatter={(date) => format(new Date(date), 'PPP')}
-              formatter={(value: number) => formatCurrency(value)}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="portfolioValue"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              name="Your Portfolio"
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="btcValue"
-              stroke="#f7931a"
-              strokeWidth={1}
-              strokeDasharray="5 5"
-              name="BTC Benchmark"
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
-  )
-}
-```
-
-#### Section 4: Recent Trades Table
-
-```tsx
-export async function RecentTradesTable({ userId }: Props) {
-  const trades = await prisma.exchangeTrade.findMany({
-    where: {
-      connection: { userId }
-    },
-    orderBy: { openedAt: 'desc' },
-    take: 20,
-    include: {
-      connection: {
-        select: { exchange: true }
-      }
-    }
-  })
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Trades</CardTitle>
-        <div className="flex gap-2">
-          <TradeFilters /> {/* TODO: implement filters */}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Exchange</TableHead>
-              <TableHead>Symbol</TableHead>
-              <TableHead>Side</TableHead>
-              <TableHead>Entry</TableHead>
-              <TableHead>Exit</TableHead>
-              <TableHead>Size</TableHead>
-              <TableHead>P&L</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {trades.map(trade => (
-              <TableRow key={trade.id}>
-                <TableCell>
-                  <Badge variant="outline">{trade.connection.exchange}</Badge>
-                </TableCell>
-
-                <TableCell className="font-medium">{trade.symbol}</TableCell>
-
-                <TableCell>
-                  <Badge variant={trade.side === 'BUY' ? 'default' : 'secondary'}>
-                    {trade.positionSide || trade.side}
-                    {trade.leverage && ` ${trade.leverage}x`}
-                  </Badge>
-                </TableCell>
-
-                <TableCell>{formatPrice(trade.entryPrice)}</TableCell>
-
-                <TableCell>
-                  {trade.exitPrice ? formatPrice(trade.exitPrice) : (
-                    <Badge variant="outline">OPEN</Badge>
-                  )}
-                </TableCell>
-
-                <TableCell>{formatQuantity(trade.quantity)}</TableCell>
-
-                <TableCell>
-                  {trade.realizedPnl ? (
-                    <span className={cn(
-                      'font-medium',
-                      trade.realizedPnl > 0 ? 'text-green-600' : 'text-red-600'
-                    )}>
-                      {formatCurrency(trade.realizedPnl)}
-                      {trade.realizedPnlPercent &&
-                        ` (${trade.realizedPnlPercent > 0 ? '+' : ''}${trade.realizedPnlPercent.toFixed(2)}%)`
-                      }
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span>{format(trade.openedAt, 'PPp')}</span>
-                    {trade.closedAt && (
-                      <span className="text-muted-foreground text-xs">
-                        Closed: {format(trade.closedAt, 'PPp')}
-                      </span>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  )
-}
-```
-
-### Page Profil Trader Public - Onglet "Verified Stats"
-
-Page: `app/orgs/[orgSlug]/(navigation)/(trading)/traders/[traderId]/page.tsx`
-
-```tsx
-export default async function TraderPublicProfilePage({ params }: Props) {
-  const trader = await getTraderProfileById(params.traderId)
-  if (!trader) notFound()
-
-  const user = await getUser() // Current user (peut être null)
-  const userPlan = user?.planName ?? 'free'
-
-  // Fetch verified stats
-  const stats = await prisma.traderPerformanceSnapshot.findFirst({
-    where: {
-      userId: trader.userId,
-      period: 'ALL_TIME'
-    },
-    orderBy: { calculatedAt: 'desc' }
-  })
-
-  // Check if trader has exchange connected
-  const hasExchangeConnected = await prisma.exchangeConnection.count({
-    where: { userId: trader.userId, isActive: true }
-  }) > 0
-
-  return (
-    <div className="container mx-auto py-8">
-      {/* Header avec infos trader... */}
-
-      <Tabs defaultValue="overview">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="verified-stats">
-            Verified Stats
-            {hasExchangeConnected && (
-              <Badge variant="secondary" className="ml-2">
-                <CheckCircle className="mr-1 size-3" />
-                Verified
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="signals">Signals</TabsTrigger>
-        </TabsList>
-
-        {/* Onglet Verified Stats */}
-        <TabsContent value="verified-stats">
-          {!hasExchangeConnected ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  This trader hasn't connected any exchange account yet.
-                </p>
-              </CardContent>
-            </Card>
-          ) : !stats ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  No trading data available yet.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {/* Performance cards */}
-              <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">Verified Win Rate</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-green-600">
-                      {stats.winRate.toFixed(1)}%
-                    </div>
-                    <p className="text-muted-foreground text-xs mt-2">
-                      From {stats.totalTrades} verified trades
-                    </p>
-                    <Badge variant="outline" className="mt-2">
-                      <CheckCircle className="mr-1 size-3" />
-                      On-chain verified
-                    </Badge>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">Total P&L</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className={cn(
-                      "text-3xl font-bold",
-                      stats.totalPnl > 0 ? "text-green-600" : "text-red-600"
-                    )}>
-                      {formatCurrency(stats.totalPnl)}
-                    </div>
-                    <p className="text-muted-foreground text-xs mt-2">
-                      {stats.totalPnlPercent > 0 ? '+' : ''}{stats.totalPnlPercent.toFixed(2)}% return
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">Risk Metrics</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm">Profit Factor</span>
-                        <span className="font-medium">{stats.profitFactor?.toFixed(2) ?? '-'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Sharpe Ratio</span>
-                        <span className="font-medium">{stats.sharpeRatio?.toFixed(2) ?? '-'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Max DD</span>
-                        <span className="font-medium text-red-600">
-                          {stats.maxDrawdownPercent?.toFixed(2) ?? '-'}%
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Equity curve (avec blur si Free) */}
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle>Performance History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {userPlan === 'free' ? (
-                    <BlurredEquityCurveWithUpsell traderId={trader.id} />
-                  ) : (
-                    <EquityCurveChart userId={trader.userId} />
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Trades table (avec blur si Free) */}
-              {userPlan === 'free' ? (
-                <BlurredTradesTableWithUpsell />
-              ) : (
-                <RecentTradesTable userId={trader.userId} />
-              )}
-            </>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
-}
-```
-
-#### Component: Blurred Upsell
-
-```tsx
-export function BlurredEquityCurveWithUpsell({ traderId }: Props) {
-  return (
-    <div className="relative">
-      {/* Chart blurred */}
-      <div className="blur-md pointer-events-none">
-        <EquityCurveChart userId={traderId} />
-      </div>
-
-      {/* Overlay upsell */}
-      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-        <Card className="max-w-sm">
-          <CardHeader>
-            <CardTitle>Unlock Verified Stats</CardTitle>
-            <CardDescription>
-              Upgrade to Pro to see full trading history and performance metrics
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="text-green-600 size-4" />
-                  <span className="text-sm">Full equity curve history</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="text-green-600 size-4" />
-                  <span className="text-sm">All verified trades</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="text-green-600 size-4" />
-                  <span className="text-sm">Advanced risk metrics</span>
-                </div>
-              </div>
-
-              <Button asChild className="w-full">
-                <Link href="/pricing">Upgrade to Pro - $49/mo</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
-}
+ENCRYPTION_SECRET must be at least 32 characters (got {length})
 ```
 
 ---
 
-## 💰 Monétisation
+## Tests
 
-### Gating Features par Plan
+### EncryptionService Tests
 
-**Plan FREE**:
-```
-❌ Pas de connexion exchange
-✅ Voir stats publiques blurred des traders vérifiés
-✅ Voir nombre total trades + winrate uniquement
+**Fichier**: `__tests__/crypto/encryption-service.test.ts`
+
+#### Coverage: 20 tests
+
+**Categories**:
+1. **encryptApiKey** (5 tests)
+   - Encrypt plaintext
+   - Different IVs for same plaintext
+   - Empty string
+   - Long strings (1000 chars)
+   - Special characters
+
+2. **decryptApiKey** (7 tests)
+   - Decrypt encrypted data
+   - Empty string round-trip
+   - Long strings round-trip
+   - Special characters round-trip
+   - Wrong IV → error
+   - Wrong tag (tampering) → error
+   - Wrong encrypted data → error
+
+3. **verifyEncryptionSetup** (2 tests)
+   - Encryption cycle works
+   - Multiple verifications consistent
+
+4. **Security properties** (5 tests)
+   - Unique IV per encryption
+   - Different ciphertext same plaintext
+   - Detect data tampering
+   - IV is 16 bytes (32 hex chars)
+   - Auth tag is 16 bytes (32 hex chars)
+
+5. **Real-world scenarios** (3 tests)
+   - Binance API keys encryption/decryption
+   - Multiple sequential encryptions
+   - Concurrent encryptions (100 keys)
+
+#### Run Tests
+
+```bash
+# Single file
+pnpm test __tests__/crypto/encryption-service.test.ts
+
+# All tests
+pnpm test:ci
 ```
 
-**Plan PRO** ($49/mois):
-```
-✅ 1 connexion exchange (Binance OU Bybit)
-✅ Sync toutes les 5 minutes
-✅ 90 jours d'historique
-✅ Stats complètes visibles (winrate, P&L, profit factor)
-✅ Equity curve chart
-✅ Recent trades table (20 derniers)
-✅ Export CSV basic
-```
+**Note**: Tests require `ENCRYPTION_SECRET` in `.env.local`.
 
-**Plan ULTRA** ($99/mois):
-```
-✅ 3 connexions exchanges (multi-exchange)
-✅ Sync temps réel (1 minute)
-✅ Historique illimité (toutes données disponibles)
-✅ Analytics avancées (Sharpe, Sortino, Calmar, MDD)
-✅ Export tax reports (FIFO/LIFO/HIFO)
-✅ Trading hours heatmap
-✅ Symbol performance breakdown
-✅ API access pour scripts custom (optionnel)
-```
+---
 
-### Matrice Features
+## Roadmap
 
-| Feature | FREE | PRO | ULTRA |
-|---------|------|-----|-------|
-| **Connexions exchange** | ❌ | 1 | 3 |
+### ✅ Semaine 1: DB + Encryption + Binance API (COMPLETED)
+
+- ✅ DB models + migration
+- ✅ EncryptionService (AES-256-GCM)
+- ✅ BinanceService (validate + fetchTrades)
+- ✅ Tests unitaires (20 tests)
+- ✅ Documentation
+
+### 🚀 Semaine 2: API Routes + Sync Engine (NEXT)
+
+**Jour 1-2: API Routes**
+- `POST /api/exchange/connect` - Validate + encrypt + store
+- `GET /api/exchange/status/:id` - Connection status
+- `POST /api/exchange/disconnect` - Soft delete
+- `POST /api/exchange/sync/:id` - Force manual sync
+- Gating par plan (FREE bloqué, PRO 1 connexion, ULTRA 3)
+
+**Jour 3-4: Sync Service + Performance Calculator**
+- `syncConnectionTrades()` - Decrypt + fetch + upsert
+- `recalculatePerformanceSnapshots()` - 4 périodes
+- Performance metrics algorithms:
+  - Winrate, profit factor, avg win/loss
+  - Sharpe ratio (risk-adjusted returns)
+  - Sortino ratio (downside risk only)
+  - Max drawdown (peak-to-trough)
+- Error handling + email notifications
+
+**Jour 5: Cron Job**
+- Route `/api/cron/sync-exchanges`
+- Batch processing (max 10 concurrent)
+- Throttling PRO (5min) vs ULTRA (1min)
+- Vercel cron config (`vercel.json`)
+
+### 📅 Semaine 3: UI Components + Public Stats
+
+**Jour 1-2: Dashboard Trader - Onglet Portfolio**
+- `ExchangeConnectionCard` (status, last sync, total trades)
+- `ConnectExchangeModal` (form + validation)
+- `PerformanceOverview` (6 metric cards)
+- Error states (sync failures, API keys invalides)
+
+**Jour 3-4: Charts + Tables**
+- `EquityCurveChart` (Recharts line chart)
+- `TradesTable` (pagination, filtres, export CSV)
+- Period selector (ALL_TIME, 30D, 90D, 365D)
+- Responsive design
+
+**Jour 5: Public Profile - Verified Stats Tab**
+- `VerifiedBadge` component
+- `VerifiedStatsTab` (gating Free users)
+- Preview winrate only pour Free
+- Full stats pour Pro/Ultra
+- Upsell modal
+
+---
+
+## Gating par Plan
+
+| Feature | FREE | PRO ($49) | ULTRA ($99) |
+|---------|------|-----------|-------------|
+| **Connexions** | ❌ 0 | ✅ 1 | ✅ 3 |
 | **Sync interval** | - | 5 min | 1 min |
-| **Historique trades** | - | 90 jours | Illimité |
-| **Voir stats publiques** | Blurred | ✅ Full | ✅ Full |
-| **Equity curve** | ❌ | ✅ | ✅ |
-| **Trades table** | ❌ | 20 derniers | Illimité |
-| **Basic stats** | ❌ | ✅ | ✅ |
-| **Advanced metrics** | ❌ | ❌ | ✅ |
-| **Export CSV** | ❌ | ✅ Basic | ✅ Advanced |
-| **Tax reports** | ❌ | ❌ | ✅ |
-| **API access** | ❌ | ❌ | ✅ |
+| **Historique** | - | 30 jours | 30 jours |
+| **Voir stats verified** | ⚠️ Winrate only | ✅ Full | ✅ Full |
+| **Export CSV** | ❌ | ✅ | ✅ |
 
-### Projections Revenus
-
-**Hypothèses conservatrices:**
-
-```
-État actuel (sans portfolio tracking):
-- 1,000 users actifs
-- 100 users Pro (10% conversion)
-- 25 users Ultra (2.5% conversion)
-- Revenue: (100 × 49$) + (25 × 99$) = 7,375$/mois
-
-Avec portfolio tracking (estimations):
-- 1,000 users actifs
-- 30% sont traders potentiels = 300 traders
-- 40% traders upgrade Pro pour portfolio = 120 nouveaux Pro
-- 10% traders upgrade Ultra pour multi-exchange = 30 nouveaux Ultra
-- Users existants: +20% upgrade pour voir stats vérifiées = 20 nouveaux Pro
-
-Revenue additionnel:
-- Nouveaux Pro traders: 120 × 49$ = 5,880$
-- Nouveaux Ultra traders: 30 × 99$ = 2,970$
-- Nouveaux Pro users: 20 × 49$ = 980$
-TOTAL additionnel: +9,830$/mois
-
-Revenue total projeté: 17,205$/mois (+133% vs sans feature!)
-```
-
-**Scénario optimiste (6-12 mois post-launch):**
-```
-- 2,000 users actifs
-- 50% upgrade rate traders Pro = 300 Pro
-- 15% upgrade rate traders Ultra = 90 Ultra
-- 25% upgrade rate users = 100 Pro
-
-Revenue: (400 × 49$) + (90 × 99$) = 28,510$/mois 🚀
-```
-
-### Upsell Strategies
-
-**1. Badge "Verified Trader"**
-
-Critères d'obtention:
-- ✅ Au moins 1 exchange connecté
-- ✅ Minimum 20 trades dans les 30 derniers jours
-- ✅ Sync actif (dernière sync < 1h)
-
-Bénéfices:
-- ✅ Badge ✓ sur profil
-- ✅ Boost ranking marketplace (+20% visibilité)
-- ✅ Mention "Verified Stats" partout
-
-**2. Tax Reports Premium (Ultra only)**
-
-Features:
-- Export CSV avec calculs FIFO/LIFO/HIFO
-- Format compatible TurboTax, CoinTracker
-- Yearly summary PDF
-- Capital gains/losses breakdown
-
-Prix standalone (si pas Ultra): 29$/année
-
-**3. API Access (Ultra only)**
-
-Use cases:
-- Custom analytics scripts
-- Webhooks pour alertes
-- Integration avec outils externes (TradingView, etc.)
-
-Features:
-- Personal API token
-- Rate limits généreux (1000 req/min)
-- Documentation complète
-- Code examples (Python, Node.js)
-
-**4. Multi-Exchange Dashboard (Ultra only)**
-
-Features:
-- Vue agrégée Binance + Bybit
-- Compare performance cross-exchange
-- Identify best exchange par symbole
-- Unified P&L tracking
+**Upsell flows**:
+1. Free user try connect → modal "Upgrade to Pro ($49/mo)"
+2. Free user view verified stats → blur + modal
+3. Pro user try 2nd connection → modal "Upgrade to Ultra ($99/mo)"
 
 ---
 
-## 📊 Analytics Uniques
+## Success Metrics (1 mois post-launch)
 
-### Métriques Exclusives MyCryptoPilot
+- ✅ **20+ traders** with active Binance connection
+- ✅ **10+ traders** avec badge "Verified"
+- ✅ **<5% sync error rate** (stability)
+- ✅ **+30% conversions** Free → Pro (verified stats incentive)
+- ✅ **0 security incidents** (API keys leak)
 
-Ces analytics sont uniques car elles combinent données exchange + signaux publiés.
+---
 
-#### 1. Signal Accuracy Score
+## Files Structure
 
-**Concept**: Mesure la corrélation entre signaux publiés et trades réels.
-
-**Calcul**:
-```typescript
-// Pour chaque signal publié
-const signal = getSignal(signalId)
-const tradesInWindow = getTrades({
-  symbol: signal.asset,
-  timeWindow: [signal.publishedAt, signal.expiresAt]
-})
-
-// Check si trader a pris position dans direction du signal
-const matchingTrades = tradesInWindow.filter(trade =>
-  (signal.payload.bias === 'LONG' && trade.positionSide === 'LONG') ||
-  (signal.payload.bias === 'SHORT' && trade.positionSide === 'SHORT')
-)
-
-const signalFollowed = matchingTrades.length > 0
-const signalAccuracy = (followedCount / totalSignals) * 100
+```
+mycryptopilot/
+├── prisma/
+│   ├── schema.prisma                           # +3 modèles, +4 enums
+│   └── migrations/
+│       └── 20251022143912_add_portfolio_tracking_models/
+│           └── migration.sql                   # Migration appliquée ✅
+├── src/
+│   ├── lib/
+│   │   ├── crypto/
+│   │   │   └── encryption-service.ts           # AES-256-GCM ✅
+│   │   ├── exchange/
+│   │   │   └── binance-service.ts              # ccxt integration ✅
+│   │   └── env.ts                              # +1 env var (ENCRYPTION_SECRET)
+│   └── generated/
+│       └── prisma/                             # Generated types ✅
+└── __tests__/
+    └── crypto/
+        └── encryption-service.test.ts          # 20 tests ✅
 ```
 
-**Affichage**:
-```
-📊 Signal Accuracy: 87%
-This trader follows their own signals 87% of the time
-```
+---
 
-**Insights**:
-- Score élevé (>80%) = trader congruent, trustworthy
-- Score faible (<50%) = signaux pas alignés avec trades, red flag
+## Dependencies
 
-#### 2. Signal vs Performance Correlation
-
-**Concept**: Compare winrate signaux vs winrate trades réels.
-
-**Calcul**:
-```typescript
-// Winrate signaux (basé sur Signal.status)
-const signalWinRate = calculateSignalWinRate(traderId)
-
-// Winrate trades réels (basé sur ExchangeTrade.realizedPnl)
-const tradeWinRate = stats.winRate
-
-// Correlation
-const correlation = Math.abs(signalWinRate - tradeWinRate)
-```
-
-**Affichage**:
-```
-Chart overlay:
-- Line 1: Signal winrate over time
-- Line 2: Actual trades winrate over time
-
-Metric: Correlation score: 0.92 (high = good)
-```
-
-**Insights**:
-- Correlation élevée = signaux reflètent vraie performance
-- Divergence = possible cherry-picking signals
-
-#### 3. Risk Consistency Score
-
-**Concept**: Mesure la discipline du trader (position sizing constant).
-
-**Calcul**:
-```typescript
-// Standard deviation position sizes (en % of account)
-const positionSizes = trades.map(t =>
-  (t.quoteQuantity / accountSize) * 100
-)
-
-const stdDev = standardDeviation(positionSizes)
-const mean = average(positionSizes)
-const coefficientOfVariation = (stdDev / mean) * 100
-
-// Score inversé (low CV = high score)
-const riskConsistencyScore = Math.max(0, 100 - coefficientOfVariation)
-```
-
-**Affichage**:
-```
-🎯 Risk Consistency: 95/100
-This trader maintains very consistent position sizing
-95% of trades within 1-3% risk tolerance
-```
-
-**Insights**:
-- Score élevé (>90) = trader discipliné, pro
-- Score bas (<70) = trader YOLO, high variance
-
-#### 4. Best Trading Hours Heatmap
-
-**Concept**: Identifier quand trader est le plus profitable.
-
-**Calcul**:
-```typescript
-// Group trades by hour of day (UTC)
-const tradesByHour = groupBy(trades, t =>
-  new Date(t.openedAt).getUTCHours()
-)
-
-// Calculate winrate per hour
-const hourlyStats = Object.entries(tradesByHour).map(([hour, trades]) => ({
-  hour: parseInt(hour),
-  winRate: calculateWinRate(trades),
-  totalTrades: trades.length,
-  avgPnl: average(trades.map(t => t.realizedPnl))
-}))
-```
-
-**Affichage**:
-```
-Heatmap 24x7:
-- X-axis: Hours (0-23 UTC)
-- Y-axis: Days (Mon-Sun)
-- Color intensity: Winrate (green = high, red = low)
-
-Insight: "Most profitable: 14:00-18:00 UTC (78% WR)"
-```
-
-**Use case**:
-- Users savent quand copier ce trader
-- Educational: Comprendre market hours impact
-
-#### 5. Symbol Specialization Matrix
-
-**Concept**: Performance breakdown par crypto symbole.
-
-**Calcul**:
-```typescript
-const symbolStats = groupBy(trades, 'symbol')
-
-const matrix = Object.entries(symbolStats).map(([symbol, trades]) => ({
-  symbol,
-  totalTrades: trades.length,
-  winRate: calculateWinRate(trades),
-  avgPnl: average(trades.map(t => t.realizedPnl)),
-  profitFactor: calculateProfitFactor(trades),
-  label: classifyExpertise(winRate, totalTrades)
-}))
-
-function classifyExpertise(winRate, totalTrades) {
-  if (totalTrades > 50 && winRate > 70) return 'Expert'
-  if (totalTrades > 20 && winRate > 60) return 'Good'
-  if (totalTrades > 10) return 'Average'
-  return 'Beginner'
+```json
+{
+  "dependencies": {
+    "ccxt": "^4.5.12"  // ✅ Installé
+  }
 }
 ```
 
-**Affichage**:
-```
-Table:
-| Symbol   | Trades | WR    | Avg P&L | Expertise |
-|----------|--------|-------|---------|-----------|
-| BTCUSDT  | 127    | 78%   | +$124   | 🏆 Expert  |
-| ETHUSDT  | 89     | 72%   | +$87    | 🏆 Expert  |
-| SOLUSDT  | 34     | 52%   | +$12    | ⚠️ Average |
-| DOGEUSDT | 12     | 38%   | -$23    | ❌ Avoid   |
-
-Insight: "This trader excels at BTC/ETH but struggles with altcoins"
-```
-
-**Use case**:
-- Users follow traders pour symboles spécifiques
-- Traders identifient leurs forces/faiblesses
-
 ---
 
-## 🗓️ Roadmap Implémentation
+## Notes de Développement
 
-### Estimation Totale: 10 semaines (2.5 mois)
+### Points d'attention
 
-### Phase 1: MVP Core Infrastructure (3 semaines)
+1. **Bybit Phase 4** (pas MVP) - On commence Binance uniquement
+2. **WebSocket real-time** (pas MVP) - Sync cron 5min suffisant
+3. **Tax reports** (pas MVP) - Export CSV basique suffit
+4. **Historique illimité** (pas MVP) - 30 jours initial OK
 
-**Semaine 1: Database & Security**
-- [ ] Créer migrations Prisma (3 tables)
-- [ ] Implémenter EncryptionService (AES-256-GCM)
-- [ ] Tests unitaires encryption (100% coverage)
-- [ ] Setup env vars (ENCRYPTION_MASTER_KEY)
-- [ ] Documentation security best practices
+### Troubleshooting
 
-**Deliverable**: DB ready + Encryption service tested
+#### Tests fail: ENCRYPTION_SECRET not configured
 
-**Semaine 2: Exchange Services**
-- [ ] Interface IExchangeService
-- [ ] BinanceService implementation (Spot + Futures)
-- [ ] API clients setup (binance SDK)
-- [ ] Tests unitaires (mocks)
-- [ ] Error handling & rate limiting
-
-**Deliverable**: Binance API integration functional
-
-**Semaine 3: Sync Engine**
-- [ ] TradeSyncService implementation
-- [ ] Stats calculation helpers
-- [ ] Cron job setup (5min intervals)
-- [ ] Logging & monitoring
-- [ ] Tests E2E sync flow
-
-**Deliverable**: Automatic sync working
-
-### Phase 2: Analytics & Calculations (2 semaines)
-
-**Semaine 4: Advanced Metrics**
-- [ ] Performance calculator (Sharpe, Sortino, Calmar)
-- [ ] Drawdown calculator
-- [ ] RR ratio calculator
-- [ ] Performance snapshots caching
-- [ ] Benchmark vs BTC helper
-
-**Deliverable**: Pro-grade analytics ready
-
-**Semaine 5: Charts & Visualization**
-- [ ] Equity curve data generation
-- [ ] P&L timeline data generation
-- [ ] Heatmap data generation (trading hours)
-- [ ] Symbol breakdown data
-- [ ] Win/Loss distribution data
-
-**Deliverable**: All chart data endpoints ready
-
-### Phase 3: Public Verified Stats (1 semaine)
-
-**Semaine 6: User-Facing Public Stats**
-- [ ] Trader public profile "Verified Stats" tab
-- [ ] Stats cards (winrate, P&L, PF)
-- [ ] Blur logic pour Free users
-- [ ] Badge "Verified Trader" component
-- [ ] Upsell modals Pro/Ultra
-
-**Deliverable**: Public stats with paywall
-
-### Phase 4: Bybit Support (1 semaine)
-
-**Semaine 7: Multi-Exchange**
-- [ ] BybitService implementation
-- [ ] Multi-exchange UI selector
-- [ ] Exchange-specific icons/branding
-- [ ] Tests cross-exchange
-- [ ] Documentation Bybit setup
-
-**Deliverable**: Binance + Bybit supported
-
-### Phase 5: Premium Features Ultra (2 semaines)
-
-**Semaine 8: Ultra-Only Features**
-- [ ] Real-time WebSocket sync (Binance user data stream)
-- [ ] Unlimited history (remove 90d limit)
-- [ ] Advanced analytics charts
-- [ ] Trading hours heatmap component
-- [ ] Symbol specialization matrix
-
-**Deliverable**: Ultra plan features complete
-
-**Semaine 9: Export & API**
-- [ ] CSV export (trades, P&L)
-- [ ] Tax reports generator (FIFO/LIFO)
-- [ ] API token generation system
-- [ ] API rate limiting
-- [ ] Webhooks (optional)
-
-**Deliverable**: Export & API functional
-
-### Phase 6: Polish & Launch (1 semaine)
-
-**Semaine 10: Production Ready**
-- [ ] Security audit (external consultant)
-- [ ] Performance optimization (DB indexes, caching)
-- [ ] Error monitoring (Sentry integration)
-- [ ] User documentation (help center)
-- [ ] Marketing materials (blog post, landing page)
-- [ ] Beta testing avec 10 traders
-- [ ] Bug fixes from beta
-- [ ] Launch! 🚀
-
-**Deliverable**: Production launch
-
----
-
-## ⚠️ Risques & Mitigation
-
-### Risques Sécurité (CRITIQUE)
-
-| Risque | Impact | Probabilité | Mitigation |
-|--------|--------|-------------|------------|
-| **API keys leak** | 🔴 Catastrophique | Faible | - AES-256-GCM encryption<br>- Env vars jamais commit<br>- Never log keys<br>- Rotation régulière (user can change)<br>- Security audit externe |
-| **MITM attacks** | 🔴 Critique | Très faible | - HTTPS only<br>- Certificate pinning<br>- No HTTP fallback |
-| **XSS injection** | 🟡 Moyen | Faible | - CSP headers strict<br>- Sanitize all user inputs<br>- React auto-escaping |
-| **SQL injection** | 🟡 Moyen | Très faible | - Prisma ORM (parameterized queries)<br>- No raw SQL |
-| **Rate limiting bypass** | 🟡 Moyen | Moyenne | - Server-side rate limiting<br>- Respect exchange limits<br>- Backoff exponential |
-
-**Action requise**: Security audit externe avant production (budget 1.5-2k€)
-
-### Risques Techniques
-
-| Risque | Impact | Probabilité | Mitigation |
-|--------|--------|-------------|------------|
-| **Exchange API changes** | 🟡 Moyen | Moyenne | - Version pinning SDKs<br>- Monitoring changelog<br>- Fallback graceful degradation<br>- Alert system |
-| **Sync failures** | 🟡 Moyen | Moyenne | - Retry logic (3 attempts)<br>- Error notifications trader<br>- Manual sync button<br>- Logs détaillés |
-| **DB performance** | 🟡 Moyen | Faible | - Proper indexes<br>- Stats caching (snapshots)<br>- Pagination everywhere<br>- Query optimization |
-| **Cron job latence** | 🟢 Faible | Faible | - Job queue (BullMQ)<br>- Parallel processing (max 10)<br>- Monitoring execution time |
-| **WebSocket disconnects** | 🟢 Faible | Moyenne | - Auto-reconnect logic<br>- Heartbeat monitoring<br>- Fallback to REST API |
-
-### Risques Business
-
-| Risque | Impact | Probabilité | Mitigation |
-|--------|--------|-------------|------------|
-| **Low adoption traders** | 🟡 Moyen | Moyenne | - Strong onboarding UX<br>- Clear value proposition<br>- Video tutorials<br>- Early access beta (top 10 traders) |
-| **Fake traders** | 🟡 Moyen | Faible | - Only verified exchanges<br>- Manual review high-volume<br>- Community reporting<br>- Algorithm detection anomalies |
-| **User privacy concerns** | 🟡 Moyen | Faible | - Opt-in by default<br>- Granular permissions<br>- Clear privacy policy<br>- RGPD compliance |
-| **High churn rate** | 🟡 Moyen | Moyenne | - Focus qualité traders<br>- Excellent support<br>- Educational content<br>- Feedback loops |
-| **Competition** | 🟢 Faible | Élevée | - Differentiation UX<br>- Social proof focus<br>- Premium analytics<br>- Fast iteration |
-
-### Risques Légaux
-
-| Risque | Impact | Probabilité | Mitigation |
-|--------|--------|-------------|------------|
-| **RGPD non-compliance** | 🟡 Moyen | Faible | - Consent explicite<br>- Data encryption<br>- Right to deletion<br>- DPO designation |
-| **KYC/AML** | 🟡 Moyen | Faible | - User identity verification (already in place)<br>- Transaction monitoring<br>- Suspicious activity reporting |
-| **Terms of Service exchanges** | 🟢 Faible | Faible | - Read-only permissions only<br>- Respect rate limits<br>- No automated trading<br>- Legal disclaimer |
-
----
-
-## 🎯 Recommandations
-
-### ✅ POURQUOI C'EST UNE EXCELLENTE FEATURE
-
-**1. Légalement Clean** ✅
-- Zero zone grise (pure data analytics)
-- Pas de conseil en investissement
-- Pas d'exécution trades
-- Read-only strict
-
-**2. Crédibilité Massive** 🚀
-- Stats vérifiées on-chain (impossible à falsifier)
-- Transparence totale pour followers
-- Trust factor x10 vs self-reported
-
-**3. Moat Defensible** 🏰
-- Intégration multi-exchange = barrière technique
-- Data accumulation over time = compounding value
-- Network effects (plus de traders verified = plus d'attraction users)
-
-**4. Upsell Naturel** 💰
-- Feature killer pour upgrade Pro/Ultra
-- ROI évident pour traders (time saved + credibility)
-- Sticky (once connected, hard to leave)
-
-**5. Données Précieuses** 📊
-- Analytics uniques (signal correlation, etc.)
-- Insights business (quels traders performent, quels symboles populaires)
-- Product improvements data-driven
-
-### 🚀 QUICK WINS (MVP Focus)
-
-**Phase 1 - Minimum Viable:**
-- Binance only (API la plus mature + market share #1)
-- Read-only strict (zero risk)
-- Basic stats (winrate, P&L, total trades)
-- Trader dashboard seulement (pas encore public)
-- Manual sync button (pas de cron d'abord)
-
-**Timeline MVP**: 3 semaines hardcore dev
-
-**Go-To-Market Strategy:**
-1. **Beta privée** (Semaine 1-2):
-   - Target: Top 10 traders actuels MyCryptoPilot
-   - Offer: Free access Beta + Pro plan gratis 3 mois
-   - Exchange: Feedback détaillé + testimonials
-
-2. **Beta élargie** (Semaine 3-4):
-   - Ouvrir à tous traders (invite-only)
-   - Fix bugs remontés
-   - Polish UX
-
-3. **Public launch** (Semaine 5):
-   - Marketing push (blog post, email, Discord)
-   - Public stats enable
-   - Paywall activate
-
-### 💡 DIFFÉRENCIATION vs CONCURRENTS
-
-**3Commas**: Focus automation/bots, UI complexe, pas social
-**Wundertrading**: Copy trading mais opaque, stats douteuses
-**TradingView**: Charts only, pas de sync exchange
-
-**MyCryptoPilot UNIQUE:**
-1. **Social Trading Context**: Stats pour prouver crédibilité, pas juste self-tracking
-2. **Signal Correlation**: Compare signaux vs trades (personne fait ça!)
-3. **Verified Trader Program**: Badge automatique basé données réelles
-4. **Educational Focus**: Learn from verified winners
-
-### 🎯 SUCCESS METRICS
-
-**KPIs à tracker:**
-```
-- Conversion rate Free → Pro (target: +40% vs baseline)
-- Trader adoption (% traders with exchange connected)
-- User engagement (time spent on verified stats)
-- Upgrade rate Pro → Ultra (target: 10%)
-- Churn rate (should decrease avec sticky feature)
-- NPS score traders (satisfaction)
+**Solution**: Ajouter dans `.env.local`:
+```bash
+ENCRYPTION_SECRET="your-32-char-key-here-min-32chars"
 ```
 
-**Success criteria (3 mois post-launch):**
-- ✅ 50+ traders with active exchange connection
-- ✅ 20+ traders avec badge "Verified"
-- ✅ +60% revenue mensuel vs pre-launch
-- ✅ <5% bug rate (stability)
-- ✅ NPS > 50 (trader satisfaction)
+#### Binance API errors: Invalid API-key
+
+**Causes**:
+1. Keys incorrectes
+2. IP non whitelistée (si restriction IP activée)
+3. Keys expirées
+
+**Solution**:
+```typescript
+const validation = await binance.validateApiKeys();
+console.log(validation.errorMessage); // Debug
+```
+
+#### Sync failures: Rate limit exceeded
+
+**Cause**: Trop de requests Binance API
+
+**Solution**: ccxt gère automatiquement (`enableRateLimit: true`)
 
 ---
 
-## 📚 Documentation Complémentaire
+## Semaine 2: API Routes + Sync Engine + Performance Calculator
 
-### Fichiers à Créer
+### ✅ Travail accompli
 
-**Backend:**
-- `src/lib/exchange/README.md` - Guide exchange services
-- `src/lib/crypto/ENCRYPTION.md` - Security guidelines
-- `docs/API_KEYS_SETUP.md` - User guide Binance/Bybit API setup
+**Date**: 22 octobre 2025
+**Commits**: 2 (API Routes + Core Sync Engine)
+**Fichiers créés**: 7 nouveaux fichiers (994 lignes de code)
 
-**Frontend:**
-- `docs/UI_COMPONENTS.md` - Portfolio tracking components
-- `docs/CHARTS.md` - Charts data formats
+#### 1. Query Helpers (`src/features/exchange/exchange-queries.ts`)
 
-**DevOps:**
-- `docs/DEPLOYMENT.md` - Cron jobs setup
-- `docs/MONITORING.md` - Alerting & logging
+6 fonctions helper pour accès DB optimisé:
 
-### Resources Externes
+```typescript
+// Fetch connections
+getTraderExchangeConnections(traderProfileId: string)
+getExchangeConnectionById(connectionId: string) // Inclut user.planName
+getExistingConnection(traderProfileId: string, exchange: Exchange)
 
-**Binance API:**
-- [Spot API Docs](https://binance-docs.github.io/apidocs/spot/en/)
-- [Futures API Docs](https://binance-docs.github.io/apidocs/futures/en/)
-- [SDK Node.js](https://www.npmjs.com/package/@binance/connector)
+// Stats & monitoring
+countTraderConnections(traderProfileId: string)
+getConnectionsToSync() // Pour cron job (batch 50, sorted par lastSyncedAt)
+getConnectionTradeStats(connectionId: string) // Total, first/last trade dates
+```
 
-**Bybit API:**
-- [V5 API Docs](https://bybit-exchange.github.io/docs/v5/intro)
-- [SDK Node.js](https://www.npmjs.com/package/bybit-api)
+#### 2. Plan Limits (`src/features/exchange/exchange-plan-limits.ts`)
 
-**Security:**
-- [OWASP Cryptographic Storage](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html)
-- [Node.js Crypto Best Practices](https://nodejs.org/api/crypto.html)
+Gating logic basé sur les plans:
+
+```typescript
+EXCHANGE_CONNECTION_LIMITS: {
+  free: 0,    // Bloqué (upsell vers Pro)
+  pro: 1,     // 1 connexion Binance
+  ultra: 3    // 3 connexions (Binance + future Bybit)
+}
+
+SYNC_INTERVAL_MINUTES: {
+  free: 0,    // N/A
+  pro: 5,     // 5 minutes
+  ultra: 1    // 1 minute (quasi real-time)
+}
+
+// Fonctions:
+getExchangeConnectionLimit(planName): number
+getSyncInterval(planName): number
+calculateNextSyncAt(planName): Date | null
+```
+
+#### 3. Zod Schemas (`src/features/exchange/exchange.schema.ts`)
+
+Validation types-safe:
+
+```typescript
+ConnectExchangeSchema = z.object({
+  exchange: z.enum(["BINANCE"]),
+  apiKey: z.string().min(1),
+  secretKey: z.string().min(1),
+});
+
+DisconnectExchangeSchema = z.object({
+  connectionId: z.string().cuid(),
+});
+
+SyncExchangeSchema = z.object({
+  connectionId: z.string().cuid(),
+});
+```
+
+#### 4. API Routes (4 endpoints RESTful)
+
+**POST /api/exchange/connect** (`app/api/exchange/connect/route.ts` - 215 lignes)
+
+Flow complet:
+1. Validate request body (Zod)
+2. Check trader profile exists
+3. Check plan limits (FREE=0, PRO=1, ULTRA=3)
+4. Check existing connection (1 per exchange)
+5. Validate Binance API keys (read-only enforcement)
+6. Encrypt keys (AES-256-GCM)
+7. Store connection in DB
+8. Return success + connection details
+
+**GET /api/exchange/[id]/status** (`app/api/exchange/[id]/status/route.ts` - 73 lignes)
+
+Retourne:
+- Connection status (active, sync times, errors)
+- Trade statistics (total, first/last trade dates)
+- Ownership verification
+
+**POST /api/exchange/[id]/disconnect** (`app/api/exchange/[id]/disconnect/route.ts` - 86 lignes)
+
+Soft delete:
+- Set isActive=false
+- Keep historical trades in DB
+- Stop auto-sync (nextSyncAt removed)
+
+**POST /api/exchange/[id]/sync** (`app/api/exchange/[id]/sync/route.ts` - 138 lignes)
+
+Force manual sync:
+- Rate limiting check (based on plan)
+- Schedule immediate sync (nextSyncAt=now)
+- Cron job picks it up in next run
+
+#### 5. Sync Service (`src/lib/exchange/sync-service.ts` - 306 lignes)
+
+Core synchronization engine:
+
+**syncConnectionTrades(connection)**: Sync single connection
+1. Decrypt API keys (AES-256-GCM)
+2. Create BinanceService instance
+3. Determine sync period (30 days first time, incremental after)
+4. Fetch trades from Binance (spot + futures via ccxt)
+5. Upsert trades to DB (idempotent via externalOrderId)
+6. Update connection metadata (lastSyncedAt, nextSyncAt)
+7. **Recalculate performance snapshots** (automatic)
+8. Cleanup (close Binance connection)
+
+**syncMultipleConnections(connections)**: Batch processing
+- Sequential processing (avoid rate limiting)
+- 2s delay between syncs
+- Used by cron job
+- Summary stats (success/fail counts, trades imported)
+
+**Features**:
+- Parallel upserts (Promise.all) pour performance
+- Error handling graceful (log + continue)
+- Auto-update performance metrics si nouveaux trades
+- Fetch ALL trader trades (multi-connections support)
+
+#### 6. Performance Calculator (`src/lib/exchange/performance-calculator.ts` - 356 lignes)
+
+Calcul de 15 métriques de trading:
+
+**Métriques de base**:
+- Total trades (winning/losing counts)
+- Winrate (%)
+- Total Profits/Losses
+- Net PnL
+- Profit Factor (ratio profits/losses)
+- Average Win/Loss
+- Largest Win/Loss
+
+**Métriques avancées**:
+- **Sharpe Ratio**: Risk-adjusted returns
+  - Formula: (Mean Return - Risk-Free Rate) / Std Deviation
+  - Mesure rendement par unité de risque total
+
+- **Sortino Ratio**: Downside risk-adjusted returns
+  - Formula: (Mean Return - Risk-Free Rate) / Downside Deviation
+  - Similaire à Sharpe mais ne considère que la volatilité négative
+
+- **Max Drawdown** (%): Largest peak-to-trough decline
+  - Suivi du PnL cumulatif
+  - Détection du plus gros drawdown historique
+
+**4 périodes de calcul**:
+- ALL_TIME: Tous les trades historiques
+- LAST_30D: 30 derniers jours
+- LAST_90D: 90 derniers jours
+- LAST_365D: 365 derniers jours
+
+**updatePerformanceSnapshots(traderProfileId, trades)**:
+- Calcule métriques pour les 4 périodes
+- Upsert snapshots en DB (via unique constraint)
+- Appelé automatiquement après chaque sync réussi
+
+#### 7. Cron Job (`app/api/cron/sync-exchanges/route.ts` - 132 lignes)
+
+**GET /api/cron/sync-exchanges**
+
+Configuration:
+- Protection: Authorization Bearer ${CRON_SECRET}
+- Runtime: nodejs
+- Max duration: 60s (Vercel Hobby limit)
+
+Flow:
+1. Verify CRON_SECRET
+2. Fetch connections ready for sync (via getConnectionsToSync)
+3. Batch process up to 50 connections
+4. Calculate summary stats
+5. Return detailed results
+
+**Vercel Cron Setup** (à configurer):
+```json
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-exchanges",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
+```
+
+Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
+
+### 📊 Statistiques Semaine 2
+
+**Code écrit**:
+- 7 nouveaux fichiers
+- 994 lignes de code total
+- 100% TypeScript strict
+- 0 erreurs ESLint/TypeScript
+
+**Fichiers par catégorie**:
+- Queries & Helpers: 147 lignes
+- API Routes: 512 lignes
+- Services: 662 lignes (SyncService + PerformanceCalculator)
+- Cron: 132 lignes
+
+**Features complètes**:
+- ✅ CRUD complet pour exchange connections
+- ✅ Sync automatique avec rate limiting
+- ✅ Calcul performance metrics (15 métriques)
+- ✅ Cron job prêt pour Vercel
+- ✅ Gestion erreurs robuste
+- ✅ Logging détaillé partout
+
+### 🔐 Sécurité
+
+**API Keys**:
+- Toujours encryptées (AES-256-GCM)
+- Jamais exposées en API responses
+- Décryptées uniquement pendant sync (en mémoire)
+- Cleanup automatique après usage
+
+**Validation**:
+- Zod schemas sur tous les endpoints
+- Ownership check sur toutes les routes
+- Read-only enforcement (Binance API)
+- CRON_SECRET pour cron job
+
+**Rate Limiting**:
+- Plan-based throttling (PRO=5min, ULTRA=1min)
+- Cooldown check pour manual sync
+- 2s delay entre syncs (batch processing)
+- ccxt built-in rate limiter
+
+### 🚀 Prochaines Étapes (Semaine 3)
+
+**UI Components** (environ 8h):
+1. Connection Management UI
+   - Connect form (API key inputs)
+   - Connection list (active/inactive)
+   - Disconnect button
+   - Manual sync button
+
+2. Stats Display UI
+   - Performance cards (winrate, profit factor, etc.)
+   - Period selector (ALL_TIME, 30D, 90D, 365D)
+   - Charts (PnL over time, drawdown)
+   - Trade history table
+
+3. Public Profile Enhancement
+   - Verified badge (si stats synced)
+   - Stats display on trader profile
+   - Free user gating (preview winrate only)
+
+**Configuration Vercel**:
+- Ajouter ENCRYPTION_SECRET en env vars
+- Configurer cron job (vercel.json)
+- Tester en staging
+
+**Documentation finale**:
+- Guide utilisateur (comment connecter Binance)
+- Guide admin (troubleshooting sync errors)
+- Architecture diagram
 
 ---
 
-## 🚀 Next Steps
-
-### Immediate Actions (si GO)
-
-**1. Architecture Review** (1-2h)
-- [ ] Review DB models ensemble
-- [ ] Validate encryption approach
-- [ ] Confirm exchange APIs choice
-
-**2. POC Technique** (1-2 jours)
-- [ ] Spike Binance API integration
-- [ ] Test encryption/decryption
-- [ ] Validate stats calculations accuracy
-
-**3. Design Mocks** (2-3 jours)
-- [ ] Figma mocks Dashboard Trader
-- [ ] Figma mocks Public Profile tabs
-- [ ] User flow connect exchange
-
-**4. Sprint Planning** (1 jour)
-- [ ] Break down tasks (tickets GitHub)
-- [ ] Assign story points
-- [ ] Setup sprint (3 semaines Phase 1)
-
-**5. Development Kickoff** (Semaine 1)
-- [ ] DB migrations
-- [ ] Encryption service
-- [ ] Binance service skeleton
+**Fin de documentation - Semaine 2 complétée** ✅
 
 ---
 
-**Prêt à commencer ?** 🚀
+## Semaine 3: UI Components + Integration + Public Stats
 
-Cette feature va transformer MyCryptoPilot en référence de transparence et crédibilité dans l'espace crypto trading social. Let's build it! 💪
+### ✅ Travail accompli
+
+**Date**: 22 octobre 2025
+**Commits**: 3 (Connection UI + Performance Components + Integration finale)
+**Fichiers créés**: 8 nouveaux fichiers (1,122 lignes de code)
+**Fichiers modifiés**: 6 fichiers existants
+
+#### Phase 1: Connection Management UI (Day 1)
+
+**Commit**: `feat(portfolio): UI Semaine 3 Day 1 - Exchange Connections Page`
+
+**Fichiers créés** (4 fichiers, 715 lignes):
+
+1. **ConnectExchangeForm** (`app/.../exchanges/_components/connect-exchange-form.tsx` - 188 lignes)
+   - Form avec API key + Secret key inputs
+   - Security alerts (read-only, AES-256-GCM)
+   - Guide pour obtenir clés Binance (6 steps)
+   - TanStack Query mutation avec error handling
+   - Success toast + auto-refresh connections list
+
+2. **ExchangeConnectionCard** (`app/.../exchanges/_components/exchange-connection-card.tsx` - 238 lignes)
+   - Display connection status (active/inactive)
+   - Stats: total trades, first/last trade dates, last sync time
+   - Manual sync button (avec cooldown enforcement)
+   - Disconnect button (avec confirmation dialog)
+   - Error display (lastSyncError si applicable)
+   - Badge status: Active (green) / Inactive (gray)
+
+3. **ExchangeConnectionsList** (`app/.../exchanges/_components/exchange-connections-list.tsx` - 84 lignes)
+   - Client component avec React Query
+   - Lazy loading des stats par connexion
+   - Skeleton loader while fetching
+   - Auto-refresh après actions (sync/disconnect)
+
+4. **Exchange Connections Page** (`app/.../account/exchanges/page.tsx` - 172 lignes)
+   - Server component (Account Space)
+   - Fetch user.planName depuis DB
+   - Plan-based gating (FREE=0, PRO=1, ULTRA=3 connexions)
+   - Redirect non-traders vers become-trader page
+   - Display plan limits badge
+   - Conditional rendering: form vs connections list vs upgrade CTA
+
+**Features implémentées**:
+- ✅ Plan limits enforcement (FREE bloqué avec upgrade CTA)
+- ✅ API key encryption automatique (invisible pour user)
+- ✅ Security warnings (read-only keys only)
+- ✅ User guide intégré (instructions Binance API)
+- ✅ Real-time updates (React Query invalidation)
+- ✅ Error handling robuste (API errors, validation)
+
+**Patterns suivis**:
+- upfetch au lieu de fetch (projet convention)
+- dialogManager pour confirmations
+- Date serialization (ISO strings pour client components)
+- TanStack Query pour mutations + caching
+
+---
+
+#### Phase 2: Performance Stats Components (Day 2)
+
+**Commit**: `feat(portfolio): Performance Stats Components - Period Selector + Display`
+
+**Fichiers créés** (3 fichiers, 407 lignes):
+
+1. **performance-queries.ts** (`src/features/exchange/performance-queries.ts` - 95 lignes)
+   - 5 helper functions pour DB queries:
+   ```typescript
+   getPerformanceSnapshot(traderProfileId, period)
+   getAllPerformanceSnapshots(traderProfileId)
+   hasPerformanceData(traderProfileId)
+   getBestPerformingPeriod(traderProfileId)
+   hasVerifiedStats(traderProfileId)  // Check si au moins 1 connexion active
+   ```
+
+2. **PeriodSelector** (`src/components/nowts/period-selector.tsx` - 44 lignes)
+   - Client component avec Tabs UI
+   - 4 périodes: ALL_TIME, LAST_30D, LAST_90D, LAST_365D
+   - Grid responsive (4 colonnes sur desktop)
+   - onChange callback pour parent component
+
+3. **PerformanceStatsDisplay** (`app/.../trader/_components/performance-stats-display.tsx` - 233 lignes)
+   - **6 key metrics cards**:
+     - Win Rate (avec badge Excellent/Good/Needs Improvement)
+     - Net PnL (colored: green profit / red loss)
+     - Profit Factor (avec label Excellent/Good/Profitable/Unprofitable)
+     - Max Drawdown (amber warning color)
+     - Average Win (green)
+     - Average Loss (red)
+   - **Advanced metrics card** (si disponible):
+     - Sharpe Ratio
+     - Sortino Ratio
+   - **Largest Trades card**:
+     - Largest Win
+     - Largest Loss
+   - **Empty states**:
+     - No data: CTA pour connecter exchange
+     - Loading: Skeleton cards (animate-pulse)
+
+**Design patterns**:
+- Color-coded metrics (green=profit, red=loss, amber=risk)
+- Responsive grid (1/2/3 columns)
+- Loading skeletons (UX smooth)
+- Empty states with CTAs
+
+---
+
+#### Phase 3: Integration Finale + Verified Badge + Free Gating (Day 3)
+
+**Commit**: `feat(portfolio): Semaine 3 UI Integration - Performance Tab + Verified Badge + Free Gating`
+
+**Fichiers créés** (2 fichiers, 135 lignes):
+
+1. **API Route - Performance Snapshot** (`app/api/performance/[traderProfileId]/[period]/route.ts` - 84 lignes)
+   - GET endpoint avec authRoute protection
+   - Returns snapshot pour une période spécifique
+   - Serialization Decimal/BigInt → JSON numbers
+   - Gestion du cas "no data" (return null au lieu d'error)
+
+2. **PerformanceTabContent** (`app/.../trader/_components/performance-tab-content.tsx` - 51 lignes)
+   - Client wrapper pour Performance tab
+   - State management: période sélectionnée (useState)
+   - React Query pour fetch snapshot
+   - Composition: PeriodSelector + PerformanceStatsDisplay
+   - Passes userPlanName pour gating logic
+
+**Fichiers modifiés** (6 fichiers):
+
+3. **PerformanceStatsDisplay** (modification - +60 lignes)
+   - **FREE User Gating implémenté**:
+     - FREE users: voir UNIQUEMENT winrate + wins/losses count
+     - Upgrade CTA avec liste features locked:
+       - 🔒 Net PnL & Profit Factor
+       - 🔒 Max Drawdown & Risk Metrics
+       - 🔒 Average Win/Loss Analysis
+       - 🔒 Sharpe & Sortino Ratios
+       - 🔒 Largest Trades History
+     - Button "Upgrade Now" → /pricing
+   - PRO/ULTRA users: Accès complet aux 15 métriques
+
+4. **Dashboard Trader Page** (modification - ~20 lignes)
+   - Fetch user.planName depuis DB (pas dans session)
+   - Intégration PerformanceTabContent dans onglet Performance
+   - Pass traderProfileId + userPlanName props
+   - Replaces placeholder performance metrics
+
+5. **Connect Exchange Route** (modification - +18 lignes)
+   - **Auto-verified logic**:
+     - Transaction atomique (create connection + update trader)
+     - Marque trader as verified=true + verifiedAt timestamp
+     - Première connexion exchange = verified badge immédiat
+
+6. **Disconnect Exchange Route** (modification - +25 lignes)
+   - **Auto-remove verified logic**:
+     - Check remaining active connections
+     - Si aucune connexion active restante:
+       - verified=false + verifiedAt=null
+     - Trader garde verified si autres connexions actives
+
+**Verified Badge**:
+- ✅ Already displayed in 2 places:
+  - Trader profile page (`/traders/[traderId]`)
+  - Traders marketplace cards
+- ✅ Now managed automatically:
+  - verified=true when first exchange connected
+  - verified=false when last exchange disconnected
+
+---
+
+### 📊 Statistiques Semaine 3
+
+**Code écrit**:
+- 8 nouveaux fichiers
+- 1,122 lignes de code (new + modifications)
+- 100% TypeScript strict
+- 0 erreurs ESLint/TypeScript
+
+**Breakdown par commit**:
+1. **Day 1 - Connection UI**: 4 fichiers, 715 lignes
+2. **Day 2 - Performance Components**: 3 fichiers, 407 lignes
+3. **Day 3 - Integration Finale**: 2 nouveaux + 6 modifiés, ~350 lignes
+
+**Components créés**:
+- 5 nouveaux React components
+- 1 nouveau API route
+- 5 nouvelles query helpers
+- 2 auto-verification hooks (connect/disconnect)
+
+**Features complètes**:
+- ✅ Exchange connection management UI (CRUD complet)
+- ✅ Performance stats display (15 métriques)
+- ✅ Period selection (4 périodes)
+- ✅ Verified badge automatique
+- ✅ Free user gating (preview winrate only)
+- ✅ Plan limits enforcement (UI + backend)
+- ✅ Real-time updates (React Query)
+- ✅ Error handling (forms + API)
+- ✅ Loading states (skeletons)
+- ✅ Empty states (CTAs)
+
+### 🎨 UI/UX Highlights
+
+**Design System**:
+- Shadcn/UI components (Card, Badge, Button, Tabs)
+- Color coding: green (profit), red (loss), amber (risk)
+- Responsive grid layouts (mobile-first)
+- Dark mode support complet
+
+**User Experience**:
+- Skeleton loaders (pas de flashes blancs)
+- Toast notifications (success/error)
+- Confirmation dialogs (actions destructives)
+- Upgrade CTAs contextuel (Free users)
+- Security warnings (read-only keys)
+- User guides inline (Binance API setup)
+
+**Performance**:
+- React Query caching (moins de requêtes DB)
+- Lazy loading per component
+- Optimized DB queries (indexes)
+- Snapshot caching (pas de recalcul)
+
+### 🔐 Sécurité UI
+
+**Data Exposure**:
+- ✅ API keys JAMAIS affichées en UI
+- ✅ Stats publiques uniquement (pas de secrets)
+- ✅ Ownership checks sur toutes les routes
+
+**Plan Enforcement**:
+- ✅ FREE users: bloqués côté UI + backend
+- ✅ Plan limits: validés server-side
+- ✅ Gating prévisible (pas de confusion)
+
+**Error Messages**:
+- User-friendly (pas de stack traces)
+- Actionnable (étapes pour résoudre)
+- Secure (pas de détails sensibles)
+
+### 🚀 Déploiement Ready
+
+**Vercel Configuration**:
+- [x] ENCRYPTION_SECRET configuré en env vars
+- [ ] Cron job à configurer (vercel.json)
+- [ ] Tester en staging
+
+**User Documentation**:
+- [x] Guide inline (connect form)
+- [ ] FAQ page (troubleshooting)
+- [ ] Video tutorial (optionnel)
+
+### 📱 Espaces UI Impactés
+
+**Account Space**:
+- ✅ New page: `/account/exchanges`
+  - Connection management
+  - Manual sync
+  - Disconnect
+
+**Trading Space - Dashboard Trader**:
+- ✅ New tab: "Performance"
+  - Period selector
+  - 15 métriques display
+  - Charts (future phase 4)
+  - Trade history table (future phase 4)
+
+**Trading Space - Public Profile**:
+- ✅ Verified badge (existing)
+  - Auto-managed (connect/disconnect hooks)
+
+**Trading Space - Marketplace**:
+- ✅ Verified badge on cards (existing)
+  - Filter by verified (future enhancement)
+
+### 🎯 Success Criteria - Semaine 3
+
+**UI Components**:
+- [x] Connection form fonctionnel
+- [x] Connection list with actions
+- [x] Performance stats display (15 metrics)
+- [x] Period selection (4 périodes)
+- [x] Free user gating (preview mode)
+- [x] Verified badge auto-management
+
+**Integration**:
+- [x] Dashboard Trader → Performance tab
+- [x] Account Settings → Exchanges page
+- [x] Public Profile → Verified badge
+- [x] Marketplace → Verified badge
+
+**User Flows**:
+- [x] Trader connect Binance → verified badge appears
+- [x] Trader disconnect last exchange → verified removed
+- [x] FREE user view stats → see winrate + upgrade CTA
+- [x] PRO user view stats → see all 15 metrics
+- [x] Error handling graceful (API failures, validation)
+
+---
+
+## Prochaines Étapes (Post-MVP - Phase 4)
+
+### Charts & Visualizations (optionnel)
+
+**Equity Curve Chart** (Recharts):
+- Line chart du PnL cumulatif over time
+- Période sélectionnable
+- Zoom/pan interactions
+- Responsive
+
+**Drawdown Chart**:
+- Visualize peak-to-trough declines
+- Highlight max drawdown period
+- Color gradient (green→red)
+
+**Trade Distribution**:
+- Histogram wins vs losses
+- Pie chart par symbol
+- Bar chart par stratégie (future)
+
+### Trade History Table
+
+**Features**:
+- Pagination (500 trades max par page)
+- Filters: symbol, side, date range
+- Sort: date, PnL, size
+- Export CSV (PRO/ULTRA only)
+- Detail modal (click pour voir détails)
+
+**Columns**:
+- Date/Time
+- Symbol
+- Side (BUY/SELL)
+- Quantity
+- Price
+- Total (USDT)
+- Fee
+- PnL (si calculable)
+
+### Admin Dashboard
+
+**Monitoring**:
+- Total connections actives
+- Sync success rate (last 24h)
+- Average sync duration
+- Failed syncs table (troubleshooting)
+
+**Actions Admin**:
+- Force re-sync connection
+- Invalidate connection (security)
+- View trader stats (debug)
+
+---
+
+## 📋 Remaining Work - Production Readiness
+
+**Status actuel** : Semaines 1-3 complétées (100% fonctionnel en dev)
+**Objectif** : Production-ready avec couverture Option B (Solide, 18-23h)
+**Date target** : Avant déploiement production
+
+### 🔴 Phase 0: BLOQUEURS PRODUCTION (P0) - Estimation: 8-10h
+
+**Statut**: ❌ **0/6 tâches complétées**
+
+#### 1. Tests (Priorité 1) - 4-6h
+
+**Tests E2E (Playwright)** - 2-3h :
+- [ ] **E2E complet**: Connect Binance → Auto-sync → View stats → Disconnect
+  - Fichier: `e2e/portfolio-tracking.spec.ts`
+  - Scénarios:
+    1. Trader PRO connect Binance (mock API keys)
+    2. Attendre premier sync (5 min)
+    3. Vérifier stats ALL_TIME affichées
+    4. Verified badge appear
+    5. Changer période (30D, 90D, 365D)
+    6. Disconnect → verified badge removed
+- [ ] **Free User Gating**: Voir uniquement winrate + upgrade CTA
+- [ ] **Verified Badge Auto-management**: Connect/disconnect hooks
+
+**Tests Unitaires (Vitest)** - 2-3h :
+- [ ] **PerformanceCalculator** (CRITIQUE - 15 métriques):
+  - Fichier: `__tests__/lib/exchange/performance-calculator.test.ts`
+  - Tests: winrate, profit factor, Sharpe, Sortino, MDD, avg win/loss
+  - Mock data: 100 trades (60% winrate scenario)
+- [ ] **BinanceService** (validateApiKeys + fetchTrades):
+  - Fichier: `__tests__/lib/exchange/binance-service.test.ts`
+  - Mock ccxt responses
+  - Test read-only enforcement
+- [ ] **SyncService** (sync flow):
+  - Fichier: `__tests__/lib/exchange/sync-service.test.ts`
+  - Mock Binance + DB
+  - Test idempotence (externalOrderId unique)
+
+**Tests API Routes** - 1h :
+- [ ] **POST /api/exchange/connect**:
+  - Validation + encryption
+  - Plan limits enforcement
+  - Read-only check
+- [ ] **GET /api/exchange/[id]/status**:
+  - Ownership verification
+- [ ] **POST /api/exchange/[id]/disconnect**:
+  - Soft delete + verified badge removal
+
+**Tests Components** - 1h :
+- [ ] **ConnectExchangeForm** (validation + submit)
+- [ ] **PerformanceStatsDisplay** (Free vs PRO rendering)
+
+---
+
+#### 2. Email Notifications - 2-3h
+
+**Status**: ❌ Non implémenté
+
+**Fichiers à créer**:
+- `emails/sync-failure.tsx` (React Email template)
+- `emails/weekly-stats-summary.tsx` (optionnel mais nice)
+- `src/lib/exchange/email-notifications.ts` (helper functions)
+
+**Templates requis**:
+
+1. **Sync Failure Email** (CRITIQUE):
+   ```tsx
+   Subject: "⚠️ Binance Sync Failed - Action Required"
+
+   Content:
+   - Nom du trader
+   - Exchange concerné (Binance)
+   - Erreur détaillée (API keys invalid, IP blocked, etc.)
+   - Action suggérée (regenerate keys, check IP whitelist)
+   - Lien direct vers /account/exchanges
+   - Support contact
+   ```
+
+2. **Weekly Summary Email** (Nice-to-have):
+   ```tsx
+   Subject: "📊 Your Trading Stats This Week"
+
+   Content:
+   - Trades synced (count)
+   - Winrate cette semaine
+   - Best trade / Worst trade
+   - Lien vers dashboard
+   ```
+
+**Intégration**:
+- Hook dans `SyncService.syncConnectionTrades()` catch block
+- Utiliser Resend API (déjà configuré)
+- Rate limiting (max 1 email/jour par erreur)
+
+---
+
+#### 3. Documentation Utilisateur - 1.5-2h
+
+**Status**: ⚠️ Partiellement fait (guide inline dans form)
+
+**Fichiers à créer/modifier**:
+
+1. **Guide Binance Setup** - 1h
+   - Fichier: `content/docs/binance-setup.mdx`
+   - Contenu:
+     - Comment créer compte Binance (si nouveau)
+     - Comment générer API keys READ-ONLY (avec screenshots annotés)
+     - Whitelist IP (optionnel mais expliqué)
+     - Troubleshooting (5-6 erreurs courantes)
+     - FAQ spécifique (temps sync, données après disconnect, etc.)
+   - Lien depuis ConnectExchangeForm
+
+2. **Update FAQ** - 15min
+   - Fichier: `content/docs/faq.mdx`
+   - Corriger ligne 465:
+     ```mdx
+     - **No financial data**: We don't store exchange API keys ❌ OBSOLÈTE!
+     ```
+   - Remplacer par:
+     ```mdx
+     - **Encrypted API keys**: We store read-only API keys encrypted with AES-256-GCM
+     - **No trading access**: Keys are validated to be read-only (no withdrawals/trading)
+     - **Your control**: Disconnect anytime, data preserved
+     ```
+
+3. **FAQ Portfolio Tracking** - 30min
+   - Section dans `faq.mdx` ou nouveau `content/docs/portfolio-faq.mdx`
+   - Questions:
+     - "How long does first sync take?" (5-10min)
+     - "Can I disconnect my exchange?" (Yes, data preserved)
+     - "What happens if my API keys expire?" (Email notification)
+     - "Why are my stats not updating?" (Check last sync time, manual sync)
+     - "Is my data safe?" (AES-256 encryption, read-only)
+     - "Can I hide my stats?" (Not yet, coming soon)
+
+---
+
+### 🟡 Phase 1: POST-LAUNCH IMMÉDIAT (P1) - Estimation: 10-13h
+
+**Statut**: ❌ **0/5 tâches complétées**
+
+#### 4. Monitoring Dashboard - 3-4h
+
+**Status**: ❌ Non implémenté
+
+**Objectif**: Admin dashboard pour monitoring en temps réel
+
+**Metrics à tracker**:
+- Total connections actives (gauge)
+- Sync success rate last 24h (%)
+- Average sync duration (ms)
+- Failed syncs table (trader, error, timestamp)
+- Trades imported today (count)
+- Top 5 traders by trade volume
+
+**Implémentation**:
+- Page: `app/admin/portfolio/page.tsx`
+- Queries: `src/features/exchange/admin-queries.ts`
+- Charts: Recharts (line chart sync rate, bar chart errors)
+- Auto-refresh: React Query (30s interval)
+
+**Vercel Integration**:
+- Analytics API (optional, coût extra)
+- Custom endpoint: `/api/admin/portfolio-stats`
+
+---
+
+#### 5. Audit Sécurité - 2h
+
+**Status**: ⚠️ Partiellement fait (encryption OK, logs ?)
+
+**Checklist**:
+
+1. **Verify No API Keys in Logs** - 1h:
+   - Grep all `logger.info/error/debug` calls
+   - Check aucun log de `apiKey`, `secretKey`, `encrypted*`
+   - Vérifier Vercel logs en staging
+   - Script: `scripts/audit-sensitive-logs.sh`
+
+2. **Tampering Tests** - 30min:
+   - Modifier `encrypted` en DB manuellement
+   - Doit fail avec "Auth tag verification failed"
+   - Test IV différent → fail
+   - Test tag différent → fail
+
+3. **Cleanup Tests** - 30min:
+   - Vérifier keys décryptées ne persistent pas en mémoire
+   - After `BinanceService.close()`, aucune ref restante
+   - Vérifier Node.js garbage collector (heap snapshots)
+
+---
+
+#### 6. Key Rotation Script - 2h
+
+**Status**: ❌ Non implémenté
+
+**Objectif**: Plan de mitigation si `ENCRYPTION_SECRET` compromise
+
+**Fichier**: `scripts/rotate-encryption-key.ts`
+
+**Algorithme**:
+1. Prendre nouveau `ENCRYPTION_SECRET_NEW` en input
+2. Fetch toutes les `ExchangeConnection` actives
+3. Pour chaque connection:
+   - Decrypt avec old key
+   - Re-encrypt avec new key
+   - Update DB (atomic transaction)
+4. Log progress (N/total connections rotated)
+5. Verify all keys décryptent correctement avec new key
+6. Instructions pour update env vars (Vercel + local)
+
+**Usage**:
+```bash
+ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
+```
+
+**Safety**:
+- Dry-run mode (preview sans modifier DB)
+- Backup DB avant rotation
+- Rollback automatique si erreur
+
+---
+
+#### 7. Load Testing - 2-3h
+
+**Status**: ❌ Non testé
+
+**Objectif**: Vérifier performance sous charge réaliste
+
+**Scénarios**:
+
+1. **100 traders, 10,000 trades each** - 1h:
+   - Seed DB avec fake data
+   - Query: `getAllPerformanceSnapshots()` x100
+   - Measure: P95 latency < 200ms
+   - Tool: k6 ou Artillery
+
+2. **Cron job stress test** - 1h:
+   - 100 connections ready to sync
+   - Measure: temps total sync < 4min (marge 1min)
+   - Check: aucun timeout Vercel (max 60s par invocation)
+   - Optimize: batch size si needed
+
+3. **Concurrent writes** - 1h:
+   - 10 traders sync simultanément
+   - Check: no DB deadlocks
+   - Check: idempotence (externalOrderId unique constraint)
+
+**Tools**:
+- k6 (load testing)
+- Prisma `EXPLAIN ANALYZE` (DB queries)
+- Vercel Analytics (production metrics)
+
+---
+
+#### 8. DB Optimization - 1-2h
+
+**Status**: ⚠️ Indexes basiques OK, EXPLAIN needed
+
+**Checklist**:
+
+1. **EXPLAIN ANALYZE Top Queries** - 1h:
+   ```sql
+   -- Query 1: Get all snapshots for trader
+   EXPLAIN ANALYZE
+   SELECT * FROM trader_performance_snapshot
+   WHERE trader_profile_id = 'xxx'
+   ORDER BY calculated_at DESC;
+
+   -- Query 2: Get connections to sync
+   EXPLAIN ANALYZE
+   SELECT * FROM exchange_connection
+   WHERE is_active = true
+     AND next_sync_at <= NOW()
+   ORDER BY last_synced_at ASC NULLS FIRST
+   LIMIT 50;
+
+   -- Query 3: Get trades for period
+   EXPLAIN ANALYZE
+   SELECT * FROM exchange_trade
+   WHERE connection_id = 'xxx'
+     AND executed_at >= NOW() - INTERVAL '30 days'
+   ORDER BY executed_at DESC;
+   ```
+
+2. **Add Missing Indexes** (si EXPLAIN montre seq scans):
+   - `CREATE INDEX IF NOT EXISTS idx_trades_executed_at ON exchange_trade(executed_at);`
+   - Déjà présents: `@@index([connectionId, executedAt])`
+
+3. **Snapshot Caching Strategy**:
+   - Verify cache hit rate
+   - Consider Redis (future, si DB load élevée)
+
+---
+
+## 📊 Progression Tracking
+
+### Phase 0 (P0) - BLOQUEURS
+
+| Tâche | Temps | Status | ETA |
+|-------|-------|--------|-----|
+| Tests E2E (4 scénarios) | 2-3h | ⬜ TODO | - |
+| Tests Unitaires (Services) | 2-3h | ⬜ TODO | - |
+| Email Notifications | 2-3h | ⬜ TODO | - |
+| Guide Binance Setup | 1h | ⬜ TODO | - |
+| Update FAQ | 15min | ⬜ TODO | - |
+| FAQ Portfolio Tracking | 30min | ⬜ TODO | - |
+| **TOTAL P0** | **8-10h** | **0%** | - |
+
+### Phase 1 (P1) - POST-LAUNCH
+
+| Tâche | Temps | Status | ETA |
+|-------|-------|--------|-----|
+| Monitoring Dashboard | 3-4h | ⬜ TODO | - |
+| Audit Sécurité | 2h | ⬜ TODO | - |
+| Key Rotation Script | 2h | ⬜ TODO | - |
+| Load Testing | 2-3h | ⬜ TODO | - |
+| DB Optimization | 1-2h | ⬜ TODO | - |
+| **TOTAL P1** | **10-13h** | **0%** | - |
+
+### GRAND TOTAL: 18-23h
+
+---
+
+## 🎯 Plan d'Exécution - Option B
+
+### Week 1: Phase 0 (P0)
+
+**Jour 1-2** (4-6h):
+- ✅ Tests E2E (Playwright)
+- ✅ Tests Unitaires (Vitest)
+
+**Jour 3** (2-3h):
+- ✅ Email Notifications
+
+**Jour 4** (2h):
+- ✅ Documentation Utilisateur
+- ✅ Update FAQ
+
+### Week 2: Phase 1 (P1)
+
+**Jour 1-2** (5-6h):
+- ✅ Monitoring Dashboard
+- ✅ Audit Sécurité
+
+**Jour 3** (2h):
+- ✅ Key Rotation Script
+
+**Jour 4-5** (4-5h):
+- ✅ Load Testing
+- ✅ DB Optimization
+
+### Week 3: Polish & Deploy
+
+**Jour 1-2**:
+- ✅ Fix issues trouvés en testing
+- ✅ Code review
+- ✅ Update documentation finale
+
+**Jour 3**:
+- ✅ Deploy staging
+- ✅ Beta testing avec 2-3 traders
+
+**Jour 4-5**:
+- ✅ Production deploy
+- ✅ Monitoring 48h post-launch
+- ✅ Quick fixes si needed
+
+---
+
+## ✅ Success Criteria - Production Ready
+
+**Avant déploiement, tout doit être ✅** :
+
+### Tests
+- [ ] E2E complet (connect → sync → stats → disconnect)
+- [ ] 80%+ code coverage (Services + Calculator)
+- [ ] Tous les tests passent en CI/CD
+- [ ] Zero flaky tests
+
+### Sécurité
+- [ ] Aucun log de sensitive data (audit complet)
+- [ ] Tampering tests passent (auth tag verification)
+- [ ] Key rotation script testé (dry-run)
+- [ ] Security review externe (optionnel, recommandé)
+
+### Performance
+- [ ] Load test 100 traders → P95 < 500ms
+- [ ] Cron sync 100 connections < 5min
+- [ ] DB queries optimisées (EXPLAIN ANALYZE)
+- [ ] Zero timeout Vercel
+
+### Documentation
+- [ ] Guide Binance Setup complet (screenshots)
+- [ ] FAQ à jour (no contradictions)
+- [ ] Troubleshooting guide
+- [ ] Admin runbook (monitoring, incidents)
+
+### Monitoring
+- [ ] Dashboard admin fonctionnel
+- [ ] Alertes configurées (error rate > 10%)
+- [ ] Metrics trackées (sync rate, latency, errors)
+- [ ] On-call runbook prêt
+
+---
+
+**Fin de documentation - Option B (Production Solide) définie** ✅

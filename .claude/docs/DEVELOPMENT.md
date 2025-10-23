@@ -1,9 +1,10 @@
 # Development Status & Roadmap - MyCryptoPilot
 
-**Dernière mise à jour**: 19 octobre 2025
+**Dernière mise à jour**: 22 octobre 2025
 **Audit complet via /project-audit**: 19 octobre 2025
 **Phase 6 (Feed Signaux) complétée**: 13 octobre 2025
 **Phase 7 (Navigation 4 Espaces + UI Polish) complétée**: 14 octobre 2025
+**Phase 8 (Portfolio Tracking - Binance + Bybit) complétée**: 22 octobre 2025
 
 ## 📊 Progression Globale
 
@@ -92,7 +93,41 @@
 - UI polish complet sur trading cards
 - Chart viewer avec watermark branding
 
-#### Phase 8: Advanced Features ⏳ (Post-MVP)
+#### Phase 8: Portfolio Tracking - Multi-Exchange ✅ (100%)
+
+**Issue**: #66 - Exchange Portfolio Tracking & Verified Stats
+
+##### Phase 0: Binance Integration ✅ (Complétée)
+- ✅ **Database Models**: ExchangeConnection, ExchangeTrade, TraderPerformanceSnapshot
+- ✅ **BinanceService**: Validation API keys, fetch trades spot/futures
+- ✅ **Encryption Service**: AES-256-GCM pour API keys
+- ✅ **Sync Service**: Cron job automatique every 5 minutes
+- ✅ **Performance Calculator**: Winrate, Profit Factor, Sharpe Ratio, etc.
+- ✅ **Dashboard UI**: Connections management, stats display
+- ✅ **Email Notifications**: Sync failures notifications
+- ✅ **Security**: Read-only keys validation, encrypted storage
+
+##### Phase 4: Bybit Integration ✅ (Complétée 22 Oct 2025)
+- ✅ **BybitService** (396 lignes): API Bybit v5, validation, fetch trades
+- ✅ **ExchangeServiceFactory**: Pattern factory multi-exchange
+- ✅ **sync-service.ts**: Support Binance ET Bybit
+- ✅ **Migration DB**: Enum `Exchange` avec BINANCE + BYBIT
+- ✅ **UI Selector**: RadioGroup pour choisir exchange
+- ✅ **Dynamic Instructions**: Guides conditionnels par exchange
+- ✅ **Connection Cards**: Logos & styles dynamiques (🟡 Binance / 🟠 Bybit)
+- ✅ **Documentation**: bybit-setup.mdx (234 lignes) + FAQ update
+- ✅ **Bug Fixes**: Validation readOnly, hydration errors, auto-revalidation
+
+**Stats Phase 8**:
+- 15 fichiers modifiés: +1,015 insertions, -137 suppressions
+- 5 nouveaux fichiers (BybitService, Factory, Migration, Docs, Script)
+- PR #70 mergée avec succès
+
+**Prochaines étapes Portfolio Tracking** (Phase 5-6 de #66):
+- ⏳ Phase 5: Premium Features (WebSocket sync, unlimited history, CSV exports, API access)
+- ⏳ Phase 6: Polish & Launch (Security audit, performance optimization, beta testing)
+
+#### Phase 9: Advanced Features ⏳ (Post-MVP)
 
 - ⏳ Journal de trading
 - ⏳ Console de risque

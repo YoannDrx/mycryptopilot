@@ -35,6 +35,7 @@ type TestEnv = {
   DISCORD_ROLE_ADMIN_ID?: string;
   DISCORD_INVITE_URL?: string;
   CRON_SECRET?: string;
+  ENCRYPTION_SECRET: string;
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
   NEXT_PUBLIC_EMAIL_CONTACT: string;
 };
@@ -91,6 +92,8 @@ function createProductionEnv() {
       DISCORD_INVITE_URL: z.string().url().optional(), // Permanent invite link for emails
       // Cron Jobs configuration
       CRON_SECRET: z.string().optional(),
+      // Encryption for sensitive data (API keys)
+      ENCRYPTION_SECRET: z.string().min(32),
     },
     /**
      * If you add `client` environment variables, you need to add them to

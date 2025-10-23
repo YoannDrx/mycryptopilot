@@ -339,6 +339,204 @@ Not yet. Currently, you must log trades manually.
 
 **Coming soon**: CSV import from exchanges (Binance, Bybit, etc.).
 
+## Portfolio Tracking (Pro/Ultra)
+
+### What is Portfolio Tracking?
+
+**Portfolio Tracking** syncs your exchange trading history (Binance, Bybit) to calculate real performance metrics automatically.
+
+**Features**:
+- Automatic trade import from exchanges (Binance, Bybit) - SPOT + Futures
+- 15 performance metrics (Winrate, Profit Factor, Sharpe Ratio, etc.)
+- 4 time periods (All-Time, 365D, 90D, 30D)
+- Verified Badge for traders (shows stats are real)
+
+**Available on**: Pro (1 connection), Ultra (3 connections)
+
+### How do I connect my exchange?
+
+1. Go to **Account → Exchanges**
+2. Click **"Connect Exchange"**
+3. Select your exchange (Binance or Bybit)
+4. Create read-only API keys:
+   - [Binance Setup Guide](/docs/binance-setup)
+   - [Bybit Setup Guide](/docs/bybit-setup)
+5. Paste API Key and Secret Key
+6. Click **"Validate & Connect"**
+
+First sync fetches last 30 days of trades. Subsequent syncs run automatically every 5 minutes.
+
+### Is it safe to connect my exchange?
+
+**Yes, when done correctly:**
+
+✅ **What we require**:
+- Read-only API keys (no withdrawal/trading permissions)
+- Keys are AES-256-GCM encrypted before storage
+- Encryption key stored securely outside database
+
+✅ **What we fetch**:
+- Trade history (orders, P&L)
+- No access to deposits, withdrawals, or balances
+
+❌ **What we CANNOT do**:
+- Place trades
+- Withdraw funds
+- Transfer assets
+- Modify your account
+
+**See setup guides for detailed security info:**
+- [Binance Setup Guide](/docs/binance-setup)
+- [Bybit Setup Guide](/docs/bybit-setup)
+
+### What metrics are calculated?
+
+**15 metrics across 4 periods:**
+
+**Basic**:
+- Total Trades, Winning Trades, Losing Trades
+- Winrate (%), Net PnL
+
+**Averages**:
+- Average Win, Average Loss
+- Largest Win, Largest Loss
+
+**Advanced**:
+- Profit Factor (Gross Profit / Gross Loss)
+- Sharpe Ratio (risk-adjusted returns)
+- Sortino Ratio (downside deviation)
+- Max Drawdown (largest peak-to-trough loss)
+
+**Periods**: All-Time, Last 365 Days, Last 90 Days, Last 30 Days
+
+### My connection isn't syncing. What's wrong?
+
+**Common issues:**
+
+1. **Invalid API keys**
+   - Check for typos (copy-paste carefully)
+   - Ensure "Enable Reading" permission is checked
+   - Verify keys haven't been revoked in Binance
+
+2. **IP whitelist restriction**
+   - If you set IP restrictions, add MyCryptoPilot server IPs
+   - Or use "Unrestricted" for simplest setup
+
+3. **No trades in last 30 days**
+   - First sync only fetches last 30 days
+   - If no trades, sync succeeds but shows 0 trades
+
+4. **Rate limit exceeded**
+   - Wait 1 minute and try "Sync Now"
+   - Binance has rate limits (weight-based)
+
+**Solution**: Go to Account → Exchanges, click "Sync Now" to retry manually.
+
+### I'm getting "Invalid API Key" error
+
+**Causes:**
+
+1. **Typo in keys**: Spaces before/after, missing characters
+2. **Wrong permissions**: "Enable Reading" must be checked
+3. **Keys revoked**: Check Binance API Management page
+4. **IP restriction**: MyCryptoPilot IPs not whitelisted
+
+**Fix:**
+
+1. Go to Binance → API Management
+2. Verify key exists and is active
+3. Check permissions (Read Only)
+4. Copy keys again (no extra spaces)
+5. Reconnect in MyCryptoPilot
+
+If persists, delete the API key in Binance and create new ones from scratch.
+
+### How often does it sync?
+
+**Sync frequency by plan:**
+
+| Plan | Frequency | Use Case |
+|------|-----------|----------|
+| FREE | N/A | No connections allowed |
+| PRO | Every 1 minute | Near real-time updates |
+| ULTRA | Every 5 seconds | Real-time tracking |
+
+You can also click **"Sync Now"** anytime to force immediate sync.
+
+### Will I get email notifications?
+
+**Yes, for sync failures only:**
+
+- You'll receive an email if sync fails (invalid keys, network errors, etc.)
+- **Rate limited**: Max 1 email per 24 hours per connection
+- Email includes troubleshooting guidance
+
+**No spam**: You won't get emails for successful syncs.
+
+**Disable**: Go to Account → Email Preferences to opt-out.
+
+### What's the Verified Badge?
+
+The **Verified Badge** appears on trader profiles when:
+
+✅ Exchange is connected and syncing successfully
+✅ Trades are being imported automatically
+✅ Performance metrics are calculated
+
+❌ Badge is removed when:
+- Exchange is disconnected
+- Sync has been failing for 7+ days
+
+**Purpose**: Shows followers that your stats are **real** and backed by live trading data (not manually entered).
+
+### Can I connect multiple exchanges?
+
+**Yes, based on your plan:**
+- **Pro Plan**: 1 exchange connection (Binance OR Bybit)
+- **Ultra Plan**: Up to 3 exchange connections (Binance + Bybit + more)
+- All trades are aggregated for performance metrics
+- Useful if you trade on multiple exchanges or accounts
+
+**Supported exchanges**: Binance, Bybit
+
+**Coming soon**: OKX, Kraken, KuCoin API support.
+
+### Does it work with Spot and Futures?
+
+**Yes!** Both supported:
+- **Spot trades**: P&L calculated from buy/sell pairs
+- **Futures trades**: P&L from `realizedPnl` field
+
+Metrics are calculated across all trade types combined.
+
+### What if I disconnect my exchange?
+
+**When you disconnect:**
+
+- ✅ Historical trades remain in database (not deleted)
+- ❌ Auto-sync stops
+- ❌ Verified Badge is removed
+- ❌ Performance stats hidden from marketplace
+
+You can reconnect anytime without data loss.
+
+### Can I delete my trade history?
+
+**Yes.** When you disconnect, you can choose:
+
+1. **Keep trades**: Disconnect but preserve historical data
+2. **Delete all trades**: Remove connection + all imported trades
+
+**Warning**: Deleting trades also deletes performance snapshots. This action is **irreversible**.
+
+### I have trades older than 30 days. Can I import them?
+
+**Currently**: First sync only fetches last 30 days due to Binance API limits.
+
+**Workaround**: Historical imports aren't supported yet.
+
+**Coming soon**: Extended history import (up to 1 year) for Ultra users.
+
 ## Discord Integration
 
 ### Why should I connect Discord?
@@ -462,14 +660,21 @@ Include:
 Yes. We use:
 - **Encryption**: All data encrypted in transit (SSL/TLS)
 - **Authentication**: Better Auth with secure sessions
-- **No financial data**: We don't store exchange API keys
+- **API keys**: Exchange API keys (Binance) are encrypted with AES-256-GCM before storage
 - **Crypto payments**: No credit card data stored
 
+**Portfolio Tracking (Optional)**:
+- Requires **read-only** Binance API keys for trade syncing
+- Keys are encrypted using military-grade AES-256-GCM encryption
+- Encryption key stored securely outside database
+- Keys never appear in logs or error messages
+- You can disconnect and revoke keys anytime
+
 We NEVER ask for:
-- Exchange API keys
-- Private keys
-- Seed phrases
-- Withdrawal passwords
+- API keys with **withdrawal** or **trading** permissions
+- Private keys or seed phrases
+- Exchange passwords
+- 2FA codes
 
 ### How do I delete my account?
 
