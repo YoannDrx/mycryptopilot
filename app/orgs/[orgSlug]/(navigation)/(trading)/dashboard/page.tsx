@@ -24,7 +24,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SignalsFeed } from "./_components/signals-feed";
 import { prisma } from "@/lib/prisma";
-import { hasUserJoinedDiscord, generatePermanentInvite } from "@/lib/discord/invitations";
+import {
+  hasUserJoinedDiscord,
+  generatePermanentInvite,
+} from "@/lib/discord/invitations";
 
 export const metadata: Metadata = {
   title: "Dashboard - MyCryptoPilot",
@@ -75,7 +78,9 @@ export default async function DashboardPage() {
   }
 
   // Check if user has joined Discord (Phase 3.4)
-  const hasJoinedDiscord = await hasUserJoinedDiscord(fullUser?.discordId ?? null);
+  const hasJoinedDiscord = await hasUserJoinedDiscord(
+    fullUser?.discordId ?? null,
+  );
   const discordInviteUrl = !hasJoinedDiscord
     ? await generatePermanentInvite()
     : null;
@@ -172,8 +177,8 @@ export default async function DashboardPage() {
                   />
                   <CardTitle className="text-base">
                     {hasJoinedDiscord
-                      ? "Discord Connecté"
-                      : "Rejoins notre Discord"}
+                      ? "Discord Connected"
+                      : "Join our Discord"}
                   </CardTitle>
                 </div>
                 {hasJoinedDiscord && (
@@ -182,7 +187,7 @@ export default async function DashboardPage() {
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <CheckCircle2 className="mr-1 size-3" />
-                    Actif
+                    Active
                   </Badge>
                 )}
               </div>
@@ -190,16 +195,16 @@ export default async function DashboardPage() {
             <CardContent>
               {hasJoinedDiscord ? (
                 <p className="text-sm text-green-700 dark:text-green-400">
-                  Ton compte Discord est connecté ! Tu reçois maintenant les
-                  signaux de trading en temps réel et tu as accès aux channels
-                  privés des traders que tu suis. 🎉
+                  Your Discord account is connected! You now receive trading
+                  signals in real-time and have access to private channels of
+                  the traders you follow. 🎉
                 </p>
               ) : (
                 <>
                   <p className="mb-4 text-sm text-amber-700 dark:text-amber-400">
-                    Rejoins notre communauté Discord pour recevoir des
-                    notifications en temps réel, accéder aux channels privés des
-                    traders, et échanger avec la communauté !
+                    Join our Discord community to receive real-time
+                    notifications, access private trader channels, and connect
+                    with the community!
                   </p>
                   {discordInviteUrl && (
                     <Button asChild variant="default" className="w-full">
@@ -209,16 +214,16 @@ export default async function DashboardPage() {
                         rel="noopener noreferrer"
                       >
                         <MessageCircle className="mr-2 size-4" />
-                        Rejoindre Discord
+                        Join Discord
                       </a>
                     </Button>
                   )}
                   <p className="mt-3 text-xs text-amber-600 dark:text-amber-500">
-                    💡 Après avoir rejoint, utilise{" "}
+                    💡 After joining, use{" "}
                     <code className="rounded bg-amber-100 px-1 py-0.5 dark:bg-amber-900">
                       /status
                     </code>{" "}
-                    pour lier ton compte.
+                    to link your account.
                   </p>
                 </>
               )}

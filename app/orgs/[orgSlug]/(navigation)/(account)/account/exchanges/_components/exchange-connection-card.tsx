@@ -124,8 +124,16 @@ export const ExchangeConnectionCard = ({
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             {/* Exchange Icon */}
-            <div className="flex size-12 items-center justify-center rounded-lg bg-amber-500/10">
-              <span className="text-2xl">🟡</span>
+            <div
+              className={`flex size-12 items-center justify-center rounded-lg ${
+                connection.exchange === "BINANCE"
+                  ? "bg-amber-500/10"
+                  : "bg-orange-500/10"
+              }`}
+            >
+              <span className="text-2xl">
+                {connection.exchange === "BINANCE" ? "🟡" : "🟠"}
+              </span>
             </div>
 
             {/* Exchange Info */}

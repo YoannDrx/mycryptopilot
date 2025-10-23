@@ -378,6 +378,7 @@ enum TierLevel {
 
 enum Exchange {
   BINANCE
+  BYBIT
 }
 
 enum TradeSide {

@@ -11,6 +11,8 @@ import {
   useZodForm,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { LoadingButton } from "@/features/form/submit-button";
 import { ConnectExchangeSchema } from "@/features/exchange/exchange.schema";
 import type { ConnectExchangeInput } from "@/features/exchange/exchange.schema";
@@ -55,9 +57,15 @@ export const ConnectExchangeForm = ({
         data.message ?? "Exchange connected successfully! Syncing trades...",
       );
       form.reset();
-      await queryClient.invalidateQueries({
-        queryKey: ["exchange-connections"],
-      });
+      // Invalidate both connections list and all connection stats
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["exchange-connections"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["exchange-status"],
+        }),
+      ]);
       // Refresh Server Component data to update connection count
       router.refresh();
       onSuccess?.();
@@ -79,95 +87,178 @@ export const ConnectExchangeForm = ({
         </AlertDescription>
       </Alert>
 
-      {/* How to get API keys */}
-      <Alert>
-        <Link2 className="size-4" />
-        <AlertDescription>
-          <strong>How to get Binance API keys:</strong>
-          <ol className="mt-2 ml-4 list-decimal space-y-1 text-sm">
-            <li>
-              Go to{" "}
-              <a
-                href="https://www.binance.com/en/my/settings/api-management"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline"
-              >
-                Binance API Management
-              </a>
-            </li>
-            <li>Create a new API key (System Generated recommended)</li>
-            <li>
-              <strong>Enable only &quot;Enable Reading&quot; permission</strong>
-            </li>
-            <li>Save your API Key and Secret Key</li>
-          </ol>
-        </AlertDescription>
-      </Alert>
-
       <Form
         form={form}
         onSubmit={async (values) => connectMutation.mutateAsync(values)}
         disabled={connectMutation.isPending}
       >
         <div className="flex flex-col gap-6">
-          {/* Exchange Selector (Fixed to BINANCE for now) */}
-          <div className="bg-muted/50 rounded-lg border p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-12 items-center justify-center rounded-lg bg-amber-500/10">
-                <span className="text-2xl">🟡</span>
-              </div>
-              <div>
-                <p className="font-semibold">Binance</p>
-                <p className="text-muted-foreground text-sm">
-                  Spot & Futures trading data
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Exchange Selector */}
+          <FormField
+            control={form.control}
+            name="exchange"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Exchange *</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col gap-4"
+                  >
+                    {/* Binance Option */}
+                    <div className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors">
+                      <RadioGroupItem value="BINANCE" id="binance" />
+                      <Label
+                        htmlFor="binance"
+                        className="flex flex-1 cursor-pointer items-center gap-3"
+                      >
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-amber-500/10">
+                          <span className="text-2xl">🟡</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">Binance</p>
+                          <p className="text-muted-foreground text-sm">
+                            Spot & Futures trading data
+                          </p>
+                        </div>
+                      </Label>
+                    </div>
+
+                    {/* Bybit Option */}
+                    <div className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors">
+                      <RadioGroupItem value="BYBIT" id="bybit" />
+                      <Label
+                        htmlFor="bybit"
+                        className="flex flex-1 cursor-pointer items-center gap-3"
+                      >
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-orange-500/10">
+                          <span className="text-2xl">🟠</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">Bybit</p>
+                          <p className="text-muted-foreground text-sm">
+                            Spot & Futures trading data
+                          </p>
+                        </div>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Instructions Binance */}
+          {form.watch("exchange") === "BINANCE" && (
+            <Alert>
+              <Link2 className="size-4" />
+              <AlertDescription>
+                <strong>How to get Binance API keys:</strong>
+                <ol className="mt-2 ml-4 list-decimal space-y-1 text-sm">
+                  <li>
+                    Go to{" "}
+                    <a
+                      href="https://www.binance.com/en/my/settings/api-management"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      Binance API Management
+                    </a>
+                  </li>
+                  <li>Create a new API key (System Generated recommended)</li>
+                  <li>
+                    <strong>
+                      Enable only &quot;Enable Reading&quot; permission
+                    </strong>
+                  </li>
+                  <li>Save your API Key and Secret Key</li>
+                </ol>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Instructions Bybit */}
+          {form.watch("exchange") === "BYBIT" && (
+            <Alert>
+              <Link2 className="size-4" />
+              <AlertDescription>
+                <strong>How to get Bybit API keys:</strong>
+                <ol className="mt-2 ml-4 list-decimal space-y-1 text-sm">
+                  <li>
+                    Go to{" "}
+                    <a
+                      href="https://www.bybit.com/app/user/api-management"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      Bybit API Management
+                    </a>
+                  </li>
+                  <li>Click &quot;Create New Key&quot;</li>
+                  <li>
+                    <strong>
+                      Select &quot;Read-Only&quot; permissions only
+                    </strong>
+                  </li>
+                  <li>Save your API Key and Secret Key</li>
+                </ol>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* API Key */}
           <FormField
             control={form.control}
             name="apiKey"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>API Key *</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your Binance API Key"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Your read-only API key from Binance
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const exchange = form.watch("exchange");
+              return (
+                <FormItem>
+                  <FormLabel>API Key *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder={`Enter your ${exchange === "BINANCE" ? "Binance" : "Bybit"} API Key`}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Your read-only API key from{" "}
+                    {exchange === "BINANCE" ? "Binance" : "Bybit"}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           {/* Secret Key */}
           <FormField
             control={form.control}
             name="secretKey"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Secret Key *</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your Binance Secret Key"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Your secret key (never shared or exposed)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const exchange = form.watch("exchange");
+              return (
+                <FormItem>
+                  <FormLabel>Secret Key *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder={`Enter your ${exchange === "BINANCE" ? "Binance" : "Bybit"} Secret Key`}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Your secret key (never shared or exposed)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
 
           {/* Error Display */}

@@ -1,12 +1,12 @@
 /**
- * API Route: Connect Exchange (Binance)
+ * API Route: Connect Exchange (Binance, Bybit)
  *
  * POST /api/exchange/connect
  *
- * Connects a trader's Binance account via read-only API keys:
+ * Connects a trader's exchange account via read-only API keys:
  * - Validates trader has a profile
  * - Checks plan limits (FREE=0, PRO=1, ULTRA=3)
- * - Validates Binance API keys (read-only enforcement)
+ * - Validates exchange API keys (read-only enforcement)
  * - Encrypts keys with AES-256-GCM
  * - Stores connection in DB
  * - Returns connection details
@@ -19,7 +19,7 @@ import { getRequiredUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { encryptApiKey } from "@/lib/crypto/encryption-service";
-import { BinanceService } from "@/lib/exchange/binance-service";
+import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
 import {
   getExistingConnection,
   countTraderConnections,
@@ -130,28 +130,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate Binance API keys
-    logger.info("Validating Binance API keys", {
+    // Validate exchange API keys
+    logger.info(`Validating ${exchange} API keys`, {
       userId: user.id,
       traderProfileId: traderProfile.id,
+      exchange,
     });
 
-    const binance = new BinanceService(apiKey, secretKey);
+    const exchangeService = createExchangeService(exchange, apiKey, secretKey);
 
     let apiValidation;
     try {
-      apiValidation = await binance.validateApiKeys();
+      apiValidation = await exchangeService.validateApiKeys();
     } catch (error) {
-      logger.error("Binance API validation failed", { error });
+      logger.error(`${exchange} API validation failed`, { error, exchange });
       return NextResponse.json(
         {
-          error:
-            "Failed to validate API keys. Please check your keys and try again.",
+          error: `Failed to validate ${exchange} API keys. Please check your keys and try again.`,
         },
         { status: 400 },
       );
     } finally {
-      await binance.close();
+      await exchangeService.close();
     }
 
     if (!apiValidation.isValid) {

@@ -343,23 +343,26 @@ Not yet. Currently, you must log trades manually.
 
 ### What is Portfolio Tracking?
 
-**Portfolio Tracking** syncs your Binance trading history to calculate real performance metrics automatically.
+**Portfolio Tracking** syncs your exchange trading history (Binance, Bybit) to calculate real performance metrics automatically.
 
 **Features**:
-- Automatic trade import from Binance (SPOT + Futures)
+- Automatic trade import from exchanges (Binance, Bybit) - SPOT + Futures
 - 15 performance metrics (Winrate, Profit Factor, Sharpe Ratio, etc.)
 - 4 time periods (All-Time, 365D, 90D, 30D)
 - Verified Badge for traders (shows stats are real)
 
 **Available on**: Pro (1 connection), Ultra (3 connections)
 
-### How do I connect Binance?
+### How do I connect my exchange?
 
 1. Go to **Account → Exchanges**
 2. Click **"Connect Exchange"**
-3. Create read-only API keys in Binance (see [Binance Setup Guide](/docs/binance-setup))
-4. Paste API Key and Secret Key
-5. Click **"Validate & Connect"**
+3. Select your exchange (Binance or Bybit)
+4. Create read-only API keys:
+   - [Binance Setup Guide](/docs/binance-setup)
+   - [Bybit Setup Guide](/docs/bybit-setup)
+5. Paste API Key and Secret Key
+6. Click **"Validate & Connect"**
 
 First sync fetches last 30 days of trades. Subsequent syncs run automatically every 5 minutes.
 
@@ -382,7 +385,9 @@ First sync fetches last 30 days of trades. Subsequent syncs run automatically ev
 - Transfer assets
 - Modify your account
 
-**See [Binance Setup Guide](/docs/binance-setup) for detailed security info.**
+**See setup guides for detailed security info:**
+- [Binance Setup Guide](/docs/binance-setup)
+- [Bybit Setup Guide](/docs/bybit-setup)
 
 ### What metrics are calculated?
 
@@ -486,12 +491,15 @@ The **Verified Badge** appears on trader profiles when:
 
 ### Can I connect multiple exchanges?
 
-**Yes (Ultra only):**
-- Ultra users can connect up to **3 Binance accounts**
+**Yes, based on your plan:**
+- **Pro Plan**: 1 exchange connection (Binance OR Bybit)
+- **Ultra Plan**: Up to 3 exchange connections (Binance + Bybit + more)
 - All trades are aggregated for performance metrics
-- Useful if you trade on multiple accounts (e.g., spot + futures)
+- Useful if you trade on multiple exchanges or accounts
 
-**Coming soon**: Bybit, OKX, Kraken API support.
+**Supported exchanges**: Binance, Bybit
+
+**Coming soon**: OKX, Kraken, KuCoin API support.
 
 ### Does it work with Spot and Futures?
 

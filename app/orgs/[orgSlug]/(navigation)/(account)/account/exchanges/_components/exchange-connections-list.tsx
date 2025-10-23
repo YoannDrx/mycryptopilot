@@ -3,7 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { upfetch } from "@/lib/up-fetch";
 import { ExchangeConnectionCard } from "./exchange-connection-card";
-import { Loader2 } from "lucide-react";
 
 type Connection = {
   id: string;
@@ -51,7 +50,7 @@ export const ExchangeConnectionsList = ({
 
 // Separate component to fetch stats for each connection
 const ConnectionWithStats = ({ connection }: { connection: Connection }) => {
-  const { data: statusData, isLoading } = useQuery({
+  const { data: statusData } = useQuery({
     queryKey: ["exchange-status", connection.id],
     queryFn: async () => {
       // upfetch automatically parses JSON and throws on error
@@ -61,16 +60,19 @@ const ConnectionWithStats = ({ connection }: { connection: Connection }) => {
         stats: Stats;
       };
     },
+    // Provide placeholder data to avoid hydration mismatch
+    placeholderData: {
+      connection,
+      stats: {
+        totalTrades: 0,
+        firstTradeDate: null,
+        lastTradeDate: null,
+      },
+    },
   });
 
-  if (isLoading) {
-    return (
-      <div className="bg-muted/50 flex items-center justify-center rounded-lg border p-8">
-        <Loader2 className="text-muted-foreground size-6 animate-spin" />
-      </div>
-    );
-  }
-
+  // statusData always exists due to placeholderData, so no need for loading state
+  // The card will show with placeholder stats initially, then update when real data arrives
   if (!statusData) {
     return null;
   }

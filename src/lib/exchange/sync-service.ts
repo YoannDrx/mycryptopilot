@@ -5,18 +5,18 @@
  *
  * Features:
  * - Decrypts API keys securely
- * - Fetches trades from Binance (spot + futures)
+ * - Fetches trades from exchanges (Binance, Bybit - spot + futures)
  * - Upserts trades with idempotence (via externalOrderId)
  * - Updates sync metadata (lastSyncedAt, nextSyncAt, errors)
  * - Handles errors gracefully with detailed logging
  *
  * Flow:
  * 1. Decrypt API keys from DB
- * 2. Create BinanceService instance
+ * 2. Create exchange service instance (Binance or Bybit)
  * 3. Fetch trades (last 30 days on first sync, incremental after)
  * 4. Upsert trades to DB (idempotent)
  * 5. Update connection metadata
- * 6. Cleanup (close Binance connection)
+ * 6. Cleanup (close exchange connection)
  *
  * @example
  * const result = await syncConnectionTrades(connection);
@@ -28,7 +28,10 @@
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { decryptApiKey } from "@/lib/crypto/encryption-service";
-import { BinanceService } from "@/lib/exchange/binance-service";
+import {
+  createExchangeService,
+  type ExchangeService,
+} from "@/lib/exchange/exchange-service-factory";
 import type { ExchangeConnection } from "@/generated/prisma";
 import { calculateNextSyncAt } from "@/features/exchange/exchange-plan-limits";
 import { sendSyncFailureNotification } from "@/lib/exchange/email-notifications";
@@ -65,7 +68,7 @@ export async function syncConnectionTrades(
     traderProfileId: connection.traderProfileId,
   });
 
-  let binanceService: BinanceService | null = null;
+  let exchangeService: ExchangeService | null = null;
 
   try {
     // 1. Decrypt API keys
@@ -80,8 +83,12 @@ export async function syncConnectionTrades(
       connection.keyTag,
     );
 
-    // 2. Create Binance service
-    binanceService = new BinanceService(apiKey, secretKey);
+    // 2. Create exchange service (Binance or Bybit)
+    exchangeService = createExchangeService(
+      connection.exchange,
+      apiKey,
+      secretKey,
+    );
 
     // 3. Determine sync period
     // First sync: get last 30 days
@@ -95,17 +102,22 @@ export async function syncConnectionTrades(
 
     const sinceDate = connection.lastSyncedAt ?? undefined;
 
-    logger.info("Fetching trades from Binance", {
+    logger.info("Fetching trades from exchange", {
       connectionId: connection.id,
+      exchange: connection.exchange,
       daysSince,
       sinceDate: sinceDate?.toISOString(),
     });
 
     // 4. Fetch trades
-    const trades = await binanceService.fetchRecentTrades(daysSince, sinceDate);
+    const trades = await exchangeService.fetchRecentTrades(
+      daysSince,
+      sinceDate,
+    );
 
-    logger.info("Trades fetched from Binance", {
+    logger.info("Trades fetched from exchange", {
       connectionId: connection.id,
+      exchange: connection.exchange,
       tradeCount: trades.length,
     });
 
@@ -265,16 +277,18 @@ export async function syncConnectionTrades(
       error: errorMessage,
     };
   } finally {
-    // 7. Cleanup: always close Binance connection
-    if (binanceService) {
+    // 7. Cleanup: always close exchange connection
+    if (exchangeService) {
       try {
-        await binanceService.close();
-        logger.info("Binance connection closed", {
+        await exchangeService.close();
+        logger.info("Exchange connection closed", {
           connectionId: connection.id,
+          exchange: connection.exchange,
         });
       } catch (closeError) {
-        logger.warn("Failed to close Binance connection", {
+        logger.warn("Failed to close exchange connection", {
           connectionId: connection.id,
+          exchange: connection.exchange,
           closeError,
         });
       }

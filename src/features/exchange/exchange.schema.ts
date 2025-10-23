@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 /**
- * Schema for connecting an exchange (Binance)
+ * Schema for connecting an exchange (Binance, Bybit)
  */
 export const ConnectExchangeSchema = z.object({
-  exchange: z.enum(["BINANCE"]),
+  exchange: z.enum(["BINANCE", "BYBIT"]),
   apiKey: z.string().min(1, "API Key is required"),
   secretKey: z.string().min(1, "Secret Key is required"),
 });
