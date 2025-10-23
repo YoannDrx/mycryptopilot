@@ -1,7 +1,7 @@
 # Crypto Payments System - MyCryptoPilot
 
-**Dernière mise à jour**: 14 octobre 2025
-**Statut**: ✅ **100% FONCTIONNEL** (Backend + Frontend + API routes)
+**Dernière mise à jour**: 23 octobre 2025
+**Statut**: ✅ **100% FONCTIONNEL** (Backend + Frontend + API routes + Testnet + Test Payment)
 
 ## Vue d'ensemble
 
@@ -12,6 +12,9 @@ Système complet de paiement crypto permettant aux users de payer leurs abonneme
 - ✅ Support pro-rata automatique
 - ✅ Activation subscription automatique
 - ✅ UI checkout complète (447 lignes!)
+- ✅ **Support testnet (Base Sepolia + Tron Shasta)**
+- ✅ **Test payment $1 avec success modal + email**
+- ✅ **Payment history dashboard**
 
 ---
 
@@ -70,6 +73,120 @@ const tronPath = "m/44'/195'/0'/0";
 const tronXpub = hdKey.derive(tronPath).publicExtendedKey;
 console.log("Tron XPUB:", tronXpub);
 ```
+
+### Testnet Support (NEW - Issue #72)
+
+**Ajouté**: 23 octobre 2025
+
+Le système supporte maintenant **2 modes de fonctionnement**:
+
+#### 1. Mainnet (Production)
+
+Configuration par défaut en production:
+
+```bash
+# .env (Production - Vercel)
+CRYPTO_NETWORK="mainnet"  # Par défaut
+
+# Mainnet RPC URLs
+BASE_RPC_URL="https://mainnet.base.org"
+TRON_RPC_URL="https://api.trongrid.io"
+
+# Mainnet XPUBs
+CRYPTO_XPUB_BASE="xpub6F..."
+CRYPTO_XPUB_TRON="xpub6D..."
+```
+
+#### 2. Testnet (Development)
+
+Pour tester les paiements sans argent réel en dev:
+
+```bash
+# .env.local (Development)
+CRYPTO_NETWORK="testnet"
+
+# Testnet RPC URLs
+BASE_RPC_URL_TESTNET="https://sepolia.base.org"
+TRON_RPC_URL_TESTNET="https://api.shasta.trongrid.io"
+
+# Testnet XPUBs (Base Sepolia + Tron Shasta)
+CRYPTO_XPUB_BASE_TESTNET="xpub6..."
+CRYPTO_XPUB_TRON_TESTNET="xpub6..."
+```
+
+**Réseaux testnet**:
+- Base Sepolia (testnet Ethereum L2)
+- Tron Shasta (testnet Tron)
+
+**Avantages**:
+- ✅ Tester le flow complet sans argent réel
+- ✅ Obtenir des tokens testnet gratuits (faucets)
+- ✅ Badge UI "TESTNET MODE" visible dans le checkout
+- ✅ Liens explorateurs adaptés automatiquement (Sepolia BaseScan, Shasta TronScan)
+
+**Obtenir des tokens testnet**:
+- Base Sepolia USDC: https://faucet.circle.com
+- Tron Shasta USDT: https://www.trongrid.io/shasta/#/
+
+### Test Payment Plan (NEW - Issue #72)
+
+**Ajouté**: 23 octobre 2025
+
+Nouveau plan `test` permettant aux users de tester le système de paiement avec seulement **$1 USD**.
+
+#### Configuration Plan
+
+```typescript
+// mycryptopilot-plans.ts
+{
+  name: "test",
+  description: "Paiement de test pour vérifier le système crypto",
+  priceUSD: 1,
+  priceCrypto: { usdc: 1, usdt: 1 },
+  daysGranted: 0, // N'active PAS d'abonnement
+  limits: {
+    // Même limites que FREE
+    activeSignalsLimit: 0,
+    tradersFollow: 0,
+    // ...
+  }
+}
+```
+
+#### Workflow Test Payment
+
+1. **User clique** "Send $1 Test Payment" sur page pricing
+2. **Système génère** adresses crypto (comme plan normal)
+3. **User paie** 1 USDC (Base) ou 1 USDT (Tron)
+4. **Payment confirmé** → **3 actions automatiques**:
+   - ✅ Popup success s'affiche (CTA vers plans)
+   - ✅ Email de confirmation envoyé
+   - ✅ Payment visible dans historique dashboard
+5. **Pas d'activation** d'abonnement (daysGranted = 0)
+
+#### Composants UI
+
+**Success Dialog** (`test-payment-success-dialog.tsx`):
+```typescript
+<TestPaymentSuccessDialog
+  open={showDialog}
+  onOpenChange={setShowDialog}
+  orgSlug={orgSlug}
+/>
+```
+
+**Email Template** (`test-payment-success.tsx`):
+- Confirmation paiement $1
+- Détails transaction (hash, network, time)
+- Lien explorer blockchain
+- CTA vers plans Pro/Ultra
+
+**Payment History** (`account/payments/page.tsx`):
+- Liste tous les paiements (test + real)
+- Badge "Test Payment" pour plan test
+- Status (PENDING/CONFIRMED)
+- Explorer links
+- CTA spécial pour test payments confirmés
 
 ### Fonctions
 
@@ -669,6 +786,79 @@ pnpm add -D @types/qrcode
 **Actions**:
 
 - `src/lib/actions/crypto/generate-address.action.ts` - Server action
+
+---
+
+## Quick Setup Guide
+
+### Development (Testnet) - 5 minutes
+
+**Objectif**: Tester les paiements crypto sans argent réel.
+
+```bash
+# 1. Générer XPUBs testnet
+npx tsx scripts/generate-testnet-xpubs.ts
+
+# 2. Copier output dans .env.local
+CRYPTO_NETWORK="testnet"
+BASE_RPC_URL_TESTNET="https://sepolia.base.org"
+TRON_RPC_URL_TESTNET="https://api.shasta.trongrid.io"
+CRYPTO_XPUB_BASE_TESTNET="xpub6..." # Output du script
+CRYPTO_XPUB_TRON_TESTNET="xpub6..." # Output du script
+
+# 3. Obtenir tokens testnet (gratuits)
+# Base Sepolia USDC: https://faucet.circle.com
+# Tron Shasta USDT: https://www.trongrid.io/shasta/
+
+# 4. Tester le flow
+pnpm dev
+# → /pricing → "Send $1 Test Payment"
+# → Badge "TESTNET MODE" visible
+# → Envoyer 1 USDC/USDT testnet
+# → Popup success + email confirmation
+```
+
+### Production (Mainnet) - Déjà configuré ✅
+
+Le système crypto est **déjà opérationnel en production** sur Vercel avec les variables:
+
+```bash
+CRYPTO_NETWORK="mainnet"  # Par défaut
+BASE_RPC_URL="https://mainnet.base.org"
+TRON_RPC_URL="https://api.trongrid.io"
+CRYPTO_XPUB_BASE="xpub6F..." # Configuré dans Vercel
+CRYPTO_XPUB_TRON="xpub6D..." # Configuré dans Vercel
+```
+
+**Test Payment $1** fonctionne directement en prod:
+- User clique "Send $1 Test Payment" sur `/pricing`
+- Paie 1 USDC (Base) ou 1 USDT (Tron)
+- Reçoit popup success + email de confirmation
+- Payment visible dans `/account/payments`
+- **Pas d'activation subscription** (plan test = 0 jours)
+
+**Script génération XPUBs testnet**:
+
+```typescript
+// scripts/generate-testnet-xpubs.ts
+import { HDNodeWallet } from "ethers";
+import { HDKey } from "@scure/bip32";
+import * as bip39 from "@scure/bip39";
+
+const mnemonic = bip39.generateMnemonic(bip39.wordlist);
+console.log("🔐 TESTNET MNEMONIC (SAVE THIS!):", mnemonic);
+
+// Base XPUB
+const hdNode = HDNodeWallet.fromPhrase(mnemonic);
+const baseXpub = hdNode.derivePath("m/44'/60'/0'/0").extendedKey;
+console.log("BASE_TESTNET:", baseXpub);
+
+// Tron XPUB
+const seed = bip39.mnemonicToSeedSync(mnemonic);
+const hdKey = HDKey.fromMasterSeed(seed);
+const tronXpub = hdKey.derive("m/44'/195'/0'/0").publicExtendedKey;
+console.log("TRON_TESTNET:", tronXpub);
+```
 
 ---
 

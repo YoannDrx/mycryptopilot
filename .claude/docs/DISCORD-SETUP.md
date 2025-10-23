@@ -414,6 +414,162 @@ Si erreur → Vérifier logs Railway pour voir permissions manquantes
 
 ---
 
+## Commandes Bot Disponibles
+
+Le bot Discord MyCryptoPilot supporte **11 commandes slash** (5 utilisateur + 6 admin).
+
+### Commandes Utilisateur
+
+#### `/help`
+Affiche la liste des commandes disponibles.
+
+```
+📊 /status - Affiche le statut de ton abonnement
+⬆️ /upgrade - Obtiens le lien pour upgrader
+🔗 /link - Lie ton compte Discord à MyCryptoPilot
+📊 /portfolio - Affiche ton portfolio (exchanges connectés)
+❓ /help - Affiche cette liste
+```
+
+#### `/status`
+Affiche le statut d'abonnement de l'utilisateur.
+
+**Exemple de réponse**:
+```
+📊 Statut de ton abonnement
+
+💎 Plan actuel: PRO (49$/mois)
+📅 Expiration: 15 novembre 2025
+📊 Signaux restants aujourd'hui: 42/50
+👥 Traders suivis: 3/5
+⏱️ Délai screener: 60s
+```
+
+#### `/upgrade`
+Affiche les plans disponibles avec leurs avantages.
+
+**Exemple**:
+```
+⬆️ Upgrade ton abonnement
+
+💎 Plan PRO - 49$/mois
+✅ 50 signaux par jour
+✅ Suis jusqu'à 5 traders vérifiés
+✅ Screener temps réel (60s)
+
+🚀 Plan ULTRA - 99$/mois
+✅ Signaux illimités
+✅ Suis tous les traders
+✅ Screener ultra-rapide (5s)
+
+👉 https://mycryptopilot.com/pricing
+```
+
+#### `/link`
+Permet de lier le compte Discord à MyCryptoPilot.
+
+#### `/portfolio`
+Affiche le portfolio et les exchanges connectés.
+
+### Commandes Admin (Restricted)
+
+Seuls les utilisateurs avec le rôle **Admin** peuvent utiliser ces commandes.
+
+#### `/deploy-commands`
+Force la republication des slash commands sur Discord.
+
+#### `/create-roles`
+Crée les 3 rôles Free/Pro/Ultra s'ils n'existent pas.
+
+#### `/sync-roles`
+Synchronise tous les rôles Discord avec les plans DB.
+
+#### `/test-signal <traderId>`
+Envoie un signal de test dans le channel Discord.
+
+#### `/stats`
+Affiche les statistiques du serveur (membres, signaux, etc.).
+
+#### `/purge <count>`
+Supprime les N derniers messages du channel (modération).
+
+---
+
+## Permissions Détaillées par Rôle
+
+### 🆓 Free Member (Niveau 0)
+
+**Permissions de base**:
+- ✅ Voir les channels publics
+- ✅ Envoyer des messages
+- ✅ Lire l'historique
+- ✅ Utiliser les commandes bot
+
+**Limitations**:
+- ❌ 5 signaux/jour max
+- ❌ Suivre 1 seul trader
+- ❌ Pas d'accès channels premium
+- ❌ Pas de notifications DM
+
+---
+
+### 💎 Pro Trader (Niveau 1)
+
+**Hérite de Free Member +**:
+- ✅ Emojis externes
+- ✅ Attacher fichiers
+- ✅ Intégrer liens (preview)
+- ✅ Ajouter réactions
+- ✅ Accès channel `#pro-signals`
+- ✅ **50 signaux/jour**
+- ✅ Suivre **jusqu'à 5 traders**
+- ✅ **Notifications DM** pour signaux
+
+---
+
+### 🚀 Ultra Trader (Niveau 2)
+
+**Hérite de Pro + Free +**:
+- ✅ Créer threads privés
+- ✅ Accès channels `#ultra-lounge` et `#strategy-talks`
+- ✅ **Signaux illimités**
+- ✅ Suivre **tous les traders**
+- ✅ **Notifications DM prioritaires**
+- ✅ Badge "Ultra" sur profil
+- ✅ Accès anticipé nouvelles features
+
+**Principe d'héritage**: Chaque rôle supérieur hérite automatiquement des permissions du rôle inférieur.
+
+---
+
+### Channels Structure
+
+**Channels Publics** (tous les rôles):
+- `#general` - Discussion générale
+- `#announcements` - Annonces officielles
+- `#signals` - Signaux publics (lecture seule pour Free)
+
+**Channels Pro** (`@Pro Trader` requis):
+- `#pro-signals` - Signaux détaillés pour Pro
+- `#support-pro` - Support dédié Pro
+
+**Channels Ultra** (`@Ultra Trader` requis):
+- `#ultra-lounge` - Salon privé Ultra
+- `#strategy-talks` - Discussions stratégies avancées
+- `#alpha-features` - Preview nouvelles features
+
+---
+
+### Assignation Automatique des Rôles
+
+Les rôles sont assignés automatiquement dans 3 cas:
+
+1. **Connexion Discord OAuth**: Le `discordId` est lié et le rôle assigné immédiatement
+2. **Mise à jour du plan**: Achat Pro/Ultra → nouveau rôle assigné + notification DM
+3. **Expiration du plan**: Cron job rétrograde automatiquement le rôle à Free
+
+---
+
 ## 🚨 Troubleshooting
 
 ### Problème: Bot ne peut pas assigner de rôles

@@ -1499,11 +1499,205 @@ Features:
 
 ---
 
+## Annexe: Trading Cards - Référence Rapide
+
+### Exemples Complets
+
+**Long BTC (Risk 2, PERP)**:
+```json
+{
+  "instrumentType": "PERP",
+  "bias": "LONG",
+  "entry": 50000,
+  "invalidation": 48000,
+  "tps": [52000, 54000, 56000],
+  "leverageBand": "1-5x",
+  "risk": 2,
+  "confidence": 75,
+  "rationales": [
+    "Strong support at 48k confirmed by volume profile",
+    "Bullish divergence on 4H RSI",
+    "Funding rate turning positive"
+  ],
+  "regime": "Bull",
+  "managedBy": "HUMAN",
+  "version": "1.0"
+}
+```
+
+**Métriques**: Risk distance 4%, Average reward 8%, R/R ratio 2:1
+
+**Short ETH (Risk 4, PERP)**:
+```json
+{
+  "instrumentType": "PERP",
+  "bias": "SHORT",
+  "entry": 3000,
+  "invalidation": 3150,
+  "tps": [2850, 2700],
+  "leverageBand": "1-3x",
+  "risk": 4,
+  "confidence": 60,
+  "rationales": [
+    "Resistance at 3150 held 3 times",
+    "Bearish engulfing candle on daily",
+    "High funding rate indicates overleveraged longs"
+  ],
+  "regime": "Bear",
+  "managedBy": "AI",
+  "version": "1.0"
+}
+```
+
+**Métriques**: Risk distance 5%, Average reward 8.3%, R/R ratio 1.66:1
+
+### Règles de Validation
+
+**Cohérence Prix**:
+- **LONG**: `invalidation < entry < tous les TPs`
+- **SHORT**: `invalidation > entry > tous les TPs`
+
+**Risk Levels**:
+| Level | Description | Use Case |
+|-------|-------------|----------|
+| 1 | Très faible | Setup haute probabilité, stop large |
+| 2 | Faible | Setup confirmé, bonne RR |
+| 3 | Moyen | Setup standard |
+| 4 | Élevé | Setup spéculatif |
+| 5 | Extrême | High risk/high reward |
+
+**Limitations**:
+- Take Profits: 1-5 niveaux max
+- Rationales: 1-5 justifications max
+- Confidence: 0-100%
+- Risk: 1-5
+
+**Warnings automatiques**:
+- Low R/R (< 1.5): Trade peu favorable
+- High Risk Distance (> 10%): Stop très éloigné
+- Tight Stop (< 1%): Risque stop-out prématuré
+
+### Calculs Position Sizing
+
+**Formules**:
+```typescript
+Risk Amount = Account Size × (Risk % / 100)
+Risk Distance % = abs(Entry - Invalidation) / Entry
+Position Size = Risk Amount / (Risk Distance % / 100)
+Position Units = Position Size / Entry Price
+Collateral (with leverage) = Position Size / Leverage
+```
+
+**Exemple**:
+- Account: 10,000 USD
+- Risk: 2%
+- Entry: 50,000
+- Invalidation: 48,000
+
+**Calcul**:
+1. Risk Amount = 10,000 × 0.02 = **200 USD**
+2. Risk Distance = (50,000 - 48,000) / 50,000 = **4%**
+3. Position Size = 200 / 0.04 = **5,000 USD**
+4. Position Units = 5,000 / 50,000 = **0.1 BTC**
+5. Avec 5x leverage: 5,000 / 5 = **1,000 USD collateral**
+
+### Suggestions Levier
+
+**Par Liquidité Token**:
+| Catégorie | Tokens | Max Leverage |
+|-----------|--------|--------------|
+| High | BTC, ETH | 10-20x |
+| Medium | SOL, BNB, XRP, ADA, AVAX, MATIC, DOT, LINK | 5-10x |
+| Low | Autres altcoins | 2-5x |
+
+**Ajustements**:
+- Risk 1-2: Levier max conservé
+- Risk 3: Réduction -15%
+- Risk 4: Réduction -30%
+- Risk 5: Réduction -45%
+
+**Stop Distance**:
+- < 2%: Réduction -50% (éviter liquidations)
+- < 4%: Réduction -25%
+- ≥ 4%: Aucune réduction
+
+**Levier Optimal**: 50% du Max Leverage (conservateur)
+
+### Code Utils
+
+**Import**:
+```typescript
+import {
+  calculatePositionSize,
+  suggestLeverage,
+  validateTradingCard,
+} from "@/features/signal/trading-card-utils";
+```
+
+**Calcul Position**:
+```typescript
+const result = calculatePositionSize({
+  accountSize: 10000,
+  riskPercentage: 2,
+  entryPrice: 50000,
+  invalidationPrice: 48000,
+  bias: "LONG",
+  leverage: 5,
+});
+// Returns: riskAmount, riskPercentageDistance, positionSizeUSD, etc.
+```
+
+**Suggestion Levier**:
+```typescript
+const suggestion = suggestLeverage({
+  symbol: "BTC-USDT",
+  cardRiskLevel: 3,
+  instrumentType: "PERP",
+  riskDistancePercentage: 4,
+});
+// Returns: minLeverage, maxLeverage, optimalLeverage, reason, riskLevel
+```
+
+### Best Practices
+
+**Pour Traders**:
+1. Fournir 2-3 rationales minimum claires
+2. Viser Risk/Reward ≥ 1.5 (idéalement 2:1+)
+3. Adapter leverage au risk level
+4. TTL réaliste (day trading: 6-12h, swing: 24-72h)
+5. Préférer 2-3 TPs pour scaling out
+
+**Pour Followers**:
+1. Calculer position size AVANT d'enter
+2. Respecter le stop loss (invalidation)
+3. Ne pas over-leverage (utiliser optimal, pas max)
+4. Scale out progressivement sur TPs
+5. Éviter signaux proches expiration
+
+### TTL & Hash
+
+**Time-To-Live**:
+- Minimum: 1 heure (3600s)
+- Maximum: 7 jours (604800s)
+- Défaut: 24 heures (86400s)
+
+**Hash SHA256**:
+```typescript
+Hash = SHA256(traderId + symbol + JSON.stringify(payload) + createdAt)
+```
+
+Utilisé pour:
+- Empêcher doublons
+- Vérifier intégrité
+- Futur: blockchain timestamping
+
+---
+
 ## Prochaines Étapes
 
 - [x] Plan user récupération depuis DB implémentée (follow.action.ts lignes 19-28) - **DONE**
-- [ ] Feed signaux avec filtres (asset, bias, status) - **1-2j**
-- [ ] Pagination + infinite scroll pour feeds - **1j**
+- [x] Feed signaux avec filtres (12 paramètres) - **DONE** (PR #40)
+- [x] Pagination cursor-based + URL state - **DONE** (PR #40)
 - [ ] Real-time signal updates (webhooks ou polling) - **2-3j**
 - [ ] Signal analytics (performance tracking) - **Phase 5**
 - [ ] Trading Journal integration - **Phase 5**
