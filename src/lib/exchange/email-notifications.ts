@@ -115,7 +115,7 @@ export async function sendSyncFailureNotification(
       to: user.email,
       subject: `⚠️ Échec de synchronisation ${exchange}`,
       html: ExchangeSyncFailureEmail({
-        userName: user.name ?? "Trader",
+        userName: user.name,
         exchange,
         errorMessage,
         lastSuccessfulSync,
