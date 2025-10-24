@@ -19,7 +19,12 @@ export const generateMetadata = combineWithParentMetadata({
   description: "View your crypto payment history.",
 });
 
-export default async function PaymentHistoryPage() {
+export default async function PaymentHistoryPage({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
   const user = await getRequiredUser();
 
   // Get all crypto payments for this user
@@ -48,7 +53,7 @@ export default async function PaymentHistoryPage() {
               No payments yet. Your payment history will appear here.
             </p>
             <Button asChild>
-              <a href={`/orgs/${user.id}/pricing`}>View Plans</a>
+              <a href={`/orgs/${orgSlug}/pricing`}>View Plans</a>
             </Button>
           </CardContent>
         </Card>
@@ -161,7 +166,7 @@ export default async function PaymentHistoryPage() {
                         <p className="text-center text-sm">
                           ✅ Test payment confirmed! You can now{" "}
                           <a
-                            href={`/orgs/${user.id}/pricing`}
+                            href={`/orgs/${orgSlug}/pricing`}
                             className="text-primary font-semibold underline"
                           >
                             subscribe to a full plan

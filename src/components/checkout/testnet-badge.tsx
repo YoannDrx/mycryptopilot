@@ -1,8 +1,11 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { env } from "@/lib/env";
 import { AlertTriangle } from "lucide-react";
+
+type TestnetBadgeProps = {
+  isTestnet?: boolean;
+};
 
 /**
  * TestnetBadge Component
@@ -10,11 +13,9 @@ import { AlertTriangle } from "lucide-react";
  * Displays a warning badge when the app is running in testnet mode.
  * Shows "TESTNET" badge with orange warning color.
  *
- * Only visible when CRYPTO_NETWORK=testnet in environment variables.
+ * Only visible when isTestnet prop is true.
  */
-export function TestnetBadge() {
-  const isTestnet = env.CRYPTO_NETWORK === "testnet";
-
+export function TestnetBadge({ isTestnet = false }: TestnetBadgeProps) {
   if (!isTestnet) {
     return null;
   }

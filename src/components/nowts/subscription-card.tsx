@@ -10,6 +10,7 @@ import {
 } from "@/lib/crypto/mycryptopilot-plans";
 import { Calendar, Crown, Zap } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export type SubscriptionCardProps = {
   plan: MyCryptoPilotPlanName;
@@ -24,6 +25,8 @@ export const SubscriptionCard = ({
   showUpgradeButton = true,
   className,
 }: SubscriptionCardProps) => {
+  const params = useParams();
+  const orgSlug = params.orgSlug as string;
   const planData = MYCRYPTOPILOT_PLANS.find((p) => p.name === plan);
 
   if (!planData) {
@@ -174,11 +177,7 @@ export const SubscriptionCard = ({
         {showUpgradeButton && !isUltra && (
           <div className="pt-2">
             {isExpired || isFreePlan ? (
-              <Link
-                href="/orgs/[orgSlug]/pricing"
-                as="/pricing"
-                className="w-full"
-              >
+              <Link href={`/orgs/${orgSlug}/pricing`} className="w-full">
                 <Button
                   className="w-full"
                   variant={isExpired ? "default" : "outline"}
@@ -187,11 +186,7 @@ export const SubscriptionCard = ({
                 </Button>
               </Link>
             ) : isExpiringSoon ? (
-              <Link
-                href="/orgs/[orgSlug]/pricing"
-                as="/pricing"
-                className="w-full"
-              >
+              <Link href={`/orgs/${orgSlug}/pricing`} className="w-full">
                 <Button className="w-full" variant="outline">
                   Extend Subscription
                 </Button>

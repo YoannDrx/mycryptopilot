@@ -26,10 +26,10 @@ export const UpgradeCard = () => {
       </CardHeader>
       <CardContent className="">
         <Link
-          href={`/orgs/${org.slug}/settings/billing`}
+          href={`/orgs/${org.slug}/pricing`}
           className={buttonVariants({ className: "w-full" })}
         >
-          Upgrade
+          View Plans
         </Link>
       </CardContent>
     </Card>

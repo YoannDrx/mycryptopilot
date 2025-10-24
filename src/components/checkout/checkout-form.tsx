@@ -42,13 +42,13 @@ import {
 import { upfetch } from "@/lib/up-fetch";
 import { logger } from "@/lib/logger";
 import { TestnetBadge } from "./testnet-badge";
-import { env } from "@/lib/env";
 import { SiteConfig } from "@/site-config";
 import { TestPaymentSuccessDialog } from "./test-payment-success-dialog";
 
 type CheckoutFormProps = {
   plan: MyCryptoPilotPlanName;
   orgSlug: string;
+  isTestnet?: boolean;
 };
 
 type GeneratedAddresses = {
@@ -66,7 +66,11 @@ type GeneratedAddresses = {
 
 type PaymentStatus = "pending" | "confirmed" | "expired";
 
-export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
+export const CheckoutForm = ({
+  plan,
+  orgSlug,
+  isTestnet = false,
+}: CheckoutFormProps) => {
   const router = useRouter();
   const planData = MYCRYPTOPILOT_PLANS.find((p) => p.name === plan);
 
@@ -226,7 +230,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
           <h1 className="text-3xl font-bold">
             Complete Your Payment - {planData.name} Plan
           </h1>
-          <TestnetBadge />
+          <TestnetBadge isTestnet={isTestnet} />
         </div>
         <p className="text-muted-foreground">
           Send ${planData.priceUSD} in USDC (Base) or USDT (Tron) to one of the
@@ -283,7 +287,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="size-5 text-blue-500" />
-                {env.CRYPTO_NETWORK === "testnet"
+                {isTestnet
                   ? SiteConfig.crypto.testnet.base.name
                   : SiteConfig.crypto.networks.base.name}{" "}
                 (USDC)
@@ -337,14 +341,11 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               {/* Explorer Link */}
               <Button variant="link" size="sm" asChild className="self-start">
                 <a
-                  href={`${env.CRYPTO_NETWORK === "testnet" ? SiteConfig.crypto.testnet.base.explorerUrl : SiteConfig.crypto.networks.base.explorerUrl}/address/${addresses.base.address}`}
+                  href={`${isTestnet ? SiteConfig.crypto.testnet.base.explorerUrl : SiteConfig.crypto.networks.base.explorerUrl}/address/${addresses.base.address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View on{" "}
-                  {env.CRYPTO_NETWORK === "testnet"
-                    ? "Sepolia BaseScan"
-                    : "BaseScan"}{" "}
+                  View on {isTestnet ? "Sepolia BaseScan" : "BaseScan"}{" "}
                   <ExternalLink className="ml-1 size-3" />
                 </a>
               </Button>
@@ -358,7 +359,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="size-5 text-red-500" />
-                {env.CRYPTO_NETWORK === "testnet"
+                {isTestnet
                   ? SiteConfig.crypto.testnet.tron.name
                   : SiteConfig.crypto.networks.tron.name}{" "}
                 (USDT)
@@ -413,14 +414,11 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               {/* Explorer Link */}
               <Button variant="link" size="sm" asChild className="self-start">
                 <a
-                  href={`${env.CRYPTO_NETWORK === "testnet" ? SiteConfig.crypto.testnet.tron.explorerUrl : SiteConfig.crypto.networks.tron.explorerUrl}/#/address/${addresses.tron.address}`}
+                  href={`${isTestnet ? SiteConfig.crypto.testnet.tron.explorerUrl : SiteConfig.crypto.networks.tron.explorerUrl}/#/address/${addresses.tron.address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View on{" "}
-                  {env.CRYPTO_NETWORK === "testnet"
-                    ? "Shasta TronScan"
-                    : "TronScan"}{" "}
+                  View on {isTestnet ? "Shasta TronScan" : "TronScan"}{" "}
                   <ExternalLink className="ml-1 size-3" />
                 </a>
               </Button>
