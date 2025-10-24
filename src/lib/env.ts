@@ -34,6 +34,7 @@ type TestEnv = {
   TRON_RPC_URL?: string;
   BASE_RPC_URL_TESTNET?: string;
   TRON_RPC_URL_TESTNET?: string;
+  TRON_API_KEY?: string;
   CRYPTO_XPUB_BASE?: string;
   CRYPTO_XPUB_TRON?: string;
   // Binance sweep wallets
@@ -116,6 +117,8 @@ function createProductionEnv() {
       TRON_RPC_URL: z.string().url().optional(),
       BASE_RPC_URL_TESTNET: z.string().url().optional(),
       TRON_RPC_URL_TESTNET: z.string().url().optional(),
+      // TronGrid API key (optional, improves rate limits)
+      TRON_API_KEY: z.string().optional(),
       // HD Wallet XPUBs (use different values in .env vs .env.local)
       CRYPTO_XPUB_BASE: z.string().optional(),
       CRYPTO_XPUB_TRON: z.string().optional(),
