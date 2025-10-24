@@ -4,7 +4,6 @@ import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
 import { Contract, JsonRpcProvider } from "ethers";
-import TronWeb from "tronweb";
 import { calculateDaysGranted, getPlanFromAmount } from "./mycryptopilot-plans";
 import { activateSubscription } from "@/lib/subscription/subscription-manager";
 import { sendEmail } from "@/lib/mail/send-email";
@@ -211,9 +210,32 @@ async function checkTronAddress(address: string): Promise<PaymentDetection[]> {
   }
 
   try {
+    // Use require for TronWeb to avoid Turbopack ESM issues
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const TronWebModule = require("tronweb");
+
+    // Debug: log what we got
+    logger.info("TronWeb module loaded", {
+      hasDefault: !!TronWebModule.default,
+      isFunction: typeof TronWebModule === "function",
+      isDefaultFunction: typeof TronWebModule.default === "function",
+      defaultKeys: TronWebModule.default
+        ? Object.keys(TronWebModule.default).slice(0, 10)
+        : [],
+      keys: Object.keys(TronWebModule).slice(0, 10),
+    });
+
+    // Try to get the right constructor - check if default.TronWeb exists
+    const TronWeb =
+      TronWebModule.default?.TronWeb ??
+      TronWebModule.TronWeb ??
+      TronWebModule.default ??
+      TronWebModule;
+
     // Connect to Tron network (mainnet or testnet)
-    // @ts-expect-error - TronWeb types are incorrect, constructor accepts string
-    const tronWeb = new TronWeb(rpcUrl);
+    const tronWeb = new TronWeb({
+      fullHost: rpcUrl,
+    });
 
     // USDT TRC-20 contract on Tron (mainnet or testnet)
     const networkConfig = getNetworkConfig("TRON");
