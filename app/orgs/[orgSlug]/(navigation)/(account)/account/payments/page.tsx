@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { SiteConfig } from "@/site-config";
 import { ExternalLink } from "lucide-react";
 import { format } from "date-fns";
+import { env } from "@/lib/env";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Payment History",
@@ -60,10 +61,17 @@ export default async function PaymentHistoryPage({
       ) : (
         <div className="space-y-4">
           {payments.map((payment) => {
+            const isTestnet = env.CRYPTO_NETWORK === "testnet";
+
+            // Use testnet or mainnet config based on environment
             const networkConfig =
               payment.network === "BASE"
-                ? SiteConfig.crypto.networks.base
-                : SiteConfig.crypto.networks.tron;
+                ? isTestnet
+                  ? SiteConfig.crypto.testnet.base
+                  : SiteConfig.crypto.networks.base
+                : isTestnet
+                  ? SiteConfig.crypto.testnet.tron
+                  : SiteConfig.crypto.networks.tron;
 
             const explorerUrl =
               payment.network === "BASE"
