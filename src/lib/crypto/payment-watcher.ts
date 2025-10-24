@@ -214,18 +214,7 @@ async function checkTronAddress(address: string): Promise<PaymentDetection[]> {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const TronWebModule = require("tronweb");
 
-    // Debug: log what we got
-    logger.info("TronWeb module loaded", {
-      hasDefault: !!TronWebModule.default,
-      isFunction: typeof TronWebModule === "function",
-      isDefaultFunction: typeof TronWebModule.default === "function",
-      defaultKeys: TronWebModule.default
-        ? Object.keys(TronWebModule.default).slice(0, 10)
-        : [],
-      keys: Object.keys(TronWebModule).slice(0, 10),
-    });
-
-    // Try to get the right constructor - check if default.TronWeb exists
+    // Get the right constructor - Turbopack requires accessing default.TronWeb
     const TronWeb =
       TronWebModule.default?.TronWeb ??
       TronWebModule.TronWeb ??
@@ -245,15 +234,42 @@ async function checkTronAddress(address: string): Promise<PaymentDetection[]> {
     const currentBlock = await tronWeb.trx.getCurrentBlock();
     const currentBlockNumber = currentBlock.block_header.raw_data.number;
 
-    // Query transactions to this address
-    // TronGrid API: get transactions related to this address
-    // Note: TronGrid has specific endpoints for TRC-20 transfers
-    const transactions = await tronWeb.trx.getTransactionsRelated(
-      address,
-      "all",
-      30, // limit to last 30 transactions
-      0, // offset
+    // Use TronGrid API directly for TRC-20 transfers (getTransactionsRelated is deprecated)
+    const isTestnet = env.CRYPTO_NETWORK === "testnet";
+    const tronGridUrl = isTestnet
+      ? "https://api.shasta.trongrid.io"
+      : "https://api.trongrid.io";
+
+    const response = await fetch(
+      `${tronGridUrl}/v1/accounts/${address}/transactions/trc20?limit=30`,
+      {
+        headers: {
+          "TRON-PRO-API-KEY": env.TRON_API_KEY ?? "",
+        },
+      },
     );
+
+    if (!response.ok) {
+      logger.warn("TronGrid API request failed", {
+        status: response.status,
+        statusText: response.statusText,
+      });
+      return [];
+    }
+
+    const data = (await response.json()) as {
+      data?: {
+        transaction_id: string;
+        token_info: { address: string; decimals: number };
+        from: string;
+        to: string;
+        type: string;
+        value: string;
+        block_timestamp: number;
+      }[];
+    };
+
+    const transactions = data.data ?? [];
 
     logger.info("Tron RPC check completed", {
       address,
@@ -263,86 +279,40 @@ async function checkTronAddress(address: string): Promise<PaymentDetection[]> {
 
     // Filter for USDT transfers to this address
     // Process all transactions in parallel to avoid await-in-loop
-    const paymentPromises = transactions.map(async (tx: unknown) => {
+    const paymentPromises = transactions.map(async (tx) => {
       try {
-        // Type guard for transaction structure
-        if (
-          !tx ||
-          typeof tx !== "object" ||
-          !("raw_data" in tx) ||
-          !("txID" in tx)
-        ) {
+        // Check if this is a transfer TO our address (not FROM)
+        if (tx.to.toLowerCase() !== address.toLowerCase()) {
           return null;
         }
 
-        const txData = tx as {
-          txID: string;
-          raw_data?: {
-            contract?: {
-              type?: string;
-              parameter?: {
-                value?: { contract_address?: string; data?: string };
-              };
-            }[];
-          };
-        };
-
-        // Check if this is a TRC-20 transfer to our address
-        if (txData.raw_data?.contract?.[0]?.type === "TriggerSmartContract") {
-          const contract = txData.raw_data.contract[0];
-          const parameter = contract.parameter?.value;
-
-          if (!parameter) {
-            return null;
-          }
-
-          // Check if it's the USDT contract
-          if (
-            parameter.contract_address &&
-            tronWeb.address.fromHex(parameter.contract_address) === usdtAddress
-          ) {
-            // Decode the data to get transfer details
-            // TRC-20 transfer data format: transfer(address,uint256)
-            const data = parameter.data;
-
-            if (data?.startsWith("a9059cbb")) {
-              // transfer() function signature
-              // Extract recipient address (next 64 chars) and amount (last 64 chars)
-              const recipient = `41${data.substring(32, 72)}`; // Add Tron prefix
-              const recipientAddress = tronWeb.address.fromHex(recipient);
-
-              if (recipientAddress === address) {
-                // This is a transfer to our address
-                const amountHex = data.substring(72);
-                const amountToken = parseInt(amountHex, 16) / 1e6; // USDT has 6 decimals
-
-                // Get transaction info for confirmations
-                const txInfo = await tronWeb.trx.getTransactionInfo(
-                  txData.txID,
-                );
-                const txBlockNumber = txInfo.blockNumber;
-                const confirmations = currentBlockNumber - txBlockNumber;
-
-                return {
-                  txHash: txData.txID,
-                  network: "TRON" as CryptoNetwork,
-                  address,
-                  amountToken,
-                  amountUSD: amountToken, // Assume 1 USDT = 1 USD
-                  currency: "USDT",
-                  confirmations,
-                  timestamp: new Date(txInfo.blockTimeStamp),
-                };
-              }
-            }
-          }
+        // Check if it's the USDT contract
+        if (tx.token_info.address.toLowerCase() !== usdtAddress.toLowerCase()) {
+          return null;
         }
+
+        // Parse amount (value is in token's smallest unit)
+        const decimals = tx.token_info.decimals;
+        const amountToken = parseInt(tx.value, 10) / Math.pow(10, decimals);
+
+        // Get transaction info for confirmations
+        const txInfo = await tronWeb.trx.getTransactionInfo(tx.transaction_id);
+        const txBlockNumber = txInfo.blockNumber;
+        const confirmations = currentBlockNumber - txBlockNumber;
+
+        return {
+          txHash: tx.transaction_id,
+          network: "TRON" as CryptoNetwork,
+          address,
+          amountToken,
+          amountUSD: amountToken, // Assume 1 USDT = 1 USD
+          currency: "USDT",
+          confirmations,
+          timestamp: new Date(txInfo.blockTimeStamp),
+        };
       } catch (txError) {
         logger.error("Error processing Tron transaction", {
-          txId:
-            typeof tx === "object" && tx && "txID" in tx
-              ? (tx as { txID: string }).txID
-              : "unknown",
+          txId: tx.transaction_id,
           error: txError,
         });
       }
