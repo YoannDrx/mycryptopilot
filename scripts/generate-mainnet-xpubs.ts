@@ -61,8 +61,8 @@ async function main() {
   // Dériver le wallet avec le path BIP-44 Ethereum: m/44'/60'/0'/0
   const baseWallet = HDNodeWallet.fromMnemonic(baseMnemonic, "m/44'/60'/0'/0");
 
-  // Extraire l'extended public key (xpub)
-  const baseXpub = baseWallet.extendedKey;
+  // Extraire l'extended public key (xpub) - .neuter() retire les clés privées!
+  const baseXpub = baseWallet.neuter().extendedKey; // ← CRITICAL: .neuter() = xpub uniquement!
 
   // Générer quelques adresses d'exemple pour vérification
   const baseAddresses = [
