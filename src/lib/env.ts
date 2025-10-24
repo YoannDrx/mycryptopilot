@@ -109,9 +109,12 @@ function createProductionEnv() {
         .default("development"),
       // Crypto payment configuration
       CRYPTO_NETWORK: z
-        .enum(["mainnet", "testnet"])
+        .string()
         .optional()
-        .default("testnet"),
+        .default("testnet")
+        .transform((val: string) =>
+          val === "mainnet" ? "mainnet" : ("testnet" as "mainnet" | "testnet"),
+        ),
       // RPC URLs (mainnet and testnet)
       BASE_RPC_URL: z.string().url().optional(),
       TRON_RPC_URL: z.string().url().optional(),
