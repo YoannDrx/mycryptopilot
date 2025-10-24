@@ -1,26 +1,30 @@
 ---
-description: Vérifie intelligemment la synchronisation des variables d'environnement entre local (.env) et distant (Vercel + GitHub Actions + Railway)
+description: Synchronise automatiquement les variables d'environnement entre local (.env) et distant (Vercel + GitHub Actions + Railway)
 ---
 
 # 🔄 Sync Environment Variables
 
-Cette commande vérifie la synchronisation des variables d'environnement et génère un rapport détaillé avec actions recommandées.
+Cette commande **synchronise automatiquement** les variables d'environnement locales vers les plateformes distantes (Vercel, GitHub Actions, Railway).
 
-**Durée estimée**: 2-3 minutes
+**Durée estimée**: 3-5 minutes (incluant l'exécution automatique)
+
+**Mode**: Synchronisation automatique avec confirmation
 
 ---
 
 ## Instructions
 
-Tu vas analyser les variables d'environnement locales et distantes, puis générer un rapport complet avec recommandations de synchronisation.
+Tu vas analyser les variables d'environnement locales et distantes, identifier les différences, puis **synchroniser automatiquement** les variables manquantes.
 
 ### 🎯 Objectifs
 
-1. **Parser les fichiers .env locaux**
+1. **Parser les fichiers .env locaux** (avec valeurs pour synchronisation)
 2. **Lister les variables distantes** (Vercel PROD + PREVIEW + GitHub Actions + Railway)
 3. **Mapper intelligemment** les variables selon leur destination
-4. **Comparer et identifier les différences**
-5. **Générer un rapport actionnable**
+4. **Identifier les différences** et générer le plan de synchronisation
+5. **Demander confirmation** à l'utilisateur avant de procéder
+6. **Exécuter automatiquement** les commandes de synchronisation
+7. **Générer un rapport final** avec résultats de la synchronisation
 
 ---
 
@@ -650,30 +654,167 @@ _Généré par `/sync-env` le <DATE>_
 
 ---
 
+## Étape 5: Synchronisation Automatique
+
+**IMPORTANT**: Cette étape exécute automatiquement les commandes pour synchroniser les variables.
+
+### A. Générer le Plan de Synchronisation
+
+Pour chaque variable manquante, générer la commande appropriée:
+
+#### Vercel (via CLI avec stdin)
+
+```bash
+# Format pour ajouter une variable Vercel avec stdin:
+echo "VALUE_HERE" | vercel env add VAR_NAME production
+
+# Exemple:
+echo "xpub6Ejw21u9tffx..." | vercel env add CRYPTO_XPUB_BASE production
+```
+
+**Variables à synchroniser sur Vercel PROD**:
+- Toutes les variables de `.env` selon mapping (section E3)
+- Utiliser `production` comme environnement
+
+**Variables à synchroniser sur Vercel PREVIEW**:
+- Toutes les variables de `.env.local` selon mapping (section E3)
+- Utiliser `preview` comme environnement
+
+**Variables COMMUNES (PROD + PREVIEW)**:
+- Ajouter 2 fois (une fois avec `production`, une fois avec `preview`)
+
+#### GitHub Actions (via gh CLI avec stdin)
+
+```bash
+# Format pour ajouter un secret GitHub:
+echo "VALUE_HERE" | gh secret set VAR_NAME -R YoannDrx/mycryptopilot
+
+# Exemple:
+echo "postgresql://..." | gh secret set DATABASE_URL -R YoannDrx/mycryptopilot
+```
+
+**Variables à synchroniser sur GitHub Actions**:
+- Variables de `.env.test` nécessaires pour CI
+- Voir mapping section E3-D
+
+#### Railway (limitation CLI)
+
+⚠️ **Railway CLI ne permet PAS d'ajouter des variables automatiquement**.
+
+Pour Railway, générer uniquement des **instructions manuelles** avec:
+- Nom de la variable
+- Valeur à copier-coller
+- Lien direct vers dashboard
+
+### B. Demander Confirmation à l'Utilisateur
+
+Avant d'exécuter les commandes, afficher:
+
+```markdown
+## 🚀 Plan de Synchronisation
+
+**Variables à ajouter**:
+- Vercel Production: <N> variables
+- Vercel Preview: <N> variables
+- GitHub Actions: <N> secrets
+- Railway: <N> variables (manuel)
+
+**⚠️ ATTENTION**:
+- Les valeurs seront ajoutées automatiquement depuis les fichiers .env locaux
+- Vercel et GitHub Actions seront mis à jour via CLI
+- Railway nécessite une configuration manuelle (limitation CLI)
+
+**Voulez-vous procéder à la synchronisation automatique?**
+```
+
+**Attendre la réponse de l'utilisateur** avec `AskUserQuestion`:
+- Option 1: "Oui, synchroniser maintenant" → Continuer
+- Option 2: "Non, seulement afficher le rapport" → Skip sync, afficher rapport
+- Option 3: "Annuler" → Arrêter la commande
+
+### C. Exécuter la Synchronisation
+
+Si l'utilisateur confirme:
+
+1. **Vercel Production**:
+   - Pour chaque variable manquante:
+     - Parser `.env` pour extraire la valeur
+     - Exécuter: `echo "value" | vercel env add VAR_NAME production`
+     - Logger: "✅ Ajouté VAR_NAME à Vercel PROD" ou "❌ Erreur: ..."
+
+2. **Vercel Preview**:
+   - Pour chaque variable manquante:
+     - Parser `.env.local` pour extraire la valeur
+     - Exécuter: `echo "value" | vercel env add VAR_NAME preview`
+     - Logger: "✅ Ajouté VAR_NAME à Vercel PREVIEW" ou "❌ Erreur: ..."
+
+3. **GitHub Actions**:
+   - Pour chaque secret manquant:
+     - Parser `.env.test` pour extraire la valeur
+     - Exécuter: `echo "value" | gh secret set VAR_NAME -R YoannDrx/mycryptopilot`
+     - Logger: "✅ Ajouté VAR_NAME à GitHub Actions" ou "❌ Erreur: ..."
+
+4. **Railway** (manuel):
+   - Générer instructions détaillées avec valeurs à copier-coller
+   - Afficher le lien direct: https://railway.app/project/<id>/service/<id>/variables
+
+### D. Gestion des Erreurs
+
+Pour chaque commande exécutée:
+- ✅ **Succès**: Logger et continuer
+- ❌ **Échec**: Logger l'erreur, demander si continuer ou arrêter
+- ⚠️ **Warning**: Variable existe déjà → Skip ou demander confirmation pour override
+
+### E. Rapport Final
+
+Après synchronisation, afficher:
+
+```markdown
+## ✅ Synchronisation Terminée!
+
+**Résultats**:
+- Vercel Production: <N> variables ajoutées (✅ <success> / ❌ <failed>)
+- Vercel Preview: <N> variables ajoutées (✅ <success> / ❌ <failed>)
+- GitHub Actions: <N> secrets ajoutés (✅ <success> / ❌ <failed>)
+- Railway: <N> variables à ajouter manuellement (instructions ci-dessous)
+
+**Variables ajoutées avec succès**:
+- ✅ DATABASE_URL → Vercel PROD
+- ✅ CRYPTO_XPUB_BASE → Vercel PROD
+- ✅ BETTER_AUTH_SECRET → Vercel PROD + PREVIEW
+- ...
+
+**Erreurs rencontrées**:
+- ❌ STRIPE_SECRET_KEY → Vercel PROD (erreur: already exists)
+- ...
+
+**Actions manuelles requises**:
+- Railway: Ajouter 2 variables via dashboard (voir instructions ci-dessous)
+```
+
+---
+
 ## Workflow Exécution
 
 Lorsque l'utilisateur lance `/sync-env`:
 
 1. Afficher: "🔄 Analyse des variables d'environnement..."
-2. Parser fichiers locaux (afficher compteurs)
+2. **Parser fichiers locaux avec VALEURS** (pour synchronisation)
 3. Lister variables Vercel (afficher compteur)
 4. Lister secrets GitHub Actions (afficher compteur)
-5. **Lister variables Railway** (afficher compteur + status linked/not-linked)
-6. Analyser et comparer (afficher progress par catégorie)
-7. **Vérifier variables interdites sur Railway** (critique!)
-8. Générer et afficher le rapport complet
-9. Résumé final: "✅ Analyse terminée! <N> variables analysées, <N> différences détectées"
+5. Lister variables Railway (afficher compteur + status)
+6. **Analyser et identifier différences**
+7. **Générer plan de synchronisation**
+8. **Afficher plan + demander confirmation**
+9. Si confirmé:
+   - **Exécuter synchronisation automatique** (Vercel, GitHub, Railway manuel)
+   - **Afficher progress en temps réel** (✅/❌ pour chaque variable)
+10. **Générer rapport final** avec résultats
+11. Résumé final: "✅ Synchronisation terminée! <N> variables ajoutées, <N> erreurs"
 
-**Durée totale estimée**: 2-3 minutes.
+**Durée totale estimée**: 3-5 minutes (incluant exécution).
 
-**Ordre d'affichage des sections du rapport**:
-1. Résumé Global (tableau avec Vercel, GitHub Actions, Railway)
-2. Variables Bien Synchronisées
-3. Variables Manquantes (Vercel PROD, PREVIEW, GitHub Actions, Railway)
-4. 🚨 **Variables INTERDITES sur Railway** (section critique en priorité!)
-5. Variables En Trop (Orphelines)
-6. Variables Absentes Partout
-7. Détail par Variable
-8. Script de Synchronisation Automatique
-9. Recommandations
-10. Configuration Actuelle Détectée
+**Sécurité**:
+- Ne JAMAIS logger les valeurs complètes des secrets (premiers/derniers 4 chars seulement)
+- Parser les fichiers .env localement (pas de transmission)
+- Utiliser stdin pour passer les valeurs (plus sécurisé que arguments CLI)
