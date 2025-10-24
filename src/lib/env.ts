@@ -134,9 +134,13 @@ function createProductionEnv() {
       DISCORD_BOT_TOKEN: z.string().optional(),
       DISCORD_GUILD_ID: z.string().optional(),
       DISCORD_BOT_ENABLED: z
-        .enum(["true", "false"])
+        .string()
         .optional()
-        .default("false"),
+        .default("false")
+        .transform(
+          (val: string) =>
+            (val === "true" ? "true" : "false") as "true" | "false",
+        ),
       DISCORD_INVITE_URL: z.string().url().optional(),
       // Discord Channels
       DISCORD_FREE_SIGNALS_CHANNEL_ID: z.string().optional(),
