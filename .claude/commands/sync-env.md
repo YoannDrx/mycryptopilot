@@ -1,5 +1,5 @@
 ---
-description: Vérifie intelligemment la synchronisation des variables d'environnement entre local (.env) et distant (Vercel + GitHub Actions)
+description: Vérifie intelligemment la synchronisation des variables d'environnement entre local (.env) et distant (Vercel + GitHub Actions + Railway)
 ---
 
 # 🔄 Sync Environment Variables
@@ -17,7 +17,7 @@ Tu vas analyser les variables d'environnement locales et distantes, puis génér
 ### 🎯 Objectifs
 
 1. **Parser les fichiers .env locaux**
-2. **Lister les variables distantes** (Vercel PROD + PREVIEW + GitHub Actions)
+2. **Lister les variables distantes** (Vercel PROD + PREVIEW + GitHub Actions + Railway)
 3. **Mapper intelligemment** les variables selon leur destination
 4. **Comparer et identifier les différences**
 5. **Générer un rapport actionnable**
@@ -70,6 +70,22 @@ gh secret list -R YoannDrx/mycryptopilot
 ```
 
 **Parser la sortie** pour extraire les noms de secrets.
+
+### Railway
+
+```bash
+# Vérifier que le service Railway est linké
+railway status 2>&1 | grep -q "No Railway project linked" && echo "⚠️ Railway not linked - skipping" || {
+  # Lister toutes les variables Railway (production environment)
+  railway variables --kv
+}
+```
+
+**Parser la sortie** pour extraire:
+- Nom de variable
+- Valeur (pour comparaison - NE PAS logger les valeurs sensibles!)
+
+**Note importante**: Railway variables sont listées en format `KEY=value`. Si Railway n'est pas linké au projet, cette étape sera sautée avec un warning.
 
 ---
 
@@ -202,6 +218,52 @@ DISCORD_BOT_TOKEN (si tests Discord)
 # ... autres selon besoins CI
 ```
 
+#### **E. Variables Railway (Discord Bot uniquement - 15 vars)**
+
+Railway héberge le **Discord Bot standalone** qui nécessite seulement un sous-ensemble de variables.
+
+**Variables REQUISES (15 vars)**:
+
+```
+# Core Database & Auth (4 vars)
+DATABASE_URL                      # Neon production (SAME as Vercel PROD!)
+DATABASE_URL_UNPOOLED             # Direct DB connection (required by Prisma)
+BETTER_AUTH_SECRET                # Auth secret (SAME as Vercel PROD!)
+NODE_ENV=production               # Production mode
+
+# Discord Bot (3 vars)
+DISCORD_BOT_TOKEN                 # Token du bot Discord
+DISCORD_GUILD_ID                  # ID du serveur Discord
+DISCORD_BOT_ENABLED=true          # Active le bot
+
+# Discord Configuration (8 vars)
+DISCORD_INVITE_URL                # Lien d'invitation au serveur
+DISCORD_FREE_SIGNALS_CHANNEL_ID   # Channel signaux gratuits
+DISCORD_LOG_CHANNEL_ID            # Channel logs bot
+DISCORD_ROLE_ADMIN_ID             # Role admin
+DISCORD_FREE_ROLE_ID              # Role plan FREE
+DISCORD_PRO_ROLE_ID               # Role plan PRO
+DISCORD_ULTRA_ROLE_ID             # Role plan ULTRA
+DISCORD_WEBHOOK_SIGNALS_URL       # Webhook pour signaux
+```
+
+**Variables INTERDITES sur Railway (6 vars)**:
+
+⚠️ Ces variables sont utilisées **UNIQUEMENT par l'app web (Vercel)**, **PAS par le Discord Bot**:
+
+```
+❌ BASE_RPC_URL           # RPC calls paiements Base (Vercel only)
+❌ CRON_SECRET            # Authentification cron jobs (Vercel only)
+❌ CRYPTO_NETWORK         # Configuration réseau crypto (Vercel only)
+❌ CRYPTO_XPUB_BASE       # HD wallet XPUB Base (Vercel only)
+❌ CRYPTO_XPUB_TRON       # HD wallet XPUB Tron (Vercel only)
+❌ TRON_RPC_URL           # RPC calls paiements Tron (Vercel only)
+```
+
+**🎯 Objectif Railway**: Garder exactement **15 variables** (pas plus, pas moins).
+
+**Source**: Ces variables sont définies dans `.env` (production) et doivent être identiques à Vercel PROD pour DATABASE_URL et BETTER_AUTH_SECRET.
+
 ---
 
 ## Étape 4: Analyse et Comparaison
@@ -241,11 +303,17 @@ Pour chaque variable distante, vérifier:
 | **Vercel Production** | 45              | 40      | 5         | 0        | 0         |
 | **Vercel Preview**    | 42              | 38      | 4         | 0        | 0         |
 | **GitHub Actions**    | 15              | 10      | 5         | 0        | 0         |
+| **Railway (Bot)**     | 15 (optimal)    | 13      | 2         | 0        | 0         |
 
 **Fichiers Locaux**:
 - `.env` (production): <N> variables
 - `.env.local` (development): <N> variables
 - `.env.test` (tests): <N> variables
+
+**⚠️ Railway Status**:
+- **Objectif**: 15 variables (Discord Bot uniquement)
+- **Actuel**: <N> variables
+- **Variables interdites détectées**: <N> (à supprimer!)
 
 ---
 
@@ -331,6 +399,35 @@ gh secret set BETTER_AUTH_SECRET_TEST -R YoannDrx/mycryptopilot
 # ... etc
 ```
 
+### Railway (Discord Bot)
+
+Variables nécessaires pour le Discord Bot mais absentes de Railway:
+
+| Variable | Source Locale | Valeur (premiers chars) | Action |
+|----------|---------------|-------------------------|--------|
+| `DISCORD_PRO_ROLE_ID` | `.env` line 85 | 142699... | Ajouter à Railway |
+| `DATABASE_URL_UNPOOLED` | `.env` line 27 | postgresql://... | Ajouter à Railway |
+| ... | ... | ... | ... |
+
+**Commandes pour corriger**:
+
+⚠️ **Note**: Railway CLI ne permet pas d'ajouter des variables via CLI. Tu dois utiliser le dashboard.
+
+**Via Dashboard Railway**:
+1. Va sur https://railway.app/dashboard
+2. Sélectionne le projet **MyCryptoPilot**
+3. Sélectionne le service **mycryptopilot**
+4. Va dans l'onglet **Variables**
+5. Clique sur **+ New Variable** pour chaque variable manquante
+6. Copie-colle les valeurs depuis `.env`
+
+**Liste des variables à ajouter**:
+```
+DISCORD_PRO_ROLE_ID = <valeur depuis .env ligne 85>
+DATABASE_URL_UNPOOLED = <valeur depuis .env ligne 27>
+... (etc pour chaque variable)
+```
+
 ---
 
 ## 🚫 Variables En Trop (Orphelines)
@@ -351,6 +448,49 @@ vercel env rm OLD_VARIABLE_NAME production --yes
 # Supprimer DEPRECATED_KEY de GitHub Actions
 gh secret delete DEPRECATED_KEY -R YoannDrx/mycryptopilot
 ```
+
+---
+
+## 🚨 Variables INTERDITES sur Railway (Critique!)
+
+⚠️ **Variables présentes sur Railway mais qui NE DOIVENT PAS y être**:
+
+Railway héberge uniquement le **Discord Bot**, qui n'utilise **AUCUNE variable crypto/payment**.
+
+| Variable | Environnement | Raison | Action Urgente |
+|----------|---------------|--------|----------------|
+| `BASE_RPC_URL` | Railway | Crypto payments (Vercel only) | 🔴 SUPPRIMER |
+| `CRON_SECRET` | Railway | Cron jobs (Vercel only) | 🔴 SUPPRIMER |
+| `CRYPTO_NETWORK` | Railway | Crypto config (Vercel only) | 🔴 SUPPRIMER |
+| `CRYPTO_XPUB_BASE` | Railway | HD wallet (Vercel only) | 🔴 SUPPRIMER |
+| `CRYPTO_XPUB_TRON` | Railway | HD wallet (Vercel only) | 🔴 SUPPRIMER |
+| `TRON_RPC_URL` | Railway | Crypto payments (Vercel only) | 🔴 SUPPRIMER |
+
+**Impact**: Ces variables ne sont **PAS utilisées** par le Discord Bot et polluent l'environnement Railway.
+
+**Commandes pour nettoyer**:
+
+⚠️ **Railway CLI ne permet pas de supprimer des variables**. Tu dois utiliser le dashboard:
+
+1. Va sur https://railway.app/dashboard
+2. Sélectionne le projet **MyCryptoPilot**
+3. Sélectionne le service **mycryptopilot**
+4. Va dans l'onglet **Variables**
+5. Clique sur les 3 points (...) à côté de chaque variable interdite
+6. Clique sur **Delete**
+7. Confirme la suppression
+
+**Variables à supprimer** (6 au total):
+```
+❌ BASE_RPC_URL
+❌ CRON_SECRET
+❌ CRYPTO_NETWORK
+❌ CRYPTO_XPUB_BASE
+❌ CRYPTO_XPUB_TRON
+❌ TRON_RPC_URL
+```
+
+**Objectif**: Railway doit avoir exactement **15 variables** (pas plus!).
 
 ---
 
@@ -422,17 +562,28 @@ Suivre les commandes dans les sections "Commandes pour corriger" ci-dessus, une 
 - ⚠️ Vérifier que `CRYPTO_NETWORK` est bien "mainnet" en PROD et "testnet" en PREVIEW
 - ✅ Les secrets GitHub Actions sont chiffrés - OK
 - ✅ Les variables Vercel sont chiffrées - OK
+- ✅ Les variables Railway sont chiffrées - OK
+
+### Railway (Discord Bot)
+
+- 🚨 **CRITIQUE**: Railway doit avoir **EXACTEMENT 15 variables** (pas plus!)
+- ⛔ **Ne JAMAIS ajouter** de variables crypto (XPUB, RPC_URL, CRYPTO_NETWORK, CRON_SECRET) sur Railway
+- ✅ **Partager** DATABASE_URL et BETTER_AUTH_SECRET avec Vercel PROD (mêmes valeurs!)
+- 🔍 **Vérifier** que toutes les 11 variables Discord sont présentes
+- 💡 **Astuce**: Railway variables sont automatiquement injectées - pas besoin de fichier .env
 
 ### Performance
 
 - 💡 GitHub Actions: Ajouter uniquement les variables nécessaires pour CI (pas toutes)
 - 💡 Vercel: Utiliser les mêmes valeurs pour PROD/PREVIEW quand possible (OAuth keys, Discord config, etc.)
+- 💡 Railway: Garder le strict minimum (15 vars) pour réduire l'overhead
 
 ### Maintenance
 
 - 🔄 Lancer cette commande `/sync-env` après chaque ajout de variable locale
 - 🔄 Vérifier la synchronisation avant chaque déploiement production
 - 📝 Documenter les nouvelles variables dans `ENV_CHECKLIST.md` (si existant)
+- 🚀 Après modification variables Railway: Redéployer le bot (`railway up` ou via dashboard)
 
 ---
 
@@ -450,6 +601,14 @@ Suivre les commandes dans les sections "Commandes pour corriger" ci-dessus, une 
 - **Owner**: YoannDrx
 - **Repo**: mycryptopilot
 - **Secrets Scope**: Repository-level
+
+### Railway Project
+
+- **Name**: MyCryptoPilot
+- **Service**: mycryptopilot (Discord Bot)
+- **Environment**: production
+- **Status**: <linked/not-linked> (détecté via `railway status`)
+- **Variables Attendues**: 15 (Discord Bot uniquement)
 
 ---
 
@@ -499,8 +658,22 @@ Lorsque l'utilisateur lance `/sync-env`:
 2. Parser fichiers locaux (afficher compteurs)
 3. Lister variables Vercel (afficher compteur)
 4. Lister secrets GitHub Actions (afficher compteur)
-5. Analyser et comparer (afficher progress par catégorie)
-6. Générer et afficher le rapport complet
-7. Résumé final: "✅ Analyse terminée! <N> variables analysées, <N> différences détectées"
+5. **Lister variables Railway** (afficher compteur + status linked/not-linked)
+6. Analyser et comparer (afficher progress par catégorie)
+7. **Vérifier variables interdites sur Railway** (critique!)
+8. Générer et afficher le rapport complet
+9. Résumé final: "✅ Analyse terminée! <N> variables analysées, <N> différences détectées"
 
 **Durée totale estimée**: 2-3 minutes.
+
+**Ordre d'affichage des sections du rapport**:
+1. Résumé Global (tableau avec Vercel, GitHub Actions, Railway)
+2. Variables Bien Synchronisées
+3. Variables Manquantes (Vercel PROD, PREVIEW, GitHub Actions, Railway)
+4. 🚨 **Variables INTERDITES sur Railway** (section critique en priorité!)
+5. Variables En Trop (Orphelines)
+6. Variables Absentes Partout
+7. Détail par Variable
+8. Script de Synchronisation Automatique
+9. Recommandations
+10. Configuration Actuelle Détectée

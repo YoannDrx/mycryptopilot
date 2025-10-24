@@ -462,7 +462,7 @@ Affiche les plans disponibles avec leurs avantages.
 ✅ Suis tous les traders
 ✅ Screener ultra-rapide (5s)
 
-👉 https://mycryptopilot.com/pricing
+👉 https://mycryptopilot.app/pricing
 ```
 
 #### `/link`

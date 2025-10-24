@@ -225,7 +225,7 @@ async function main() {
   console.log("🧪 TESTER EN PRODUCTION (recommandé avec un petit montant!):");
   console.log("");
   console.log("1️⃣  Aller sur votre site de production:");
-  console.log("   → https://mycryptopilot.com/orgs/[slug]/checkout/pro");
+  console.log("   → https://mycryptopilot.app/orgs/[slug]/checkout/pro");
   console.log("");
   console.log("2️⃣  Vérifier la génération des adresses:");
   console.log("   → Base address (0x...) doit s'afficher ✅");

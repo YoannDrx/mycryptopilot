@@ -25,7 +25,7 @@ Ce guide couvre le déploiement complet de MyCryptoPilot en production.
 │  - Interface web                        │
 │  - API routes                           │
 │  - Authentification                     │
-│  URL: https://mycryptopilot.com         │
+│  URL: https://mycryptopilot.app         │
 └─────────────────────────────────────────┘
               ↕ (Partage DB Neon)
 ┌─────────────────────────────────────────┐
@@ -121,14 +121,14 @@ railway logs
 | `DISCORD_GUILD_ID` | Discord Server (right-click) | `127...890` |
 | `DATABASE_URL` | Neon Console | `postgresql://...` |
 | `DATABASE_URL_UNPOOLED` | Neon Console | `postgresql://...` |
-| `BETTER_AUTH_URL` | Vercel URL | `https://mycryptopilot.com` |
+| `BETTER_AUTH_URL` | Vercel URL | `https://mycryptopilot.app` |
 | `BETTER_AUTH_SECRET` | Vercel Variables | `random_secret_32+` |
 | `BASE_RPC_URL` | Vercel Variables | `https://mainnet.base.org` |
 | `TRON_RPC_URL` | Vercel Variables | `https://api.trongrid.io` |
 | `CRYPTO_XPUB_BASE` | Vercel Variables | `xpub6F...` |
 | `CRYPTO_XPUB_TRON` | Vercel Variables | `xpub6D...` |
 | `RESEND_API_KEY` | Resend Dashboard | `re_...` |
-| `EMAIL_FROM` | Resend Domain | `noreply@mycryptopilot.com` |
+| `EMAIL_FROM` | Resend Domain | `noreply@mycryptopilot.app` |
 
 **Total**: 15 variables minimum
 
@@ -306,7 +306,7 @@ neonctl branches delete preview-test
 git checkout main
 git merge feature/xxx
 git push origin main
-# → https://mycryptopilot.com (auto-deploy)
+# → https://mycryptopilot.app (auto-deploy)
 ```
 
 **Feature branches** → Preview deployments
@@ -382,7 +382,7 @@ vercel logs --all
 
 3. **Vercel Production** (`.env.production`):
    - DB Neon branch `main`
-   - BETTER_AUTH_URL = `https://mycryptopilot.com`
+   - BETTER_AUTH_URL = `https://mycryptopilot.app`
    - Mainnet crypto
 
 4. **Railway** (Discord Bot):
@@ -415,10 +415,10 @@ cat .env.development | grep DATABASE_URL
 **Vercel (Web)**:
 ```bash
 # Test homepage
-curl https://mycryptopilot.com
+curl https://mycryptopilot.app
 
 # Test API
-curl https://mycryptopilot.com/api/health
+curl https://mycryptopilot.app/api/health
 
 # Check build status
 vercel --prod
