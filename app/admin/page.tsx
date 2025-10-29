@@ -6,6 +6,9 @@ import {
   LayoutTitle,
 } from "@/features/page/layout";
 import { getRequiredAdmin } from "@/lib/auth/auth-user";
+import { Suspense } from "react";
+import { TreasuryCard } from "./_components/treasury-card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function AdminPage() {
   await getRequiredAdmin();
@@ -14,10 +17,24 @@ export default async function AdminPage() {
     <Layout size="lg">
       <LayoutHeader>
         <LayoutTitle>Admin Dashboard</LayoutTitle>
-        <LayoutDescription>Manage users and organizations</LayoutDescription>
+        <LayoutDescription>
+          Vue d'ensemble MyCryptoPilot - Trésorerie et métriques clés
+        </LayoutDescription>
       </LayoutHeader>
 
-      <LayoutContent></LayoutContent>
+      <LayoutContent>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Suspense fallback={<TreasuryCardSkeleton />}>
+            <TreasuryCard />
+          </Suspense>
+
+          {/* Futures KPI cards à ajouter ici */}
+        </div>
+      </LayoutContent>
     </Layout>
   );
+}
+
+function TreasuryCardSkeleton() {
+  return <Skeleton className="h-[320px] w-full" />;
 }
