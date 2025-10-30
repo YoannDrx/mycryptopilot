@@ -146,6 +146,101 @@
 **Cible**: **100% coverage** (61 tests total)
 **Tests à ajouter**: **26 tests** (30-40h effort)
 
+### Configuration Tests & Stratégie .env
+
+#### Stratégie Environment Variables
+
+**Fichiers .env utilisés** :
+- `.env` - Variables de base (fallback)
+- `.env.local` - Dev local overrides (DB Neon vercel-dev) - **gitignored**
+- `.env.test` - Tests E2E (DB locale Postgres.app) - **gitignored**
+- `.env.example` - Template pour documentation
+
+**Fichiers .env qui N'EXISTENT PAS** :
+- ❌ `.env.production` - **N'a JAMAIS existé** (Next.js utilise variables Vercel en prod)
+- ❌ `.env.test.local` - **Pas nécessaire** (`.env.test` suffit)
+
+#### Tests Locaux (Développeur)
+
+**Configuration** :
+- **Base de données** : PostgreSQL local (Postgres.app)
+- **DATABASE_URL** : `postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test`
+- **NODE_ENV** : `test` (pour build ET runtime)
+- **Setup** : `pnpm db:setup-test` (crée DB + migrations)
+- **Lancement** : `pnpm test:e2e:ci` (utilise `scripts/run-e2e-tests.sh`)
+
+**Fichier utilisé** : `.env.test`
+
+**Workflow** :
+1. Script `run-e2e-tests.sh` tue les serveurs existants
+2. Libère le port 3000
+3. Setup la DB `mycryptopilot_test` (migrations)
+4. Playwright démarre son serveur (`NODE_ENV=test`)
+5. Next.js charge `.env.test` automatiquement
+6. Tests s'exécutent contre DB locale
+
+#### Tests CI/CD (GitHub Actions)
+
+**Configuration** :
+- **Base de données** : PostgreSQL Docker (`postgres:15`)
+- **DATABASE_URL** : `postgresql://postgres:postgres@localhost:5432/mycryptopilot_test`
+- **NODE_ENV** : `test` (pour build ET runtime)
+- **Setup** : Service Docker + migrations Prisma
+- **Lancement** : Workflows GitHub Actions
+
+**Workflows GitHub Actions** :
+1. **`playwright.yml`** - Tests E2E dédiés ✅
+   - Build : `NODE_ENV=test pnpm build`
+   - Run : `NODE_ENV=test pnpm start`
+   - PostgreSQL Docker avec `postgres:postgres`
+
+2. **`ci.yml`** - Pipeline CI/CD complet ✅
+   - Build : `NODE_ENV=test pnpm build`
+   - Run : `NODE_ENV=test pnpm start`
+   - PostgreSQL Docker avec `postgres:postgres`
+
+**Secrets GitHub Actions** :
+- 15 secrets configurés (crypto keys, Discord tokens, etc.)
+- DATABASE_URL hardcodée dans workflows (Docker)
+- Pas de DB Neon en CI (PostgreSQL local Docker)
+
+#### Priorité de Chargement Next.js
+
+Next.js charge les fichiers `.env` dans cet ordre (du plus prioritaire au moins) :
+
+1. `.env.$(NODE_ENV).local` (ex: `.env.test.local`)
+2. `.env.local` (ignoré quand `NODE_ENV=test`)
+3. `.env.$(NODE_ENV)` (ex: `.env.test`) ← **UTILISÉ EN TESTS**
+4. `.env` (fallback)
+
+#### Historique & Evolution
+
+**17 octobre 2025** (commit 37b3691 - **PIVOT MAJEUR**) :
+- Création de `.env.test` pour isolation complète
+- Ajout de `prisma.config.ts` pour charger `.env.test` quand `NODE_ENV=test`
+- Fix de 11 tests E2E qui échouaient en CI (Issue #61)
+- Sécurisation des secrets crypto (migration vers GitHub Secrets)
+
+**29 octobre 2025** (corrections locales) :
+- Fix `playwright.config.mts` : `reuseExistingServer: false` (isolation)
+- Fix `.env.test` : `yoannandrieux:@` pour Postgres.app
+- Désactivation dev overlay en test (`next.config.ts`)
+- Création script `run-e2e-tests.sh` (cleanup automatique)
+- Fix `ci.yml` : Build en `NODE_ENV=test` (alignement avec `playwright.yml`)
+
+#### IMPORTANT : Différences Local vs CI
+
+| Aspect | Local (Dev) | CI (GitHub Actions) |
+|--------|-------------|---------------------|
+| **DB** | Postgres.app | PostgreSQL Docker |
+| **User** | `yoannandrieux:` | `postgres:postgres` |
+| **Setup** | `pnpm db:setup-test` | Service Docker + migrations |
+| **Fichier .env** | `.env.test` (gitignored) | Variables hardcodées dans workflow |
+| **NODE_ENV** | `test` (build + run) | `test` (build + run) |
+| **Isolation** | Serveur dédié (port 3000) | Container Docker isolé |
+
+**Note** : Les différences de DATABASE_URL sont **normales et voulues** - ce sont 2 environnements distincts avec leurs propres configurations PostgreSQL.
+
 ### Tests Existants par Module
 
 | Module | Tests | Fichier | Status |
