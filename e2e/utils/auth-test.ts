@@ -56,10 +56,14 @@ export async function createTestAccount(options: {
 
   if (options.admin) {
     const user = await retry(
-      async () =>
-        prisma.user.findUniqueOrThrow({
+      async () => {
+        // Force Prisma to refresh its connection to avoid cache issues
+        await prisma.$disconnect();
+        await prisma.$connect();
+        return prisma.user.findUniqueOrThrow({
           where: { email: userData.email },
-        }),
+        });
+      },
       {
         maxAttempts: 5,
         delayMs: 1000,
