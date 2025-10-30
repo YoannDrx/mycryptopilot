@@ -83,11 +83,12 @@ const config: PlaywrightTestConfig = {
   ...(!process.env.PLAYWRIGHT_TEST_BASE_URL
     ? {
         webServer: {
-          // CRITICAL: Build AND run in test mode to load .env.test (local DB)
-          command: "NODE_ENV=test pnpm run build && NODE_ENV=test pnpm run start",
+          // CRITICAL: Use 'next dev' to respect NODE_ENV=test and load .env.test.local
+          // 'next start' forces production mode and ignores .env.test.* files
+          command: "NODE_ENV=test pnpm run dev",
           url: SERVER_URL,
-          // Increased timeout for CI environment where build can be slower
-          timeout: process.env.CI ? 240 * 1000 : 120 * 1000,
+          // Dev server starts faster than build+start
+          timeout: process.env.CI ? 120 * 1000 : 60 * 1000,
           // Always start a fresh server for tests (isolation)
           reuseExistingServer: false,
         },

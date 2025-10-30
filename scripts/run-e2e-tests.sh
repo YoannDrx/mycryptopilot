@@ -66,8 +66,9 @@ sleep 1
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🗄️  Étape 3/4 : Configuration de la base de données de test...\n${NC}"
 
-# Run the test database setup script
-if ./scripts/setup-test-db.sh; then
+# Run the test database setup script with NODE_ENV=test
+# This ensures .env.test.local is loaded (overrides .env.local)
+if NODE_ENV=test ./scripts/setup-test-db.sh; then
   echo -e "${GREEN}   ✅ Base de données de test prête\n${NC}"
 else
   echo -e "${RED}   ❌ Échec du setup de la base de données\n${NC}"
