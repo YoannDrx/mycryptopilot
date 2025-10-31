@@ -67,6 +67,7 @@ export async function handleStatusCommand(
   // Couleur selon le plan
   const planColors: Record<MyCryptoPilotPlanName, number> = {
     free: 0x6b7280, // Gray
+    test: 0x6b7280, // Gray (same as free)
     pro: parseInt(SiteConfig.brand.primary.replace("#", ""), 16), // Amber
     ultra: 0x8b5cf6, // Purple
   };

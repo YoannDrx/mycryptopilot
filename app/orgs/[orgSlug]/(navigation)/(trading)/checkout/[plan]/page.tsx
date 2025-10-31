@@ -16,23 +16,31 @@ import { redirect } from "next/navigation";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { getRequiredCurrentOrg } from "@/lib/organizations/get-org";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { env } from "@/lib/env";
 
 type CheckoutPageProps = {
-  params: {
+  params: Promise<{
     orgSlug: string;
     plan: string;
-  };
+  }>;
 };
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {
   await getRequiredUser();
   const org = await getRequiredCurrentOrg();
+  const { plan } = await params;
 
   // Validate plan parameter
-  const planName = params.plan.toLowerCase();
-  if (planName !== "pro" && planName !== "ultra") {
+  const planName = plan.toLowerCase();
+  if (planName !== "pro" && planName !== "ultra" && planName !== "test") {
     redirect(`/orgs/${org.slug}/pricing`);
   }
 
-  return <CheckoutForm plan={planName as "pro" | "ultra"} orgSlug={org.slug} />;
+  return (
+    <CheckoutForm
+      plan={planName as "pro" | "ultra" | "test"}
+      orgSlug={org.slug}
+      isTestnet={env.CRYPTO_NETWORK === "testnet"}
+    />
+  );
 }

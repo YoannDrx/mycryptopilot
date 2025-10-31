@@ -11,15 +11,36 @@ import bs58check from "bs58check";
  * HD Wallet Address Generator
  *
  * Generates unique crypto addresses for users using HD wallet derivation (watch-only).
- * Supports Base (USDC) and Tron (USDT) networks.
+ * Supports Base (USDC) and Tron (USDT) networks on both mainnet and testnet.
  *
  * IMPORTANT: This service uses xpub (extended public keys) for address derivation.
  * Private keys are NEVER stored or accessible from this service.
+ *
+ * Network Selection:
+ * - Set CRYPTO_NETWORK=testnet in .env for Base Sepolia + Tron Shasta
+ * - Defaults to mainnet (Base + Tron) in production
  *
  * @example
  * const address = await generateCryptoAddress(user.id, "BASE");
  * // Returns: { address: "0x...", derivationPath: "m/44'/60'/0'/0/123", network: "BASE" }
  */
+
+/**
+ * Get the appropriate XPUB for a network based on CRYPTO_NETWORK env var
+ */
+function getXpubForNetwork(network: CryptoNetwork): string | undefined {
+  const isTestnet = env.CRYPTO_NETWORK === "testnet";
+
+  if (network === "BASE") {
+    return isTestnet ? env.CRYPTO_XPUB_BASE_TESTNET : env.CRYPTO_XPUB_BASE;
+  }
+
+  if (network === "TRON") {
+    return isTestnet ? env.CRYPTO_XPUB_TRON_TESTNET : env.CRYPTO_XPUB_TRON;
+  }
+
+  return undefined;
+}
 
 type CryptoAddressResult = {
   id: string;
@@ -73,21 +94,29 @@ export async function generateCryptoAddress(
 
   switch (network) {
     case "BASE":
-      if (!env.CRYPTO_XPUB_BASE) {
-        throw new Error(
-          "CRYPTO_XPUB_BASE is not configured. Cannot generate Base address.",
-        );
+      {
+        const xpub = getXpubForNetwork("BASE");
+        if (!xpub) {
+          const networkMode = env.CRYPTO_NETWORK ?? "mainnet";
+          throw new Error(
+            `CRYPTO_XPUB_BASE${networkMode === "testnet" ? "_TESTNET" : ""} is not configured. Cannot generate Base address.`,
+          );
+        }
+        ({ address, derivationPath } = await deriveBaseAddress(userId));
       }
-      ({ address, derivationPath } = await deriveBaseAddress(userId));
       break;
 
     case "TRON":
-      if (!env.CRYPTO_XPUB_TRON) {
-        throw new Error(
-          "CRYPTO_XPUB_TRON is not configured. Cannot generate Tron address.",
-        );
+      {
+        const xpub = getXpubForNetwork("TRON");
+        if (!xpub) {
+          const networkMode = env.CRYPTO_NETWORK ?? "mainnet";
+          throw new Error(
+            `CRYPTO_XPUB_TRON${networkMode === "testnet" ? "_TESTNET" : ""} is not configured. Cannot generate Tron address.`,
+          );
+        }
+        ({ address, derivationPath } = await deriveTronAddress(userId));
       }
-      ({ address, derivationPath } = await deriveTronAddress(userId));
       break;
 
     default:
@@ -150,9 +179,12 @@ export async function deriveBaseAddress(
   // 2. Derive the child key at the given path (0/0/{index})
   // 3. Generate the Ethereum address from the derived public key
   try {
-    const xpub = env.CRYPTO_XPUB_BASE;
+    const xpub = getXpubForNetwork("BASE");
     if (!xpub) {
-      throw new Error("CRYPTO_XPUB_BASE is not configured");
+      const networkMode = env.CRYPTO_NETWORK ?? "mainnet";
+      throw new Error(
+        `CRYPTO_XPUB_BASE${networkMode === "testnet" ? "_TESTNET" : ""} is not configured`,
+      );
     }
 
     const hdNode = HDNodeWallet.fromExtendedKey(xpub);
@@ -207,9 +239,12 @@ export async function deriveTronAddress(
   // 2. Derive the child key at the given path (0/{index})
   // 3. Generate the Tron address (T...) from the derived public key
   try {
-    const xpub = env.CRYPTO_XPUB_TRON;
+    const xpub = getXpubForNetwork("TRON");
     if (!xpub) {
-      throw new Error("CRYPTO_XPUB_TRON is not configured");
+      const networkMode = env.CRYPTO_NETWORK ?? "mainnet";
+      throw new Error(
+        `CRYPTO_XPUB_TRON${networkMode === "testnet" ? "_TESTNET" : ""} is not configured`,
+      );
     }
 
     const hdKey = HDKey.fromExtendedKey(xpub);

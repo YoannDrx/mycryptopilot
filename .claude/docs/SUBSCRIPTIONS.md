@@ -359,7 +359,7 @@ function getPlanFeatures(plan: MyCryptoPilotPlanName): string[] {
 
 ```bash
 RESEND_API_KEY="re_..."
-SITE_URL="https://mycryptopilot.com"
+SITE_URL="https://mycryptopilot.app"
 ```
 
 ---

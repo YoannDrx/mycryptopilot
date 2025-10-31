@@ -81,13 +81,30 @@ console.log(`   Derivation path: m/44'/195'/0'\n`);
 // ====================================
 
 console.log("═══════════════════════════════════════════════════════════");
-console.log("📋 Add these to your .env.local file:\n");
+console.log("📋 CONFIGURATION - Copier dans .env.local\n");
 console.log(`CRYPTO_XPUB_BASE="${baseXpub}"`);
 console.log(`CRYPTO_XPUB_TRON="${tronXpub}"`);
 console.log("\n═══════════════════════════════════════════════════════════");
 
-console.log("\n🎯 Next Steps:");
-console.log("1. Copy the above environment variables to .env.local");
-console.log("2. Keep the mnemonic phrase in a secure location");
-console.log("3. Run the test script to verify address generation");
-console.log("4. For production, use a hardware wallet (Ledger/Trezor)\n");
+console.log("\n🎯 PROCHAINES ÉTAPES:");
+console.log(
+  "\n1️⃣  Copier les XPUBs ci-dessus dans .env.local (PAS .env.development)",
+);
+console.log("   → Ouvrir .env.local");
+console.log("   → Ajouter CRYPTO_XPUB_BASE et CRYPTO_XPUB_TRON");
+console.log("   → Redémarrer le serveur: pnpm dev");
+
+console.log("\n2️⃣  Sauvegarder la mnemonic phrase dans un endroit sûr");
+console.log("   → Utiliser un password manager (1Password, Bitwarden)");
+console.log("   → ⚠️  Ne JAMAIS commit cette phrase dans Git");
+
+console.log("\n3️⃣  Tester le système de paiement");
+console.log("   → Aller sur http://localhost:3000/orgs/[slug]/checkout/pro");
+console.log("   → Vérifier que les adresses Base et Tron sont générées");
+console.log("   → Obtenir testnet tokens (liens dans la doc)");
+console.log("   → Tester un paiement de $1 pour valider le flow");
+
+console.log("\n4️⃣  Pour la production, utiliser un hardware wallet");
+console.log("   → Ledger ou Trezor recommandé");
+console.log("   → Script production: npm run generate-mainnet-xpubs");
+console.log("\n");

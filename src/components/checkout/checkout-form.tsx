@@ -41,10 +41,14 @@ import {
 } from "lucide-react";
 import { upfetch } from "@/lib/up-fetch";
 import { logger } from "@/lib/logger";
+import { TestnetBadge } from "./testnet-badge";
+import { SiteConfig } from "@/site-config";
+import { TestPaymentSuccessDialog } from "./test-payment-success-dialog";
 
 type CheckoutFormProps = {
   plan: MyCryptoPilotPlanName;
   orgSlug: string;
+  isTestnet?: boolean;
 };
 
 type GeneratedAddresses = {
@@ -62,7 +66,11 @@ type GeneratedAddresses = {
 
 type PaymentStatus = "pending" | "confirmed" | "expired";
 
-export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
+export const CheckoutForm = ({
+  plan,
+  orgSlug,
+  isTestnet = false,
+}: CheckoutFormProps) => {
   const router = useRouter();
   const planData = MYCRYPTOPILOT_PLANS.find((p) => p.name === plan);
 
@@ -77,12 +85,13 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
     base: string;
     tron: string;
   } | null>(null);
+  const [showTestSuccessDialog, setShowTestSuccessDialog] = useState(false);
 
   // Generate crypto addresses on mount
   const generateMutation = useMutation({
     mutationFn: async () => {
       const result = await generateAddressAction({
-        plan: plan as "pro" | "ultra",
+        plan: plan as "test" | "pro" | "ultra",
       });
 
       if (!isActionSuccessful(result)) {
@@ -145,13 +154,21 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
 
         if (result.confirmed) {
           setPaymentStatus("confirmed");
-          toast.success("Payment confirmed! Activating subscription...");
 
-          // Wait 2s before redirect to show success message
-          setTimeout(() => {
-            router.push(`/orgs/${orgSlug}/dashboard`);
-            router.refresh();
-          }, 2000);
+          // For test plan, show success dialog instead of redirecting
+          if (plan === "test") {
+            toast.success("Test payment confirmed!");
+            setShowTestSuccessDialog(true);
+          } else {
+            // Regular plan: show toast and redirect
+            toast.success("Payment confirmed! Activating subscription...");
+
+            // Wait 2s before redirect to show success message
+            setTimeout(() => {
+              router.push(`/orgs/${orgSlug}/dashboard`);
+              router.refresh();
+            }, 2000);
+          }
         } else if (result.error) {
           logger.error("Payment check error", { error: result.error });
         }
@@ -167,7 +184,7 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
     const interval = setInterval(checkPaymentStatus, 10000);
 
     return () => clearInterval(interval);
-  }, [addresses, paymentStatus, orgSlug, router]);
+  }, [addresses, paymentStatus, orgSlug, router, plan]);
 
   // Handle expiration
   const handleExpiration = () => {
@@ -209,9 +226,12 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
     <div className="container mx-auto max-w-4xl py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold">
-          Complete Your Payment - {planData.name} Plan
-        </h1>
+        <div className="mb-2 flex items-center gap-3">
+          <h1 className="text-3xl font-bold">
+            Complete Your Payment - {planData.name} Plan
+          </h1>
+          <TestnetBadge isTestnet={isTestnet} />
+        </div>
         <p className="text-muted-foreground">
           Send ${planData.priceUSD} in USDC (Base) or USDT (Tron) to one of the
           addresses below
@@ -267,7 +287,10 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="size-5 text-blue-500" />
-                Base Network (USDC)
+                {isTestnet
+                  ? SiteConfig.crypto.testnet.base.name
+                  : SiteConfig.crypto.networks.base.name}{" "}
+                (USDC)
               </CardTitle>
               <Badge variant="secondary">Recommended</Badge>
             </div>
@@ -318,11 +341,12 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               {/* Explorer Link */}
               <Button variant="link" size="sm" asChild className="self-start">
                 <a
-                  href={`https://basescan.org/address/${addresses.base.address}`}
+                  href={`${isTestnet ? SiteConfig.crypto.testnet.base.explorerUrl : SiteConfig.crypto.networks.base.explorerUrl}/address/${addresses.base.address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View on BaseScan <ExternalLink className="ml-1 size-3" />
+                  View on {isTestnet ? "Sepolia BaseScan" : "BaseScan"}{" "}
+                  <ExternalLink className="ml-1 size-3" />
                 </a>
               </Button>
             </div>
@@ -335,7 +359,10 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="size-5 text-red-500" />
-                Tron Network (USDT)
+                {isTestnet
+                  ? SiteConfig.crypto.testnet.tron.name
+                  : SiteConfig.crypto.networks.tron.name}{" "}
+                (USDT)
               </CardTitle>
             </div>
           </CardHeader>
@@ -387,11 +414,12 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
               {/* Explorer Link */}
               <Button variant="link" size="sm" asChild className="self-start">
                 <a
-                  href={`https://tronscan.org/#/address/${addresses.tron.address}`}
+                  href={`${isTestnet ? SiteConfig.crypto.testnet.tron.explorerUrl : SiteConfig.crypto.networks.tron.explorerUrl}/#/address/${addresses.tron.address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View on TronScan <ExternalLink className="ml-1 size-3" />
+                  View on {isTestnet ? "Shasta TronScan" : "TronScan"}{" "}
+                  <ExternalLink className="ml-1 size-3" />
                 </a>
               </Button>
             </div>
@@ -441,6 +469,13 @@ export const CheckoutForm = ({ plan, orgSlug }: CheckoutFormProps) => {
           Cancel and Return to Pricing
         </Button>
       </div>
+
+      {/* Test Payment Success Dialog */}
+      <TestPaymentSuccessDialog
+        open={showTestSuccessDialog}
+        onOpenChange={setShowTestSuccessDialog}
+        orgSlug={orgSlug}
+      />
     </div>
   );
 };

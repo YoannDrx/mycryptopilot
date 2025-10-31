@@ -219,13 +219,15 @@ export function OrganizationCryptoSubscription({
                 <SelectValue placeholder="Select a plan" />
               </SelectTrigger>
               <SelectContent>
-                {MYCRYPTOPILOT_PLANS.map((plan) => (
-                  <SelectItem key={plan.name} value={plan.name}>
-                    <span className="font-medium capitalize">
-                      {plan.name} - ${plan.priceUSD}/month
-                    </span>
-                  </SelectItem>
-                ))}
+                {MYCRYPTOPILOT_PLANS.filter((plan) => plan.name !== "test").map(
+                  (plan) => (
+                    <SelectItem key={plan.name} value={plan.name}>
+                      <span className="font-medium capitalize">
+                        {plan.name} - ${plan.priceUSD}/month
+                      </span>
+                    </SelectItem>
+                  ),
+                )}
               </SelectContent>
             </Select>
             <Button

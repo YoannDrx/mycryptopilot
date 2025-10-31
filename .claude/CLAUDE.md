@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 22 octobre 2025 - Portfolio Tracking Bybit complété
+**Dernière mise à jour**: 23 octobre 2025 - Audit complet projet (18 migrations, 38 issues)
 
 ---
 
@@ -84,9 +84,10 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ### 📊 Progression Globale: 🎉 100% MVP COMPLETE! 🎉
 
-**Audit complet**: 19 octobre 2025 (via /project-audit)
+**Audit complet**: 23 octobre 2025 (via /project-audit - complet)
 **Phase 6 complétée**: 13 octobre 2025
 **Phase 7 complétée**: 14 octobre 2025
+**Phase 8 complétée**: 22 octobre 2025 (Portfolio Tracking Bybit)
 **MVP 100% achevé**: 14 octobre 2025
 
 ### Phases Complétées
@@ -114,15 +115,22 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 - ✅ **UI/UX Polish**: Trading cards professionnelles + Chart viewer + Image management
 - ✅ **Portfolio Tracking**: Binance + Bybit integration (API validation, sync engine, encrypted keys, performance metrics)
 
-### TODOs Restants
+### TODOs Restants (Audit 23 octobre 2025)
 
 **P1 (Important)** - ✅ **TOUS COMPLÉTÉS!**
 1. ~~`webhook.ts:37`~~ - ✅ Fixed (commit 41bd066)
 2. ~~`follow-button.tsx:20`~~ - ✅ Vérifié fonctionnel (aucun TODO réel)
 3. ~~`payment-status/[addressId]/route.ts:39`~~ - ✅ Deleted (commit 41bd066)
 
-**P2 (Non-critique)** - 4 items (post-MVP):
-4. `sweep-to-binance.ts` - 4 TODOs pour sweep implementation (Phase 7 - Advanced Features)
+**P2 (Non-critique)** - 7 TODOs restants (post-MVP):
+1. `src/lib/cron/tier-check-job.ts` - 2 TODOs (notifications email/Discord, tier rewards)
+2. `src/lib/mail/send-signal-notification.ts` - 1 TODO (email preference filter)
+3. `src/lib/discord/user-management.ts` - 1 TODO (channels privés par trader)
+4. `src/lib/exchange/email-notifications.ts` - 1 TODO (weekly performance email template)
+5. `app/admin/traders/_actions/trader-admin.actions.ts` - 1 TODO (rejection email)
+6. `scripts/sweep-to-binance.ts` - 4 TODOs (sweep implementation)
+
+**Total**: 10 TODOs non-critiques (toutes post-MVP, aucune bloquante)
 
 ### Features MVP
 
