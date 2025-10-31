@@ -31,8 +31,11 @@ export async function ReferralsCard() {
       <CardHeader>
         <CardTitle>🎁 Referral Program</CardTitle>
         <CardDescription>Invitations et rewards</CardDescription>
-        <CardAction>
+        <CardAction className="flex flex-col items-end gap-2">
           <ReferralsRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -43,7 +46,7 @@ export async function ReferralsCard() {
             {metrics.totalInvitations}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Total invitations envoyées
+            Total invitations sent
           </p>
         </div>
 
@@ -68,14 +71,14 @@ export async function ReferralsCard() {
             </span>
           </div>
           <p className="text-muted-foreground mt-1 text-xs">
-            Total credits donnés aux traders
+            Total credits given to traders
           </p>
         </div>
 
         {/* Tier split */}
         <div className="border-t pt-4">
           <p className="text-muted-foreground mb-2 text-xs font-semibold">
-            Breakdown par tier
+            Breakdown by tier
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-xs">
@@ -94,12 +97,6 @@ export async function ReferralsCard() {
               💠 Diamond: {metrics.tierSplit.DIAMOND}
             </Badge>
           </div>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

@@ -30,10 +30,13 @@ export async function UsersCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>👥 Utilisateurs</CardTitle>
-        <CardDescription>Croissance et engagement</CardDescription>
-        <CardAction>
+        <CardTitle>👥 Users</CardTitle>
+        <CardDescription>Growth and engagement</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <UsersRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -43,19 +46,15 @@ export async function UsersCard() {
           <div className="text-primary text-3xl font-bold">
             {metrics.totalUsers}
           </div>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Total utilisateurs
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">Total users</p>
         </div>
 
-        {/* Nouveaux ce mois */}
+        {/* New this month */}
         <div>
           <div className="text-success text-2xl font-semibold">
             +{metrics.newUsersThisMonth}
           </div>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Nouveaux 30 derniers jours
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">New last 30 days</p>
         </div>
 
         {/* Statuts users */}
@@ -80,18 +79,13 @@ export async function UsersCard() {
               {metrics.conversionRate.toFixed(1)}%
             </div>
             <span className="text-muted-foreground text-sm">
-              conversion vers payant
+              conversion to paid
             </span>
           </div>
           <p className="text-muted-foreground mt-1 text-xs">
-            {metrics.paidUsers} users Pro/Ultra sur {metrics.totalUsers} total
+            {metrics.paidUsers} Pro/Ultra users out of {metrics.totalUsers}{" "}
+            total
           </p>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

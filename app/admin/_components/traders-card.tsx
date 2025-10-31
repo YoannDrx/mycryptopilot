@@ -30,9 +30,12 @@ export async function TradersCard() {
     <Card>
       <CardHeader>
         <CardTitle>🎯 Traders</CardTitle>
-        <CardDescription>Activité et vérifications</CardDescription>
-        <CardAction>
+        <CardDescription>Activity and verifications</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <TradersRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -43,7 +46,7 @@ export async function TradersCard() {
             {metrics.totalTraders}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Total traders inscrits
+            Total registered traders
           </p>
         </div>
 
@@ -57,32 +60,26 @@ export async function TradersCard() {
           </Badge>
         </div>
 
-        {/* Nouveaux ce mois */}
+        {/* New this month */}
         <div className="border-t pt-4">
           <div className="flex items-baseline gap-2">
             <div className="text-success text-xl font-semibold">
               +{metrics.newTradersThisMonth}
             </div>
             <span className="text-muted-foreground text-sm">
-              nouveaux 30 derniers jours
+              new last 30 days
             </span>
           </div>
         </div>
 
-        {/* Avec exchanges */}
+        {/* With exchanges */}
         <div className="border-t pt-4">
           <Badge variant="outline" className="text-sm">
-            🔗 Avec exchanges: {metrics.withExchanges}
+            🔗 With exchanges: {metrics.withExchanges}
           </Badge>
           <p className="text-muted-foreground mt-2 text-xs">
-            Traders ayant connecté Binance ou Bybit
+            Traders who connected Binance or Bybit
           </p>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

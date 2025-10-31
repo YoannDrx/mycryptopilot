@@ -27,10 +27,13 @@ export async function SubscriptionsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>💎 Abonnements</CardTitle>
-        <CardDescription>Plans actifs et MRR</CardDescription>
-        <CardAction>
+        <CardTitle>💎 Subscriptions</CardTitle>
+        <CardDescription>Active plans and MRR</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <SubscriptionsRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -58,24 +61,24 @@ export async function SubscriptionsCard() {
           </Badge>
         </div>
 
-        {/* Plans expirant bientôt */}
+        {/* Plans expiring soon */}
         {metrics.expiringSoon > 0 && (
           <div className="border-t pt-4">
             <div className="flex items-center gap-2">
               <Badge variant="destructive" className="text-sm">
-                ⚠️ Expirent sous 7 jours: {metrics.expiringSoon}
+                ⚠️ Expiring within 7 days: {metrics.expiringSoon}
               </Badge>
             </div>
             <p className="text-muted-foreground mt-2 text-xs">
-              Plans Pro/Ultra arrivant à expiration
+              Pro/Ultra plans expiring soon
             </p>
           </div>
         )}
 
-        {/* Détail revenue */}
+        {/* MRR details */}
         <div className="border-t pt-4">
           <p className="text-muted-foreground mb-2 text-xs font-semibold">
-            Détail MRR
+            MRR Details
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-xs">
@@ -85,12 +88,6 @@ export async function SubscriptionsCard() {
               🌟 Ultra: ${(metrics.ultraCount * 99).toFixed(0)}
             </Badge>
           </div>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

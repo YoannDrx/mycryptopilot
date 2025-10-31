@@ -30,10 +30,13 @@ export async function PaymentsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>💵 Paiements Crypto</CardTitle>
-        <CardDescription>Revenue et statuts des paiements</CardDescription>
-        <CardAction>
+        <CardTitle>💵 Crypto Payments</CardTitle>
+        <CardDescription>Revenue and payment status</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <PaymentsRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -44,17 +47,17 @@ export async function PaymentsCard() {
             ${metrics.totalRevenue.toFixed(2)}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Total revenue (tous paiements confirmés)
+            Total revenue (all confirmed payments)
           </p>
         </div>
 
-        {/* Revenue mensuel */}
+        {/* Monthly revenue */}
         <div>
           <div className="text-success text-2xl font-semibold">
             ${metrics.revenueThisMonth.toFixed(2)}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Revenue 30 derniers jours
+            Revenue last 30 days
           </p>
         </div>
 
@@ -71,7 +74,7 @@ export async function PaymentsCard() {
         {/* Network split */}
         <div className="border-t pt-4">
           <p className="text-muted-foreground mb-2 text-xs font-semibold">
-            Revenue par réseau
+            Revenue by network
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-xs">
@@ -96,7 +99,7 @@ export async function PaymentsCard() {
         {/* Plan split */}
         <div className="border-t pt-4">
           <p className="text-muted-foreground mb-2 text-xs font-semibold">
-            Revenue par plan
+            Revenue by plan
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-xs">
@@ -106,12 +109,6 @@ export async function PaymentsCard() {
               🌟 ULTRA: ${metrics.planSplit.ULTRA.toFixed(2)}
             </Badge>
           </div>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

@@ -29,10 +29,13 @@ export async function SignalsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>📡 Signaux Trading</CardTitle>
-        <CardDescription>Activité et performance</CardDescription>
-        <CardAction>
+        <CardTitle>📡 Trading Signals</CardTitle>
+        <CardDescription>Activity and performance</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <SignalsRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -43,30 +46,30 @@ export async function SignalsCard() {
             {metrics.totalSignals}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Total signaux publiés
+            Total published signals
           </p>
         </div>
 
         {/* Active vs Total */}
         <div className="flex flex-wrap gap-2">
           <Badge variant="default" className="text-sm">
-            🔥 Actifs: {metrics.activeSignals}
+            🔥 Active: {metrics.activeSignals}
           </Badge>
           <Badge variant="outline" className="text-sm">
-            📈 Nouveaux 30j: {metrics.newSignalsThisMonth}
+            📈 New 30d: {metrics.newSignalsThisMonth}
           </Badge>
         </div>
 
-        {/* TTL moyen */}
+        {/* Average TTL */}
         <div className="border-t pt-4">
           <div className="flex items-baseline gap-2">
             <div className="text-primary text-xl font-semibold">
               {metrics.avgTTLHours.toFixed(1)}h
             </div>
-            <span className="text-muted-foreground text-sm">TTL moyen</span>
+            <span className="text-muted-foreground text-sm">Average TTL</span>
           </div>
           <p className="text-muted-foreground mt-1 text-xs">
-            Durée de vie moyenne des signaux
+            Average signal lifespan
           </p>
         </div>
 
@@ -77,16 +80,10 @@ export async function SignalsCard() {
               🏆 Top Trader
             </p>
             <Badge variant="outline" className="text-sm">
-              {metrics.topTrader.name} ({metrics.topTrader.count} signaux)
+              {metrics.topTrader.name} ({metrics.topTrader.count} signals)
             </Badge>
           </div>
         )}
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
-        </div>
       </CardContent>
     </Card>
   );

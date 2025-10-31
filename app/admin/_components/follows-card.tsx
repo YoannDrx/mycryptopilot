@@ -30,9 +30,12 @@ export async function FollowsCard() {
     <Card>
       <CardHeader>
         <CardTitle>🔗 Follows</CardTitle>
-        <CardDescription>Engagement et conversions</CardDescription>
-        <CardAction>
+        <CardDescription>Engagement and conversions</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <FollowsRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -43,18 +46,16 @@ export async function FollowsCard() {
             {metrics.activeFollows}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Follows actifs totaux
+            Total active follows
           </p>
         </div>
 
-        {/* Nouveaux ce mois */}
+        {/* New this month */}
         <div>
           <div className="text-success text-2xl font-semibold">
             +{metrics.newFollowsThisMonth}
           </div>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Nouveaux 30 derniers jours
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">New last 30 days</p>
         </div>
 
         {/* Conversion rate */}
@@ -64,25 +65,25 @@ export async function FollowsCard() {
               {metrics.paidConversionRate.toFixed(1)}%
             </div>
             <span className="text-muted-foreground text-sm">
-              conversion vers payant
+              conversion to paid
             </span>
           </div>
           <p className="text-muted-foreground mt-1 text-xs">
-            Follows avec users Pro/Ultra actifs
+            Follows with active Pro/Ultra users
           </p>
         </div>
 
-        {/* Moyenne par user */}
+        {/* Average per user */}
         <div className="border-t pt-4">
           <Badge variant="outline" className="text-sm">
-            📊 Moyenne: {metrics.avgFollowsPerUser.toFixed(1)} follows/user
+            📊 Average: {metrics.avgFollowsPerUser.toFixed(1)} follows/user
           </Badge>
         </div>
 
         {/* Source split */}
         <div className="border-t pt-4">
           <p className="text-muted-foreground mb-2 text-xs font-semibold">
-            Breakdown par source
+            Breakdown by source
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="text-xs">
@@ -95,12 +96,6 @@ export async function FollowsCard() {
               🎁 Referral: {metrics.sourceSplit.REFERRAL}
             </Badge>
           </div>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

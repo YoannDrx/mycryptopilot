@@ -34,12 +34,12 @@ export function PaymentsRefreshButton() {
       {isPending ? (
         <>
           <Loader2 className="animate-spin" />
-          Actualisation...
+          Refreshing...
         </>
       ) : (
         <>
           <RefreshCw />
-          Actualiser
+          Refresh
         </>
       )}
     </Button>

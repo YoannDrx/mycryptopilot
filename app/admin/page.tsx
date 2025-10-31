@@ -26,7 +26,7 @@ export default async function AdminPage() {
       <LayoutHeader>
         <LayoutTitle>Admin Dashboard</LayoutTitle>
         <LayoutDescription>
-          Vue d'ensemble MyCryptoPilot - Trésorerie et métriques clés
+          MyCryptoPilot Overview - Treasury and Key Metrics
         </LayoutDescription>
       </LayoutHeader>
 

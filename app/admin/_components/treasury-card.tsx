@@ -28,10 +28,13 @@ export async function TreasuryCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>💰 Trésorerie Crypto</CardTitle>
-        <CardDescription>Balances on-chain + swept historique</CardDescription>
-        <CardAction>
+        <CardTitle>💰 Crypto Treasury</CardTitle>
+        <CardDescription>On-chain balances + swept history</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <TreasuryRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {treasury.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
@@ -56,11 +59,11 @@ export async function TreasuryCard() {
           </Badge>
         </div>
 
-        {/* Nombre d'adresses actives */}
+        {/* Active addresses */}
         <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <span>
-            📦 {treasury.base.addressCount + treasury.tron.addressCount}{" "}
-            adresses actives
+            📦 {treasury.base.addressCount + treasury.tron.addressCount} active
+            addresses
           </span>
           <span className="text-muted-foreground/50">•</span>
           <span className="text-xs">
@@ -69,23 +72,17 @@ export async function TreasuryCard() {
           </span>
         </div>
 
-        {/* Montant swept historique */}
+        {/* Swept amount history */}
         <div className="border-t pt-4">
           <div className="flex items-baseline gap-2">
             <div className="text-success text-xl font-semibold">
               ${treasury.sweptAmount.toFixed(2)}
             </div>
-            <span className="text-muted-foreground text-sm">déjà swept</span>
+            <span className="text-muted-foreground text-sm">already swept</span>
           </div>
           <p className="text-muted-foreground mt-1 text-xs">
-            🧹 Transféré vers Binance (historique complet)
+            🧹 Transferred to Binance (complete history)
           </p>
-        </div>
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {treasury.lastUpdated.toLocaleTimeString("fr-FR")}
         </div>
       </CardContent>
     </Card>

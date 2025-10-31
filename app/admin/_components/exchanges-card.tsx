@@ -31,20 +31,23 @@ export async function ExchangesCard() {
     <Card>
       <CardHeader>
         <CardTitle>🔗 Exchanges</CardTitle>
-        <CardDescription>Intégrations Binance & Bybit</CardDescription>
-        <CardAction>
+        <CardDescription>Binance & Bybit integrations</CardDescription>
+        <CardAction className="flex flex-col items-end gap-2">
           <ExchangesRefreshButton />
+          <span className="text-muted-foreground text-xs">
+            Last updated: {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
+          </span>
         </CardAction>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4">
-        {/* Total connexions actives */}
+        {/* Total active connections */}
         <div>
           <div className="text-primary text-3xl font-bold">
             {metrics.activeConnections}
           </div>
           <p className="text-muted-foreground mt-1 text-sm">
-            Connexions actives ({metrics.totalConnections} total)
+            Active connections ({metrics.totalConnections} total)
           </p>
         </div>
 
@@ -67,27 +70,21 @@ export async function ExchangesCard() {
             <span className="text-muted-foreground text-sm">trades synced</span>
           </div>
           <p className="text-muted-foreground mt-1 text-xs">
-            {metrics.tradesThisMonth.toLocaleString()} trades ce mois
+            {metrics.tradesThisMonth.toLocaleString()} trades this month
           </p>
         </div>
 
-        {/* Erreurs de sync */}
+        {/* Sync errors */}
         {metrics.connectionsWithErrors > 0 && (
           <div className="border-t pt-4">
             <Badge variant="destructive" className="text-sm">
-              ⚠️ Erreurs sync: {metrics.connectionsWithErrors}
+              ⚠️ Sync errors: {metrics.connectionsWithErrors}
             </Badge>
             <p className="text-muted-foreground mt-2 text-xs">
-              Connexions nécessitant attention
+              Connections needing attention
             </p>
           </div>
         )}
-
-        {/* Last updated */}
-        <div className="text-muted-foreground text-xs">
-          Dernière mise à jour:{" "}
-          {metrics.lastUpdated.toLocaleTimeString("fr-FR")}
-        </div>
       </CardContent>
     </Card>
   );
