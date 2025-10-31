@@ -33,6 +33,7 @@ model TraderProfile {
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   exchangeConnections   ExchangeConnection[]
   performanceSnapshots  TraderPerformanceSnapshot[]
+  traderTrades          TraderTrade[]
 
   @@map("trader_profile")
 }
@@ -65,6 +66,8 @@ model ExchangeTrade {
   id              String             @id @default(cuid())
   connectionId    String
   connection      ExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  traderTradeId   String?            // NOUVEAU: Lien vers TraderTrade agrégé
+  traderTrade     TraderTrade?       @relation(fields: [traderTradeId], references: [id])
   externalOrderId String             @unique
   symbol          String
   side            TradeSide
@@ -81,6 +84,7 @@ model ExchangeTrade {
   @@index([connectionId, executedAt])
   @@index([symbol])
   @@index([executedAt])
+  @@index([traderTradeId])
   @@map("exchange_trade")
 }
 
@@ -177,18 +181,21 @@ model CryptoPayment {
 }
 
 model Signal {
-  id          String   @id @default(cuid())
-  traderId    String
-  symbol      String
-  payloadJson Json
-  ttlSec      Int
-  hash        String   @unique
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime
-  trader      User     @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  traderId      String
+  symbol        String
+  payloadJson   Json
+  ttlSec        Int
+  hash          String        @unique
+  linkedTradeId String?       // NOUVEAU: Lien vers TraderTrade
+  createdAt     DateTime      @default(now())
+  expiresAt     DateTime
+  trader        User          @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  linkedTrade   TraderTrade?  @relation(fields: [linkedTradeId], references: [id])
 
   @@index([traderId])
   @@index([createdAt])
+  @@index([linkedTradeId])
   @@map("signal")
 }
 
@@ -301,6 +308,129 @@ model FraudLog {
   @@map("fraud_log")
 }
 
+// ============================================================================
+// UNIFIED TRADING SYSTEM MODELS
+// ============================================================================
+
+model TraderTrade {
+  id               String             @id @default(cuid())
+  traderProfileId  String
+  trader           TraderProfile      @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+
+  // Source & Type
+  source           TradeSource        // BINANCE, BYBIT, MANUAL
+  instrumentType   InstrumentType     // SPOT, FUTURES
+  symbol           String             // e.g., "BTC/USDT"
+
+  // Position Data
+  status           TradeStatus        // OPEN, CLOSED, PARTIAL
+  side             TradeSide          // BUY, SELL (LONG, SHORT for Futures)
+
+  // Quantities & Prices
+  totalQuantity    Decimal            @db.Decimal(20, 8)  // Total position quantity
+  averageEntry     Decimal            @db.Decimal(20, 8)  // Average entry price
+  averageExit      Decimal?           @db.Decimal(20, 8)  // Average exit price (if closed)
+
+  // Risk Management
+  stopLoss         Decimal?           @db.Decimal(20, 8)  // NULL for exchange trades (Phase 1)
+  takeProfit       Json?              // Array of TPs, NULL for exchange trades
+
+  // Performance
+  realizedPnl      Decimal?           @db.Decimal(20, 8)  // PnL if closed
+  fees             Decimal            @db.Decimal(20, 8)  // Total fees
+
+  // Metadata
+  notes            String?            @db.Text            // Optional notes for manual trades
+
+  // Timestamps
+  openedAt         DateTime           // First entry
+  closedAt         DateTime?          // Last exit (if closed)
+  lastActivityAt   DateTime           // Last modification
+
+  // Relations
+  fills            ExchangeTrade[]    // Raw fills from exchange (if source != MANUAL)
+  signals          Signal[]           // Signals created from this trade
+  copies           CopyTrade[]        // Copies by users
+
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([traderProfileId, status])
+  @@index([symbol])
+  @@index([openedAt])
+  @@map("trader_trade")
+}
+
+model UserExchangeConnection {
+  id                 String        @id @default(cuid())
+  userId             String
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchange           Exchange      // BINANCE, BYBIT
+
+  // Encrypted API credentials
+  encryptedApiKey    String        @db.Text
+  encryptedSecretKey String        @db.Text
+  keyIv              String
+  keyTag             String
+
+  // Configuration
+  mode               CopyMode      // MANUAL, AUTO
+  isActive           Boolean       @default(true)
+
+  // Metadata
+  lastSyncedAt       DateTime?
+  lastError          String?       @db.Text
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@unique([userId, exchange])
+  @@index([userId])
+  @@map("user_exchange_connection")
+}
+
+model CopyTrade {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Source
+  originalTradeId   String        // TraderTrade.id
+  originalTrade     TraderTrade   @relation(fields: [originalTradeId], references: [id], onDelete: Cascade)
+
+  // Copy Configuration
+  mode              CopyMode      // MANUAL, AUTO
+  status            CopyStatus    // PENDING, EXECUTED, FAILED, CANCELLED
+
+  // Execution (if AUTO)
+  exchangeOrderId   String?       // Order ID on user's exchange
+  executedPrice     Decimal?      @db.Decimal(20, 8)  // Actual execution price
+  executedQuantity  Decimal?      @db.Decimal(20, 8)  // Actual executed quantity
+  slippage          Decimal?      @db.Decimal(10, 4)  // Price difference percentage
+
+  // Manual tracking (if MANUAL)
+  manualEntry       Decimal?      @db.Decimal(20, 8)  // Manual entry price
+  manualExit        Decimal?      @db.Decimal(20, 8)  // Manual exit price
+  manualPnl         Decimal?      @db.Decimal(20, 8)  // Manual PnL calculation
+  notes             String?       @db.Text            // Personal notes
+
+  // Risk Management
+  stopLoss          Decimal?      @db.Decimal(20, 8)  // Custom SL
+  takeProfit        Json?         // Custom TPs
+
+  // Timestamps
+  copiedAt          DateTime      @default(now())
+  executedAt        DateTime?     // When executed (if AUTO)
+  closedAt          DateTime?     // When closed
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId, status])
+  @@index([originalTradeId])
+  @@map("copy_trade")
+}
+
 enum UserRole {
   USER
   TRADER
@@ -403,4 +533,37 @@ enum PerformancePeriod {
   LAST_30D
   LAST_90D
   LAST_365D
+}
+
+// ============================================================================
+// UNIFIED TRADING SYSTEM ENUMS
+// ============================================================================
+
+enum TradeSource {
+  BINANCE
+  BYBIT
+  MANUAL
+}
+
+enum InstrumentType {
+  SPOT
+  FUTURES
+}
+
+enum TradeStatus {
+  OPEN
+  CLOSED
+  PARTIAL    // Partially closed
+}
+
+enum CopyMode {
+  MANUAL     // User journal, no execution
+  AUTO       // Automatic execution via API
+}
+
+enum CopyStatus {
+  PENDING    // Waiting for execution
+  EXECUTED   // Successfully executed
+  FAILED     // Execution failed
+  CANCELLED  // Cancelled by user
 }

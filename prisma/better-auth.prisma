@@ -37,6 +37,8 @@ model User {
   referralCredits  ReferralCredit[]
   referralRewards  ReferralReward[]
   referralTier     ReferralTier?
+  userExchangeConnections UserExchangeConnection[]
+  copyTrades       CopyTrade[]
 
   @@map("user")
 }
