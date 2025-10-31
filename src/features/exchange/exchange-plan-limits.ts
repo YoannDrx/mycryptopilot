@@ -10,6 +10,7 @@ import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 export const EXCHANGE_CONNECTION_LIMITS: Record<MyCryptoPilotPlanName, number> =
   {
     free: 0,
+    test: 0, // Test plan has same limits as free
     pro: 1,
     ultra: 3,
   };
@@ -22,6 +23,7 @@ export const EXCHANGE_CONNECTION_LIMITS: Record<MyCryptoPilotPlanName, number> =
  */
 export const SYNC_INTERVAL_MINUTES: Record<MyCryptoPilotPlanName, number> = {
   free: 0, // N/A
+  test: 0, // N/A - Test plan has no exchange features
   pro: 5,
   ultra: 1,
 };

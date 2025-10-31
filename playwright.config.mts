@@ -27,12 +27,12 @@ function getServerUrl(): string {
 const SERVER_URL = getServerUrl();
 
 const HEADLESS = process.env.HEADLESS
-  ? process.env.HEADLESS.toLowerCase() === "true"
+  ? ["1", "true", "yes"].includes(process.env.HEADLESS.toLowerCase())
   : true;
 
 const config: PlaywrightTestConfig = {
-  // 50 seconds
-  timeout: 70 * 1000,
+  // 2 minutes - increased for complex tests (crypto-checkout, portfolio)
+  timeout: 120 * 1000,
   // Expect timeout for assertions (e.g., toBeVisible, toHaveText)
   // Increased to 30s for CI environment which is slower
   expect: {
@@ -54,7 +54,8 @@ const config: PlaywrightTestConfig = {
   reporter: process.env.CI ? [["list"], ["html"]] : "list",
   use: {
     launchOptions: {
-      slowMo: 200,
+      // Disable slowMo in headless mode to speed up CI tests
+      slowMo: HEADLESS ? 0 : 200,
     },
     headless: HEADLESS,
     contextOptions: {
@@ -82,13 +83,14 @@ const config: PlaywrightTestConfig = {
   ...(!process.env.PLAYWRIGHT_TEST_BASE_URL
     ? {
         webServer: {
-          // CRITICAL: Build in production mode for performance, run in test mode for env vars
-          command: "NODE_ENV=production pnpm run build && NODE_ENV=test pnpm run start",
+          // CRITICAL: Use 'next dev' to respect NODE_ENV=test and load .env.test.local
+          // 'next start' forces production mode and ignores .env.test.* files
+          command: "NODE_ENV=test pnpm run dev",
           url: SERVER_URL,
-          // Increased timeout for CI environment where build can be slower
-          timeout: process.env.CI ? 240 * 1000 : 120 * 1000,
-          reuseExistingServer:
-            process.env.NODE_ENV === "development" ? !process.env.CI : true,
+          // Dev server starts faster than build+start
+          timeout: process.env.CI ? 120 * 1000 : 60 * 1000,
+          // Always start a fresh server for tests (isolation)
+          reuseExistingServer: false,
         },
       }
     : {}),

@@ -216,7 +216,7 @@ NewSignalNotificationEmail.PreviewProps = {
       "Breakout above key resistance",
     ],
   },
-  signalUrl: "https://mycryptopilot.com/signals/123",
+  signalUrl: "https://mycryptopilot.app/signals/123",
 } as NewSignalNotificationEmailProps;
 
 // Default export for React Email dev server

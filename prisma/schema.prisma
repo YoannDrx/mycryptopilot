@@ -121,11 +121,14 @@ model CryptoAddress {
   address        String          @unique
   derivationPath String?
   isActive       Boolean         @default(true)
+  sweptAt        DateTime?       // Timestamp when funds were swept to Binance
+  sweptTxHash    String?         // Transaction hash of the sweep transaction
   createdAt      DateTime        @default(now())
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments       CryptoPayment[]
 
   @@index([userId])
+  @@index([sweptAt])
   @@map("crypto_address")
 }
 

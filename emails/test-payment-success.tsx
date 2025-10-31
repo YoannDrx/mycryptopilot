@@ -1,0 +1,126 @@
+import { SiteConfig } from "@/site-config";
+import {
+  Button,
+  Heading,
+  Preview,
+  Section,
+  Text,
+} from "@react-email/components";
+import { EmailLayout } from "./utils/email-layout";
+
+type TestPaymentSuccessEmailProps = {
+  userName: string;
+  txHash: string;
+  network: "BASE" | "TRON";
+  amountUSD: number;
+  confirmedAt: Date;
+  pricingUrl: string;
+};
+
+export function TestPaymentSuccessEmail({
+  userName,
+  txHash,
+  network,
+  amountUSD,
+  confirmedAt,
+  pricingUrl,
+}: TestPaymentSuccessEmailProps) {
+  const explorerUrl =
+    network === "BASE"
+      ? `https://basescan.org/tx/${txHash}`
+      : `https://tronscan.org/#/transaction/${txHash}`;
+
+  return (
+    <EmailLayout>
+      <Preview>Test Payment Confirmed - {SiteConfig.title}</Preview>
+
+      <Heading className="text-2xl font-bold text-gray-900">
+        🎉 Test Payment Successful!
+      </Heading>
+
+      <Text className="text-base text-gray-700">Hello {userName},</Text>
+
+      <Text className="text-base text-gray-700">
+        Great news! Your test payment of <strong>${amountUSD}</strong> has been
+        confirmed on-chain. The crypto payment system is working perfectly!
+      </Text>
+
+      <Section className="my-6 rounded-lg border border-green-200 bg-green-50 p-4">
+        <Text className="mb-2 text-sm font-semibold text-green-900">
+          ✓ Payment Details
+        </Text>
+        <ul className="list-none space-y-1 pl-0 text-sm text-green-800">
+          <li>
+            <strong>Amount:</strong> ${amountUSD} USD
+          </li>
+          <li>
+            <strong>Network:</strong>{" "}
+            {network === "BASE" ? "Base (USDC)" : "Tron (USDT)"}
+          </li>
+          <li>
+            <strong>Status:</strong> Confirmed
+          </li>
+          <li>
+            <strong>Time:</strong> {confirmedAt.toLocaleString()}
+          </li>
+        </ul>
+      </Section>
+
+      <Text className="text-base text-gray-700">
+        You can view your transaction on the blockchain explorer:
+      </Text>
+
+      <Section className="my-4 text-center">
+        <Button
+          href={explorerUrl}
+          className="rounded-lg bg-gray-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+        >
+          View Transaction
+        </Button>
+      </Section>
+
+      <Section className="my-6">
+        <Heading className="text-lg font-bold text-gray-900">
+          What's Next?
+        </Heading>
+        <ul className="list-disc pl-5 text-base text-gray-700">
+          <li>
+            <strong>You've verified the system works</strong> - Crypto payments
+            are processed automatically
+          </li>
+          <li>
+            <strong>The test payment is in your history</strong> - Check your
+            dashboard to see it
+          </li>
+          <li>
+            <strong>Ready to subscribe?</strong> - Choose Pro or Ultra plan to
+            get full access
+          </li>
+        </ul>
+      </Section>
+
+      <Section className="my-6 text-center">
+        <Button
+          href={pricingUrl}
+          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+        >
+          View Plans & Subscribe
+        </Button>
+      </Section>
+
+      <Text className="text-sm text-gray-500">
+        Questions about crypto payments? Contact us at{" "}
+        <a
+          href={`mailto:${SiteConfig.email.contact}`}
+          className="text-indigo-600 no-underline"
+        >
+          {SiteConfig.email.contact}
+        </a>
+        .
+      </Text>
+    </EmailLayout>
+  );
+}
+
+// Default export for React Email dev server
+export default TestPaymentSuccessEmail;

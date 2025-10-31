@@ -8,7 +8,7 @@ import { z } from "zod";
 
 const updatePlanSchema = z.object({
   userId: z.string(),
-  planName: z.enum(["free", "pro", "ultra"]),
+  planName: z.enum(["free", "test", "pro", "ultra"]),
   daysGranted: z.number().int().positive(),
 });
 

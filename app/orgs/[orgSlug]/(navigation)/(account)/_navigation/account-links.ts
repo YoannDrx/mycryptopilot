@@ -6,6 +6,7 @@ import {
   Users,
   AlertCircle,
   BarChart3,
+  Receipt,
 } from "lucide-react";
 
 const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
@@ -13,10 +14,11 @@ const ORGANIZATION_PATH = `/orgs/:organizationSlug`;
 /**
  * Account Space Links
  *
- * 6 liens pour la section Account Settings :
+ * 7 liens pour la section Account Settings :
  * - Profile (settings principal)
  * - Discord Integration
  * - Exchanges (Portfolio Tracking)
+ * - Payment History (crypto payments)
  * - Email Preferences
  * - Following (traders suivis)
  * - Danger Zone (suppression compte)
@@ -36,6 +38,11 @@ export const ACCOUNT_LINKS: NavigationLink[] = [
     href: `${ORGANIZATION_PATH}/account/exchanges`,
     Icon: BarChart3,
     label: "Portfolio Tracking",
+  },
+  {
+    href: `${ORGANIZATION_PATH}/account/payments`,
+    Icon: Receipt,
+    label: "Payment History",
   },
   {
     href: `${ORGANIZATION_PATH}/account/email`,
