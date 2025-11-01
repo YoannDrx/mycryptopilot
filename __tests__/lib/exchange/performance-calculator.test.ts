@@ -24,6 +24,7 @@ describe("PerformanceCalculator", () => {
   }): ExchangeTrade => ({
     id: `trade-${Math.random()}`,
     connectionId: "conn-123",
+    traderTradeId: null,
     externalOrderId: `order-${Math.random()}`,
     symbol: "BTCUSDT",
     side: "BUY",

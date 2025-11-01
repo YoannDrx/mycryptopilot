@@ -20,6 +20,12 @@
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { TraderTrade } from "@/generated/prisma";
+import {
+  calculateSharpeRatio as calculateSharpeRatioShared,
+  calculateSortinoRatio as calculateSortinoRatioShared,
+  calculateMaxDrawdown as calculateMaxDrawdownShared,
+  type TradeForDrawdown,
+} from "@/lib/trading/performance-metrics.shared";
 
 // ============= Types =============
 
@@ -106,7 +112,7 @@ export type DrawdownPeriod = {
 // ============= Calculation Functions =============
 
 /**
- * Calculate maximum drawdown
+ * Calculate maximum drawdown (adapter for shared implementation)
  */
 function calculateMaxDrawdown(trades: TraderTrade[]): {
   maxDrawdown: number;
@@ -117,72 +123,32 @@ function calculateMaxDrawdown(trades: TraderTrade[]): {
     return { maxDrawdown: 0, maxDrawdownPercent: 0, drawdownPeriods: [] };
   }
 
-  // Sort trades by close date
-  const sortedTrades = [...trades]
+  // Convert TraderTrade to TradeForDrawdown format
+  const tradesForDrawdown: TradeForDrawdown[] = trades
     .filter((t) => t.closedAt && t.realizedPnl)
-    .sort((a, b) => {
-      // We filtered for closedAt above, so these are safe
-      const aTime = a.closedAt?.getTime() ?? 0;
-      const bTime = b.closedAt?.getTime() ?? 0;
-      return aTime - bTime;
-    });
+    .map((t) => ({
+      executedAt: t.closedAt ?? new Date(),
+      realizedPnl: Number(t.realizedPnl),
+    }));
 
-  let peak = 0;
-  let maxDrawdown = 0;
-  let maxDrawdownPercent = 0;
-  let cumulative = 0;
-  const drawdownPeriods: DrawdownPeriod[] = [];
-  let currentDrawdown: DrawdownPeriod | null = null;
+  const result = calculateMaxDrawdownShared(tradesForDrawdown);
 
-  for (const trade of sortedTrades) {
-    cumulative += Number(trade.realizedPnl);
+  // Convert shared DrawdownPeriod format to portfolio DrawdownPeriod format
+  const drawdownPeriods: DrawdownPeriod[] = result.drawdownPeriods.map((p) => ({
+    start: p.start,
+    end: p.end,
+    peak: p.peakValue,
+    trough: p.troughValue,
+    drawdown: p.drawdown,
+    drawdownPercent: p.drawdownPercent,
+    duration: p.durationDays,
+  }));
 
-    if (cumulative > peak) {
-      // New peak reached
-      if (currentDrawdown) {
-        currentDrawdown.end = trade.closedAt ?? new Date();
-        drawdownPeriods.push(currentDrawdown);
-        currentDrawdown = null;
-      }
-      peak = cumulative;
-    } else {
-      // In drawdown
-      const drawdown = peak - cumulative;
-      const drawdownPercent = peak > 0 ? (drawdown / peak) * 100 : 0;
-
-      if (!currentDrawdown) {
-        currentDrawdown = {
-          start: trade.closedAt ?? new Date(),
-          end: null,
-          peak,
-          trough: cumulative,
-          drawdown,
-          drawdownPercent,
-          duration: 0,
-        };
-      } else {
-        currentDrawdown.trough = Math.min(currentDrawdown.trough, cumulative);
-        currentDrawdown.drawdown =
-          currentDrawdown.peak - currentDrawdown.trough;
-        currentDrawdown.drawdownPercent =
-          currentDrawdown.peak > 0
-            ? (currentDrawdown.drawdown / currentDrawdown.peak) * 100
-            : 0;
-      }
-
-      if (drawdown > maxDrawdown) {
-        maxDrawdown = drawdown;
-        maxDrawdownPercent = drawdownPercent;
-      }
-    }
-  }
-
-  // Close any open drawdown period
-  if (currentDrawdown) {
-    drawdownPeriods.push(currentDrawdown);
-  }
-
-  return { maxDrawdown, maxDrawdownPercent, drawdownPeriods };
+  return {
+    maxDrawdown: result.maxDrawdown,
+    maxDrawdownPercent: result.maxDrawdownPercent,
+    drawdownPeriods,
+  };
 }
 
 /**
@@ -222,11 +188,27 @@ function calculateVaR95(trades: TraderTrade[]): number {
 }
 
 /**
- * Calculate Sharpe Ratio
- * (Return - Risk Free Rate) / Volatility
- * Assuming 0% risk-free rate for crypto
+ * Calculate Sharpe Ratio from trades (adapter for shared implementation)
+ * Prefix with _ to indicate intentionally unused (reserved for future use)
  */
-function calculateSharpeRatio(
+function _calculateSharpeRatioFromTrades(trades: TraderTrade[]): number {
+  const returns = trades
+    .filter((t) => t.realizedPnl !== null)
+    .map((t) => {
+      const invested = Number(t.totalQuantity) * Number(t.averageEntry);
+      return invested > 0 ? (Number(t.realizedPnl) / invested) * 100 : 0; // Convert to percentage
+    });
+
+  const result = calculateSharpeRatioShared(returns);
+  return result ?? 0;
+}
+
+/**
+ * Calculate Sharpe Ratio from avg return and volatility
+ * Helper function for pre-computed statistics
+ * @deprecated Use calculateSharpeRatioFromTrades instead
+ */
+function calculateSharpeRatioFromStats(
   avgReturn: number,
   volatility: number,
   riskFreeRate = 0,
@@ -236,7 +218,7 @@ function calculateSharpeRatio(
 }
 
 /**
- * Calculate Sortino Ratio
+ * Calculate Sortino Ratio (adapter for shared implementation)
  * Similar to Sharpe but only considers downside volatility
  */
 function calculateSortinoRatio(trades: TraderTrade[]): number {
@@ -244,24 +226,13 @@ function calculateSortinoRatio(trades: TraderTrade[]): number {
     .filter((t) => t.realizedPnl !== null)
     .map((t) => {
       const invested = Number(t.totalQuantity) * Number(t.averageEntry);
-      return invested > 0 ? Number(t.realizedPnl) / invested : 0;
+      return invested > 0 ? (Number(t.realizedPnl) / invested) * 100 : 0; // Convert to percentage
     });
 
-  if (returns.length < 2) return 0;
+  const result = calculateSortinoRatioShared(returns);
 
-  const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-
-  // Only consider negative returns for downside deviation
-  const negativeReturns = returns.filter((r) => r < 0);
-  if (negativeReturns.length === 0) return mean > 0 ? Infinity : 0;
-
-  const downsideVariance =
-    negativeReturns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) /
-    negativeReturns.length;
-
-  const downsideDeviation = Math.sqrt(downsideVariance);
-
-  return downsideDeviation > 0 ? mean / downsideDeviation : 0;
+  // Return 0 instead of null for backward compatibility with portfolio analytics
+  return result ?? 0;
 }
 
 /**
@@ -566,7 +537,7 @@ export async function calculatePortfolioAnalytics(
   // Performance ratios
   const avgReturn =
     trades.length > 0 && totalVolume > 0 ? totalPnL / totalVolume : 0;
-  const sharpeRatio = calculateSharpeRatio(avgReturn, volatility);
+  const sharpeRatio = calculateSharpeRatioFromStats(avgReturn, volatility);
   const sortinoRatio = calculateSortinoRatio(closedTrades);
 
   // Calculate period in days for Calmar ratio
