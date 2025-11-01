@@ -32,6 +32,7 @@ import {
   calculateSpotPnL,
   calculateFuturesPnL,
 } from "./pnl-calculator.service";
+import { closeOriginalTradeCopies } from "./copy-trade.service";
 
 /**
  * Convert ExchangeTrade (with Decimal types) to ProcessedExchangeTrade (with number types)
@@ -253,6 +254,14 @@ async function updateTraderTradeFromSession(
     session.status,
   );
 
+  // Check if status is transitioning to CLOSED
+  const wasNotClosed = await prisma.traderTrade
+    .findUnique({
+      where: { id: traderTradeId },
+      select: { status: true },
+    })
+    .then((trade) => trade?.status !== "CLOSED");
+
   // Update TraderTrade
   const traderTrade = await prisma.traderTrade.update({
     where: { id: traderTradeId },
@@ -287,6 +296,32 @@ async function updateTraderTradeFromSession(
     totalFees: metrics.totalFees,
     realizedPnl: traderTrade.realizedPnl,
   });
+
+  // CRITICAL: Propagate closure to copy trades if status changed to CLOSED
+  if (wasNotClosed && session.status === "CLOSED" && metrics.averageExit) {
+    logger.info("Propagating CLOSED status to copy trades", {
+      traderTradeId: traderTrade.id,
+      exitPrice: metrics.averageExit,
+    });
+
+    try {
+      const closedCopiesCount = await closeOriginalTradeCopies(
+        traderTradeId,
+        metrics.averageExit,
+      );
+
+      logger.info("Successfully closed copy trades", {
+        traderTradeId: traderTrade.id,
+        closedCopiesCount,
+      });
+    } catch (error) {
+      logger.error("Failed to close copy trades", {
+        traderTradeId: traderTrade.id,
+        error,
+      });
+      // Don't throw - closing copies is not critical for the main aggregation
+    }
+  }
 
   return traderTrade;
 }

@@ -542,6 +542,18 @@ export async function batchCreateCopyTrades(
 
 /**
  * Close all copies when original trade closes
+ *
+ * When a TraderTrade status changes to CLOSED, this function:
+ * 1. Fetches all EXECUTED copies for this trade
+ * 2. Updates each copy with exit data and PnL
+ * 3. Sets closedAt timestamp
+ *
+ * For MANUAL copies:
+ * - manualExit = original trade's averageExit
+ * - manualPnl = calculated based on entry/exit difference
+ *
+ * For AUTO copies:
+ * - Marks them for closure (future: trigger sell orders)
  */
 export async function closeOriginalTradeCopies(
   originalTradeId: string,
@@ -552,22 +564,72 @@ export async function closeOriginalTradeCopies(
     exitPrice,
   });
 
-  // Update all EXECUTED copies with exit information
-  const result = await prisma.copyTrade.updateMany({
+  // Fetch all EXECUTED copies with their original trade data
+  const executedCopies = await prisma.copyTrade.findMany({
     where: {
       originalTradeId,
       status: "EXECUTED",
     },
-    data: {
-      notes: `Original trade closed at ${exitPrice}`,
-      // In a real implementation, we would trigger sell orders here
+    include: {
+      originalTrade: {
+        select: {
+          side: true,
+          averageEntry: true,
+          averageExit: true,
+        },
+      },
     },
   });
 
-  logger.info("Copies marked for closure", {
-    originalTradeId,
-    count: result.count,
+  if (executedCopies.length === 0) {
+    logger.info("No EXECUTED copies to close", { originalTradeId });
+    return 0;
+  }
+
+  // Update each copy individually to calculate proper PnL
+  const updatePromises = executedCopies.map(async (copy) => {
+    const entryPrice =
+      copy.mode === "MANUAL"
+        ? Number(copy.manualEntry ?? copy.originalTrade.averageEntry)
+        : Number(copy.executedPrice ?? copy.originalTrade.averageEntry);
+
+    const quantity = Number(copy.executedQuantity ?? 0);
+    const side = copy.originalTrade.side;
+
+    // Calculate PnL based on position side
+    let pnl = 0;
+    if (quantity > 0) {
+      if (side === "BUY") {
+        // LONG position: profit = (exit - entry) * quantity
+        pnl = (exitPrice - entryPrice) * quantity;
+      } else {
+        // SHORT position: profit = (entry - exit) * quantity
+        pnl = (entryPrice - exitPrice) * quantity;
+      }
+    }
+
+    // Update the copy trade with exit information
+    return prisma.copyTrade.update({
+      where: { id: copy.id },
+      data: {
+        manualExit: exitPrice,
+        manualPnl: pnl,
+        closedAt: new Date(),
+        notes: copy.notes
+          ? `${copy.notes}\n\nClosed at $${exitPrice.toFixed(2)} (PnL: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} USDT)`
+          : `Closed at $${exitPrice.toFixed(2)} (PnL: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} USDT)`,
+      },
+    });
   });
 
-  return result.count;
+  // Execute all updates in parallel
+  await Promise.all(updatePromises);
+
+  logger.info("Copies closed successfully", {
+    originalTradeId,
+    count: executedCopies.length,
+    exitPrice,
+  });
+
+  return executedCopies.length;
 }
