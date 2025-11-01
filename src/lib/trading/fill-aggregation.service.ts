@@ -83,10 +83,10 @@ function calculatePositionQuantities(session: TradingSession): {
   const netQuantity = entryQuantity - exitQuantity;
 
   // DEPRECATED totalQuantity: for backward compatibility
-  // For closed positions, use max of entry/exit
-  // For open/partial, use absolute net quantity
+  // For closed/partial positions (with exits), use max of entry/exit
+  // For open positions (no exits yet), use absolute net quantity
   const totalQuantity =
-    session.status === "CLOSED"
+    session.status === "CLOSED" || session.status === "PARTIAL"
       ? Math.max(entryQuantity, exitQuantity)
       : Math.abs(netQuantity);
 
