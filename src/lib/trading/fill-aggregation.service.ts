@@ -49,44 +49,64 @@ function convertToProcessedFill(fill: ExchangeTrade): ProcessedExchangeTrade {
 }
 
 /**
- * Calculate detailed position quantities from fills
- * Tracks entry, exit, and net quantities separately for accurate PnL calculation
+ * Calculate detailed position metrics from fills
+ * Tracks quantities, weighted averages, and cumulative fees
  */
-function calculatePositionQuantities(session: TradingSession): {
+function calculatePositionMetrics(
+  fills: ProcessedExchangeTrade[],
+  side: "BUY" | "SELL",
+  status: "OPEN" | "PARTIAL" | "CLOSED",
+): {
   entryQuantity: number;
   exitQuantity: number;
   netQuantity: number;
   totalQuantity: number; // DEPRECATED: for backward compatibility
+  averageEntry: number;
+  averageExit: number | null;
+  totalFees: number;
 } {
   // Calculate entry and exit quantities based on position side
   let entryQuantity = 0;
   let exitQuantity = 0;
+  let entryValueSum = 0; // For weighted average entry
+  let exitValueSum = 0; // For weighted average exit
+  let totalFees = 0;
 
-  for (const fill of session.fills) {
-    if (session.side === "BUY") {
+  for (const fill of fills) {
+    totalFees += fill.fee;
+
+    if (side === "BUY") {
       // Long position: entry = buys, exit = sells
       if (fill.side === "BUY") {
         entryQuantity += fill.quantity;
+        entryValueSum += fill.quantity * fill.price;
       } else {
         exitQuantity += fill.quantity;
+        exitValueSum += fill.quantity * fill.price;
       }
     } else {
       // Short position: entry = sells, exit = buys
       if (fill.side === "SELL") {
         entryQuantity += fill.quantity;
+        entryValueSum += fill.quantity * fill.price;
       } else {
         exitQuantity += fill.quantity;
+        exitValueSum += fill.quantity * fill.price;
       }
     }
   }
 
   const netQuantity = entryQuantity - exitQuantity;
 
+  // Calculate weighted averages
+  const averageEntry = entryQuantity > 0 ? entryValueSum / entryQuantity : 0;
+  const averageExit = exitQuantity > 0 ? exitValueSum / exitQuantity : null;
+
   // DEPRECATED totalQuantity: for backward compatibility
   // For closed/partial positions (with exits), use max of entry/exit
   // For open positions (no exits yet), use absolute net quantity
   const totalQuantity =
-    session.status === "CLOSED" || session.status === "PARTIAL"
+    status === "CLOSED" || status === "PARTIAL"
       ? Math.max(entryQuantity, exitQuantity)
       : Math.abs(netQuantity);
 
@@ -95,6 +115,9 @@ function calculatePositionQuantities(session: TradingSession): {
     exitQuantity,
     netQuantity,
     totalQuantity,
+    averageEntry,
+    averageExit,
+    totalFees,
   };
 }
 
@@ -132,8 +155,12 @@ async function createTraderTradeFromSession(
       ? calculateSpotPnL(session.fills)
       : calculateFuturesPnL(session.fills);
 
-  // Calculate position quantities (entry, exit, net)
-  const quantities = calculatePositionQuantities(session);
+  // Calculate position metrics (quantities, weighted averages, fees)
+  const metrics = calculatePositionMetrics(
+    session.fills,
+    session.side,
+    session.status,
+  );
 
   // Create TraderTrade
   const traderTrade = await prisma.traderTrade.create({
@@ -144,19 +171,19 @@ async function createTraderTradeFromSession(
       symbol: session.symbol,
       status: session.status,
       side: session.side,
-      totalQuantity: quantities.totalQuantity, // DEPRECATED: kept for backward compatibility
-      entryQuantity: quantities.entryQuantity,
-      exitQuantity: quantities.exitQuantity,
-      netQuantity: quantities.netQuantity,
-      averageEntry: session.averageEntry,
-      averageExit: session.averageExit,
+      totalQuantity: metrics.totalQuantity, // DEPRECATED: kept for backward compatibility
+      entryQuantity: metrics.entryQuantity,
+      exitQuantity: metrics.exitQuantity,
+      netQuantity: metrics.netQuantity,
+      averageEntry: metrics.averageEntry,
+      averageExit: metrics.averageExit,
       stopLoss: null, // Phase 1: No SL/TP from exchange
       takeProfit: undefined, // Phase 1: No SL/TP from exchange
       realizedPnl:
         session.status === "CLOSED" || session.status === "PARTIAL"
           ? pnlResult.realizedPnl
           : null,
-      fees: session.totalFees,
+      fees: metrics.totalFees,
       notes: null,
       openedAt: session.openedAt,
       closedAt: session.closedAt,
@@ -168,9 +195,12 @@ async function createTraderTradeFromSession(
     traderTradeId: traderTrade.id,
     symbol: traderTrade.symbol,
     status: traderTrade.status,
-    entryQuantity: quantities.entryQuantity,
-    exitQuantity: quantities.exitQuantity,
-    netQuantity: quantities.netQuantity,
+    entryQuantity: metrics.entryQuantity,
+    exitQuantity: metrics.exitQuantity,
+    netQuantity: metrics.netQuantity,
+    averageEntry: metrics.averageEntry,
+    averageExit: metrics.averageExit,
+    totalFees: metrics.totalFees,
     realizedPnl: traderTrade.realizedPnl,
   });
 
@@ -216,9 +246,12 @@ async function updateTraderTradeFromSession(
       ? calculateSpotPnL(allFills)
       : calculateFuturesPnL(allFills);
 
-  // Calculate position quantities from ALL fills
-  const allFillsSession: TradingSession = { ...session, fills: allFills };
-  const quantities = calculatePositionQuantities(allFillsSession);
+  // Calculate position metrics from ALL fills (critical for DCA and weighted averages)
+  const metrics = calculatePositionMetrics(
+    allFills,
+    session.side,
+    session.status,
+  );
 
   // Update TraderTrade
   const traderTrade = await prisma.traderTrade.update({
@@ -226,17 +259,17 @@ async function updateTraderTradeFromSession(
     data: {
       status: session.status,
       side: session.side,
-      totalQuantity: quantities.totalQuantity, // DEPRECATED: kept for backward compatibility
-      entryQuantity: quantities.entryQuantity,
-      exitQuantity: quantities.exitQuantity,
-      netQuantity: quantities.netQuantity,
-      averageEntry: session.averageEntry,
-      averageExit: session.averageExit,
+      totalQuantity: metrics.totalQuantity, // DEPRECATED: kept for backward compatibility
+      entryQuantity: metrics.entryQuantity,
+      exitQuantity: metrics.exitQuantity,
+      netQuantity: metrics.netQuantity,
+      averageEntry: metrics.averageEntry, // CRITICAL: Recalculated weighted average from ALL fills
+      averageExit: metrics.averageExit, // CRITICAL: Recalculated weighted average from ALL fills
       realizedPnl:
         session.status === "CLOSED" || session.status === "PARTIAL"
           ? pnlResult.realizedPnl
           : null,
-      fees: session.totalFees,
+      fees: metrics.totalFees, // CRITICAL: Cumulative fees from ALL fills
       closedAt: session.closedAt,
       lastActivityAt: session.lastActivityAt,
       updatedAt: new Date(),
@@ -246,9 +279,12 @@ async function updateTraderTradeFromSession(
   logger.info("Updated TraderTrade from session", {
     traderTradeId: traderTrade.id,
     status: traderTrade.status,
-    entryQuantity: quantities.entryQuantity,
-    exitQuantity: quantities.exitQuantity,
-    netQuantity: quantities.netQuantity,
+    entryQuantity: metrics.entryQuantity,
+    exitQuantity: metrics.exitQuantity,
+    netQuantity: metrics.netQuantity,
+    averageEntry: metrics.averageEntry,
+    averageExit: metrics.averageExit,
+    totalFees: metrics.totalFees,
     realizedPnl: traderTrade.realizedPnl,
   });
 
@@ -291,11 +327,13 @@ async function linkFillsToTraderTrade(
 async function findMatchingTraderTrade(
   traderProfileId: string,
   session: TradingSession,
+  source: "BINANCE" | "BYBIT" | "MANUAL", // CRITICAL: Exchange source
 ): Promise<TraderTrade | null> {
-  // Look for open/partial TraderTrade with same symbol and side
+  // Look for open/partial TraderTrade with same symbol, side, and source
   const existingTrade = await prisma.traderTrade.findFirst({
     where: {
       traderProfileId,
+      source, // CRITICAL: Must match source to prevent merging trades from different exchanges
       symbol: session.symbol,
       instrumentType: session.instrumentType,
       side: session.side, // CRITICAL: Must match side to prevent merging opposite positions
@@ -397,11 +435,28 @@ export async function aggregateTraderFills(
   // Sessions must be processed sequentially to maintain order and dependencies
 
   for (const session of sessions) {
+    // Get source from first fill's connection
+    const firstFill = session.fills[0];
+    // eslint-disable-next-line no-await-in-loop
+    const connection = await prisma.exchangeConnection.findUnique({
+      where: { id: firstFill.connectionId },
+      select: { exchange: true },
+    });
+
+    if (!connection) {
+      logger.error("Connection not found for session", {
+        connectionId: firstFill.connectionId,
+        sessionId: session.id,
+      });
+      continue; // Skip this session
+    }
+
     // Check if this session matches an existing open trade
     // eslint-disable-next-line no-await-in-loop
     const existingTrade = await findMatchingTraderTrade(
       traderProfileId,
       session,
+      connection.exchange,
     );
 
     let traderTrade: TraderTrade;
