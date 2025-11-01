@@ -18,7 +18,11 @@
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { ExchangeTrade, TraderTrade } from "@/generated/prisma";
-import type { TradingSession, AggregationResult } from "./types";
+import type {
+  TradingSession,
+  AggregationResult,
+  ProcessedExchangeTrade,
+} from "./types";
 import {
   detectSessionsForTrader,
   findUnassignedFills,
@@ -30,26 +34,68 @@ import {
 } from "./pnl-calculator.service";
 
 /**
- * Calculate the real position size from fills
- * For closed positions, returns the total amount traded (max of buys or sells)
- * For open/partial positions, returns the current net quantity
+ * Convert ExchangeTrade (with Decimal types) to ProcessedExchangeTrade (with number types)
+ * This is needed for PnL calculation which expects number types
  */
-function calculatePositionSize(session: TradingSession): number {
-  if (session.status === "CLOSED") {
-    // For closed positions, calculate total amount traded
-    const totalBuys = session.fills
-      .filter((f) => f.side === "BUY")
-      .reduce((sum, f) => sum + f.quantity, 0);
-    const totalSells = session.fills
-      .filter((f) => f.side === "SELL")
-      .reduce((sum, f) => sum + f.quantity, 0);
+function convertToProcessedFill(fill: ExchangeTrade): ProcessedExchangeTrade {
+  return {
+    ...fill,
+    quantity: Number(fill.quantity),
+    price: Number(fill.price),
+    quoteQuantity: Number(fill.quoteQuantity),
+    fee: Number(fill.fee),
+    realizedPnl: fill.realizedPnl ? Number(fill.realizedPnl) : null,
+  };
+}
 
-    // Return the larger of the two (position size)
-    return Math.max(totalBuys, totalSells);
+/**
+ * Calculate detailed position quantities from fills
+ * Tracks entry, exit, and net quantities separately for accurate PnL calculation
+ */
+function calculatePositionQuantities(session: TradingSession): {
+  entryQuantity: number;
+  exitQuantity: number;
+  netQuantity: number;
+  totalQuantity: number; // DEPRECATED: for backward compatibility
+} {
+  // Calculate entry and exit quantities based on position side
+  let entryQuantity = 0;
+  let exitQuantity = 0;
+
+  for (const fill of session.fills) {
+    if (session.side === "BUY") {
+      // Long position: entry = buys, exit = sells
+      if (fill.side === "BUY") {
+        entryQuantity += fill.quantity;
+      } else {
+        exitQuantity += fill.quantity;
+      }
+    } else {
+      // Short position: entry = sells, exit = buys
+      if (fill.side === "SELL") {
+        entryQuantity += fill.quantity;
+      } else {
+        exitQuantity += fill.quantity;
+      }
+    }
   }
 
-  // For open/partial positions, return absolute net quantity
-  return Math.abs(session.totalQuantity);
+  const netQuantity = entryQuantity - exitQuantity;
+
+  // DEPRECATED totalQuantity: for backward compatibility
+  // For closed positions, use max of entry/exit
+  // For open/partial, use absolute net quantity
+  const totalQuantity =
+    session.status === "CLOSED"
+      ? Math.max(entryQuantity, exitQuantity)
+      : Math.abs(netQuantity);
+
+  return {
+    entryQuantity,
+    exitQuantity,
+    netQuantity,
+    totalQuantity,
+  };
 }
 
 /**
@@ -86,8 +132,8 @@ async function createTraderTradeFromSession(
       ? calculateSpotPnL(session.fills)
       : calculateFuturesPnL(session.fills);
 
-  // Calculate real position size (handles closed positions correctly)
-  const positionSize = calculatePositionSize(session);
+  // Calculate position quantities (entry, exit, net)
+  const quantities = calculatePositionQuantities(session);
 
   // Create TraderTrade
   const traderTrade = await prisma.traderTrade.create({
@@ -98,7 +144,10 @@ async function createTraderTradeFromSession(
       symbol: session.symbol,
       status: session.status,
       side: session.side,
-      totalQuantity: positionSize,
+      totalQuantity: quantities.totalQuantity, // DEPRECATED: kept for backward compatibility
+      entryQuantity: quantities.entryQuantity,
+      exitQuantity: quantities.exitQuantity,
+      netQuantity: quantities.netQuantity,
       averageEntry: session.averageEntry,
       averageExit: session.averageExit,
       stopLoss: null, // Phase 1: No SL/TP from exchange
@@ -119,7 +168,9 @@ async function createTraderTradeFromSession(
     traderTradeId: traderTrade.id,
     symbol: traderTrade.symbol,
     status: traderTrade.status,
-    positionSize,
+    entryQuantity: quantities.entryQuantity,
+    exitQuantity: quantities.exitQuantity,
+    netQuantity: quantities.netQuantity,
     realizedPnl: traderTrade.realizedPnl,
   });
 
@@ -140,14 +191,34 @@ async function updateTraderTradeFromSession(
     newFills: session.fills.length,
   });
 
-  // Calculate PnL based on instrument type
+  // CRITICAL: Fetch ALL existing fills for this TraderTrade
+  // We need to recalculate PnL on ALL fills (old + new), not just new ones
+  const existingFills = await prisma.exchangeTrade.findMany({
+    where: { traderTradeId },
+    orderBy: { executedAt: "asc" },
+  });
+
+  logger.debug("Fetched existing fills for PnL recalculation", {
+    traderTradeId,
+    existingFillsCount: existingFills.length,
+    newFillsCount: session.fills.length,
+  });
+
+  // Convert existing fills from Decimal to number types
+  const existingProcessedFills = existingFills.map(convertToProcessedFill);
+
+  // Combine existing fills with new fills for complete PnL calculation
+  const allFills = [...existingProcessedFills, ...session.fills];
+
+  // Calculate PnL based on instrument type using ALL fills
   const pnlResult =
     session.instrumentType === "SPOT"
-      ? calculateSpotPnL(session.fills)
-      : calculateFuturesPnL(session.fills);
+      ? calculateSpotPnL(allFills)
+      : calculateFuturesPnL(allFills);
 
-  // Calculate real position size (handles closed positions correctly)
-  const positionSize = calculatePositionSize(session);
+  // Calculate position quantities from ALL fills
+  const allFillsSession: TradingSession = { ...session, fills: allFills };
+  const quantities = calculatePositionQuantities(allFillsSession);
 
   // Update TraderTrade
   const traderTrade = await prisma.traderTrade.update({
@@ -155,7 +226,10 @@ async function updateTraderTradeFromSession(
     data: {
       status: session.status,
       side: session.side,
-      totalQuantity: positionSize,
+      totalQuantity: quantities.totalQuantity, // DEPRECATED: kept for backward compatibility
+      entryQuantity: quantities.entryQuantity,
+      exitQuantity: quantities.exitQuantity,
+      netQuantity: quantities.netQuantity,
       averageEntry: session.averageEntry,
       averageExit: session.averageExit,
       realizedPnl:
@@ -172,7 +246,9 @@ async function updateTraderTradeFromSession(
   logger.info("Updated TraderTrade from session", {
     traderTradeId: traderTrade.id,
     status: traderTrade.status,
-    positionSize,
+    entryQuantity: quantities.entryQuantity,
+    exitQuantity: quantities.exitQuantity,
+    netQuantity: quantities.netQuantity,
     realizedPnl: traderTrade.realizedPnl,
   });
 

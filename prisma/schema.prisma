@@ -327,7 +327,10 @@ model TraderTrade {
   side             TradeSide          // BUY, SELL (LONG, SHORT for Futures)
 
   // Quantities & Prices
-  totalQuantity    Decimal            @db.Decimal(20, 8)  // Total position quantity
+  totalQuantity    Decimal            @db.Decimal(20, 8)  // DEPRECATED: kept for backward compatibility
+  entryQuantity    Decimal            @default(0) @db.Decimal(20, 8)  // Total quantity bought/longed
+  exitQuantity     Decimal            @default(0) @db.Decimal(20, 8)  // Total quantity sold/shorted
+  netQuantity      Decimal            @default(0) @db.Decimal(20, 8)  // entryQuantity - exitQuantity (current position)
   averageEntry     Decimal            @db.Decimal(20, 8)  // Average entry price
   averageExit      Decimal?           @db.Decimal(20, 8)  // Average exit price (if closed)
 
