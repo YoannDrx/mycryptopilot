@@ -66,8 +66,8 @@ export type TradingSession = {
  * Fill Aggregation Result
  */
 export type AggregationResult = {
-  /** Newly created or updated TraderTrade */
-  traderTrade: TraderTrade;
+  /** Newly created or updated TraderTrade (null if no fills to process) */
+  traderTrade: TraderTrade | null;
   /** Number of fills processed */
   fillsProcessed: number;
   /** Number of new sessions created */
@@ -118,6 +118,74 @@ export enum GenesisStrategy {
 }
 
 /**
+ * Take Profit Level
+ * Structured format for TP levels with optional metadata
+ */
+export type TakeProfitLevel = {
+  /** Price level for take profit */
+  price: number;
+  /** Percentage of position to close at this level (optional, default: 100) */
+  percentage?: number;
+  /** Whether this TP has been hit (optional, for tracking) */
+  hit?: boolean;
+};
+
+/**
+ * Take Profit Array Type
+ * Can be either simple number array or structured TP levels
+ */
+export type TakeProfitArray = number[] | TakeProfitLevel[];
+
+/**
+ * Validate and normalize take profit data
+ * Converts any format to structured TakeProfitLevel[]
+ */
+export function normalizeTakeProfits(
+  takeProfits: TakeProfitArray | null | undefined,
+): TakeProfitLevel[] | null {
+  if (!takeProfits || takeProfits.length === 0) {
+    return null;
+  }
+
+  // Check if array contains numbers or objects
+  if (typeof takeProfits[0] === "number") {
+    // Convert number array to structured format
+    return (takeProfits as number[]).map((price) => ({
+      price,
+      percentage: 100,
+      hit: false,
+    }));
+  }
+
+  // Already structured format, validate it
+  return (takeProfits as TakeProfitLevel[]).map((tp) => ({
+    price: tp.price,
+    percentage: tp.percentage ?? 100,
+    hit: tp.hit ?? false,
+  }));
+}
+
+/**
+ * Parse take profit data from Prisma Json field
+ */
+export function parseTakeProfits(json: unknown): TakeProfitLevel[] | null {
+  if (!json) return null;
+
+  try {
+    // Handle string JSON
+    const data = typeof json === "string" ? JSON.parse(json) : json;
+
+    if (!Array.isArray(data)) {
+      return null;
+    }
+
+    return normalizeTakeProfits(data as TakeProfitArray);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Manual Trade Creation Input
  */
 export type CreateManualTradeInput = {
@@ -135,8 +203,8 @@ export type CreateManualTradeInput = {
   quantity: number;
   /** Stop loss (optional) */
   stopLoss?: number;
-  /** Take profits (optional) */
-  takeProfits?: number[];
+  /** Take profits (optional, can be simple numbers or structured) */
+  takeProfits?: TakeProfitArray;
   /** Notes (optional) */
   notes?: string;
 };

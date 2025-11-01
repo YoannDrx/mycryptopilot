@@ -23,7 +23,8 @@
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { TraderTrade, Prisma } from "@/generated/prisma";
-import type { CreateManualTradeInput } from "./types";
+import type { CreateManualTradeInput, TakeProfitArray } from "./types";
+import { normalizeTakeProfits } from "./types";
 
 /**
  * Validate manual trade input
@@ -41,30 +42,39 @@ function validateManualTradeInput(input: CreateManualTradeInput): void {
     throw new Error("Stop loss must be positive");
   }
 
-  if (input.takeProfits) {
-    for (const tp of input.takeProfits) {
-      if (tp <= 0) {
-        throw new Error("Take profit levels must be positive");
-      }
-    }
+  if (input.takeProfits && input.takeProfits.length > 0) {
+    // Normalize to structured format for validation
+    const normalizedTPs = normalizeTakeProfits(input.takeProfits);
 
-    // For LONG trades, TPs should be above entry
-    if (input.side === "BUY") {
-      const invalidTp = input.takeProfits.some((tp) => tp <= input.entryPrice);
-      if (invalidTp) {
-        throw new Error(
-          "Take profit levels must be above entry price for long trades",
-        );
+    if (normalizedTPs) {
+      for (const tp of normalizedTPs) {
+        if (tp.price <= 0) {
+          throw new Error("Take profit levels must be positive");
+        }
       }
-    }
 
-    // For SHORT trades, TPs should be below entry
-    if (input.side === "SELL") {
-      const invalidTp = input.takeProfits.some((tp) => tp >= input.entryPrice);
-      if (invalidTp) {
-        throw new Error(
-          "Take profit levels must be below entry price for short trades",
+      // For LONG trades, TPs should be above entry
+      if (input.side === "BUY") {
+        const invalidTp = normalizedTPs.some(
+          (tp) => tp.price <= input.entryPrice,
         );
+        if (invalidTp) {
+          throw new Error(
+            "Take profit levels must be above entry price for long trades",
+          );
+        }
+      }
+
+      // For SHORT trades, TPs should be below entry
+      if (input.side === "SELL") {
+        const invalidTp = normalizedTPs.some(
+          (tp) => tp.price >= input.entryPrice,
+        );
+        if (invalidTp) {
+          throw new Error(
+            "Take profit levels must be below entry price for short trades",
+          );
+        }
       }
     }
   }
@@ -105,6 +115,11 @@ export async function createManualTrade(
     throw new Error(`Trader profile not found: ${input.traderProfileId}`);
   }
 
+  // Normalize take profits to structured format
+  const normalizedTPs = input.takeProfits
+    ? normalizeTakeProfits(input.takeProfits)
+    : null;
+
   // Create manual trade
   const trade = await prisma.traderTrade.create({
     data: {
@@ -118,7 +133,7 @@ export async function createManualTrade(
       averageEntry: input.entryPrice,
       averageExit: null,
       stopLoss: input.stopLoss ?? null,
-      takeProfit: input.takeProfits ?? undefined,
+      takeProfit: normalizedTPs ?? undefined,
       realizedPnl: null,
       fees: 0, // Manual trades have no fees initially
       notes: input.notes ?? null,
@@ -146,7 +161,7 @@ export async function updateManualTrade(
   update: {
     exitPrice?: number;
     stopLoss?: number;
-    takeProfits?: number[];
+    takeProfits?: TakeProfitArray;
     notes?: string;
     status?: "OPEN" | "CLOSED" | "PARTIAL";
   },
@@ -196,9 +211,10 @@ export async function updateManualTrade(
     updateData.stopLoss = update.stopLoss;
   }
 
-  // Update take profits
+  // Update take profits (normalize to structured format)
   if (update.takeProfits !== undefined) {
-    updateData.takeProfit = update.takeProfits;
+    const normalizedTPs = normalizeTakeProfits(update.takeProfits);
+    updateData.takeProfit = normalizedTPs ?? undefined;
   }
 
   // Update notes

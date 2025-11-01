@@ -30,6 +30,29 @@ import {
 } from "./pnl-calculator.service";
 
 /**
+ * Calculate the real position size from fills
+ * For closed positions, returns the total amount traded (max of buys or sells)
+ * For open/partial positions, returns the current net quantity
+ */
+function calculatePositionSize(session: TradingSession): number {
+  if (session.status === "CLOSED") {
+    // For closed positions, calculate total amount traded
+    const totalBuys = session.fills
+      .filter((f) => f.side === "BUY")
+      .reduce((sum, f) => sum + f.quantity, 0);
+    const totalSells = session.fills
+      .filter((f) => f.side === "SELL")
+      .reduce((sum, f) => sum + f.quantity, 0);
+
+    // Return the larger of the two (position size)
+    return Math.max(totalBuys, totalSells);
+  }
+
+  // For open/partial positions, return absolute net quantity
+  return Math.abs(session.totalQuantity);
+}
+
+/**
  * Create a TraderTrade from a trading session
  */
 async function createTraderTradeFromSession(
@@ -63,6 +86,9 @@ async function createTraderTradeFromSession(
       ? calculateSpotPnL(session.fills)
       : calculateFuturesPnL(session.fills);
 
+  // Calculate real position size (handles closed positions correctly)
+  const positionSize = calculatePositionSize(session);
+
   // Create TraderTrade
   const traderTrade = await prisma.traderTrade.create({
     data: {
@@ -72,12 +98,15 @@ async function createTraderTradeFromSession(
       symbol: session.symbol,
       status: session.status,
       side: session.side,
-      totalQuantity: Math.abs(session.totalQuantity),
+      totalQuantity: positionSize,
       averageEntry: session.averageEntry,
       averageExit: session.averageExit,
       stopLoss: null, // Phase 1: No SL/TP from exchange
       takeProfit: undefined, // Phase 1: No SL/TP from exchange
-      realizedPnl: session.status === "CLOSED" ? pnlResult.realizedPnl : null,
+      realizedPnl:
+        session.status === "CLOSED" || session.status === "PARTIAL"
+          ? pnlResult.realizedPnl
+          : null,
       fees: session.totalFees,
       notes: null,
       openedAt: session.openedAt,
@@ -90,6 +119,7 @@ async function createTraderTradeFromSession(
     traderTradeId: traderTrade.id,
     symbol: traderTrade.symbol,
     status: traderTrade.status,
+    positionSize,
     realizedPnl: traderTrade.realizedPnl,
   });
 
@@ -116,16 +146,22 @@ async function updateTraderTradeFromSession(
       ? calculateSpotPnL(session.fills)
       : calculateFuturesPnL(session.fills);
 
+  // Calculate real position size (handles closed positions correctly)
+  const positionSize = calculatePositionSize(session);
+
   // Update TraderTrade
   const traderTrade = await prisma.traderTrade.update({
     where: { id: traderTradeId },
     data: {
       status: session.status,
       side: session.side,
-      totalQuantity: Math.abs(session.totalQuantity),
+      totalQuantity: positionSize,
       averageEntry: session.averageEntry,
       averageExit: session.averageExit,
-      realizedPnl: session.status === "CLOSED" ? pnlResult.realizedPnl : null,
+      realizedPnl:
+        session.status === "CLOSED" || session.status === "PARTIAL"
+          ? pnlResult.realizedPnl
+          : null,
       fees: session.totalFees,
       closedAt: session.closedAt,
       lastActivityAt: session.lastActivityAt,
@@ -136,6 +172,7 @@ async function updateTraderTradeFromSession(
   logger.info("Updated TraderTrade from session", {
     traderTradeId: traderTrade.id,
     status: traderTrade.status,
+    positionSize,
     realizedPnl: traderTrade.realizedPnl,
   });
 
@@ -179,12 +216,13 @@ async function findMatchingTraderTrade(
   traderProfileId: string,
   session: TradingSession,
 ): Promise<TraderTrade | null> {
-  // Look for open/partial TraderTrade with same symbol
+  // Look for open/partial TraderTrade with same symbol and side
   const existingTrade = await prisma.traderTrade.findFirst({
     where: {
       traderProfileId,
       symbol: session.symbol,
       instrumentType: session.instrumentType,
+      side: session.side, // CRITICAL: Must match side to prevent merging opposite positions
       status: { in: ["OPEN", "PARTIAL"] },
     },
     orderBy: {
@@ -252,9 +290,9 @@ export async function aggregateTraderFills(
 
   if (fillsToProcess.length === 0) {
     logger.info("No fills to process");
-    // Return null result when no fills to process
+    // Return proper null result when no fills to process
     const emptyResult: AggregationResult = {
-      traderTrade: null as unknown as TraderTrade, // Cast for empty result
+      traderTrade: null,
       fillsProcessed: 0,
       sessionsCreated: 0,
       processingTimeMs: Date.now() - startTime,
@@ -329,7 +367,7 @@ export async function aggregateTraderFills(
   });
 
   return {
-    traderTrade: lastTraderTrade ?? ({} as TraderTrade), // Provide fallback for type safety
+    traderTrade: lastTraderTrade,
     fillsProcessed: fillsToProcess.length,
     sessionsCreated,
     processingTimeMs,

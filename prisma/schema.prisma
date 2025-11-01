@@ -564,6 +564,7 @@ enum CopyMode {
 enum CopyStatus {
   PENDING    // Waiting for execution
   EXECUTED   // Successfully executed
+  CLOSED     // Position closed
   FAILED     // Execution failed
   CANCELLED  // Cancelled by user
 }
