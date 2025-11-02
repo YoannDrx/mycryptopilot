@@ -1,49 +1,65 @@
 #!/bin/bash
 
 # Script pour configurer la base de données de test
-# Fonctionne avec Postgres.app
+# Fonctionne en local (Postgres.app) ET sur CI (Docker Postgres)
 
-set -e
+set -euo pipefail
 
-# Ajouter Postgres.app au PATH (requis pour pg_isready, psql, createdb)
-export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+IS_CI=${GITHUB_ACTIONS:-""}
+
+if [[ -z "$IS_CI" ]]; then
+  # En local on utilise Postgres.app (macOS)
+  export PATH="/Applications/Postgres.app/Contents/Versions/latest/bin:$PATH"
+  PG_USER=${PGUSER:-$(whoami)}
+  PG_PASSWORD=${PGPASSWORD:-}
+else
+  # Sur CI (GitHub Actions) on utilise le service docker postgres
+  PG_USER=${PGUSER:-postgres}
+  PG_PASSWORD=${PGPASSWORD:-}
+  if [[ -z "$PG_PASSWORD" ]]; then
+    echo "❌ PGPASSWORD doit être fourni via l'environnement CI_POSTGRES_PASSWORD"
+    exit 1
+  fi
+fi
+
+export PGUSER="$PG_USER"
+export PGPASSWORD="$PG_PASSWORD"
 
 echo "🔍 Vérification de PostgreSQL..."
 
-# Vérifier que PostgreSQL est accessible
-if ! pg_isready -h localhost -p 5432 > /dev/null 2>&1; then
-    echo "❌ PostgreSQL n'est pas accessible sur localhost:5432"
+if ! pg_isready -h localhost -p 5432 -U "$PG_USER" > /dev/null 2>&1; then
+  echo "❌ PostgreSQL n'est pas accessible sur localhost:5432"
+  if [[ -z "$IS_CI" ]]; then
     echo ""
     echo "Solutions possibles :"
     echo "  1. Ouvrez Postgres.app et démarrez le serveur"
     echo "  2. Vérifiez que le port 5432 est bien utilisé"
-    exit 1
+  fi
+  exit 1
 fi
 
-echo "✅ PostgreSQL est accessible"
+echo "✅ PostgreSQL est accessible (user: $PG_USER)"
 
-# Déterminer l'utilisateur PostgreSQL à utiliser
-# Postgres.app: utilise l'utilisateur macOS
-PG_USER=${PGUSER:-$(whoami)}
-
-# Créer la base de données si elle n'existe pas
 echo "🗄️  Création de la base de données 'mycryptopilot_test'..."
 
 if psql -h localhost -U "$PG_USER" -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw mycryptopilot_test; then
-    echo "✅ La base de données 'mycryptopilot_test' existe déjà"
+  echo "✅ La base de données 'mycryptopilot_test' existe déjà"
 else
-    createdb -h localhost -U "$PG_USER" mycryptopilot_test 2>/dev/null || true
-    echo "✅ Base de données 'mycryptopilot_test' créée"
+  createdb -h localhost -U "$PG_USER" mycryptopilot_test
+  echo "✅ Base de données 'mycryptopilot_test' créée"
 fi
 
-# Appliquer les migrations
 echo "🔄 Application des migrations..."
 
-# Export DATABASE_URL for test database
-export DATABASE_URL="postgresql://$PG_USER:@localhost:5432/mycryptopilot_test"
-export DATABASE_URL_UNPOOLED="postgresql://$PG_USER:@localhost:5432/mycryptopilot_test"
+DB_URL="postgresql://$PG_USER"
+if [[ -n "$PG_PASSWORD" ]]; then
+  DB_URL="postgresql://$PG_USER:$PG_PASSWORD"
+fi
+DB_URL+="@localhost:5432/mycryptopilot_test"
 
-# Run migrations
+export DATABASE_URL="$DB_URL"
+export DATABASE_URL_UNPOOLED="$DB_URL"
+
 npx prisma migrate deploy
 
 echo ""
