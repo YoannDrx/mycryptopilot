@@ -15,9 +15,9 @@ if [[ -z "$IS_CI" ]]; then
 else
   # Sur CI (GitHub Actions) on utilise le service docker postgres
   PG_USER=${PGUSER:-postgres}
-  PG_PASSWORD=${PGPASSWORD:-}
+  PG_PASSWORD=${CI_POSTGRES_PASSWORD:-${PGPASSWORD:-}}
   if [[ -z "$PG_PASSWORD" ]]; then
-    echo "❌ PGPASSWORD doit être fourni via l'environnement CI_POSTGRES_PASSWORD"
+    echo "❌ CI_POSTGRES_PASSWORD ou PGPASSWORD doit être fourni dans l'environnement CI"
     exit 1
   fi
 fi
