@@ -204,6 +204,8 @@ jobs:
       HEADLESS: "true"
       CI: "true"
       PORT: 3000
+      # PostgreSQL password for test DB setup
+      CI_POSTGRES_PASSWORD: postgres
 
     services:
       postgres:
