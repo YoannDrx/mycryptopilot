@@ -1,14 +1,7 @@
-import { headers } from "next/headers";
-import { auth } from "../auth";
+import { hasPermissionApi } from "./auth-api-helper";
 import type { AuthPermission } from "./auth-permissions";
 
 export const hasPermission = async (permission: AuthPermission) => {
-  const result = await auth.api.hasPermission({
-    headers: await headers(),
-    body: {
-      permission,
-    },
-  });
-
+  const result = await hasPermissionApi(permission);
   return result.success;
 };

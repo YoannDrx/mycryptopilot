@@ -13,6 +13,7 @@ import { ac, roles } from "./auth/auth-permissions";
 import { sendEmail } from "@/lib/mail/send-email";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
+import { createOrganizationApi } from "./auth/auth-api-helper";
 import { setupResendCustomer } from "./auth/auth-config-setup";
 import { sendDiscordInviteEmail } from "./discord/invitations";
 import { env } from "./env";
@@ -123,14 +124,9 @@ export const auth = betterAuth({
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
               // eslint-disable-next-line no-await-in-loop
-              await auth.api.createOrganization({
-                body: {
-                  name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
-                  slug: generateSlug(user.id), // Use user ID for unique slug
-                  logo: `${getServerUrl()}/images/account-logo.png`,
-                  userId: user.id,
-                  keepCurrentActiveOrganization: false,
-                },
+              await createOrganizationApi({
+                name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
+                slug: generateSlug(user.id), // Use user ID for unique slug
               });
               logger.info(`Organization created for user ${user.id}`);
               break; // Success, exit loop

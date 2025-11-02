@@ -1,12 +1,8 @@
-import { headers } from "next/headers";
 import { unauthorized } from "next/navigation";
-import { auth } from "../auth";
+import { getSessionApi } from "./auth-api-helper";
 
 export const getSession = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
+  const session = await getSessionApi();
   return session;
 };
 

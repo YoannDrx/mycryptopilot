@@ -169,6 +169,7 @@ jobs:
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
       DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET_TEST }}
+      ENCRYPTION_SECRET: "test-encryption-secret-32-chars-minimum-for-e2e"
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       # Email
