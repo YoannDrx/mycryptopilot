@@ -1,3 +1,5 @@
+"use server";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { headers } from "next/headers";
 import { auth } from "../auth";
@@ -20,7 +22,7 @@ import type { AuthOrganization, AuthFullOrganization } from "./auth-type";
  */
 export async function listOrganizationsApi(): Promise<AuthOrganization[]> {
   const result = await (auth.api as any).listOrganizations({
-    headers: await headers(),
+    headers: headers(),
   });
   return result as AuthOrganization[];
 }
@@ -33,7 +35,7 @@ export async function setActiveOrganizationApi(
 ): Promise<void> {
   await (auth.api as any).setActiveOrganization({
     body: { organizationId },
-    headers: await headers(),
+    headers: headers(),
   });
 }
 
@@ -44,7 +46,7 @@ export async function hasPermissionApi(
   permission: string | Record<string, unknown>,
 ): Promise<{ success: boolean }> {
   const result = await (auth.api as any).hasPermission({
-    headers: await headers(),
+    headers: headers(),
     body: { permission },
   });
   return result;
@@ -59,7 +61,7 @@ export async function createOrganizationApi(data: {
 }): Promise<AuthOrganization> {
   const result = await (auth.api as any).createOrganization({
     body: data,
-    headers: await headers(),
+    headers: headers(),
   });
   return result as AuthOrganization;
 }
@@ -72,7 +74,7 @@ export async function getFullOrganizationApi(
 ): Promise<AuthFullOrganization | null> {
   const result = await (auth.api as any).getFullOrganization({
     query: { organizationSlug },
-    headers: await headers(),
+    headers: headers(),
   });
   return result as AuthFullOrganization | null;
 }
@@ -85,7 +87,7 @@ export async function acceptInvitationApi(
 ): Promise<{ success: boolean }> {
   const result = await (auth.api as any).acceptInvitation({
     body: { invitationId },
-    headers: await headers(),
+    headers: headers(),
   });
   return result;
 }
@@ -95,7 +97,7 @@ export async function acceptInvitationApi(
  */
 export async function getSessionApi(requestHeaders?: Headers) {
   const result = await (auth.api as any).getSession({
-    headers: requestHeaders ?? (await headers()),
+    headers: requestHeaders ?? headers(),
   });
   return result;
 }
@@ -107,7 +109,7 @@ export async function getFullOrganizationApiWithHeaders(
   requestHeaders?: Headers,
 ): Promise<AuthFullOrganization | null> {
   const result = await (auth.api as any).getFullOrganization({
-    headers: requestHeaders ?? (await headers()),
+    headers: requestHeaders ?? headers(),
   });
   return result as AuthFullOrganization | null;
 }
