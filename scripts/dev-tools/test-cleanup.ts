@@ -4,7 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { cleanupOrphanedData } from "../e2e/utils/cleanup";
+import { cleanupOrphanedData } from "../../e2e/utils/cleanup";
 import { logger } from "@/lib/logger";
 
 async function testCleanup() {
@@ -12,9 +12,7 @@ async function testCleanup() {
 
   try {
     // 1. Find orphaned data before cleanup using raw SQL
-    const orphanedProfilesBefore = await prisma.$queryRaw<
-      { id: string }[]
-    >`
+    const orphanedProfilesBefore = await prisma.$queryRaw<{ id: string }[]>`
       SELECT tp.id
       FROM trader_profile tp
       LEFT JOIN "user" u ON tp."userId" = u.id

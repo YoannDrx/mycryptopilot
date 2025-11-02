@@ -62,6 +62,11 @@ const TRADER_TOOLS_LINKS: NavigationLink[] = [
     label: "Trader Dashboard",
   },
   {
+    href: `${ORGANIZATION_PATH}/portfolio`,
+    Icon: LineChart,
+    label: "Portfolio Analytics",
+  },
+  {
     href: `${ORGANIZATION_PATH}/dashboard/trader/signals/new`,
     Icon: PlusCircle,
     label: "Create Signal",

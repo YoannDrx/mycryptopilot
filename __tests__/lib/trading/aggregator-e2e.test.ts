@@ -107,7 +107,7 @@ vi.mock("@/lib/trading/pnl-calculator.service", () => ({
  * Helper: Create mock ExchangeTrade
  */
 function createMockFill(
-  partial: Partial<ExchangeTrade> & {
+  partial: Omit<Partial<ExchangeTrade>, "quantity" | "price"> & {
     side: "BUY" | "SELL";
     quantity: number;
     price: number;

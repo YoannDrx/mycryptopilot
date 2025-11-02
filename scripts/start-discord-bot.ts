@@ -15,15 +15,31 @@
 // Load environment variables BEFORE importing any modules
 // IMPORTANT: Only load .env files in development
 // In production (Railway/Vercel), variables are injected via platform
-import dotenv from "dotenv";
+import fs from "node:fs";
 import path from "node:path";
+import dotenv from "dotenv";
 
 // Only load .env files in non-production environments
 if (process.env.NODE_ENV !== "production") {
-  const envFile = ".env.development";
-  dotenv.config({ path: path.join(process.cwd(), envFile), override: true });
-  // eslint-disable-next-line no-console
-  console.log(`Loaded environment from ${envFile}`);
+  const cwd = process.cwd();
+  const candidateFiles = [
+    path.join(cwd, ".env.local"),
+    path.join(cwd, ".env.development"),
+    path.join(cwd, ".env"),
+  ];
+
+  const envPath = candidateFiles.find((filePath) => fs.existsSync(filePath));
+
+  if (envPath) {
+    dotenv.config({ path: envPath, override: false });
+    // eslint-disable-next-line no-console
+    console.log(`Loaded environment from ${path.basename(envPath)}`);
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "No local .env file found for Discord bot (expected .env.local or .env.development)",
+    );
+  }
 } else {
   // eslint-disable-next-line no-console
   console.log(

@@ -5,6 +5,8 @@ tags: project-management, documentation, github, analysis
 
 # Project Audit Command
 
+> **Note (2 nov 2025)** : ce workflow reflète l’audit massif d’octobre 2025. Les sections suivantes restent valables pour un audit complet, mais certains chiffres/labels historiques ont été mis à jour dans `.claude/docs/AUDIT-2025-11-02.md`. Adapter les étapes avant de relancer la commande.
+
 Effectue un audit complet du projet MyCryptoPilot, met à jour toute la documentation et les issues GitHub, puis génère un rapport détaillé avec progress tracking et recommandations.
 
 **Durée estimée**: 5-10 minutes

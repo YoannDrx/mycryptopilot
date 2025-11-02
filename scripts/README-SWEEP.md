@@ -90,19 +90,21 @@ Tape `CONFIRM` pour lancer le sweep.
 
 ## ⚙️ Configuration Avancée
 
-### Variables Optionnelles (.env.sweep)
+### Variables `.env.sweep`
 
 ```bash
 # Seuil minimum pour sweep (défaut: 10 USD)
-SWEEP_MIN_THRESHOLD_USD="50"
+SWEEP_MIN_THRESHOLD_USD="25"
 
-# Mode dry-run par défaut (défaut: true)
+# Mode dry-run par défaut
 DRY_RUN="true"
 
-# Notifications email (défaut: false)
-SWEEP_EMAIL_NOTIFICATION="true"
-SWEEP_NOTIFICATION_EMAIL="ton-email@example.com"
+# Seeds utilisées pour dériver les clés privées
+SWEEP_MNEMONIC_BASE="word1 word2 ..."
+SWEEP_MNEMONIC_TRON="word1 word2 ..."
 ```
+
+> ℹ️ Les adresses Binance (`BINANCE_MASTER_WALLET_BASE/TRON`) peuvent être stockées soit dans `.env`, soit dans `.env.sweep`. Si elles sont définies dans les deux, les valeurs de `.env.sweep` prennent le dessus pendant le sweep.
 
 ---
 

@@ -19,8 +19,8 @@ dotenv.config({ path: ".env.local" });
 import {
   generateCryptoAddress,
   getUserCryptoAddresses,
-} from "../src/lib/crypto/address-generator";
-import { prisma } from "../src/lib/prisma";
+} from "@/lib/crypto/address-generator";
+import { prisma } from "@/lib/prisma";
 
 console.log("🧪 Testing Crypto Address Generation\n");
 

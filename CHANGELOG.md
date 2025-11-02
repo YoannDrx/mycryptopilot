@@ -1,3 +1,52 @@
+## 2025-11-02 - Documentation & Scripts Audit Refresh
+
+### ✅ Alignement Documentation & Tooling (2 novembre 2025)
+
+- Mise à jour des guides principaux (`.claude/CLAUDE.md`, `.claude/docs/DEVELOPMENT.md`, `.claude/docs/DATABASE.md`, `.claude/docs/TRADING-SYSTEM.md`, `.claude/docs/TESTING.md`, `.claude/docs/SUBSCRIPTIONS.md`, `.claude/docs/ENV-VARIABLES-MAPPING.md`).
+- Réécriture du `README.md` public et de `scripts/README.md` pour refléter l’état actuel du projet.
+- Documentation sweep actualisée (`scripts/README-SWEEP.md`, `scripts/SWEEP_SETUP.md`) suite à l’implémentation des transferts réels.
+- Scripts `upgrade-to-pro.ts` / `upgrade-to-ultra.ts` refactorés (arguments dynamiques, appel `activateSubscription`).
+- `scripts/start-discord-bot.ts` charge désormais `.env.local` (fallback `.env`), `deploy-railway.sh` documenté.
+- Ajout des précisions `.env.sweep`, `DISCORD_BOT_ENABLED`, `TRON_API_KEY` dans l’ensemble des guides déploiement/env.
+
+---
+
+## 2025-10-22 - Phase 8: Portfolio Tracking - Bybit Integration
+
+### ✅ **Multi-Exchange Portfolio Tracking Completed (22 octobre 2025)**
+
+**MILESTONE**: Extension du portfolio tracking avec support Bybit + architecture multi-exchange unifiée!
+
+**🏗️ Architecture Multi-Exchange**:
+- Factory pattern (`exchange-service-factory.ts`) pour abstraction Binance + Bybit
+- Services spécialisés: `binance-service.ts` (existing) + `bybit-service.ts` (new, 396 lignes)
+- Sync engine unifié (`sync-service.ts`) supportant les deux exchanges
+- Encryption AES-256-GCM pour les API keys (`encryption-service.ts`)
+
+**📊 Modèles Database**:
+- `ExchangeConnection` - Connexions traders (API keys chiffrées, sync status)
+- `ExchangeTrade` - Historique trades (fills importés depuis exchanges)
+- `TraderPerformanceSnapshot` - KPI pré-calculés (winrate, profit factor, drawdown)
+- `UserExchangeConnection` - Connexions utilisateurs pour copy-trading
+- `CopyTrade` - Copy trades (MANUAL/AUTO modes, status CLOSED ajouté)
+
+**🔧 Features Implémentées**:
+- Import automatique des trades Bybit (spot + perps)
+- Calcul métriques: winrate, profit factor, max drawdown, Sharpe ratio
+- UI: Connexion exchanges, dashboard performances, tableaux trades
+- Guides: `content/docs/bybit-setup.mdx` (234 lignes)
+
+**🧪 Tests**:
+- Tests unitaires services Bybit
+- Tests E2E connexion exchanges
+- Validation encryption/decryption API keys
+
+**Impact**: Portfolio tracking production-ready avec support multi-exchange et métriques professionnelles.
+
+**PR**: #43 - Merged to main
+
+---
+
 ## 2025-10-14 - Phase 7: Navigation 4 Espaces + UI Polish
 
 ### ✅ **Architecture Navigation Complétée (14 octobre 2025)**
@@ -114,8 +163,6 @@ npx prisma migrate status
 
 - `.claude/CLAUDE.md` - Updated database status section
 - `README.md` - Removed critical blocker warning
-- `docs/environment-setup.md` - Updated with resolution status
-- `docs/neon-setup.md` - Updated with resolution status
 - `CHANGELOG.md` - Added this entry
 
 ---
