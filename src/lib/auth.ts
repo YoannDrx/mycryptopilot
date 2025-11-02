@@ -152,26 +152,37 @@ export const auth = betterAuth({
         },
       },
       delete: {
-        before: async (user: {
-          id: string;
-          email: string;
-          name: string;
-          discordId: string | null;
-        }) => {
+        before: async (user: { id: string }) => {
+          // Better Auth provides basic user, fetch full user data from DB
+          const fullUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              discordId: true,
+            },
+          });
+
+          if (!fullUser) {
+            logger.error(`[USER DELETE] User ${user.id} not found in database`);
+            throw new Error(`User ${user.id} not found`);
+          }
+
           // Handle complete user deletion
           // This hook is called AFTER email confirmation, right before DB deletion
           logger.info(
-            `[USER DELETE] Starting deletion flow for user ${user.id}`,
+            `[USER DELETE] Starting deletion flow for user ${fullUser.id}`,
           );
 
           // 1. Remove Discord access (if linked) - non-blocking
-          if (user.discordId) {
+          if (fullUser.discordId) {
             const { removeUserFromDiscord } = await import(
               "./discord/user-management"
             );
-            void removeUserFromDiscord(user.discordId).catch((err) => {
+            void removeUserFromDiscord(fullUser.discordId).catch((err) => {
               logger.error(
-                `[USER DELETE] Failed to remove Discord access for user ${user.id}`,
+                `[USER DELETE] Failed to remove Discord access for user ${fullUser.id}`,
                 { err },
               );
             });
@@ -187,9 +198,9 @@ export const auth = betterAuth({
 
           // 3. Send goodbye email - non-blocking
           const { sendGoodbyeEmail } = await import("./mail/goodbye-email");
-          void sendGoodbyeEmail(user.email, user.name).catch((err) => {
+          void sendGoodbyeEmail(fullUser.email, fullUser.name).catch((err) => {
             logger.error(
-              `[USER DELETE] Failed to send goodbye email to ${user.email}`,
+              `[USER DELETE] Failed to send goodbye email to ${fullUser.email}`,
               { err },
             );
           });
