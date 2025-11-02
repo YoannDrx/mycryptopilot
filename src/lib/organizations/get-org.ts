@@ -15,6 +15,7 @@ type OrgParams = {
 const getOrg = async () => {
   const user = await getSession();
 
+   
   if (user?.session.activeOrganizationId) {
     // Get organization directly from Prisma to include stripeCustomerId
     return prisma.organization.findFirst({

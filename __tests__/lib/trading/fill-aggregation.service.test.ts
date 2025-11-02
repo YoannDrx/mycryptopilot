@@ -27,6 +27,8 @@ vi.mock("@/lib/prisma", () => ({
     },
     traderTrade: {
       findFirst: vi.fn(),
+      // findUnique needs to return a thenable Promise for .then() chaining
+      findUnique: vi.fn().mockResolvedValue({ status: "OPEN" }),
       create: vi.fn(),
       update: vi.fn(),
     },

@@ -1,9 +1,16 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   encryptApiKey,
   decryptApiKey,
   verifyEncryptionSetup,
 } from "@/lib/crypto/encryption-service";
+
+// Mock env module to provide ENCRYPTION_SECRET
+vi.mock("@/lib/env", () => ({
+  env: {
+    ENCRYPTION_SECRET: "test-encryption-secret-32-chars-minimum",
+  },
+}));
 
 vi.mock("@/lib/logger", () => ({
   logger: {
@@ -16,6 +23,12 @@ vi.mock("@/lib/logger", () => ({
 describe("EncryptionService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock ENCRYPTION_SECRET for tests
+    process.env.ENCRYPTION_SECRET = "test-encryption-secret-32-chars-minimum";
+  });
+
+  afterEach(() => {
+    delete process.env.ENCRYPTION_SECRET;
   });
 
   describe("encryptApiKey", () => {

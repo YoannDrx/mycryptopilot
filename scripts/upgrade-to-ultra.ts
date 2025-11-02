@@ -15,6 +15,8 @@ async function upgrade(plan: MyCryptoPilotPlanName) {
     process.exit(1);
   }
 
+  // daysArg can be undefined at runtime despite ESLint thinking otherwise
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const daysGranted = Number.parseInt(daysArg ?? "30", 10);
   if (Number.isNaN(daysGranted) || daysGranted <= 0) {
     console.error("`daysGranted` must be a positive integer (default 30).");
@@ -72,4 +74,3 @@ upgrade(PLAN)
   .finally(async () => {
     await prisma.$disconnect();
   });
-

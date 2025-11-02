@@ -97,6 +97,7 @@ jobs:
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_build"
       DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_build"
       BETTER_AUTH_SECRET: "test-secret-for-build"
+      ENCRYPTION_SECRET: "test-encryption-secret-32-chars-minimum"
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       RESEND_API_KEY: "test-resend-key"
