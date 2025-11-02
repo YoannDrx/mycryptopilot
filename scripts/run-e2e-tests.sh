@@ -29,37 +29,51 @@ echo -e "${BLUE}================================================================
 echo -e "${BLUE}🧪 MyCryptoPilot - E2E Tests Runner\n${NC}"
 echo -e "${BLUE}==============================================================================\n${NC}"
 
+# Detect if Playwright expects an external server (skips internal management)
+USE_EXTERNAL_SERVER=false
+if [[ -n "${PLAYWRIGHT_TEST_BASE_URL:-}" ]]; then
+  USE_EXTERNAL_SERVER=true
+fi
+
 # ------------------------------------------------------------------------------
-# Step 1: Cleanup existing Next.js servers
+# Step 1: Cleanup existing Next.js servers (unless external server is provided)
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🧹 Étape 1/4 : Nettoyage des serveurs Next.js existants...\n${NC}"
 
-# Kill all next-server processes
-if pkill -f "next-server" 2>/dev/null; then
-  echo -e "${GREEN}   ✅ Serveurs Next.js arrêtés\n${NC}"
+if [[ "$USE_EXTERNAL_SERVER" == true ]]; then
+  echo -e "${GREEN}   ℹ️  Serveur externe détecté (${PLAYWRIGHT_TEST_BASE_URL}), nettoyage ignoré\n${NC}"
 else
-  echo -e "${GREEN}   ℹ️  Aucun serveur Next.js à arrêter\n${NC}"
+  # Kill all next-server processes
+  if pkill -f "next-server" 2>/dev/null; then
+    echo -e "${GREEN}   ✅ Serveurs Next.js arrêtés\n${NC}"
+  else
+    echo -e "${GREEN}   ℹ️  Aucun serveur Next.js à arrêter\n${NC}"
+  fi
+
+  # Wait a bit to ensure processes are fully killed
+  sleep 1
 fi
 
-# Wait a bit to ensure processes are fully killed
-sleep 1
-
 # ------------------------------------------------------------------------------
-# Step 2: Free port 3000 if occupied
+# Step 2: Free port 3000 if occupied (unless external server is provided)
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🔓 Étape 2/4 : Libération du port 3000...\n${NC}"
 
-# Kill any process using port 3000
-if lsof -ti:3000 >/dev/null 2>&1; then
-  echo -e "${YELLOW}   ⚠️  Port 3000 occupé, arrêt du processus...\n${NC}"
-  lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-  echo -e "${GREEN}   ✅ Port 3000 libéré\n${NC}"
+if [[ "$USE_EXTERNAL_SERVER" == true ]]; then
+  echo -e "${GREEN}   ℹ️  Port 3000 géré par le serveur externe, aucune action\n${NC}"
 else
-  echo -e "${GREEN}   ℹ️  Port 3000 déjà libre\n${NC}"
-fi
+  # Kill any process using port 3000
+  if lsof -ti:3000 >/dev/null 2>&1; then
+    echo -e "${YELLOW}   ⚠️  Port 3000 occupé, arrêt du processus...\n${NC}"
+    lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    echo -e "${GREEN}   ✅ Port 3000 libéré\n${NC}"
+  else
+    echo -e "${GREEN}   ℹ️  Port 3000 déjà libre\n${NC}"
+  fi
 
-# Wait a bit to ensure port is fully released
-sleep 1
+  # Wait a bit to ensure port is fully released
+  sleep 1
+fi
 
 # ------------------------------------------------------------------------------
 # Step 3: Setup test database
@@ -79,7 +93,11 @@ fi
 # Step 4: Run E2E tests
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🧪 Étape 4/4 : Lancement des tests E2E...\n${NC}"
-echo -e "${BLUE}   (Playwright va démarrer son propre serveur sur le port 3000)\n${NC}"
+if [[ "$USE_EXTERNAL_SERVER" == true ]]; then
+  echo -e "${BLUE}   (Serveur Next.js externe détecté, Playwright utilisera ${PLAYWRIGHT_TEST_BASE_URL})\n${NC}"
+else
+  echo -e "${BLUE}   (Playwright va démarrer son propre serveur sur le port 3000)\n${NC}"
+fi
 
 # Run Playwright tests
 # Playwright will automatically:
