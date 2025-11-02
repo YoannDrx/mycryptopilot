@@ -235,8 +235,10 @@ describe("EncryptionService", () => {
 
       const encrypted = encryptApiKey(plaintext);
 
-      // Tamper with encrypted data (flip one bit)
-      const tamperedEncrypted = `a${encrypted.encrypted.slice(1)}`;
+      // Tamper with encrypted data (flip first hex character to its complement)
+      const firstChar = encrypted.encrypted.charAt(0);
+      const flippedChar = firstChar === "a" ? "b" : "a";
+      const tamperedEncrypted = flippedChar + encrypted.encrypted.slice(1);
 
       // Decryption should fail due to auth tag mismatch
       expect(() => {
