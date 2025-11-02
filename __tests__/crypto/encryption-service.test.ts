@@ -66,7 +66,7 @@ describe("EncryptionService", () => {
       const encrypted = encryptApiKey(plaintext);
 
       // Empty string encryption is valid - check structure exists
-      expect(encrypted.encrypted).toBeDefined();
+      expect(encrypted.encrypted).toBeDefined(); // Empty string returns ""
       expect(encrypted.iv).toBeTruthy();
       expect(encrypted.tag).toBeTruthy();
     });
