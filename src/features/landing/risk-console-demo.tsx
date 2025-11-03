@@ -11,10 +11,10 @@ import { useState } from "react";
 import { SectionLayout } from "./section-layout";
 
 export function RiskConsoleDemo() {
-  const [capital, setCapital] = useState("");
-  const [riskPercent, setRiskPercent] = useState("");
-  const [entryPrice, setEntryPrice] = useState("");
-  const [stopLoss, setStopLoss] = useState("");
+  const [capital, setCapital] = useState("1000");
+  const [riskPercent, setRiskPercent] = useState("2");
+  const [entryPrice, setEntryPrice] = useState("42000");
+  const [stopLoss, setStopLoss] = useState("41000");
 
   // Calculate position size using 2% rule
   const capitalNum = Number(capital) || 0;
