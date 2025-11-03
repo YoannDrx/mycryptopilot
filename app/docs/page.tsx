@@ -11,9 +11,9 @@ import Link from "next/link";
 import { getDocs } from "./doc-manager";
 
 export const metadata = {
-  title: "Documentation | Lumail",
+  title: "Documentation | MyCryptoPilot",
   description:
-    "Everything you need to know about using Lumail for your email marketing",
+    "Guides and references for traders and followers using MyCryptoPilot's risk-first crypto trading platform.",
 };
 
 export default async function DocsPage(props: PageProps<"/docs">) {

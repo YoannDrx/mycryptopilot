@@ -1,0 +1,69 @@
+---
+title: "Crypto Payments"
+description: "How on-chain subscriptions, test payments, and billing history work in MyCryptoPilot"
+keywords: ["crypto", "payments", "checkout", "subscriptions", "usdc", "usdt"]
+tags: ["billing", "followers", "traders"]
+order: 7
+subcategory: "Features"
+---
+
+# Crypto Payments & Subscription Management
+
+MyCryptoPilot uses crypto-native payments to activate subscriptions instantly after on-chain confirmation. This guide covers the checkout flow, supported networks, and how to monitor payment status.
+
+## Supported Plans & Tokens
+
+- **Plans**: Test ($1), Pro ($49), Ultra ($99) – prorated if you send partial amounts.
+- **Networks**: Base (USDC) and Tron (USDT).
+- **Activation**: Access begins immediately after the transaction is confirmed and the payment watcher validates the amount.
+
+## Checkout Flow
+
+1. Choose a plan from **Trading → Pricing** and click **Subscribe Now**.
+2. You’ll be redirected to `/orgs/[orgSlug]/checkout/[plan]` (`app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/page.tsx`).
+3. MyCryptoPilot generates unique Base & Tron deposit addresses (`src/components/checkout/checkout-form.tsx`).
+4. Scan the QR code or copy the address. Payments expire after 15 minutes to avoid stale invoices.
+5. Keep the page open while we poll every 10 seconds for confirmation.
+6. Once confirmed, you’re redirected to the dashboard; the plan and expiry date update automatically.
+
+> **Tip** – Not sure your wallet is configured? Use the **Test** plan to send $1 and validate the flow before upgrading.
+
+## Payment Status & History
+
+- View historical payments in **Account → Payments** (`app/orgs/[orgSlug]/(navigation)/(account)/account/payments/page.tsx`).
+- Each record includes amount in USD/token, network, confirmations, days granted, and on-chain explorer links.
+- Pending, confirmed, and failed statuses are color-coded with badges for quick scanning.
+
+## Pro-Rata Billing Explained
+
+Send any USD amount and the system converts it into plan days automatically. Examples:
+
+- $25 for Pro → 15 days of access
+- $150 for Ultra → roughly 45 days
+
+The tracker credits your organization accordingly and extends existing subscriptions instead of overwriting them.
+
+## Handling Mistakes
+
+- **Underpayment** – partial access granted; you can top up with another payment.
+- **Overpayment** – extra days added automatically.
+- **Wrong network/token** – reach out to support with the transaction hash for manual review.
+
+## Notifications & Roles
+
+- Successful payments trigger email notifications (if enabled) and Discord role updates via the subscription manager.
+- Admins can grant manual upgrades using CLI scripts (`scripts/upgrade-to-pro.ts`, `scripts/upgrade-to-ultra.ts`) for special cases.
+
+## Security & Observability
+
+- Addresses are derived from HD wallets; we never reuse a payment address.
+- On-chain watchers monitor Base and Tron with confirmation thresholds (1 for Base, configurable for Tron).
+- Activity is logged through the subscription manager so support can audit any payment.
+
+## Related Topics
+
+- [FAQ](/docs/faq) – Subscription and billing section
+- [For Traders](/docs/for-traders) – Understand how follower upgrades translate into revenue
+- [Getting Started](/docs/getting-started) – Overview of plan limits and test payments
+
+Crypto billing keeps MyCryptoPilot borderless. Expect additional network support and invoicing options as we expand.
