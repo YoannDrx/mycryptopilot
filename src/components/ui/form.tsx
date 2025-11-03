@@ -48,6 +48,9 @@ const Form = <T extends FieldValues>({
     void form.handleSubmit(onSubmit)();
   }, 500);
 
+  // Use formState with subscribe to avoid hydration mismatch
+  const { isSubmitting } = useFormState({ control: form.control });
+
   return (
     <FormProvider {...form}>
       <form
@@ -60,10 +63,7 @@ const Form = <T extends FieldValues>({
         {...props}
         className={className}
       >
-        <fieldset
-          disabled={disabled ?? form.formState.isSubmitting}
-          className={className}
-        >
+        <fieldset disabled={disabled ?? isSubmitting} className={className}>
           {children}
         </fieldset>
       </form>
