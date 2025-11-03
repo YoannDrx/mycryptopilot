@@ -97,7 +97,7 @@ export async function acceptInvitationApi(
  */
 export async function getSessionApi(requestHeaders?: Headers) {
   const result = await (auth.api as any).getSession({
-    headers: requestHeaders ?? headers(),
+    headers: requestHeaders ?? (await headers()),
   });
   return result;
 }
