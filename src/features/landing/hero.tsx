@@ -51,7 +51,7 @@ export const Hero = () => {
                 href="/auth/signup"
                 className={buttonVariants({ size: "lg", variant: "default" })}
               >
-                Calculate My Risk for Free
+                Sign Up
               </Link>
               <Link
                 href="#ecosystem"
