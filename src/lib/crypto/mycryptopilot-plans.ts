@@ -32,7 +32,7 @@ export type MyCryptoPilotPlan = {
 export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
   {
     name: "free",
-    description: "Découvrez les signaux de trading avec accès limité",
+    description: "Discover trading signals with limited access",
     priceUSD: 0,
     priceCrypto: { usdc: 0, usdt: 0 },
     limits: {
@@ -49,24 +49,24 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     features: [
       {
         icon: Lock,
-        label: "Teasers de signaux floutés",
-        description: "Aperçu des opportunités du marché",
+        label: "Blurred signal teasers",
+        description: "Preview market opportunities",
       },
       {
         icon: Signal,
-        label: "1 trader à suivre",
-        description: "Essayez les signaux d'un trader vérifié",
+        label: "1 trader to follow",
+        description: "Try signals from one verified trader",
       },
       {
         icon: Clock,
         label: "Screeners refresh 5min",
-        description: "Données marché en différé",
+        description: "Delayed market data",
       },
     ],
   },
   {
     name: "test",
-    description: "Paiement de test pour vérifier le système crypto",
+    description: "Test payment to verify the crypto system",
     priceUSD: 1,
     priceCrypto: { usdc: 1, usdt: 1 },
     limits: {
@@ -83,14 +83,14 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     features: [
       {
         icon: Lock,
-        label: "Paiement de test",
-        description: "Vérifiez le fonctionnement du système de paiement crypto",
+        label: "Test payment",
+        description: "Verify the crypto payment system works",
       },
     ],
   },
   {
     name: "pro",
-    description: "Signaux temps réel pour traders actifs",
+    description: "Real-time signals for active traders",
     priceUSD: 49,
     priceCrypto: { usdc: 49, usdt: 49 },
     limits: {
@@ -107,35 +107,35 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     features: [
       {
         icon: Signal,
-        label: "Signaux complets en temps réel",
-        description: "Accès immédiat aux cartes de trading",
+        label: "Full real-time signals",
+        description: "Instant access to trading cards",
       },
       {
         icon: TrendingUp,
-        label: "Jusqu'à 5 traders",
-        description: "Diversifiez vos sources de signaux",
+        label: "Up to 5 traders",
+        description: "Diversify your signal sources",
       },
       {
         icon: BarChart3,
-        label: "Console de risque",
-        description: "Calculez vos positions et gérez votre risque",
+        label: "Risk console",
+        description: "Calculate positions and manage risk",
       },
       {
         icon: Clock,
-        label: "Journal de trading",
-        description: "Suivez vos performances",
+        label: "Trading journal",
+        description: "Track your performance",
       },
       {
         icon: Zap,
         label: "Screeners refresh 1min",
-        description: "Données marché quasi temps réel",
+        description: "Near real-time market data",
       },
     ],
     isPopular: true,
   },
   {
     name: "ultra",
-    description: "Outils pro pour traders exigeants",
+    description: "Pro tools for demanding traders",
     priceUSD: 99,
     priceCrypto: { usdc: 99, usdt: 99 },
     limits: {
@@ -152,28 +152,28 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
     features: [
       {
         icon: Signal,
-        label: "Signaux illimités",
-        description: "Tous les traders, tous les signaux",
+        label: "Unlimited signals",
+        description: "All traders, all signals",
       },
       {
         icon: TrendingUp,
-        label: "Traders illimités",
-        description: "Suivez autant de traders que vous voulez",
+        label: "Unlimited traders",
+        description: "Follow as many traders as you want",
       },
       {
         icon: Zap,
-        label: "Alertes personnalisées",
-        description: "Créez vos propres conditions d'alerte",
+        label: "Custom alerts",
+        description: "Create your own alert conditions",
       },
       {
         icon: BarChart3,
-        label: "Filtres avancés",
-        description: "Funding, OI, corrélations, bêta",
+        label: "Advanced filters",
+        description: "Funding, OI, correlations, beta",
       },
       {
         icon: Clock,
         label: "Screeners refresh 5sec",
-        description: "Données marché temps réel",
+        description: "Real-time market data",
       },
     ],
   },

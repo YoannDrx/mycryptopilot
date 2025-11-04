@@ -10,8 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { authClient, useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
 import type { MyCryptoPilotPlan } from "@/lib/crypto/mycryptopilot-plans";
+import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 import { Check } from "lucide-react";
 import Link from "next/link";
 
@@ -21,7 +22,7 @@ type LandingPricingCardProps = {
 
 export function LandingPricingCard({ plan }: LandingPricingCardProps) {
   const { data: session } = useSession();
-  const { data: activeOrg } = authClient.useActiveOrganization();
+  const currentOrg = useCurrentOrg();
 
   // Determine the subscribe link based on auth status
   const getSubscribeLink = () => {
@@ -29,11 +30,12 @@ export function LandingPricingCard({ plan }: LandingPricingCardProps) {
       return "/auth/signup";
     }
 
-    if (activeOrg) {
-      return `/orgs/${activeOrg.slug}/pricing`;
+    if (currentOrg?.slug) {
+      return `/orgs/${currentOrg.slug}/pricing`;
     }
 
-    return "/auth/signup";
+    // Fallback: redirect to /orgs for auto-select
+    return "/orgs";
   };
 
   const subscribeLink = getSubscribeLink();
@@ -41,7 +43,7 @@ export function LandingPricingCard({ plan }: LandingPricingCardProps) {
 
   return (
     <Card
-      className={`relative ${plan.isPopular ? "border-primary shadow-lg" : ""}`}
+      className={`relative flex flex-col ${plan.isPopular ? "border-primary shadow-lg" : ""}`}
     >
       {plan.isPopular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -58,7 +60,7 @@ export function LandingPricingCard({ plan }: LandingPricingCardProps) {
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex-1">
         {/* Price */}
         <div className="mb-6">
           <span className="text-4xl font-bold">${plan.priceUSD}</span>

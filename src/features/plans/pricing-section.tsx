@@ -1,11 +1,18 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useSession } from "@/lib/auth-client";
 import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
+import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 import Link from "next/link";
 import { LandingPricingCard } from "./landing-pricing-card";
+import { PricingComparisonTable } from "./pricing-comparison-table";
 
 export function Pricing() {
+  const { data: session } = useSession();
+  const currentOrg = useCurrentOrg();
   return (
     <section
       id="pricing"
@@ -15,52 +22,57 @@ export function Pricing() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-              Pricing built for risk-first traders
+              Simple, Transparent Pricing
             </h2>
             <p className="text-muted-foreground max-w-[700px] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Start free with verified signal previews. Upgrade whenever you
-              need more traders, faster syncs, or automation—paid with crypto on
-              your schedule.
+              Pay with crypto. No credit card required. Cancel anytime. Pro-rata
+              billing means you only pay for what you use.
             </p>
           </div>
 
           {/* Crypto Payment Badges */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <Badge variant="secondary" className="text-sm">
-              💎 USDC (Base)
-            </Badge>
-            <Badge variant="secondary" className="text-sm">
-              💎 USDT (Tron)
-            </Badge>
-            <Badge variant="outline" className="text-sm">
-              ⚡ Pro-rata billing
-            </Badge>
+          <div className="mt-6 flex items-center justify-center gap-2">
+            <Badge variant="secondary">USDC (Base)</Badge>
+            <Badge variant="secondary">USDT (Tron)</Badge>
           </div>
-
-          <p className="text-muted-foreground/80 mt-2 text-sm">
-            Pay any amount—your subscription duration is calculated
-            automatically.
-          </p>
         </div>
 
-        <div
-          className="mt-16 grid gap-8 lg:gap-12"
-          style={{
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          }}
-        >
+        <div className="mt-16 grid gap-8 lg:grid-cols-3">
           {MYCRYPTOPILOT_PLANS.filter((p) => p.name !== "test").map((plan) => (
             <LandingPricingCard key={plan.name} plan={plan} />
           ))}
         </div>
 
+        {/* Test Payment CTA - Only for logged-in users with an org */}
+        {session?.user && currentOrg?.slug && (
+          <Card className="bg-muted/30 mx-auto mt-12 max-w-3xl border-2 border-dashed">
+            <CardContent className="flex flex-col items-center justify-center gap-6 py-8 text-center sm:flex-row sm:text-left">
+              <div className="flex-1">
+                <h3 className="mb-2 text-lg font-semibold">
+                  Test the Payment System First
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Not sure about crypto payments? Try our test payment for just
+                  $1 to verify everything works perfectly before subscribing to
+                  a full plan.
+                </p>
+              </div>
+              <Button variant="outline" size="lg" className="shrink-0" asChild>
+                <Link href={`/orgs/${currentOrg.slug}/checkout/test`}>
+                  Send $1 Test Payment
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Comparison Table */}
+        <PricingComparisonTable />
+
         <div className="mt-16 text-center">
           <p className="text-muted-foreground">
-            <span className="text-foreground font-semibold">
-              All plans include the risk console (2% rule)
-            </span>{" "}
-            with varying calculation limits. Upgrade to Pro or Ultra for higher
-            limits, trading journal, and automation tools.
+            All plans include the risk console (2% rule). Upgrade to Pro or
+            Ultra for higher limits, trading journal, and automation tools.
           </p>
           <p className="text-muted-foreground mt-2">
             Need a custom plan for your trading team?{" "}
