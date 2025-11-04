@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Typography } from "../../components/nowts/typography";
 
 const HERO_HIGHLIGHTS = [
-  "Free Risk Console",
+  "Free Risk Console Demo",
   "Binance/Bybit On-Chain Verified",
   "Crypto Pro-Rata Payments",
 ];

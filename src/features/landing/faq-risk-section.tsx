@@ -28,7 +28,7 @@ const RISK_FAQS = [
   {
     question: "Is the risk console really free?",
     answer:
-      "Yes! All plans (Free, Pro, Ultra) include access to the risk console. The Free plan allows 5 calculations per day, Pro allows 50/day, and Ultra is unlimited. This ensures everyone can protect their capital, regardless of their plan.",
+      "The risk console demo on our landing page is completely free for everyone (no login required). For the full authenticated version with calculation history, custom presets, and live capital integration from your exchanges, you'll need a Pro or Ultra plan. This ensures serious traders have unlimited access to professional risk management tools.",
   },
   {
     question: "Can I use the risk console without following traders?",
@@ -86,7 +86,7 @@ export function FAQRiskSection() {
             Ready to start managing your risk like a professional trader?
           </Typography>
           <Button size="lg" asChild>
-            <Link href="/auth/signup">Start with Free Risk Console</Link>
+            <Link href="/auth/signup">Try Risk Console Demo Free</Link>
           </Button>
         </div>
       </div>

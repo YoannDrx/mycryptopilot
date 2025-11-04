@@ -71,8 +71,9 @@ export function Pricing() {
 
         <div className="mt-16 text-center">
           <p className="text-muted-foreground">
-            All plans include the risk console (2% rule). Upgrade to Pro or
-            Ultra for higher limits, trading journal, and automation tools.
+            Try the risk console demo for free on our landing page. Pro and
+            Ultra plans unlock unlimited access with calculation history, custom
+            presets, and live capital integration.
           </p>
           <p className="text-muted-foreground mt-2">
             Need a custom plan for your trading team?{" "}

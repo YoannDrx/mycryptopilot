@@ -22,7 +22,7 @@ import type { AuthOrganization, AuthFullOrganization } from "./auth-type";
  */
 export async function listOrganizationsApi(): Promise<AuthOrganization[]> {
   const result = await (auth.api as any).listOrganizations({
-    headers: headers(),
+    headers: await headers(),
   });
   return result as AuthOrganization[];
 }
@@ -35,7 +35,7 @@ export async function setActiveOrganizationApi(
 ): Promise<void> {
   await (auth.api as any).setActiveOrganization({
     body: { organizationId },
-    headers: headers(),
+    headers: await headers(),
   });
 }
 
@@ -46,7 +46,7 @@ export async function hasPermissionApi(
   permission: string | Record<string, unknown>,
 ): Promise<{ success: boolean }> {
   const result = await (auth.api as any).hasPermission({
-    headers: headers(),
+    headers: await headers(),
     body: { permission },
   });
   return result;
@@ -61,7 +61,7 @@ export async function createOrganizationApi(data: {
 }): Promise<AuthOrganization> {
   const result = await (auth.api as any).createOrganization({
     body: data,
-    headers: headers(),
+    headers: await headers(),
   });
   return result as AuthOrganization;
 }
@@ -74,7 +74,7 @@ export async function getFullOrganizationApi(
 ): Promise<AuthFullOrganization | null> {
   const result = await (auth.api as any).getFullOrganization({
     query: { organizationSlug },
-    headers: headers(),
+    headers: await headers(),
   });
   return result as AuthFullOrganization | null;
 }
@@ -87,7 +87,7 @@ export async function acceptInvitationApi(
 ): Promise<{ success: boolean }> {
   const result = await (auth.api as any).acceptInvitation({
     body: { invitationId },
-    headers: headers(),
+    headers: await headers(),
   });
   return result;
 }
@@ -109,7 +109,7 @@ export async function getFullOrganizationApiWithHeaders(
   requestHeaders?: Headers,
 ): Promise<AuthFullOrganization | null> {
   const result = await (auth.api as any).getFullOrganization({
-    headers: requestHeaders ?? headers(),
+    headers: requestHeaders ?? (await headers()),
   });
   return result as AuthFullOrganization | null;
 }

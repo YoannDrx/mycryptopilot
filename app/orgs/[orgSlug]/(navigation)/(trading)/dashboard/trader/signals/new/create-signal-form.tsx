@@ -22,6 +22,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { TradingCard } from "@/components/nowts/trading-card";
 import { LoadingButton } from "@/features/form/submit-button";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { validateTradingCard } from "@/features/signal/trading-card-utils";
 import { ImageFormItem } from "@/features/images/image-form-item";
 import { createSignalAction } from "@/features/signal/signal.action";
 import {
@@ -100,7 +104,9 @@ export const CreateSignalForm = ({ traderName }: { traderName: string }) => {
     },
     onSuccess: () => {
       toast.success("Signal created successfully!");
-      const signalsPath = currentOrg?.slug ? `/orgs/${currentOrg.slug}/signals` : "/signals";
+      const signalsPath = currentOrg?.slug
+        ? `/orgs/${currentOrg.slug}/signals`
+        : "/signals";
       router.push(signalsPath);
       router.refresh();
     },
@@ -476,14 +482,19 @@ export const CreateSignalForm = ({ traderName }: { traderName: string }) => {
                   <FormLabel>Chart Image (optional)</FormLabel>
                   <FormControl>
                     <ImageFormItem
-                      className="w-full aspect-video"
-                      onChange={(url) => form.setValue("payload.chartImage", url)}
-                      onRemove={() => form.setValue("payload.chartImage", undefined)}
+                      className="aspect-video w-full"
+                      onChange={(url) =>
+                        form.setValue("payload.chartImage", url)
+                      }
+                      onRemove={() =>
+                        form.setValue("payload.chartImage", undefined)
+                      }
                       imageUrl={form.watch("payload.chartImage")}
                     />
                   </FormControl>
                   <FormDescription>
-                    Upload a chart screenshot to show your market analysis (PNG, JPG - max 1MB)
+                    Upload a chart screenshot to show your market analysis (PNG,
+                    JPG - max 1MB)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -571,6 +582,199 @@ export const CreateSignalForm = ({ traderName }: { traderName: string }) => {
                 </FormItem>
               )}
             />
+
+            {/* Risk Analysis Card */}
+            <div className="space-y-4">
+              <Separator />
+              <div>
+                <h3 className="mb-2 text-sm font-semibold">
+                  💡 Quick Risk Check
+                </h3>
+                <p className="text-muted-foreground mb-4 text-xs">
+                  Validate your position sizing before publishing this signal
+                </p>
+
+                {(() => {
+                  // Construire payload temporaire depuis form.watch()
+                  const entry = form.watch("payload.entry") || 0;
+                  const invalidation = form.watch("payload.invalidation") || 0;
+                  const tps = form.watch("payload.tps").filter((tp) => tp > 0);
+                  const bias = form.watch("payload.bias");
+
+                  // Calculer les métriques avec validateTradingCard
+                  const formPayload = {
+                    instrumentType: form.watch("payload.instrumentType"),
+                    bias,
+                    entry,
+                    invalidation,
+                    tps,
+                    leverageBand: form.watch("payload.leverageBand"),
+                    risk: form.watch("payload.risk"),
+                    confidence: form.watch("payload.confidence"),
+                    rationales: form.watch("payload.rationales"),
+                    regime: form.watch("payload.regime"),
+                    managedBy: form.watch("payload.managedBy"),
+                    version: form.watch("payload.version"),
+                  };
+
+                  const validation = validateTradingCard(formPayload);
+                  const {
+                    riskRewardRatio,
+                    riskPercentage,
+                    averageTPPercentage,
+                  } = validation.metrics;
+
+                  // Calculs additionnels avec protection contre NaN
+                  const defaultCapital = 1000; // Capital par défaut
+                  const safeRiskPercentage = Number.isFinite(riskPercentage)
+                    ? riskPercentage
+                    : 0;
+                  const riskAmount =
+                    defaultCapital * (safeRiskPercentage / 100);
+                  const priceRisk = Math.abs(entry - invalidation);
+                  const priceRiskFraction = entry > 0 ? priceRisk / entry : 0;
+                  const positionSize =
+                    priceRiskFraction > 0 && Number.isFinite(riskAmount)
+                      ? riskAmount / priceRiskFraction
+                      : 0;
+                  const contracts =
+                    entry > 0 && Number.isFinite(positionSize)
+                      ? positionSize / entry
+                      : 0;
+
+                  // Valider que les métriques sont valides
+                  const hasValidMetrics =
+                    Number.isFinite(riskRewardRatio) &&
+                    Number.isFinite(riskPercentage) &&
+                    Number.isFinite(averageTPPercentage) &&
+                    riskRewardRatio > 0;
+
+                  const isValid =
+                    entry > 0 &&
+                    invalidation > 0 &&
+                    tps.length > 0 &&
+                    hasValidMetrics;
+
+                  // Helper pour formater les nombres avec protection NaN
+                  const formatNumber = (value: number, decimals: number) => {
+                    return Number.isFinite(value)
+                      ? value.toFixed(decimals)
+                      : "0.00";
+                  };
+
+                  return (
+                    <Card className="bg-muted/30">
+                      <CardContent className="space-y-4 py-4">
+                        {isValid ? (
+                          <>
+                            {/* Grid de métriques */}
+                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                              <div className="space-y-1">
+                                <p className="text-muted-foreground text-xs">
+                                  Risk Amount
+                                </p>
+                                <p className="text-xl font-semibold">
+                                  ${formatNumber(riskAmount, 2)}
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-muted-foreground text-xs">
+                                  Price Risk
+                                </p>
+                                <p className="text-xl font-semibold">
+                                  {formatNumber(riskPercentage, 2)}%
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-muted-foreground text-xs">
+                                  Position Size
+                                </p>
+                                <p className="text-xl font-semibold">
+                                  ${formatNumber(positionSize, 2)}
+                                </p>
+                                <p className="text-muted-foreground text-xs">
+                                  ≈ {formatNumber(contracts, 4)} contracts
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                <p className="text-muted-foreground text-xs">
+                                  R/R Ratio
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-xl font-semibold">
+                                    1:{formatNumber(riskRewardRatio, 2)}
+                                  </p>
+                                  <Badge
+                                    variant={
+                                      riskRewardRatio >= 2
+                                        ? "default"
+                                        : riskRewardRatio >= 1.5
+                                          ? "secondary"
+                                          : "destructive"
+                                    }
+                                  >
+                                    {riskRewardRatio >= 2
+                                      ? "Excellent"
+                                      : riskRewardRatio >= 1.5
+                                        ? "OK"
+                                        : "Poor"}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Message explicatif */}
+                            <div className="text-muted-foreground text-xs">
+                              💡 This calculation protects you from risking more
+                              than{" "}
+                              <span className="text-primary font-semibold">
+                                ${formatNumber(riskAmount, 2)}
+                              </span>{" "}
+                              if your stop loss is hit. With a{" "}
+                              <span className="text-primary font-semibold">
+                                1:{formatNumber(riskRewardRatio, 2)}
+                              </span>{" "}
+                              RR and average target at{" "}
+                              <span className="text-primary font-semibold">
+                                +{formatNumber(averageTPPercentage, 1)}%
+                              </span>
+                              , you could capture{" "}
+                              <span className="text-primary font-semibold">
+                                ${formatNumber(riskAmount * riskRewardRatio, 2)}
+                              </span>{" "}
+                              if all take profits are reached.
+                            </div>
+
+                            {/* Liste des TPs */}
+                            {tps.length > 0 && (
+                              <div className="text-muted-foreground flex flex-col gap-1 text-xs">
+                                {tps.map((tp, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-center justify-between"
+                                  >
+                                    <span>TP{idx + 1}</span>
+                                    <span>
+                                      {formatNumber(100 / tps.length, 0)}% @ $
+                                      {formatNumber(tp, 2)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-muted-foreground py-8 text-center text-sm">
+                            Fill in Entry Price, Invalidation Level, and Take
+                            Profits to see risk analysis
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
+              </div>
+            </div>
 
             <LoadingButton
               loading={createSignalMutation.isPending}

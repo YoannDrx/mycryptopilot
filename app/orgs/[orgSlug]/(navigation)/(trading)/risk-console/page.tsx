@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { getPlanLimits } from "@/lib/crypto/get-plan-limits";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { getRequiredCurrentOrgCache } from "@/lib/react/cache";
+import { getRequiredUser } from "@/lib/auth/auth-user";
+import { getUserRiskPresets } from "@/features/risk-console/risk-console-queries";
 
 import { RiskConsolePageContent } from "./_components/risk-console-page-content";
 import { RiskConsolePaywall } from "./_components/risk-console-paywall";
@@ -15,12 +17,20 @@ export const metadata: Metadata = {
 
 export default async function RiskConsolePage() {
   const org = await getRequiredCurrentOrgCache();
-  const planName = (org.subscription?.plan ?? "free") as MyCryptoPilotPlanName;
+  const user = await getRequiredUser();
+
+  // MyCryptoPilot uses User.planName (not org.subscription)
+  const planName = (user.planName ?? "free") as MyCryptoPilotPlanName;
   const planLimits = getPlanLimits(planName);
 
   if (!planLimits.riskConsole) {
     return <RiskConsolePaywall orgSlug={org.slug} currentPlan={planName} />;
   }
 
-  return <RiskConsolePageContent planName={planName} />;
+  // Load user presets
+  const userPresets = await getUserRiskPresets(user.id);
+
+  return (
+    <RiskConsolePageContent planName={planName} userPresets={userPresets} />
+  );
 }

@@ -8,11 +8,37 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Typography } from "@/components/nowts/typography";
 import { cn } from "@/lib/utils";
-import { Plus, X } from "lucide-react";
+import { Plus, X, TrendingUp, Save, Bookmark } from "lucide-react";
+import type { ExchangeBalance } from "@/features/exchange/exchange-queries";
+import type { RiskCalculation } from "@/generated/prisma";
+import { saveRiskCalculationAction } from "@/features/risk-console/risk-console.action";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type PositionType = "LONG" | "SHORT";
+
+// Hardcoded risk presets
+const HARDCODED_PRESETS = {
+  conservative: { name: "Conservative (1%)", riskPercent: 1 },
+  moderate: { name: "Moderate (2%)", riskPercent: 2 },
+  aggressive: { name: "Aggressive (3%)", riskPercent: 3 },
+} as const;
 
 type TakeProfitConfig = {
   id: string;
@@ -68,6 +94,9 @@ export type RiskConsoleCalculatorProps = {
   showHeader?: boolean;
   className?: string;
   onResultChange?: (result: RiskConsoleCalculatorResult) => void;
+  // Presets support
+  userPresets?: RiskCalculation[];
+  onPresetSaved?: () => void;
 };
 
 export function RiskConsoleCalculator({
@@ -83,6 +112,8 @@ export function RiskConsoleCalculator({
   showHeader = true,
   className,
   onResultChange,
+  userPresets = [],
+  onPresetSaved,
 }: RiskConsoleCalculatorProps) {
   const [capital, setCapital] = useState(() => defaultCapital.toString());
   const [riskPercent, setRiskPercent] = useState(() =>
@@ -94,6 +125,139 @@ export function RiskConsoleCalculator({
   const [stopLoss, setStopLoss] = useState(() => defaultStopLoss.toString());
   const [positionType, setPositionType] =
     useState<PositionType>(defaultPositionType);
+
+  // Capital Source state (manual or exchange)
+  const [capitalSource, setCapitalSource] = useState<string>("manual");
+  const [exchangeBalances, setExchangeBalances] = useState<ExchangeBalance[]>(
+    [],
+  );
+  const [isLoadingBalances, setIsLoadingBalances] = useState(false);
+
+  // Preset state
+  const [isSavingPreset, setIsSavingPreset] = useState(false);
+  const [presetName, setPresetName] = useState("");
+  const [showPresetDialog, setShowPresetDialog] = useState(false);
+
+  // Fetch exchange balances on mount
+  useEffect(() => {
+    async function fetchBalances() {
+      setIsLoadingBalances(true);
+      try {
+        const response = await fetch("/api/exchange/balances");
+        const data = (await response.json()) as {
+          success: boolean;
+          balances?: ExchangeBalance[];
+        };
+        if (data.success && data.balances) {
+          setExchangeBalances(data.balances);
+        }
+      } catch {
+        // Silently fail - user can still use manual input
+        setExchangeBalances([]);
+      } finally {
+        setIsLoadingBalances(false);
+      }
+    }
+    void fetchBalances();
+  }, []);
+
+  // Load preset handler
+  const handleLoadPreset = (presetId: string) => {
+    // Check hardcoded presets first
+    if (presetId in HARDCODED_PRESETS) {
+      const preset =
+        HARDCODED_PRESETS[presetId as keyof typeof HARDCODED_PRESETS];
+      setRiskPercent(preset.riskPercent.toString());
+      toast.success(`Loaded ${preset.name} preset`);
+      return;
+    }
+
+    // Load user custom preset
+    const userPreset = userPresets.find((p) => p.id === presetId);
+    if (userPreset) {
+      setCapital(userPreset.capital.toString());
+      setRiskPercent(userPreset.riskPercent.toString());
+      setEntryPrice(userPreset.entryPrice.toString());
+      setStopLoss(userPreset.stopLoss.toString());
+      setPositionType(userPreset.positionType as PositionType);
+
+      // Load take profits
+      const tps = userPreset.takeProfits as unknown as {
+        price: number;
+        allocation: number;
+        label?: string;
+      }[];
+      if (Array.isArray(tps) && tps.length > 0) {
+        setTargets(
+          tps.map((tp, index) => ({
+            id: `tp${index + 1}`,
+            label: tp.label ?? `TP${index + 1}`,
+            price: tp.price.toString(),
+            allocation: tp.allocation.toString(),
+          })),
+        );
+      }
+
+      toast.success(`Loaded preset: ${userPreset.presetName ?? "Custom"}`);
+    }
+  };
+
+  // Save preset handler
+  const handleSavePreset = async () => {
+    if (!presetName.trim()) {
+      toast.error("Please enter a preset name");
+      return;
+    }
+
+    setIsSavingPreset(true);
+    try {
+      const calculationResult = result;
+
+      if (!calculationResult.isValidConfiguration) {
+        toast.error("Cannot save invalid configuration as preset");
+        setIsSavingPreset(false);
+        return;
+      }
+
+      const takeProfitsData = targets
+        .filter((t) => Number(t.allocation) > 0)
+        .map((t) => ({
+          price: Number(t.price),
+          allocation: Number(t.allocation),
+          label: t.label,
+        }));
+
+      const saveResult = await saveRiskCalculationAction({
+        capital: Number(capital),
+        riskPercent: Number(riskPercent),
+        entryPrice: Number(entryPrice),
+        stopLoss: Number(stopLoss),
+        positionType,
+        takeProfits: takeProfitsData,
+        riskAmount: calculationResult.riskAmount,
+        positionSize: calculationResult.positionSize,
+        contracts: calculationResult.contracts,
+        rrRatio: calculationResult.rrRatio,
+        isPreset: true,
+        presetName: presetName.trim(),
+      });
+
+      if (saveResult.success) {
+        toast.success(`Preset "${presetName}" saved successfully`);
+        setShowPresetDialog(false);
+        setPresetName("");
+        if (onPresetSaved) {
+          onPresetSaved();
+        }
+      } else {
+        toast.error(saveResult.error ?? "Failed to save preset");
+      }
+    } catch {
+      toast.error("Failed to save preset");
+    } finally {
+      setIsSavingPreset(false);
+    }
+  };
 
   const initialTargets = () => {
     if (defaultTargets && defaultTargets.length > 0) {
@@ -470,6 +634,142 @@ export function RiskConsoleCalculator({
             </div>
           </RadioGroup>
         </div>
+
+        {/* Risk Presets Section */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="risk-preset">Risk Presets</Label>
+              <Typography variant="muted" className="text-xs">
+                Load a preset or save your current configuration
+              </Typography>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPresetDialog(true)}
+              disabled={!result.isValidConfiguration}
+              className="gap-2"
+            >
+              <Save className="size-4" />
+              Save as Preset
+            </Button>
+          </div>
+          <Select onValueChange={handleLoadPreset}>
+            <SelectTrigger id="risk-preset">
+              <SelectValue placeholder="Select a preset..." />
+            </SelectTrigger>
+            <SelectContent>
+              {/* Hardcoded presets */}
+              <SelectItem value="conservative">
+                <span className="flex items-center gap-2">
+                  <Bookmark className="size-4 text-green-500" />
+                  {HARDCODED_PRESETS.conservative.name}
+                </span>
+              </SelectItem>
+              <SelectItem value="moderate">
+                <span className="flex items-center gap-2">
+                  <Bookmark className="size-4 text-yellow-500" />
+                  {HARDCODED_PRESETS.moderate.name}
+                </span>
+              </SelectItem>
+              <SelectItem value="aggressive">
+                <span className="flex items-center gap-2">
+                  <Bookmark className="size-4 text-red-500" />
+                  {HARDCODED_PRESETS.aggressive.name}
+                </span>
+              </SelectItem>
+              {/* User custom presets */}
+              {userPresets.length > 0 && (
+                <>
+                  <div className="border-border my-1 border-t" />
+                  {userPresets.map((preset) => (
+                    <SelectItem key={preset.id} value={preset.id}>
+                      <span className="flex items-center gap-2">
+                        <Bookmark className="size-4 text-blue-500" />
+                        {preset.presetName ?? "Unnamed"}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Capital Source Selector */}
+        {exchangeBalances.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="capital-source">Capital Source</Label>
+            <Select
+              value={capitalSource}
+              onValueChange={(value) => {
+                setCapitalSource(value);
+                if (value !== "manual") {
+                  // Auto-fill from exchange
+                  const balance = exchangeBalances.find(
+                    (b) => b.exchange === value,
+                  );
+                  if (balance?.isActive) {
+                    setCapital(balance.available.toFixed(2));
+                  }
+                }
+              }}
+            >
+              <SelectTrigger id="capital-source">
+                <SelectValue placeholder="Select capital source..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="manual">
+                  <span className="flex items-center gap-2">
+                    ✏️ Manual Input
+                  </span>
+                </SelectItem>
+                {exchangeBalances.map((balance) => (
+                  <SelectItem key={balance.exchange} value={balance.exchange}>
+                    <span className="flex items-center gap-2">
+                      <span>
+                        {balance.exchange === "BINANCE" ? "🟡" : "🔷"}{" "}
+                        {balance.exchange}
+                      </span>
+                      {balance.isActive ? (
+                        <Badge
+                          variant="default"
+                          className="ml-auto h-5 px-1.5 text-xs"
+                        >
+                          🟢 ${balance.available.toFixed(2)}
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="ml-auto">
+                          ❌ Error
+                        </Badge>
+                      )}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {capitalSource !== "manual" && (
+              <Typography variant="muted" className="text-xs">
+                <TrendingUp className="mr-1 inline size-3" />
+                Live balance from {capitalSource}
+                {exchangeBalances.find((b) => b.exchange === capitalSource)
+                  ?.lastSync && (
+                  <span className="ml-1">
+                    (Updated:{" "}
+                    {new Date(
+                      exchangeBalances.find((b) => b.exchange === capitalSource)
+                        ?.lastSync ?? "",
+                    ).toLocaleTimeString()}
+                    )
+                  </span>
+                )}
+              </Typography>
+            )}
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <Label htmlFor="risk-console-capital">Total Capital (USD)</Label>
@@ -479,6 +779,7 @@ export function RiskConsoleCalculator({
               value={capital}
               onChange={(event) => setCapital(event.target.value)}
               placeholder="10000"
+              disabled={capitalSource !== "manual" && !isLoadingBalances}
               className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
@@ -756,6 +1057,65 @@ export function RiskConsoleCalculator({
           </div>
         )}
       </CardContent>
+
+      {/* Save Preset Dialog */}
+      <Dialog open={showPresetDialog} onOpenChange={setShowPresetDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save as Preset</DialogTitle>
+            <DialogDescription>
+              Save your current risk configuration as a preset for quick access
+              later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="preset-name">Preset Name</Label>
+              <Input
+                id="preset-name"
+                placeholder="e.g., My Bitcoin Strategy"
+                value={presetName}
+                onChange={(e) => setPresetName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isSavingPreset) {
+                    void handleSavePreset();
+                  }
+                }}
+              />
+            </div>
+            <div className="bg-muted/50 rounded-lg p-3 text-xs">
+              <Typography variant="muted">
+                <strong>Current configuration:</strong>
+                <br />• Capital: ${capital} | Risk: {riskPercent}%
+                <br />• Entry: ${entryPrice} | SL: ${stopLoss}
+                <br />• Position: {positionType}
+                <br />• Take Profits:{" "}
+                {targets.filter((t) => Number(t.allocation) > 0).length} targets
+              </Typography>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowPresetDialog(false);
+                setPresetName("");
+              }}
+              disabled={isSavingPreset}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => void handleSavePreset()}
+              disabled={isSavingPreset || !presetName.trim()}
+            >
+              {isSavingPreset ? "Saving..." : "Save Preset"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

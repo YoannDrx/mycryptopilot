@@ -434,6 +434,40 @@ model CopyTrade {
   @@map("copy_trade")
 }
 
+model RiskCalculation {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Inputs
+  capital     Decimal  @db.Decimal(20, 2)
+  riskPercent Decimal  @db.Decimal(5, 2)
+  entryPrice  Decimal  @db.Decimal(20, 8)
+  stopLoss    Decimal  @db.Decimal(20, 8)
+  positionType String  // LONG, SHORT
+
+  // Take Profit Targets (JSON array)
+  takeProfits Json     // [{ price: number, allocation: number, label?: string }]
+
+  // Outputs (pre-calculated for performance)
+  riskAmount       Decimal  @db.Decimal(20, 8)
+  positionSize     Decimal  @db.Decimal(20, 8)
+  contracts        Decimal  @db.Decimal(20, 8)
+  rrRatio          Decimal  @db.Decimal(10, 4)
+
+  // Metadata
+  symbol      String?  // BTC-USDT, ETH-USDT (optional)
+  notes       String?  @db.Text
+  isPreset    Boolean  @default(false) // True if saved as preset
+  presetName  String?  // Name of preset (e.g., "BTC Conservative")
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, isPreset])
+  @@map("risk_calculation")
+}
+
 enum UserRole {
   USER
   TRADER

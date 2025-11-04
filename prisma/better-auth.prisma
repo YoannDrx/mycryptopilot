@@ -39,6 +39,7 @@ model User {
   referralTier     ReferralTier?
   userExchangeConnections UserExchangeConnection[]
   copyTrades       CopyTrade[]
+  riskCalculations RiskCalculation[]
 
   @@map("user")
 }
