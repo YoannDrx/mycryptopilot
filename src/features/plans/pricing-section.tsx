@@ -1,16 +1,11 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { AUTH_PLANS } from "@/lib/auth/stripe/auth-plans";
-import { cn } from "@/lib/utils";
+import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
 import Link from "next/link";
-import { useState } from "react";
-import { PricingCard } from "./pricing-card";
+import { LandingPricingCard } from "./landing-pricing-card";
 
 export function Pricing() {
-  const [isYearly, setIsYearly] = useState(false);
-
   return (
     <section
       id="pricing"
@@ -29,42 +24,22 @@ export function Pricing() {
             </p>
           </div>
 
-          <div className="bg-muted/50 mt-8 flex items-center space-x-4 rounded-full p-2">
-            <span
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                !isYearly
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground",
-              )}
-            >
-              Monthly
-            </span>
-            <Switch
-              checked={isYearly}
-              onCheckedChange={setIsYearly}
-              className="data-[state=checked]:bg-primary"
-            />
-            <div
-              className={cn(
-                "flex items-center rounded-full px-4 py-2 transition-all duration-200",
-                isYearly
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground",
-              )}
-            >
-              <span className="text-sm font-medium">Yearly</span>
-              <Badge
-                variant="outline"
-                className="border-primary/20 bg-primary/10 text-primary ml-2"
-              >
-                Save 20%
-              </Badge>
-            </div>
+          {/* Crypto Payment Badges */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <Badge variant="secondary" className="text-sm">
+              💎 USDC (Base)
+            </Badge>
+            <Badge variant="secondary" className="text-sm">
+              💎 USDT (Tron)
+            </Badge>
+            <Badge variant="outline" className="text-sm">
+              ⚡ Pro-rata billing
+            </Badge>
           </div>
-          <p className="text-muted-foreground/80 text-sm">
-            Pay with USDC (Base) or USDT (Tron). Pro-rata billing and a $1 test
-            plan are included.
+
+          <p className="text-muted-foreground/80 mt-2 text-sm">
+            Pay any amount—your subscription duration is calculated
+            automatically.
           </p>
         </div>
 
@@ -74,8 +49,8 @@ export function Pricing() {
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           }}
         >
-          {AUTH_PLANS.filter((p) => !p.isHidden).map((plan) => (
-            <PricingCard key={plan.name} plan={plan} isYearly={isYearly} />
+          {MYCRYPTOPILOT_PLANS.filter((p) => p.name !== "test").map((plan) => (
+            <LandingPricingCard key={plan.name} plan={plan} />
           ))}
         </div>
 
