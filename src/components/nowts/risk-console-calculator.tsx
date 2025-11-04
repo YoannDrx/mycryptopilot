@@ -17,10 +17,13 @@ import {
 } from "@/components/ui/select";
 import { Typography } from "@/components/nowts/typography";
 import { cn } from "@/lib/utils";
-import { Plus, X, TrendingUp, Save, Bookmark } from "lucide-react";
+import { Plus, X, TrendingUp, Save, Bookmark, History } from "lucide-react";
 import type { ExchangeBalance } from "@/features/exchange/exchange-queries";
-import type { RiskCalculation } from "@/generated/prisma";
-import { saveRiskCalculationAction } from "@/features/risk-console/risk-console.action";
+import type { SerializableRiskCalculation } from "@/features/risk-console/risk-console-queries";
+import {
+  saveRiskCalculationAction,
+  deleteRiskCalculationAction,
+} from "@/features/risk-console/risk-console.action";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -30,6 +33,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type PositionType = "LONG" | "SHORT";
 
@@ -84,6 +97,7 @@ export type RiskConsoleCalculatorProps = {
   defaultStopLoss?: number;
   defaultTakeProfit?: number;
   defaultPositionType?: PositionType;
+  defaultSymbol?: string;
   defaultTargets?: {
     price: number;
     allocation: number;
@@ -95,7 +109,7 @@ export type RiskConsoleCalculatorProps = {
   className?: string;
   onResultChange?: (result: RiskConsoleCalculatorResult) => void;
   // Presets support
-  userPresets?: RiskCalculation[];
+  userPresets?: SerializableRiskCalculation[];
   onPresetSaved?: () => void;
 };
 
@@ -106,6 +120,7 @@ export function RiskConsoleCalculator({
   defaultStopLoss = 41000,
   defaultTakeProfit = 44000,
   defaultPositionType = "LONG",
+  defaultSymbol = "",
   defaultTargets,
   heading = "Risk Console (2% Rule)",
   description,
@@ -125,6 +140,7 @@ export function RiskConsoleCalculator({
   const [stopLoss, setStopLoss] = useState(() => defaultStopLoss.toString());
   const [positionType, setPositionType] =
     useState<PositionType>(defaultPositionType);
+  const [symbol, setSymbol] = useState(defaultSymbol);
 
   // Capital Source state (manual or exchange)
   const [capitalSource, setCapitalSource] = useState<string>("manual");
@@ -137,6 +153,55 @@ export function RiskConsoleCalculator({
   const [isSavingPreset, setIsSavingPreset] = useState(false);
   const [presetName, setPresetName] = useState("");
   const [showPresetDialog, setShowPresetDialog] = useState(false);
+
+  // Save calculation handler (for history)
+  const [isSavingCalculation, setIsSavingCalculation] = useState(false);
+
+  const handleSaveCalculation = async () => {
+    setIsSavingCalculation(true);
+    try {
+      const calculationResult = result;
+
+      if (!calculationResult.isValidConfiguration) {
+        toast.error("Cannot save invalid configuration");
+        setIsSavingCalculation(false);
+        return;
+      }
+
+      const takeProfitsData = targets
+        .filter((t) => Number(t.allocation) > 0)
+        .map((t) => ({
+          price: Number(t.price),
+          allocation: Number(t.allocation),
+          label: t.label,
+        }));
+
+      const saveResult = await saveRiskCalculationAction({
+        capital: Number(capital),
+        riskPercent: Number(riskPercent),
+        entryPrice: Number(entryPrice),
+        stopLoss: Number(stopLoss),
+        positionType,
+        takeProfits: takeProfitsData,
+        riskAmount: calculationResult.riskAmount,
+        positionSize: calculationResult.positionSize,
+        contracts: calculationResult.contracts,
+        rrRatio: calculationResult.rrRatio,
+        symbol: symbol.trim() || undefined,
+        isPreset: false, // This is a calculation, not a preset
+      });
+
+      if (saveResult.success) {
+        toast.success("Calculation saved to history");
+      } else {
+        toast.error(saveResult.error ?? "Failed to save calculation");
+      }
+    } catch {
+      toast.error("Failed to save calculation");
+    } finally {
+      setIsSavingCalculation(false);
+    }
+  };
 
   // Fetch exchange balances on mount
   useEffect(() => {
@@ -238,6 +303,7 @@ export function RiskConsoleCalculator({
         positionSize: calculationResult.positionSize,
         contracts: calculationResult.contracts,
         rrRatio: calculationResult.rrRatio,
+        symbol: symbol.trim() || undefined,
         isPreset: true,
         presetName: presetName.trim(),
       });
@@ -256,6 +322,46 @@ export function RiskConsoleCalculator({
       toast.error("Failed to save preset");
     } finally {
       setIsSavingPreset(false);
+    }
+  };
+
+  // Delete preset handler
+  const [deletingPresetId, setDeletingPresetId] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [presetToDelete, setPresetToDelete] = useState<{
+    id: string;
+    name: string | null;
+  } | null>(null);
+
+  const handleDeletePreset = (presetId: string, presetName: string | null) => {
+    setPresetToDelete({ id: presetId, name: presetName });
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeletePreset = async () => {
+    if (!presetToDelete) return;
+
+    setDeletingPresetId(presetToDelete.id);
+    try {
+      const result = await deleteRiskCalculationAction(presetToDelete.id);
+
+      if (result.success) {
+        toast.success(
+          `Preset "${presetToDelete.name ?? "Unnamed"}" deleted successfully`,
+        );
+        setShowDeleteDialog(false);
+        setPresetToDelete(null);
+        // Notify parent to refresh presets
+        if (onPresetSaved) {
+          onPresetSaved();
+        }
+      } else {
+        toast.error(result.error ?? "Failed to delete preset");
+      }
+    } catch {
+      toast.error("Failed to delete preset");
+    } finally {
+      setDeletingPresetId(null);
     }
   };
 
@@ -639,22 +745,35 @@ export function RiskConsoleCalculator({
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
-              <Label htmlFor="risk-preset">Risk Presets</Label>
+              <Label htmlFor="risk-preset">Risk Presets & History</Label>
               <Typography variant="muted" className="text-xs">
                 Load a preset or save your current configuration
               </Typography>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPresetDialog(true)}
-              disabled={!result.isValidConfiguration}
-              className="gap-2"
-            >
-              <Save className="size-4" />
-              Save as Preset
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void handleSaveCalculation()}
+                disabled={!result.isValidConfiguration || isSavingCalculation}
+                className="gap-2"
+              >
+                <History className="size-4" />
+                {isSavingCalculation ? "Saving..." : "Save to History"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPresetDialog(true)}
+                disabled={!result.isValidConfiguration}
+                className="gap-2"
+              >
+                <Save className="size-4" />
+                Save as Preset
+              </Button>
+            </div>
           </div>
           <Select onValueChange={handleLoadPreset}>
             <SelectTrigger id="risk-preset">
@@ -696,6 +815,39 @@ export function RiskConsoleCalculator({
               )}
             </SelectContent>
           </Select>
+
+          {/* User Presets List with Delete */}
+          {userPresets.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {userPresets.map((preset) => (
+                <Badge
+                  key={preset.id}
+                  variant="outline"
+                  className="group relative flex items-center gap-2 pr-1"
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleLoadPreset(preset.id)}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Bookmark className="size-3 text-blue-500" />
+                    <span>{preset.presetName ?? "Unnamed"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () =>
+                      handleDeletePreset(preset.id, preset.presetName)
+                    }
+                    disabled={deletingPresetId === preset.id}
+                    className="hover:bg-destructive/10 ml-1 rounded-full p-0.5 transition-colors disabled:opacity-50"
+                    title="Delete preset"
+                  >
+                    <X className="text-muted-foreground hover:text-destructive size-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Capital Source Selector */}
@@ -801,6 +953,21 @@ export function RiskConsoleCalculator({
             </Typography>
           </div>
         </div>
+
+        {/* Symbol (optional) */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="risk-console-symbol">
+            Symbol <span className="text-muted-foreground">(optional)</span>
+          </Label>
+          <Input
+            id="risk-console-symbol"
+            type="text"
+            value={symbol}
+            onChange={(event) => setSymbol(event.target.value)}
+            placeholder="BTC-USDT, ETH-USDT, etc."
+          />
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <Label htmlFor="risk-console-entry">Entry Price (USD)</Label>
@@ -1116,6 +1283,32 @@ export function RiskConsoleCalculator({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Preset Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Preset</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the preset &quot;
+              {presetToDelete?.name ?? "Unnamed"}&quot;? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!deletingPresetId}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeletePreset}
+              disabled={!!deletingPresetId}
+              className="bg-destructive hover:bg-destructive/90 text-white"
+            >
+              {deletingPresetId ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

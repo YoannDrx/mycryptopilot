@@ -44,10 +44,12 @@ export type AuthSession = BetterAuthSession & {
   activeOrganizationId: string | null;
 };
 
-// Extended User with role and discordId
+// Extended User with role, discordId, and MyCryptoPilot plan fields
 export type AuthUser = BetterAuthUser & {
   role?: string;
   discordId?: string | null;
+  planName?: string | null;
+  planExpiresAt?: Date | null;
 };
 
 // Organization with members

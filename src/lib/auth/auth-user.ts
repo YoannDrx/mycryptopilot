@@ -1,5 +1,6 @@
 import { unauthorized } from "next/navigation";
 import { getSessionApi } from "./auth-api-helper";
+import { prisma } from "@/lib/prisma";
 
 export const getSession = async () => {
   const session = await getSessionApi();
@@ -13,8 +14,30 @@ export const getUser = async () => {
     return null;
   }
 
-  const user = session.user;
-  return user;
+  // Fetch additional user fields from database (planName, planExpiresAt, etc.)
+  // Better Auth session only contains basic fields
+  const fullUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      emailVerified: true,
+      role: true,
+      discordId: true,
+      planName: true,
+      planExpiresAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  if (!fullUser) {
+    return null;
+  }
+
+  return fullUser;
 };
 
 export const getRequiredUser = async () => {

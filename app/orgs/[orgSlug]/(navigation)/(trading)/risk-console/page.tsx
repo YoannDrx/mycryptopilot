@@ -9,6 +9,8 @@ import { getUserRiskPresets } from "@/features/risk-console/risk-console-queries
 import { RiskConsolePageContent } from "./_components/risk-console-page-content";
 import { RiskConsolePaywall } from "./_components/risk-console-paywall";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Risk Console",
   description:

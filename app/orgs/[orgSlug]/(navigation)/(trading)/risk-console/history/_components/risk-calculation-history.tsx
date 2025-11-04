@@ -10,23 +10,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { RiskCalculation } from "@/generated/prisma";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import type { SerializableRiskCalculation } from "@/features/risk-console/risk-console-queries";
 import { format } from "date-fns";
-import { Trash2, RotateCw } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Trash2, ArrowRight } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 import { deleteRiskCalculationAction } from "@/features/risk-console/risk-console.action";
 import { toast } from "sonner";
 
 type Props = {
-  calculations: RiskCalculation[];
+  calculations: SerializableRiskCalculation[];
 };
 
 export function RiskCalculationHistory({ calculations }: Props) {
   const router = useRouter();
+  const params = useParams();
+  const orgSlug = params.orgSlug as string;
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [calculationToDelete, setCalculationToDelete] = useState<{
+    id: string;
+    symbol: string | null;
+  } | null>(null);
 
-  const handleReload = (calc: RiskCalculation) => {
+  const handleReload = (calc: SerializableRiskCalculation) => {
     // Navigate to main risk console with query params
     const takeProfits = calc.takeProfits as {
       price: number;
@@ -34,7 +51,7 @@ export function RiskCalculationHistory({ calculations }: Props) {
       label?: string;
     }[];
 
-    const params = new URLSearchParams({
+    const queryParams = new URLSearchParams({
       capital: calc.capital.toString(),
       riskPercent: calc.riskPercent.toString(),
       entryPrice: calc.entryPrice.toString(),
@@ -45,20 +62,25 @@ export function RiskCalculationHistory({ calculations }: Props) {
       takeProfits: JSON.stringify(takeProfits),
     });
 
-    router.push(`/risk-console?${params.toString()}`);
+    router.push(`/orgs/${orgSlug}/risk-console?${queryParams.toString()}`);
   };
 
-  const handleDelete = async (calculationId: string) => {
-    if (!confirm("Are you sure you want to delete this calculation?")) {
-      return;
-    }
+  const handleDeleteClick = (calculationId: string, symbol: string | null) => {
+    setCalculationToDelete({ id: calculationId, symbol });
+    setShowDeleteDialog(true);
+  };
 
-    setDeletingId(calculationId);
+  const confirmDelete = async () => {
+    if (!calculationToDelete) return;
+
+    setDeletingId(calculationToDelete.id);
     try {
-      const result = await deleteRiskCalculationAction(calculationId);
+      const result = await deleteRiskCalculationAction(calculationToDelete.id);
 
       if (result.success) {
         toast.success("Calculation deleted");
+        setShowDeleteDialog(false);
+        setCalculationToDelete(null);
         router.refresh();
       } else {
         toast.error(result.error ?? "Failed to delete calculation");
@@ -83,7 +105,7 @@ export function RiskCalculationHistory({ calculations }: Props) {
           No calculations saved yet. Start using the Risk Console to see your
           history here.
         </p>
-        <Button onClick={() => router.push("/risk-console")}>
+        <Button onClick={() => router.push(`/orgs/${orgSlug}/risk-console`)}>
           Go to Risk Console
         </Button>
       </div>
@@ -140,13 +162,13 @@ export function RiskCalculationHistory({ calculations }: Props) {
                     variant="outline"
                     onClick={() => handleReload(calc)}
                   >
-                    <RotateCw className="mr-1 size-4" />
-                    Reload
+                    <ArrowRight className="mr-1 size-4" />
+                    Apply
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={async () => handleDelete(calc.id)}
+                    onClick={() => handleDeleteClick(calc.id, calc.symbol)}
                     disabled={deletingId === calc.id}
                   >
                     <Trash2 className="text-destructive size-4" />
@@ -157,6 +179,34 @@ export function RiskCalculationHistory({ calculations }: Props) {
           ))}
         </TableBody>
       </Table>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Calculation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this calculation
+              {calculationToDelete?.symbol
+                ? ` for ${calculationToDelete.symbol}`
+                : ""}
+              ? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!deletingId}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={!!deletingId}
+              className="bg-destructive hover:bg-destructive/90 text-white"
+            >
+              {deletingId ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

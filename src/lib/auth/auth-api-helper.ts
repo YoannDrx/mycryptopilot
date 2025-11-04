@@ -21,8 +21,9 @@ import type { AuthOrganization, AuthFullOrganization } from "./auth-type";
  * List all organizations where the user is a member
  */
 export async function listOrganizationsApi(): Promise<AuthOrganization[]> {
+  const headersList = await headers();
   const result = await (auth.api as any).listOrganizations({
-    headers: await headers(),
+    headers: headersList,
   });
   return result as AuthOrganization[];
 }
@@ -33,9 +34,10 @@ export async function listOrganizationsApi(): Promise<AuthOrganization[]> {
 export async function setActiveOrganizationApi(
   organizationId: string,
 ): Promise<void> {
+  const headersList = await headers();
   await (auth.api as any).setActiveOrganization({
     body: { organizationId },
-    headers: await headers(),
+    headers: headersList,
   });
 }
 
@@ -45,8 +47,9 @@ export async function setActiveOrganizationApi(
 export async function hasPermissionApi(
   permission: string | Record<string, unknown>,
 ): Promise<{ success: boolean }> {
+  const headersList = await headers();
   const result = await (auth.api as any).hasPermission({
-    headers: await headers(),
+    headers: headersList,
     body: { permission },
   });
   return result;
@@ -59,9 +62,10 @@ export async function createOrganizationApi(data: {
   name: string;
   slug?: string;
 }): Promise<AuthOrganization> {
+  const headersList = await headers();
   const result = await (auth.api as any).createOrganization({
     body: data,
-    headers: await headers(),
+    headers: headersList,
   });
   return result as AuthOrganization;
 }
@@ -72,9 +76,10 @@ export async function createOrganizationApi(data: {
 export async function getFullOrganizationApi(
   organizationSlug: string,
 ): Promise<AuthFullOrganization | null> {
+  const headersList = await headers();
   const result = await (auth.api as any).getFullOrganization({
     query: { organizationSlug },
-    headers: await headers(),
+    headers: headersList,
   });
   return result as AuthFullOrganization | null;
 }
@@ -85,9 +90,10 @@ export async function getFullOrganizationApi(
 export async function acceptInvitationApi(
   invitationId: string,
 ): Promise<{ success: boolean }> {
+  const headersList = await headers();
   const result = await (auth.api as any).acceptInvitation({
     body: { invitationId },
-    headers: await headers(),
+    headers: headersList,
   });
   return result;
 }
