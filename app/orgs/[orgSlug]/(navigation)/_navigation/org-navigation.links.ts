@@ -5,6 +5,7 @@ import type { SerializableGroup } from "./global-search-command";
 import {
   AlertCircle,
   BarChart3,
+  Calculator,
   BookOpen,
   DollarSign,
   FileText,
@@ -97,9 +98,9 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         label: "Traders Marketplace",
       },
       {
-        href: `${ORGANIZATION_PATH}/pricing`,
-        Icon: DollarSign,
-        label: "Pricing & Plans",
+        href: `${ORGANIZATION_PATH}/risk-console`,
+        Icon: Calculator,
+        label: "Risk Console",
       },
       {
         href: `${ORGANIZATION_PATH}/dashboard/trader`,
@@ -110,6 +111,11 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
         href: `${ORGANIZATION_PATH}/portfolio`,
         Icon: LineChart,
         label: "Portfolio Analytics",
+      },
+      {
+        href: `${ORGANIZATION_PATH}/pricing`,
+        Icon: DollarSign,
+        label: "Pricing & Plans",
       },
     ],
   },

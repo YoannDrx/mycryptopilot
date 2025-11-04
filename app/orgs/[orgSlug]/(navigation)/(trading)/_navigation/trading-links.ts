@@ -4,6 +4,7 @@ import type {
 } from "@/features/navigation/navigation.type";
 import {
   BarChart3,
+  Calculator,
   TrendingUp,
   Users,
   DollarSign,
@@ -41,6 +42,11 @@ const SIGNALS_LINKS: NavigationLink[] = [
     href: `${ORGANIZATION_PATH}/signals`,
     Icon: TrendingUp,
     label: "Signals Feed",
+  },
+  {
+    href: `${ORGANIZATION_PATH}/risk-console`,
+    Icon: Calculator,
+    label: "Risk Console",
   },
   {
     href: `${ORGANIZATION_PATH}/traders`,
