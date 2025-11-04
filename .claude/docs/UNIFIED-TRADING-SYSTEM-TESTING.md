@@ -1385,4 +1385,633 @@ Avant de déployer en production:
 
 ---
 
+## Tests Copy Trading avec Binance
+
+### 📋 Vue d'ensemble
+
+Le système de Copy Trading permet aux utilisateurs de répliquer les trades des traders qu'ils suivent, soit manuellement (journal), soit automatiquement (exécution via API).
+
+**Modes disponibles**:
+- **MANUAL**: User copie le signal dans son journal personnel, track entry/exit manuellement
+- **AUTO**: Exécution automatique via l'API Binance/Bybit de l'utilisateur
+
+**Tests à effectuer**:
+1. Copy Trading MANUAL (SPOT)
+2. Copy Trading AUTO (SPOT)
+3. Copy Trading FUTURES (avec leverage)
+4. Circuit Breakers (sécurité)
+
+---
+
+### Setup Binance Testnet
+
+#### Étape 1: Créer un Compte Testnet
+
+1. Va sur https://testnet.binance.vision/
+2. Connecte-toi avec GitHub
+3. Note ton UID Testnet
+
+#### Étape 2: Générer API Keys
+
+**Pour le Trader** (READ + WRITE):
+1. Dashboard → API Management
+2. Create API Key → Label: "Trader Test"
+3. Permissions:
+   - ✅ Enable Spot & Margin Trading
+   - ✅ Enable Futures
+   - ❌ Enable Withdrawals (pas nécessaire)
+4. Copie API Key + Secret Key
+5. Whitelist IP (optionnel, recommandé: ton IP publique)
+
+**Pour l'User** (READ + WRITE):
+1. Même processus, Label: "User Test"
+2. Permissions identiques au trader
+
+#### Étape 3: Variables d'Environnement
+
+Ajoute dans `.env.local`:
+
+```bash
+# Encryption
+ENCRYPTION_SECRET="$(openssl rand -hex 32)"
+
+# Trader connection
+BINANCE_TRADER_API_KEY="trader_testnet_api_key"
+BINANCE_TRADER_SECRET="trader_testnet_secret"
+
+# User connection (pour copy trading)
+BINANCE_USER_API_KEY="user_testnet_api_key"
+BINANCE_USER_SECRET="user_testnet_secret"
+
+# Database
+DATABASE_URL="postgresql://..."
+```
+
+#### Étape 4: Seed Database
+
+```bash
+# Créer un trader profile
+npx prisma studio
+
+# Ajouter manuellement:
+# 1. User (trader) avec planName="ultra", role="TRADER"
+# 2. TraderProfile pour ce user, verified=true
+# 3. User (follower) avec planName="pro"
+# 4. Follow relation: followerId=user2, traderId=user1, status="ACTIVE"
+```
+
+---
+
+### Test 1: Copy Trading MANUAL (SPOT)
+
+**Objectif**: Copier un signal dans le journal personnel sans exécution automatique
+
+#### Steps
+
+**1. Trader crée un signal**:
+
+Navigue vers `/orgs/[orgSlug]/dashboard/trader/signals/new` et crée un signal:
+- Symbol: `BTC/USDT`
+- Side: `LONG`
+- Entry Price: `50000`
+- Stop Loss: `48000`
+- Take Profit 1: `52000` (50%)
+- Take Profit 2: `54000` (50%)
+- Confidence: HIGH
+- Risk: MEDIUM
+
+**2. User voit le signal dans son feed**:
+
+Navigue vers `/orgs/[orgSlug]/dashboard`:
+- Le signal doit apparaître dans le feed
+- Bouton "Copy" visible si user est PRO/ULTRA
+
+**3. User clique "Copy"**:
+
+Le `CopyTradeDialog` s'ouvre:
+- Choix du mode: MANUAL ou AUTO
+- Sélectionne **MANUAL**
+- Entry price pré-rempli: `50000`
+- Quantité: User peut ajuster (ex: `0.01 BTC`)
+- Click "Copy to Journal"
+
+**4. Vérifications DB** (Prisma Studio):
+
+```sql
+SELECT * FROM "CopyTrade"
+WHERE userId = 'user_id'
+AND originalTradeId = 'signal.linkedTradeId';
+
+-- Devrait afficher:
+{
+  "id": "copy_xxx",
+  "userId": "user_xxx",
+  "originalTradeId": "trade_xxx",
+  "mode": "MANUAL",
+  "status": "PENDING",
+  "manualEntry": 50000,
+  "manualExit": null,
+  "manualPnl": null,
+  "notes": "",
+  "stopLoss": 48000,
+  "takeProfit": [
+    {"price": 52000, "percentage": 50, "hit": false},
+    {"price": 54000, "percentage": 50, "hit": false}
+  ]
+}
+```
+
+**5. User ferme manuellement le trade**:
+
+User navigue vers son journal → Edit copy trade:
+- Set `manualExit`: `52000`
+- `manualPnl` calculé automatiquement: `(52000 - 50000) * 0.01 = 20 USD`
+- Status → `CLOSED`
+
+**Résultat attendu**:
+✅ CopyTrade créé en mode MANUAL
+✅ User track son trade manuellement
+✅ Aucune exécution réelle sur Binance
+✅ PnL calculé correctement
+
+---
+
+### Test 2: Copy Trading AUTO (SPOT)
+
+**Objectif**: Exécution automatique du copy sur l'exchange de l'utilisateur
+
+#### Steps
+
+**1. User connecte son API Binance**:
+
+```typescript
+POST /api/user-exchange/connect
+{
+  "exchange": "BINANCE",
+  "apiKey": "user_testnet_api_key",
+  "secretKey": "user_testnet_secret",
+  "mode": "AUTO"
+}
+```
+
+**2. Validation backend**:
+
+Le service `UserExchangeConnectionService` :
+- Encrypt les keys (AES-256-GCM)
+- Test credentials avec `validateApiKeys()`
+- Store dans DB avec `isActive = true`
+
+Vérifications DB:
+
+```sql
+SELECT * FROM "UserExchangeConnection" WHERE userId = 'user_id';
+
+-- Devrait afficher:
+{
+  "exchange": "BINANCE",
+  "encryptedApiKey": "hex_encrypted...",
+  "encryptedSecretKey": "hex_encrypted...",
+  "keyIv": "hex_iv...",
+  "keyTag": "hex_tag...",
+  "mode": "AUTO",
+  "isActive": true
+}
+```
+
+**3. Trader crée un signal** (identique au Test 1)
+
+**4. Auto-execution**:
+
+Le `CopyTradeService` détecte le nouveau signal et exécute:
+
+```typescript
+// Backend automatique
+const userConnection = await getUserConnectionForExchange(userId, 'BINANCE');
+const decryptedCreds = await getDecryptedCredentials(userConnection);
+
+// Create Binance order
+const exchange = new ccxt.binance({
+  apiKey: decryptedCreds.apiKey,
+  secret: decryptedCreds.secretKey,
+});
+
+const order = await exchange.createMarketBuyOrder(
+  'BTC/USDT',
+  quantity
+);
+```
+
+**5. Vérifications DB**:
+
+```sql
+SELECT * FROM "CopyTrade" WHERE mode = 'AUTO';
+
+-- Devrait afficher:
+{
+  "mode": "AUTO",
+  "status": "EXECUTED",
+  "executedPrice": 50005.5,  // Prix réel Binance
+  "executedQuantity": 0.01,
+  "slippage": 5.5,           // Différence avec signal (50005.5 - 50000)
+  "exchangeOrderId": "28457", // Binance order ID
+  "executedAt": "2025-11-04T10:00:00Z"
+}
+```
+
+**6. Vérification Binance Testnet**:
+
+Dashboard Binance Testnet → Orders History:
+- Devrait afficher l'ordre BUY exécuté
+- Symbol: BTC/USDT
+- Quantity: 0.01
+- Status: FILLED
+
+**7. Trader close le trade**:
+
+Trader ferme son `TraderTrade` → Trigger automatique:
+
+```typescript
+// Backend
+await closeOriginalTradeCopies(traderTrade.id, averageExit);
+
+// Execute SELL order pour user
+const sellOrder = await exchange.createMarketSellOrder(
+  'BTC/USDT',
+  executedQuantity
+);
+```
+
+**8. Vérifications finales**:
+
+```sql
+SELECT * FROM "CopyTrade" WHERE id = 'copy_xxx';
+
+-- Devrait afficher:
+{
+  "status": "CLOSED",
+  "manualExit": 52000,
+  "manualPnl": 194.5,  // (52000 - 50005.5) * 0.01 = 19.945 - fees
+  "closedAt": "2025-11-04T11:00:00Z"
+}
+```
+
+**Résultat attendu**:
+✅ Ordre BUY exécuté automatiquement sur Binance user
+✅ CopyTrade.status = EXECUTED
+✅ Slippage tracked (différence prix signal vs exécution)
+✅ Ordre SELL automatique quand trader close
+✅ PnL final calculé avec prix réels
+
+---
+
+### Test 3: Copy Trading FUTURES (avec Leverage)
+
+**Objectif**: Tester le copy trading avec effet de levier
+
+#### Différences avec SPOT
+
+**1. Leverage (effet de levier)**:
+
+```typescript
+// Signal FUTURES
+{
+  "instrumentType": "FUTURES",
+  "symbol": "BTCUSDT",  // Pas de "/" pour futures
+  "leverage": 10,
+  "side": "LONG"
+}
+```
+
+**2. Position Sizing**:
+
+```typescript
+// SPOT
+const spotQuantity = userCapital / entryPrice;
+// Ex: $1000 / $50000 = 0.02 BTC
+
+// FUTURES
+const futuresQuantity = (userCapital * leverage) / entryPrice;
+// Ex: ($1000 * 10) / $50000 = 0.2 BTC (10x plus grand!)
+```
+
+**3. Marginal Requirements**:
+
+```typescript
+// Vérifier balance suffisante
+const requiredMargin = positionValue / leverage;
+const userBalance = await exchange.fetchBalance();
+
+if (userBalance.free['USDT'] < requiredMargin) {
+  throw new Error('Insufficient margin');
+}
+```
+
+**4. Liquidation Price**:
+
+```typescript
+// LONG
+const liquidationPrice = entryPrice * (1 - 1/leverage);
+// Ex: 50000 * (1 - 1/10) = 45000
+
+// SHORT
+const liquidationPrice = entryPrice * (1 + 1/leverage);
+// Ex: 50000 * (1 + 1/10) = 55000
+```
+
+#### Steps Test FUTURES
+
+**1. User connect Binance avec Futures enabled**:
+
+Verify API permissions include Futures trading.
+
+**2. Trader crée signal FUTURES**:
+
+- Symbol: `BTCUSDT`
+- Instrument: `FUTURES`
+- Leverage: `5x`
+- Side: `LONG`
+- Entry: `50000`
+- Stop Loss: `48000`
+
+**3. Auto-execution sur Binance Futures**:
+
+```typescript
+// Backend
+const exchange = new ccxt.binance({
+  apiKey: decryptedCreds.apiKey,
+  secret: decryptedCreds.secretKey,
+  options: {
+    defaultType: 'future',  // Important!
+  }
+});
+
+// Set leverage
+await exchange.fapiPrivatePostLeverage({
+  symbol: 'BTCUSDT',
+  leverage: 5,
+});
+
+// Open position
+const order = await exchange.createMarketBuyOrder(
+  'BTC/USDT',
+  quantity,
+  { reduceOnly: false }
+);
+```
+
+**4. Vérifier position ouverte**:
+
+```typescript
+const positions = await exchange.fetchPositions(['BTC/USDT']);
+console.log(positions[0]);
+
+// Devrait afficher:
+{
+  symbol: 'BTC/USDT',
+  side: 'long',
+  contracts: 0.2,
+  notional: 10000,  // 0.2 * 50000
+  leverage: 5,
+  entryPrice: 50000,
+  markPrice: 50100,
+  liquidationPrice: 40000,  // Approximatif avec 5x
+  unrealizedPnl: 20,        // (50100 - 50000) * 0.2
+}
+```
+
+**5. Close position quand trader close**:
+
+```typescript
+// Trigger auto
+const closeOrder = await exchange.createMarketSellOrder(
+  'BTC/USDT',
+  position.contracts,
+  { reduceOnly: true }  // Important pour Futures!
+);
+```
+
+**6. Vérifications PnL**:
+
+```sql
+SELECT * FROM "CopyTrade" WHERE originalTradeId = 'trade_xxx';
+
+-- PnL avec leverage
+{
+  "executedPrice": 50000,
+  "manualExit": 52000,
+  "executedQuantity": 0.2,
+  "manualPnl": 400,  // (52000 - 50000) * 0.2 = 400 USD (5x le PnL SPOT!)
+  "leverage": 5
+}
+```
+
+**Résultat attendu**:
+✅ Position FUTURES ouverte avec leverage 5x
+✅ Quantité 5x plus grande que SPOT
+✅ PnL amplifié par le leverage
+✅ Liquidation price calculé et tracké
+✅ Close avec `reduceOnly: true`
+
+---
+
+### Test 4: Circuit Breakers (Sécurité)
+
+**Objectif**: Vérifier les limites de sécurité pour copy trading
+
+#### Scénario 1: Max Position Size
+
+**Configuration**:
+
+```typescript
+// copy-trade.service.ts
+const MAX_COPY_VALUE_USD = 1000;  // $1000 max par copy
+
+// Si signal = $5000
+const userQuantity = Math.min(
+  signalQuantity * copyRatio,
+  MAX_COPY_VALUE_USD / entryPrice
+);
+```
+
+**Test**:
+
+1. Trader crée signal: Entry `50000`, Quantity `0.1 BTC` (= $5000)
+2. User copie avec `copyRatio = 1` (100%)
+3. Backend calcule: `min(0.1, 1000/50000) = min(0.1, 0.02) = 0.02 BTC`
+
+**Vérifications**:
+
+```sql
+SELECT * FROM "CopyTrade" WHERE userId = 'user_id';
+
+-- executedQuantity devrait être 0.02, pas 0.1
+{
+  "executedQuantity": 0.02,
+  "notes": "Position size limited to $1000 max"
+}
+```
+
+**Résultat attendu**:
+✅ Copy refusé si > $1000
+✅ Quantity ajustée automatiquement
+✅ User notifié de la limitation
+
+#### Scénario 2: Max Daily Trades
+
+**Configuration**:
+
+```typescript
+const MAX_DAILY_COPIES = 10;
+
+const todayCopies = await prisma.copyTrade.count({
+  where: {
+    userId: user.id,
+    createdAt: { gte: startOfDay(new Date()) }
+  }
+});
+
+if (todayCopies >= MAX_DAILY_COPIES) {
+  throw new Error('Daily copy limit reached (10/day)');
+}
+```
+
+**Test**:
+
+1. User copie 10 signaux dans la journée
+2. Essaie de copier le 11ème
+
+**Résultat attendu**:
+✅ 11ème copy refusé
+✅ Error message: "Daily limit reached"
+✅ Compteur reset à minuit UTC
+
+#### Scénario 3: Stop Loss Automatique
+
+**Configuration**:
+
+```typescript
+// User settings
+const userMaxLoss = 500;  // $500 max loss
+
+// Monitorer les copies
+const totalLoss = await calculateUserLosses(userId, 'today');
+
+if (totalLoss > userMaxLoss) {
+  await disableAutoCopy(userId);
+  await sendAlert(user.email, 'Max loss reached: auto-copy disabled');
+}
+```
+
+**Test**:
+
+1. User active AUTO mode
+2. Copy 3 trades qui perdent chacun $200 (total = $600)
+3. Backend détecte `$600 > $500`
+
+**Résultat attendu**:
+✅ Auto-copy désactivé automatiquement
+✅ Email envoyé à l'user
+✅ Futures copies en mode MANUAL uniquement
+
+---
+
+### Checklist Tests Copy Trading
+
+#### Setup ✅
+- [ ] Binance Testnet account créé
+- [ ] API keys générées (trader + user)
+- [ ] `.env.local` configuré
+- [ ] Database seed (TraderProfile + Follow)
+
+#### Test MANUAL ✅
+- [ ] Signal créé par trader
+- [ ] Copy button visible pour user PRO
+- [ ] CopyTrade créé en mode MANUAL
+- [ ] User track entry/exit manuellement
+- [ ] PnL calculé correctement
+
+#### Test AUTO SPOT ✅
+- [ ] User connecte API Binance
+- [ ] Credentials encryptées en DB
+- [ ] Signal → ordre BUY automatique
+- [ ] Order visible sur Binance Testnet
+- [ ] Slippage tracké
+- [ ] Trader close → ordre SELL automatique
+- [ ] PnL final correct
+
+#### Test FUTURES ✅
+- [ ] Signal FUTURES avec leverage
+- [ ] Position sizing correct (× leverage)
+- [ ] Position ouverte sur Binance Futures
+- [ ] Liquidation price calculé
+- [ ] PnL amplifié par leverage
+- [ ] Close avec `reduceOnly: true`
+
+#### Circuit Breakers ✅
+- [ ] Max position size enforced ($1000)
+- [ ] Max daily copies enforced (10/day)
+- [ ] Stop loss auto-disable
+- [ ] Email alerts fonctionnent
+
+---
+
+### Troubleshooting Copy Trading
+
+#### Issue: "Insufficient funds"
+
+**Cause**: User balance insuffisante
+
+**Solution**:
+1. Ajoute des fonds Testnet: https://testnet.binance.vision/ → Faucet
+2. Vérifie balance: `exchange.fetchBalance()`
+3. Ajuste quantity du copy
+
+#### Issue: "Invalid API keys"
+
+**Cause**: Keys incorrectes ou expirées
+
+**Solution**:
+1. Regenerate keys sur Binance Testnet
+2. Update `.env.local`
+3. Reconnecte via `/api/user-exchange/connect`
+
+#### Issue: "Order would trigger immediately"
+
+**Cause**: Prix marché trop proche du stop loss
+
+**Solution**:
+1. Ajuste stop loss du signal
+2. Ou: ignore stop loss pour ce copy
+
+#### Issue: "Leverage not set"
+
+**Cause**: Leverage pas configuré pour Futures
+
+**Solution**:
+```typescript
+await exchange.fapiPrivatePostLeverage({
+  symbol: 'BTCUSDT',
+  leverage: 5,
+});
+```
+
+---
+
+## 🔗 Ressources Additionnelles
+
+**Binance Testnet**:
+- Dashboard: https://testnet.binance.vision/
+- API Docs: https://binance-docs.github.io/apidocs/spot/en/
+- Futures Docs: https://binance-docs.github.io/apidocs/futures/en/
+
+**CCXT Documentation**:
+- Main docs: https://docs.ccxt.com/
+- Binance methods: https://docs.ccxt.com/en/latest/manual.html#binance
+
+**Encryption Reference**:
+- AES-256-GCM: Voir `src/lib/crypto/encryption-service.ts`
+- Key management: `.claude/docs/CRYPTO-PAYMENTS.md`
+
+---
+
 **End of Unified Trading System Testing Guide** 🎯

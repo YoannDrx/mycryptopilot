@@ -60,11 +60,101 @@ Ce document synthétise le fonctionnement du trading social, depuis la création
 - Cron `sync-service.ts` importe les fills, agrège dans `TraderTrade`, calcule les snapshots (`src/lib/trading/portfolio-analytics.service.ts`).
 - Admin & traders consultent `app/orgs/[orgSlug]/(trading)/portfolio` + dashboard admin.
 
-### 5. Copy-trading utilisateur (WIP)
+### 5. Copy-trading utilisateur
 
-- Connexion API utilisateur (`UserExchangeConnection`), configuration `mode`.
-- `CopyTradeService` crée des `CopyTrade` lors de la réception de nouveaux signaux/trades agrégés.
-- TODO: queue d’exécution pour pousser les ordres vers l’exchange utilisateur (`src/lib/trading/copy-trade.service.ts:191`).
+Le système de Copy Trading permet aux utilisateurs de répliquer les trades de traders qu'ils suivent, avec deux modes distincts: **MANUAL** et **AUTO**.
+
+#### 🔄 Modes de Copy Trading
+
+**MANUAL Mode (Journal Personnel)**:
+- User copie le signal dans son journal de trading personnel
+- Aucune exécution automatique
+- Position tracking manuel via `CopyTrade` avec `status: PENDING`
+- Idéal pour users qui veulent analyser avant d'exécuter
+- **Setup requis**: Aucun - juste un compte MyCryptoPilot
+
+**AUTO Mode (Exécution Automatique)**:
+- Exécution automatique via API Binance/Bybit de l'utilisateur
+- Réplication en temps réel des positions du trader
+- Position sizing ajustée au capital utilisateur
+- Circuit breakers intégrés (max position size, daily limits)
+- **Setup requis**: `UserExchangeConnection` avec API keys encrypted
+
+#### 🎯 SPOT vs FUTURES Copy Trading
+
+**SPOT Trading**:
+```typescript
+// Position sizing simple
+const spotQuantity = userCapital / entryPrice;
+// Exemple: $1000 / $50000 = 0.02 BTC
+```
+
+**FUTURES Trading**:
+```typescript
+// Position sizing avec leverage
+const futuresQuantity = (userCapital * leverage) / entryPrice;
+// Exemple: ($1000 × 10x) / $50000 = 0.2 BTC
+```
+
+**Différences clés**:
+- **SPOT**: Pas de liquidation, ownership direct, pas de leverage
+- **FUTURES**: Liquidation price tracking, margin requirements, leverage 1-125x
+- **Risk**: FUTURES = higher risk/reward, SPOT = lower risk
+
+#### 🔐 Sécurité & Circuit Breakers
+
+**1. Max Position Size**: Limite par copy (ex: $1000)
+```typescript
+if (copyValue > maxPositionSize) {
+  throw new Error("Position size exceeds limit");
+}
+```
+
+**2. Daily Trade Limit**: Max 10 copies/jour par utilisateur
+```typescript
+const dailyCopies = await getCopyTradesCountToday(userId);
+if (dailyCopies >= 10) {
+  throw new Error("Daily copy limit reached");
+}
+```
+
+**3. Stop Loss Auto**: Désactivation automatique si pertes excessives
+```typescript
+const dailyPnl = await calculateDailyPnL(userId);
+if (dailyPnl < -maxDailyLoss) {
+  await disableCopyTrading(userId);
+}
+```
+
+#### 🔧 Implémentation Technique
+
+**Connexion Exchange**:
+- `UserExchangeConnection` stocke API keys encrypted (AES-256-GCM)
+- Service: `src/lib/trading/user-exchange-connection.service.ts`
+- Validation API avant activation (TODO: validation réelle)
+
+**Copy Execution**:
+- Service: `src/lib/trading/copy-trade.service.ts`
+- Create `CopyTrade` lors réception signal/trade
+- Queue d'exécution pour AUTO mode (TODO: line 191)
+
+**UI Components**:
+- `src/components/copy-trading/copy-trade-button.tsx` - Bouton copy avec dialog
+- `src/components/copy-trading/copy-trade-dialog.tsx` - Configuration MANUAL/AUTO
+
+#### 📚 Tests & Documentation
+
+**Guide de test complet**: `.claude/docs/UNIFIED-TRADING-SYSTEM-TESTING.md`
+
+**4 Scénarios couverts**:
+1. **Copy MANUAL SPOT** - Journal personnel
+2. **Copy AUTO SPOT** - Exécution automatique Binance
+3. **Copy FUTURES** - Leverage + liquidation tracking
+4. **Circuit Breakers** - Tests limites sécurité
+
+**Setup Binance Testnet**: Guide inclus avec génération API keys, env vars, seed DB
+
+**Note**: Pour tester AUTO mode, nécessite compte Binance Testnet + `ENCRYPTION_SECRET` configuré.
 
 ### 6. Intégration Discord
 
