@@ -3,8 +3,8 @@
 **Issue** : [#77](https://github.com/YoannDrx/mycryptopilot/issues/77)
 **Branche** : `feature/remove-organizations`
 **Date début** : 5 janvier 2025
-**Statut global** : 🟡 En cours - Phase 5 (UI Progressive)
-**Phases complètes** : 0, 1, 2, 3, 4 ✅
+**Statut global** : 🟡 En cours - Phase 5a terminée, Phase 5b à planifier
+**Phases complètes** : 0, 1, 2, 3, 4, 5a ✅
 
 ---
 
@@ -16,8 +16,9 @@
 | 1. Structures | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | d7e3906 |
 | 2. Migration données | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | fb8d321 |
 | 3. Services | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | c18194d, 05877f1 |
-| 4. Auth & Middleware | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | 6d48bbe |
-| 5. UI progressive | ⚪ À faire | - | - | - | - |
+| 4. Auth & Middleware | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | 6d48bbe, 657a6c3 |
+| 5a. Routes principales | ✅ Terminé | 2025-01-08 | 2025-01-08 | 2h | ff67a66 |
+| 5b. Sub-routes | ⚪ À faire | - | - | - | - |
 | 6. Tests | ⚪ À faire | - | - | - | - |
 | 7. Bascule prod | ⚪ À faire | - | - | - | - |
 | 8. Nettoyage | ⚪ À faire | - | - | - | - |
@@ -371,7 +372,175 @@ if (FEATURES.USER_ACCOUNT_MODE) {
 
 ---
 
-## Phase 5-8 : À Détailler
+## Phase 5a : Routes Principales (UI Progressive) ✅ COMPLETE
+
+**Date début** : 2025-01-08
+**Date fin** : 2025-01-08
+**Durée réelle** : 2 heures
+**Stratégie retenue** : Option A (Pragmatique - 5 routes principales seulement)
+
+### Checklist Tâches
+
+- [x] Analyser structure routes existantes (28 pages identifiées)
+- [x] Créer helper `getOrgOrStub()` dual-mode
+- [x] Définir stratégie migration (Option A vs Option B)
+- [x] Créer route `/dashboard` avec composants
+- [x] Créer route `/traders` avec composants
+- [x] Créer route `/signals` avec composants
+- [x] Créer route `/pricing` (migration complète)
+- [x] Créer route `/account` (hub page nouveau)
+- [x] Vérifier TypeScript (0 erreurs)
+- [x] Vérifier ESLint (0 erreurs)
+- [x] Commit Phase 5a
+
+### Décisions Validées
+
+**Option A retenue** : Migrer seulement 5 routes principales
+- ✅ Plus rapide (2h vs 10h)
+- ✅ Valide le système dual-mode end-to-end
+- ✅ Redirections 307 gèrent anciens liens automatiquement
+- ✅ Sub-routes restent sous `/orgs/[orgSlug]/` temporairement
+
+**Stratégie alternative (Option B non retenue)** :
+- ❌ Migrer toutes les 28 pages d'un coup
+- ❌ Trop long (10-15h)
+- ❌ Blast radius trop large
+- ❌ Difficile à tester incrémentalement
+
+### Routes Créées
+
+| Route | Statut | Fichiers | LOC | Source |
+|-------|--------|----------|-----|--------|
+| `/dashboard` | ✅ | page.tsx + 2 components | ~600 | `(trading)/dashboard/` |
+| `/traders` | ✅ | page.tsx + 2 components | ~500 | `(trading)/traders/` |
+| `/signals` | ✅ | page.tsx + 2 components | ~400 | `(trading)/signals/` |
+| `/pricing` | ✅ | page.tsx | ~280 | `(trading)/pricing/` |
+| `/account` | ✅ | page.tsx (nouveau) | ~130 | Créé from scratch |
+
+**Total** : 11 fichiers créés, 1942 lignes ajoutées
+
+### Fichiers Modifiés
+
+**Helper dual-mode créé** :
+- `src/lib/react/org-cache-dual.ts` (88 lignes)
+  - Fonction `getOrgOrStub()` : retourne `CurrentOrgPayload`
+  - Mode legacy: `getRequiredCurrentOrgCache()`
+  - Mode nouveau: stub compatible avec `UserSubscription`
+
+**Toutes les pages utilisent `getOrgOrStub()`** :
+- `app/(app)/dashboard/page.tsx` : ligne 38
+- `app/(app)/signals/page.tsx` : lignes 3, 29
+- `app/(app)/pricing/page.tsx` : lignes 15, 24
+- `app/(app)/account/page.tsx` : ligne 30
+- `app/(app)/traders/page.tsx` : aucune modification (pas de dépendance org)
+
+### Tests Validés
+
+- ✅ **TypeScript** : `pnpm ts` - 0 erreurs
+- ✅ **ESLint** : `pnpm lint` - 0 erreurs (warnings auto-fixés)
+- ⏳ **Tests manuels** : À faire en mode dev
+- ⏳ **Tests e2e** : À mettre à jour (Phase 6)
+
+### Commit Final
+
+**Commit** : `ff67a66`
+```
+feat(refactor): Phase 5a - Create root-level routes for dual-mode
+
+Issue #77 - Refactoring Suppression Organizations
+Phase 5a: UI Progressive - Main Routes Migration (Option A)
+
+Created 5 main root-level routes compatible with dual-mode:
+- /dashboard - User dashboard with signals feed
+- /traders - Traders marketplace
+- /signals - All trading signals with filters
+- /pricing - Pricing page with crypto payment links
+- /account - Account settings hub page
+```
+
+### Risques Identifiés Phase 5a
+
+- ✅ **Mitigé** : Composants copiés (pas réutilisés) → Acceptable temporairement
+- ✅ **Mitigé** : Liens checkout restent sur ancien système → OK, checkout pas encore migré
+- ⚠️ **Ouvert** : Sub-routes pas encore migrées → Phase 5b ou à ignorer ?
+
+### Livrables Phase 5a
+
+- [x] 5 routes principales au niveau racine `app/(app)/`
+- [x] Helper `getOrgOrStub()` fonctionnel
+- [x] Tous composants nécessaires copiés
+- [x] 0 erreurs TS/ESLint
+- [x] Documentation tracking mise à jour
+
+---
+
+## Phase 5b : Sub-Routes Migration (À Planifier)
+
+**Date début** : À définir
+**Statut** : ⚪ À planifier
+
+### Décision Stratégique Requise
+
+**Question** : Faut-il migrer les sub-routes maintenant ou passer aux tests ?
+
+**Option 1 - Migrer sub-routes maintenant** :
+- ✅ Architecture plus propre
+- ✅ Toutes les URLs cohérentes
+- ❌ Temps estimé : 6-8h supplémentaires
+- ❌ Retarde les tests
+
+**Option 2 - Passer aux tests (Phase 6)** :
+- ✅ Valide le système rapidement
+- ✅ Redirections 307 suffisent temporairement
+- ✅ Sub-routes peuvent attendre post-MVP
+- ❌ Architecture "hybride" temporaire
+
+**Recommandation** : Option 2 - Valider avec tests d'abord
+
+### Sub-Routes Identifiées (si migration Phase 5b)
+
+**Dashboard Trader** (7 pages) :
+- `/dashboard/trader/` - Trader dashboard overview
+- `/dashboard/trader/signals/` - Manage signals
+- `/dashboard/trader/signals/new` - Create signal
+- `/dashboard/trader/analytics` - Analytics
+- `/dashboard/trader/followers` - Followers management
+- `/dashboard/trader/earnings` - Earnings tracker
+- `/dashboard/trader/verification` - Verification status
+
+**Account Settings** (10 pages) :
+- `/account/(settings)/profile` - Profile settings
+- `/account/(settings)/preferences` - User preferences
+- `/account/(settings)/notifications` - Notification settings
+- `/account/(settings)/security` - Security settings
+- `/account/discord` - Discord connection
+- `/account/email` - Email preferences
+- `/account/following` - Following management
+- `/account/become-trader` - Become trader form
+- `/account/exchanges` - Exchange connections
+- `/account/payments` - Payment history
+- `/account/change-password` - Change password
+- `/account/danger` - Danger zone
+
+**Autres** (6 pages) :
+- `/analytics` - Platform analytics
+- `/checkout/[plan]` - Checkout pages
+- `/risk-console` - Risk console tool
+- `/portfolio` - Portfolio tracker
+- `/trader-tools` - Trader tools
+
+**Total sub-routes** : 23 pages
+
+### Estimation Phase 5b (si décision de migrer)
+
+- **Durée estimée** : 6-8 heures
+- **Complexité** : Moyenne-élevée
+- **Risque** : Moyen (beaucoup de pages)
+- **Priorité** : Basse (redirections 307 suffisent)
+
+---
+
+## Phase 6-8 : À Détailler
 
 *Détails à compléter au fur et à mesure de l'avancement*
 
