@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import { ArrowUpRight, Lock } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
 type BlurredSignalCardProps = {
   signalId: string;
@@ -36,9 +35,6 @@ export function BlurredSignalCard({
   userPlan,
   showCopyButton,
 }: BlurredSignalCardProps) {
-  const params = useParams();
-  const orgSlug = params.orgSlug as string;
-
   if (!isBlurred) {
     // Normal signal display
     return (
@@ -82,7 +78,7 @@ export function BlurredSignalCard({
             </p>
           </div>
           <Button asChild size="sm" className="gap-1.5">
-            <Link href={`/orgs/${orgSlug}/pricing`}>
+            <Link href="/pricing">
               Upgrade to Pro
               <ArrowUpRight className="size-3.5" />
             </Link>

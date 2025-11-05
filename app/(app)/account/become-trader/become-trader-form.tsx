@@ -23,11 +23,9 @@ import { isActionSuccessful } from "@/lib/actions/actions-utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 
 export const BecomeTraderForm = () => {
   const router = useRouter();
-  const currentOrg = useCurrentOrg();
 
   const form = useZodForm({
     schema: CreateTraderProfileSchema,
@@ -50,10 +48,7 @@ export const BecomeTraderForm = () => {
     },
     onSuccess: () => {
       toast.success("Trader profile created successfully!");
-      const accountPath = currentOrg?.slug
-        ? `/orgs/${currentOrg.slug}/account`
-        : "/account";
-      router.push(accountPath);
+      router.push("/account");
       router.refresh();
     },
     onError: (error) => {

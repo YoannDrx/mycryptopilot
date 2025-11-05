@@ -1,6 +1,10 @@
+/**
+ * React Cache Utilities
+ * Big Bang (Issue #77 Phase 10) - Organization caching removed
+ *
+ * DEPRECATED: getRequiredCurrentOrgCache removed
+ * Organization-based caching is no longer needed in user-centric architecture.
+ */
+
 // To avoid calling many time same function, you can cache them with react `cache` method
-
-import { cache } from "react";
-import { getRequiredCurrentOrg } from "../organizations/get-org";
-
-export const getRequiredCurrentOrgCache = cache(getRequiredCurrentOrg);
+// Empty file kept for compatibility

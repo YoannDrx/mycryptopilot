@@ -11,7 +11,6 @@ import {
 import { cn } from "@/lib/utils";
 import { ArrowRight, Crown, Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
 export type SubscriptionCTAProps = {
   variant?: "compact" | "full";
@@ -24,8 +23,6 @@ export const SubscriptionCTA = ({
   planToPromote = "pro",
   className,
 }: SubscriptionCTAProps) => {
-  const params = useParams();
-  const orgSlug = params.orgSlug as string;
   const isPro = planToPromote === "pro";
 
   const planData = {
@@ -89,7 +86,7 @@ export const SubscriptionCTA = ({
                 </p>
               </div>
             </div>
-            <Link href={`/orgs/${orgSlug}/pricing`}>
+            <Link href="/pricing">
               <Button size="sm" variant="default">
                 View Plans <ArrowRight className="ml-1 size-4" />
               </Button>
@@ -150,7 +147,7 @@ export const SubscriptionCTA = ({
 
         {/* CTA Button */}
         <div className="flex flex-col gap-2 pt-2">
-          <Link href={`/orgs/${orgSlug}/pricing`} className="w-full">
+          <Link href="/pricing" className="w-full">
             <Button
               className={cn(
                 "w-full bg-gradient-to-r text-white",
