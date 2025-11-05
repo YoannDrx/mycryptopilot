@@ -1,11 +1,14 @@
 "use server";
 
-import { orgAction } from "@/lib/actions/safe-actions";
+import { authAction } from "@/lib/actions/safe-actions";
 import { ActionError } from "@/lib/errors/action-error";
 import { z } from "zod";
 
-export const uploadImageAction = orgAction
-  .metadata({})
+/**
+ * Upload Image Action
+ * Big Bang (Issue #77 Phase 8) - Migrated from orgAction to authAction
+ */
+export const uploadImageAction = authAction
   .inputSchema(
     z.object({
       base64: z.string(),
