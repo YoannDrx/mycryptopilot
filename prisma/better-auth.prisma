@@ -41,6 +41,10 @@ model User {
   copyTrades       CopyTrade[]
   riskCalculations RiskCalculation[]
 
+  // Refactoring Issue #77: New user-centric models
+  userSubscription UserSubscription?
+  legacyOrgSlugs   LegacyOrgSlug[]
+
   @@map("user")
 }
 
