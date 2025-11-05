@@ -3,8 +3,8 @@
 **Issue** : [#77](https://github.com/YoannDrx/mycryptopilot/issues/77)
 **Branche** : `feature/remove-organizations`
 **Date début** : 5 janvier 2025
-**Statut global** : ✅ Phase 5 COMPLETE - Prêt pour tests & push
-**Phases complètes** : 0, 1, 2, 3, 4, 5a, 5b ✅
+**Statut global** : 🟡 Phase 6 EN COURS - Tests & Validation
+**Phases complètes** : 0, 1, 2, 3, 4, 5a, 5b ✅ | Phase 6: 🟡 En cours
 
 ---
 
@@ -18,8 +18,8 @@
 | 3. Services | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | c18194d, 05877f1 |
 | 4. Auth & Middleware | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | 6d48bbe, 657a6c3 |
 | 5a. Routes principales | ✅ Terminé | 2025-01-08 | 2025-01-08 | 2h | ff67a66, 41d45b5 |
-| 5b. Layout Navigation | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1h | b75a6f9 |
-| 6. Tests | ⚪ À faire | - | - | - | - |
+| 5b. Layout Navigation | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1h | b75a6f9, b904215 |
+| 6. Tests & Validation | 🟡 En cours | 2025-01-08 | - | ~3h (estimé) | - |
 | 7. Bascule prod | ⚪ À faire | - | - | - | - |
 | 8. Nettoyage | ⚪ À faire | - | - | - | - |
 
@@ -590,7 +590,185 @@ Solution: Created complete navigation system for (app) route group
 
 ---
 
-## Phase 6-8 : À Détailler
+## Phase 6 : Tests & Validation 🔄 IN PROGRESS
+
+**Date début** : 2025-01-08 (après PR #78)
+**Date fin prévue** : 2025-01-09 (estimation 3-4j)
+**Statut** : 🟡 En cours
+
+### Objectifs Phase 6
+
+- Valider que les 5 nouvelles routes fonctionnent correctement
+- S'assurer que la navigation sidebar est opérationnelle
+- Tester les redirections 307 (legacy → nouvelles routes)
+- Valider le mode dual (flag ON/OFF)
+- Mettre à jour les tests e2e existants si nécessaire
+
+### État CI/CD - PR #78
+
+**Pull Request** : [#78](https://github.com/YoannDrx/mycryptopilot/pull/78)
+
+**Checks Status** (2025-01-08):
+- ✅ GitGuardian Security: SUCCESS
+- ✅ Lint & TypeScript: SUCCESS
+- ✅ Unit Tests: SUCCESS
+- ✅ Build Application: SUCCESS
+- ✅ Vercel Deploy: SUCCESS (preview disponible)
+- ⏳ E2E Tests (Playwright): IN PROGRESS (démarré 14:55 UTC)
+
+### Analyse Tests E2E Existants
+
+**Total tests** : 24 fichiers spec dans `e2e/`
+
+**Tests pertinents pour Phase 5** :
+1. `navigation.spec.ts` - Teste sidebar navigation et global search
+   - Utilise `/orgs/${orgSlug}/dashboard`, `/traders`, `/pricing`, `/account`
+   - ⚠️ Tests uniquement les anciennes routes (legacy mode)
+
+2. `dashboard.spec.ts` - Teste dashboard utilisateur
+   - Stats cards, signals feed, blurred signals, tabs
+   - Utilise `/orgs/${orgSlug}/dashboard`
+   - ⚠️ Tests uniquement l'ancienne route
+
+3. `pricing.spec.ts` - Teste page pricing
+   - Utilise `/orgs/${orgSlug}/pricing`
+   - ⚠️ Tests uniquement l'ancienne route
+
+4. `marketplace.spec.ts` - Teste traders marketplace
+   - Utilise `/orgs/${orgSlug}/traders`
+   - ⚠️ Tests uniquement l'ancienne route
+
+5. `signals-feed-filters.spec.ts` - Teste feed signaux avec filtres
+   - Utilise `/orgs/${orgSlug}/signals`
+   - ⚠️ Tests uniquement l'ancienne route
+
+### Vérification Routes Créées
+
+**Routes Phase 5 vérifiées** :
+```bash
+app/(app)/
+├── _navigation/        # Navigation sidebar
+├── account/           # Hub account settings ✅
+├── dashboard/         # Dashboard utilisateur ✅
+├── layout.tsx         # Layout principal ✅
+├── pricing/           # Pricing page ✅
+├── signals/           # Signals feed ✅
+└── traders/           # Traders marketplace ✅
+```
+
+**Total** : 5 routes + 1 layout + 1 navigation = 7 fichiers créés ✅
+
+### Besoins Tests Phase 6
+
+#### 1. Tests e2e existants à mettre à jour
+
+Les tests actuels utilisent tous `/orgs/${orgSlug}/*` et fonctionnent en mode legacy.
+
+**Options** :
+- **Option A** : Ne rien changer maintenant (tests valident le mode legacy)
+- **Option B** : Dupliquer les tests pour tester les 2 modes (legacy + nouveau)
+- **Option C** : Ajouter des tests conditionnels basés sur feature flag
+
+**Recommandation** : **Option A** pour Phase 6
+- Les tests actuels valident que le mode legacy fonctionne toujours ✅
+- Les redirections 307 sont testées indirectement (middleware)
+- Tests nouveaux mode peuvent être ajoutés en Phase 7 (avant bascule prod)
+
+#### 2. Tests nouveaux à créer (Phase 7)
+
+```typescript
+// e2e/dual-mode-navigation.spec.ts
+test("new root routes work correctly", async ({ page }) => {
+  // Test /dashboard, /traders, /signals, /pricing, /account
+  // Verify sidebar navigation
+  // Verify no errors
+});
+
+test("legacy routes redirect to new routes with 307", async ({ page }) => {
+  // Test /orgs/${slug}/dashboard → /dashboard (307)
+  // Verify redirect status code
+  // Verify final URL is correct
+});
+
+test("dual mode: flag ON enables new routes", async ({ page }) => {
+  // Set NEXT_PUBLIC_USER_ACCOUNT_MODE=true
+  // Navigate to /dashboard
+  // Verify getOrgOrStub() stub is used
+});
+
+test("dual mode: flag OFF uses legacy routes", async ({ page }) => {
+  // Set NEXT_PUBLIC_USER_ACCOUNT_MODE=false
+  // Navigate to /orgs/${slug}/dashboard
+  // Verify getRequiredCurrentOrgCache() is used
+});
+```
+
+### Tests Manuels Phase 6
+
+**À faire** :
+- [ ] Tester `/dashboard` en local (logged in)
+- [ ] Tester `/signals` en local
+- [ ] Tester `/traders` en local
+- [ ] Tester `/pricing` en local
+- [ ] Tester `/account` en local
+- [ ] Vérifier sidebar navigation entre pages
+- [ ] Vérifier global search fonctionne
+- [ ] Tester redirections `/orgs/:slug/* → nouvelles routes`
+- [ ] Vérifier collapsible sections sidebar
+- [ ] Tester avec/sans profil trader (TRADER TOOLS section)
+
+### Validation Dual-Mode
+
+**Test avec flag OFF (legacy mode)** :
+```bash
+# .env.local
+NEXT_PUBLIC_USER_ACCOUNT_MODE=false
+
+# Test
+pnpm dev
+# Navigate to /orgs/mon-org/dashboard
+# Should work normally
+```
+
+**Test avec flag ON (nouveau mode)** :
+```bash
+# .env.local
+NEXT_PUBLIC_USER_ACCOUNT_MODE=true
+
+# Test
+pnpm dev
+# Navigate to /dashboard
+# Should work with stub organization
+```
+
+### Métriques Phase 6
+
+**Attendu** :
+- **Tests manuels** : 10-15 minutes
+- **Tests e2e** : Attendre fin CI/CD (~1-2h)
+- **Documentation** : 30 minutes
+- **Total** : 2-3 heures
+
+### Décisions Phase 6
+
+| Décision | Rationale | Date |
+|----------|-----------|------|
+| Ne pas modifier tests existants | Tests legacy valident backward compatibility | 2025-01-08 |
+| Créer nouveaux tests en Phase 7 | Plus proche de la bascule prod | 2025-01-08 |
+| Attendre E2E CI/CD avant merge | Validation automatique critique | 2025-01-08 |
+
+### Statut Actuel Phase 6
+
+- ✅ E2E tests existants analysés
+- ✅ Vérification 5 routes créées
+- ✅ Plan tests Phase 6/7 défini
+- ⏳ Attente E2E CI/CD completion
+- ⏳ Tests manuels à faire
+- ⏳ Documentation finale
+
+---
+
+## Phase 7-8 : À Détailler
 
 *Détails à compléter au fur et à mesure de l'avancement*
 
