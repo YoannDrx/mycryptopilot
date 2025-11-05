@@ -14,7 +14,7 @@ type ExchangeSyncFailureEmailProps = {
   errorMessage: string;
   lastSuccessfulSync?: Date;
   connectionId: string;
-  orgSlug: string | null;
+  exchangesUrl: string;
 };
 
 export function ExchangeSyncFailureEmail({
@@ -23,17 +23,12 @@ export function ExchangeSyncFailureEmail({
   errorMessage,
   lastSuccessfulSync,
   connectionId,
-  orgSlug,
+  exchangesUrl,
 }: ExchangeSyncFailureEmailProps) {
   const isKeyError =
     errorMessage.includes("Invalid API") ||
     errorMessage.includes("401") ||
     errorMessage.includes("IP address");
-
-  // Build correct URL with orgSlug
-  const exchangesUrl = orgSlug
-    ? `${SiteConfig.prodUrl}/orgs/${orgSlug}/account/exchanges`
-    : `${SiteConfig.prodUrl}/login`; // Fallback to login if no orgSlug
 
   return (
     <EmailLayout>

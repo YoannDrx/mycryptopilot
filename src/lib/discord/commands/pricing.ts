@@ -3,6 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
 import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
+import { getAppUrl } from "@/lib/urls/app-urls";
 
 export async function handlePricingCommand(
   interaction: ChatInputCommandInteraction,
@@ -13,16 +14,7 @@ export async function handlePricingCommand(
     where: { discordId },
     select: {
       id: true,
-      members: {
-        include: {
-          organization: {
-            select: {
-              slug: true,
-              name: true,
-            },
-          },
-        },
-      },
+      name: true,
     },
   });
 
@@ -55,17 +47,14 @@ export async function handlePricingCommand(
     )
     .setTimestamp();
 
-  let pricingUrl = `${SiteConfig.prodUrl}/pricing`;
-  let note =
-    "Crée un compte ou connecte-toi pour lancer le checkout crypto depuis ton espace.";
+  // Générer l'URL pricing (dual-mode via getAppUrl)
+  const pricingUrl = user
+    ? await getAppUrl("/pricing", user.id, true)
+    : `${SiteConfig.prodUrl}/pricing`;
 
-  if (user && user.members.length > 0) {
-    const member = user.members[0];
-    if (member.organization.slug) {
-      pricingUrl = `${SiteConfig.prodUrl}/orgs/${member.organization.slug}/pricing`;
-      note = `Tu peux payer directement depuis ton organisation **${member.organization.name}**.`;
-    }
-  }
+  const note = user
+    ? `Tu peux payer directement depuis ton espace **${user.name}**.`
+    : "Crée un compte ou connecte-toi pour lancer le checkout crypto depuis ton espace.";
 
   embed.addFields({
     name: "Accéder au pricing",

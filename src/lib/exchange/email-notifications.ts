@@ -17,6 +17,7 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { sendEmail } from "@/lib/mail/send-email";
 import { ExchangeSyncFailureEmail } from "@email/exchange-sync-failure";
+import { getAppUrl } from "@/lib/urls/app-urls";
 
 type SyncFailureNotificationParams = {
   connectionId: string;
@@ -67,16 +68,6 @@ export async function sendSyncFailureNotification(
                 id: true,
                 name: true,
                 email: true,
-                members: {
-                  select: {
-                    organization: {
-                      select: {
-                        slug: true,
-                      },
-                    },
-                  },
-                  take: 1,
-                },
               },
             },
           },
@@ -114,25 +105,14 @@ export async function sendSyncFailureNotification(
       return false;
     }
 
-    // Get orgSlug for correct routing
-    const orgSlug =
-      user.members.length > 0 && user.members[0]?.organization.slug
-        ? user.members[0].organization.slug
-        : null;
-
-    if (!orgSlug) {
-      logger.error("User has no organization slug for email link", {
-        userId: user.id,
-        connectionId,
-      });
-      // Still send email but without link (should not happen in production)
-    }
+    // Generate exchanges URL (dual-mode via getAppUrl)
+    const exchangesUrl = await getAppUrl("/account/exchanges", user.id, true);
 
     logger.info("Sending sync failure email", {
       connectionId,
       userId: user.id,
       userEmail: user.email,
-      orgSlug,
+      exchangesUrl,
     });
 
     // Send email
@@ -145,7 +125,7 @@ export async function sendSyncFailureNotification(
         errorMessage,
         lastSuccessfulSync,
         connectionId,
-        orgSlug,
+        exchangesUrl,
       }),
     });
 
