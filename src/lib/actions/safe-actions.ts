@@ -1,11 +1,7 @@
 import { createSafeActionClient } from "next-safe-action";
-import { z } from "zod";
-import { AuthPermissionSchema, RolesKeys } from "../auth/auth-permissions";
 import { getRequiredUser } from "../auth/auth-user";
-import { ActionError } from "../errors/action-error";
 import { ApplicationError } from "../errors/application-error";
 import { logger } from "../logger";
-import { getRequiredCurrentOrg } from "../organizations/get-org";
 
 /**
  * Base safe action client with error handling
@@ -74,74 +70,17 @@ export const authAction = createSafeActionClient({
 });
 
 /**
- * Organization-based safe action client with role and permission authorization
+ * DEPRECATED: orgAction removed - Big Bang (Issue #77 Phase 8)
  *
- * @description
- * The most comprehensive client that provides:
- * - Role-based access control (RBAC) via metadata.roles
- * - Fine-grained permission checking via metadata.permissions
- * - Automatic organization membership validation
- * - Type-safe metadata schema for roles and permissions
+ * Organization-based actions are no longer needed in user-centric architecture.
+ * All actions should use either:
+ * - `action` for public actions
+ * - `authAction` for authenticated user actions
  *
- * Use this for actions that require specific organizational roles or permissions.
- * The user must be part of an organization and have the required roles/permissions.
- *
- *
- * @example
- * ```ts
- * // Require specific permissions
- * export const inviteUser = orgAction
- *   .metadata({ permissions: { users: ["create", "invite"] } })
- *   .inputSchema(z.object({
- *     email: z.string().email(),
- *     role: z.enum(["member", "admin"])
- *   }))
- *   .action(async ({ parsedInput: { email, role }, ctx: { org } }) => {
- *     const invitation = await inviteUserToOrg(email, role, org.id);
- *     return { invitationId: invitation.id };
- *   });
- * ```
- *
- * @example
- * ```ts
- * // Combine roles and permissions
- * export const manageTeam = orgAction
- *   .metadata({
- *     roles: ["admin", "manager"],
- *     permissions: { teams: ["create", "update", "delete"] }
- *   })
- *   .inputSchema(z.object({
- *     action: z.enum(["create", "update", "delete"]),
- *     teamData: z.object({ name: z.string() }).optional()
- *   }))
- *   .action(async ({ parsedInput, ctx: { org } }) => {
- *     // User has admin/manager role AND team management permissions
- *     return await performTeamAction(parsedInput, org.id);
- *   });
- * ```
+ * Legacy usages:
+ * - upload-image.action.ts → migrated to authAction
+ * - plans.action.ts → Stripe legacy, will be removed in cleanup
  */
-export const orgAction = createSafeActionClient({
-  handleServerError,
-  defineMetadataSchema() {
-    return z
-      .object({
-        roles: z.array(z.enum(RolesKeys)).optional(),
-        permissions: AuthPermissionSchema.optional(),
-      })
-      .optional();
-  },
-}).use(async ({ next, metadata = {} }) => {
-  try {
-    const org = await getRequiredCurrentOrg(metadata);
-    return next({
-      ctx: { org },
-    });
-  } catch {
-    throw new ActionError(
-      "You need to be part of an organization to access this resource.",
-    );
-  }
-});
 
 function handleServerError(e: Error) {
   if (e instanceof ApplicationError) {
