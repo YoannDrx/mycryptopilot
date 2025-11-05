@@ -165,7 +165,7 @@ async function migrateOrganizationsToUser(
   for (const org of orgs) {
     const owner = org.members[0];
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- owner can be undefined if org has no owner member
+     
     if (!owner) {
       stats.errors.push({
         orgId: org.id,
@@ -254,7 +254,7 @@ async function migrateOrganizationsToUser(
     }
 
     const owner = org.members[0];
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- owner can be undefined if org has no owner member
+     
     if (!owner) continue;
 
     try {

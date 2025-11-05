@@ -105,8 +105,8 @@ export async function sendSyncFailureNotification(
       return false;
     }
 
-    // Generate exchanges URL (dual-mode via getAppUrl)
-    const exchangesUrl = await getAppUrl("/account/exchanges", user.id, true);
+    // Generate exchanges URL (user-centric)
+    const exchangesUrl = getAppUrl("/account/exchanges", true);
 
     logger.info("Sending sync failure email", {
       connectionId,

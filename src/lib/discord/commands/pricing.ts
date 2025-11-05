@@ -47,9 +47,9 @@ export async function handlePricingCommand(
     )
     .setTimestamp();
 
-  // Générer l'URL pricing (dual-mode via getAppUrl)
+  // Générer l'URL pricing (user-centric)
   const pricingUrl = user
-    ? await getAppUrl("/pricing", user.id, true)
+    ? getAppUrl("/pricing", true)
     : `${SiteConfig.prodUrl}/pricing`;
 
   const note = user
