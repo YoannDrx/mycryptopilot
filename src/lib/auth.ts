@@ -6,23 +6,17 @@ import {
   emailOTP,
   lastLoginMethod,
   multiSession,
-  organization,
 } from "better-auth/plugins";
-import { ac, roles } from "./auth/auth-permissions";
 
 import { sendEmail } from "@/lib/mail/send-email";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
-import { createOrganizationApi } from "./auth/auth-api-helper";
 import { setupResendCustomer } from "./auth/auth-config-setup";
 import { sendDiscordInviteEmail } from "./discord/invitations";
 import { env } from "./env";
-import { FEATURES } from "./feature-flags";
-import { generateSlug } from "./format/id";
 import { logger } from "./logger";
 import { prisma } from "./prisma";
 import { getServerUrl } from "./server-url";
-import { stripe } from "./stripe";
 type SocialProvidersType = Parameters<typeof betterAuth>[0]["socialProviders"];
 
 export const SocialProviders: SocialProvidersType = {};
@@ -119,68 +113,24 @@ export const auth = betterAuth({
           })();
 
           // ============================================
-          // DUAL-MODE: Organization vs UserSubscription
+          // Create UserSubscription (Big Bang - Issue #77)
           // ============================================
-          if (FEATURES.USER_ACCOUNT_MODE) {
-            // ============================================
-            // MODE NOUVEAU: Créer UserSubscription directement
-            // ============================================
-            try {
-              await prisma.userSubscription.create({
-                data: {
-                  userId: user.id,
-                  plan: "free",
-                  status: "active",
-                  periodEnd: null, // Free plan has no expiration
-                  // migratedFromOrgId: null (no migration context at signup)
-                },
-              });
-              logger.info(
-                `UserSubscription created for user ${user.id} (mode: user-centric)`,
-              );
-            } catch (err) {
-              logger.error("Failed to create UserSubscription", {
-                err,
+          try {
+            await prisma.userSubscription.create({
+              data: {
                 userId: user.id,
-              });
-              // Don't throw - user creation should not fail
-            }
-          } else {
-            // ============================================
-            // MODE LEGACY: Create organization with retry
-            // ============================================
-            const maxRetries = 3;
-
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-              try {
-                // eslint-disable-next-line no-await-in-loop
-                await createOrganizationApi({
-                  name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
-                  slug: generateSlug(user.id), // Use user ID for unique slug
-                });
-                logger.info(
-                  `Organization created for user ${user.id} (mode: legacy)`,
-                );
-                break; // Success, exit loop
-              } catch (err) {
-                logger.error(
-                  `Failed to create organization for user ${user.id} (attempt ${attempt}/${maxRetries})`,
-                  { err },
-                );
-                if (attempt < maxRetries) {
-                  // Wait before retry (exponential backoff)
-                  // eslint-disable-next-line no-await-in-loop
-                  await new Promise((resolve) =>
-                    setTimeout(resolve, 100 * Math.pow(2, attempt)),
-                  );
-                } else {
-                  // Last attempt failed - log critical error but don't throw
-                  logger.error(
-                    `CRITICAL: Failed to create organization after ${maxRetries} attempts for user ${user.id}`,
-                  );
-                }
-              }
-            }
+                plan: "free",
+                status: "active",
+                periodEnd: null, // Free plan has no expiration
+              },
+            });
+            logger.info(`UserSubscription created for user ${user.id}`);
+          } catch (err) {
+            logger.error("Failed to create UserSubscription", {
+              err,
+              userId: user.id,
+            });
+            // Don't throw - user creation should not fail
           }
         },
       },
@@ -422,54 +372,7 @@ export const auth = betterAuth({
   },
   socialProviders: SocialProviders,
   plugins: [
-    // ============================================
-    // DUAL-MODE: organization plugin conditionnel
-    // ============================================
-    // Plugin organization() uniquement en mode legacy (flag OFF)
-    ...(FEATURES.USER_ACCOUNT_MODE
-      ? []
-      : [
-          organization({
-            ac: ac,
-            roles: roles,
-            organizationLimit: 5,
-            membershipLimit: 10,
-            autoCreateOrganizationOnSignUp: true,
-
-            organizationCreation: {
-              async afterCreate(data) {
-                const stripeCustomer = await stripe.customers.create({
-                  email: data.user.email,
-                  name: data.organization.name,
-                  metadata: {
-                    organizationId: data.organization.id,
-                  },
-                });
-                await prisma.organization.update({
-                  where: { id: data.organization.id },
-                  data: { stripeCustomerId: stripeCustomer.id },
-                });
-              },
-            },
-            async sendInvitationEmail({ id, email }) {
-              const inviteLink = `${getServerUrl()}/orgs/accept-invitation/${id}`;
-              await sendEmail({
-                to: email,
-                subject: "You are invited to join an organization",
-                html: MarkdownEmail({
-                  preview: `Join an organization on ${SiteConfig.title}`,
-                  markdown: `
-            Hello,
-
-            You have been invited to join an organization on ${SiteConfig.title}.
-
-            [Click here to accept the invitation](${inviteLink})
-            `,
-                }),
-              });
-            },
-          }),
-        ]),
+    // Organization plugin removed - Big Bang (Issue #77 Phase 2)
     emailOTP({
       sendVerificationOTP: async ({ email, otp }) => {
         logger.debug("Sending OTP", { email, otp });
