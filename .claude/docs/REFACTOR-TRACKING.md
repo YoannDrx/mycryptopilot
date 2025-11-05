@@ -768,9 +768,632 @@ pnpm dev
 
 ---
 
-## Phase 7-8 : À Détailler
+## Phase 7 : Bascule Production (PLANNED)
 
-*Détails à compléter au fur et à mesure de l'avancement*
+**Date début prévue** : 2025-01-09 (après Phase 6 complète)
+**Date fin prévue** : 2025-01-30 (estimation 3-4 semaines)
+**Statut** : ⚪ À faire
+
+### Objectifs Phase 7
+
+- Déployer le code avec feature flag OFF en production
+- Créer tests e2e pour nouvelles routes (dual-mode)
+- Tester flag ON en staging/preview
+- Activer progressivement flag ON en prod (0% → 10% → 50% → 100%)
+- Monitorer performance et erreurs
+- Avoir un rollback plan opérationnel
+- Communiquer aux utilisateurs
+
+### Timeline Progressive (4 semaines)
+
+#### Semaine 1 : Tests & Staging (2025-01-09 → 2025-01-15)
+
+**Objectifs** :
+- Créer tests e2e nouveaux
+- Déployer en prod avec flag OFF
+- Tester flag ON en staging
+- Valider monitoring
+
+**Tests nouveaux à créer** :
+
+```typescript
+// e2e/dual-mode-navigation.spec.ts (NOUVEAU)
+test.describe("Dual-Mode Navigation", () => {
+  test("new root routes work correctly", async ({ page }) => {
+    // Login user
+    await createTestAccount({ page, callbackURL: "/dashboard" });
+
+    // Test /dashboard
+    await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+
+    // Navigate to /signals
+    await page.goto("/signals");
+    await expect(page).toHaveURL(/\/signals/);
+
+    // Navigate to /traders
+    await page.goto("/traders");
+    await expect(page.getByRole("heading", { name: /traders marketplace/i })).toBeVisible();
+
+    // Navigate to /pricing
+    await page.goto("/pricing");
+    await expect(page.getByRole("heading", { name: /pricing/i })).toBeVisible();
+
+    // Navigate to /account
+    await page.goto("/account");
+    await expect(page).toHaveURL(/\/account/);
+  });
+
+  test("sidebar navigation works on new routes", async ({ page }) => {
+    await createTestAccount({ page, callbackURL: "/dashboard" });
+
+    // Verify sidebar is visible
+    await expect(page.getByRole("link", { name: /dashboard/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /signals/i }).first()).toBeVisible();
+
+    // Click sidebar link to navigate
+    await page.getByRole("link", { name: /traders/i }).first().click();
+    await expect(page).toHaveURL(/\/traders/);
+
+    // Verify sidebar still visible after navigation
+    await expect(page.getByRole("link", { name: /dashboard/i }).first()).toBeVisible();
+  });
+
+  test("global search works on new routes", async ({ page }) => {
+    await createTestAccount({ page, callbackURL: "/dashboard" });
+
+    // Open global search
+    const searchInput = page.getByPlaceholder("Search...").first();
+    await searchInput.click();
+    await page.waitForTimeout(500);
+
+    // Search for a page
+    const dialogInput = page.getByPlaceholder(/type to search/i);
+    await dialogInput.fill("Pricing");
+    await page.waitForTimeout(500);
+
+    // Click result
+    const pricingLink = page.getByRole("option", { name: /pricing/i });
+    await pricingLink.click();
+
+    // Verify navigation
+    await expect(page).toHaveURL(/\/pricing/);
+  });
+});
+
+// e2e/redirections.spec.ts (NOUVEAU)
+test.describe("Legacy Redirections", () => {
+  test("legacy routes redirect to new routes with 307", async ({ page, context }) => {
+    await createTestAccount({ page, callbackURL: "/orgs" });
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // Test /orgs/:slug/dashboard → /dashboard
+    const dashboardResponse = await page.goto(`/orgs/${orgSlug}/dashboard`);
+    expect(dashboardResponse?.status()).toBe(307);
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Test /orgs/:slug/signals → /signals
+    const signalsResponse = await page.goto(`/orgs/${orgSlug}/signals`);
+    expect(signalsResponse?.status()).toBe(307);
+    await expect(page).toHaveURL(/\/signals/);
+
+    // Test /orgs/:slug/traders → /traders
+    const tradersResponse = await page.goto(`/orgs/${orgSlug}/traders`);
+    expect(tradersResponse?.status()).toBe(307);
+    await expect(page).toHaveURL(/\/traders/);
+
+    // Test /orgs/:slug/pricing → /pricing
+    const pricingResponse = await page.goto(`/orgs/${orgSlug}/pricing`);
+    expect(pricingResponse?.status()).toBe(307);
+    await expect(page).toHaveURL(/\/pricing/);
+  });
+
+  test("legacy sub-routes still work (not migrated yet)", async ({ page }) => {
+    await createTestAccount({ page, callbackURL: "/orgs" });
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // Test sub-route not yet migrated
+    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+
+    // Should NOT redirect (not migrated yet)
+    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard/trader`));
+    await expect(page.getByRole("heading", { name: /trader dashboard/i })).toBeVisible();
+  });
+});
+
+// e2e/feature-flag-validation.spec.ts (NOUVEAU)
+test.describe("Feature Flag Dual-Mode", () => {
+  test("flag OFF: legacy routes work normally", async ({ page }) => {
+    // Ensure flag is OFF (default in test env)
+    process.env.NEXT_PUBLIC_USER_ACCOUNT_MODE = "false";
+
+    await createTestAccount({ page, callbackURL: "/orgs" });
+
+    const currentUrl = page.url();
+    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+
+    // Navigate to legacy route
+    await page.goto(`/orgs/${orgSlug}/dashboard`);
+
+    // Should work normally
+    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard`));
+    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+  });
+
+  test("flag ON: new routes work with stub org", async ({ page }) => {
+    // Enable flag
+    process.env.NEXT_PUBLIC_USER_ACCOUNT_MODE = "true";
+
+    await createTestAccount({ page, callbackURL: "/dashboard" });
+
+    // Should land on new route
+    await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+
+    // Verify sidebar works (org stub created successfully)
+    await expect(page.getByRole("link", { name: /signals/i }).first()).toBeVisible();
+  });
+});
+```
+
+**Déploiement Semaine 1** :
+```bash
+# 1. Merge PR #78
+git checkout main
+git pull origin main
+git merge feature/remove-organizations
+git push origin main
+
+# 2. Deploy to production (Vercel)
+# Flag OFF par défaut (NEXT_PUBLIC_USER_ACCOUNT_MODE=false)
+
+# 3. Vérifier déploiement
+# - Toutes routes legacy fonctionnent ✅
+# - Nouvelles routes existent mais pas encore utilisées ✅
+# - Aucune erreur en prod ✅
+```
+
+**Tests Staging Semaine 1** :
+```bash
+# Créer preview deployment avec flag ON
+# Dans Vercel: Create deployment with env var override
+NEXT_PUBLIC_USER_ACCOUNT_MODE=true
+
+# Tester manuellement:
+# - /dashboard
+# - /signals
+# - /traders
+# - /pricing
+# - /account
+# - Sidebar navigation
+# - Global search
+
+# Vérifier logs:
+# - Aucune erreur console
+# - Aucune erreur server
+# - Performance normale
+```
+
+#### Semaine 2 : Rollout 10% (2025-01-16 → 2025-01-22)
+
+**Objectifs** :
+- Activer flag pour 10% des users
+- Monitorer métriques clés
+- Rollback si problème critique
+
+**Métriques à monitorer** :
+- **Error Rate** : Doit rester < 0.1%
+- **P95 Load Time** : Doit rester < 2s
+- **Bounce Rate** : Pas d'augmentation > 5%
+- **Navigation Success Rate** : Doit rester > 99%
+
+**Implémentation Progressive** :
+
+```typescript
+// src/lib/feature-flags.ts (MODIFIER)
+import { headers } from "next/headers";
+
+export const FEATURES = {
+  // Phase 7: Progressive rollout avec A/B testing
+  USER_ACCOUNT_MODE: getUserAccountModeEnabled(),
+  LEGACY_ORG_REDIRECTS: getLegacyOrgRedirectsEnabled(),
+} as const;
+
+function getUserAccountModeEnabled(): boolean {
+  // Vérifier env var globale d'abord
+  const globalFlag = process.env.NEXT_PUBLIC_USER_ACCOUNT_MODE === "true";
+  if (globalFlag) return true;
+
+  // Phase 7: Rollout progressif basé sur user ID
+  try {
+    const headersList = headers();
+    const userId = headersList.get("x-user-id"); // À setter via middleware
+
+    if (!userId) return false;
+
+    // Hash user ID pour distribution stable
+    const hash = simpleHash(userId);
+    const rolloutPercentage = parseInt(process.env.ROLLOUT_PERCENTAGE || "0", 10);
+
+    return (hash % 100) < rolloutPercentage;
+  } catch {
+    return false;
+  }
+}
+
+function simpleHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
+function getLegacyOrgRedirectsEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_LEGACY_ORG_REDIRECTS === "true";
+}
+```
+
+**Configuration Vercel Semaine 2** :
+```bash
+# Dans Vercel Dashboard:
+# Environment Variables > Production
+
+ROLLOUT_PERCENTAGE=10  # 10% des users
+NEXT_PUBLIC_LEGACY_ORG_REDIRECTS=true  # Activer redirections
+```
+
+**Dashboard Monitoring** :
+```bash
+# Métriques Vercel Analytics à surveiller:
+# - Page views: /dashboard vs /orgs/:slug/dashboard
+# - Error rate par route
+# - P95 load time
+# - Geographic distribution
+
+# Alerts à configurer:
+# - Error rate > 0.5% → Alerte Slack
+# - P95 > 3s → Alerte Slack
+# - Traffic drop > 20% → Alerte Slack
+```
+
+#### Semaine 3 : Rollout 50% (2025-01-23 → 2025-01-29)
+
+**Conditions pour passer à 50%** :
+- ✅ Semaine 2 complète sans incident critique
+- ✅ Error rate < 0.1%
+- ✅ Performance stable
+- ✅ Aucun feedback négatif critique
+
+**Déploiement** :
+```bash
+# Update Vercel env var
+ROLLOUT_PERCENTAGE=50
+
+# Redeploy (trigger automatically or manually)
+```
+
+**Communication Utilisateurs Semaine 3** :
+
+Email/Discord announcement:
+```
+🎉 Amélioration de la Navigation MyCryptoPilot
+
+Nous déployons progressivement une nouvelle architecture de navigation
+plus rapide et plus intuitive.
+
+Nouvelles URLs simplifiées:
+- /dashboard (au lieu de /orgs/your-org/dashboard)
+- /signals (au lieu de /orgs/your-org/signals)
+- /traders (au lieu de /orgs/your-org/traders)
+- /pricing (au lieu de /orgs/your-org/pricing)
+
+Les anciennes URLs continuent de fonctionner et redirigent automatiquement.
+Mettez à jour vos favoris pour profiter de la nouvelle expérience !
+
+Questions? Contactez-nous sur Discord.
+```
+
+#### Semaine 4 : Rollout 100% (2025-01-30)
+
+**Conditions pour passer à 100%** :
+- ✅ Semaine 3 complète sans incident
+- ✅ Feedback utilisateurs positif
+- ✅ Toutes métriques stables
+
+**Déploiement Final** :
+```bash
+# Update Vercel env var
+NEXT_PUBLIC_USER_ACCOUNT_MODE=true
+ROLLOUT_PERCENTAGE=100  # Optionnel, flag global suffit
+
+# Cleanup rollout logic (optionnel, peut rester pour Phase 8)
+```
+
+**Phase 7 COMPLETE** → Prêt pour Phase 8 (Nettoyage Final)
+
+### Rollback Plan Phase 7
+
+**Si problème critique détecté** :
+
+```bash
+# Option 1: Rollback percentage (immediate)
+ROLLOUT_PERCENTAGE=0  # Désactive pour tous
+
+# Option 2: Rollback flag global (immediate)
+NEXT_PUBLIC_USER_ACCOUNT_MODE=false
+
+# Option 3: Revert deployment (5-10 minutes)
+vercel rollback [deployment-url]
+
+# Option 4: Revert code (15-20 minutes)
+git revert [commit-hash]
+git push origin main
+# Trigger new deployment
+```
+
+**Critères Rollback Automatique** :
+- Error rate > 1% pendant 5 minutes
+- P95 load time > 5s pendant 10 minutes
+- Traffic drop > 50% pendant 5 minutes
+
+### Communication Phase 7
+
+**Channels** :
+- Email newsletter (Semaine 3)
+- Discord announcement (Semaine 3)
+- In-app banner (Semaine 4)
+- Documentation update (Semaine 1)
+
+**Documentation à mettre à jour** :
+- README.md (nouvelles URLs)
+- `.claude/docs/DEVELOPMENT.md` (feature flags)
+- User guides (screenshots avec nouvelles URLs)
+- API documentation (si applicable)
+
+### Métriques Phase 7
+
+**Objectifs** :
+- **Zero downtime** : 100% uptime pendant rollout
+- **Error rate** : < 0.1% tout au long
+- **Performance** : P95 < 2s maintenu
+- **User satisfaction** : Aucun feedback négatif critique
+
+### Tests Phase 7
+
+**Tests automatiques** :
+- 3 nouveaux fichiers e2e (dual-mode-navigation, redirections, feature-flag-validation)
+- ~12 tests nouveaux au total
+- Durée execution: +5-7 minutes aux tests existants
+
+**Tests manuels** :
+- Vérification quotidienne dashboard Vercel
+- Tests manuels avant chaque augmentation percentage
+- Smoke tests après chaque déploiement
+
+---
+
+## Phase 8 : Nettoyage Final (PLANNED - IRREVERSIBLE)
+
+**Date début prévue** : 2025-02-01 (après Phase 7 100% stable)
+**Date fin prévue** : 2025-02-05 (estimation 3-4j)
+**Statut** : ⚪ À faire
+
+⚠️ **ATTENTION**: Phase 8 est **IRREVERSIBLE**. Une fois les tables droppées, impossible de revenir en arrière sans restauration complète de backup.
+
+### Pré-requis Phase 8
+
+**Obligatoires avant de démarrer** :
+- ✅ Phase 7 complète à 100% depuis minimum 1 semaine
+- ✅ Zero incidents critiques pendant 7 jours
+- ✅ Backup complet base de données créé et testé
+- ✅ Validation explicite utilisateur (Yoann)
+- ✅ Plan de restauration documenté et testé
+
+### Objectifs Phase 8
+
+- Créer backup complet base de données
+- Drop tables legacy (Organization, Member, Invitation, Subscription)
+- Supprimer code legacy (app/orgs/, src/lib/organizations/)
+- Supprimer feature flags (plus nécessaires)
+- Cleanup migrations Prisma
+- Update documentation finale
+
+### Étape 1 : Backup & Validation
+
+```bash
+# 1. Créer backup complet (Vercel Postgres)
+vercel env pull .env.backup
+# Ou via dashboard Vercel > Storage > Backup
+
+# 2. Télécharger backup localement
+pg_dump $DATABASE_URL > backup-pre-phase8-$(date +%Y%m%d).sql
+
+# 3. Tester restauration sur DB locale
+createdb mycryptopilot_test
+psql mycryptopilot_test < backup-pre-phase8-20250201.sql
+
+# 4. Vérifier intégrité
+psql mycryptopilot_test -c "SELECT COUNT(*) FROM \"User\";"
+psql mycryptopilot_test -c "SELECT COUNT(*) FROM \"UserSubscription\";"
+# Tous les counts doivent correspondre à la prod
+
+# 5. Stocker backup en lieu sûr
+# - S3 bucket avec versioning
+# - Drive backup
+# - Archive locale chiffrée
+```
+
+### Étape 2 : Drop Tables Legacy
+
+⚠️ **POINT DE NON-RETOUR** - Backup obligatoire
+
+```sql
+-- migration: drop-legacy-tables.sql
+BEGIN;
+
+-- Drop foreign keys first (si existantes)
+ALTER TABLE "User" DROP CONSTRAINT IF EXISTS "User_organizationId_fkey";
+ALTER TABLE "Subscription" DROP CONSTRAINT IF EXISTS "Subscription_organizationId_fkey";
+
+-- Drop tables (ordre important pour contraintes)
+DROP TABLE IF EXISTS "Invitation" CASCADE;
+DROP TABLE IF EXISTS "Member" CASCADE;
+DROP TABLE IF EXISTS "Subscription" CASCADE;
+DROP TABLE IF EXISTS "Organization" CASCADE;
+
+-- Cleanup User table
+ALTER TABLE "User" DROP COLUMN IF EXISTS "organizationId";
+
+COMMIT;
+```
+
+**Prisma migration** :
+```bash
+# Créer migration
+npx prisma migrate dev --name drop-legacy-org-tables
+
+# Vérifier migration avant deploy
+cat prisma/migrations/*_drop-legacy-org-tables/migration.sql
+
+# Deploy en prod (IRREVERSIBLE!)
+npx prisma migrate deploy
+```
+
+### Étape 3 : Cleanup Code Legacy
+
+**Fichiers à supprimer** :
+
+```bash
+# Routes legacy
+rm -rf app/orgs/
+
+# Services legacy
+rm -rf src/lib/organizations/
+rm -f src/lib/organization-helper.ts
+
+# Queries legacy
+rm -f src/query/org/*.ts
+
+# Components legacy
+rm -f src/features/org-switcher/
+rm -f src/components/org-selector.tsx
+
+# Middleware legacy logic
+# (modifier src/middleware.ts - retirer org slug handling)
+
+# Feature flags (plus nécessaires)
+# (modifier src/lib/feature-flags.ts - simplifier)
+```
+
+**Fichiers à modifier** :
+
+```typescript
+// src/lib/feature-flags.ts (SIMPLIFIER)
+export const FEATURES = {
+  // Remove USER_ACCOUNT_MODE (toujours ON maintenant)
+  // Remove LEGACY_ORG_REDIRECTS (plus nécessaire)
+} as const;
+
+// src/middleware.ts (SIMPLIFIER)
+export async function middleware(request: NextRequest) {
+  // Remove org slug extraction
+  // Remove legacy redirects
+  // Keep only essential auth checks
+}
+
+// Tous les fichiers utilisant FEATURES.USER_ACCOUNT_MODE
+// → Retirer conditionals, garder seulement le code "nouveau mode"
+
+// Tous les fichiers utilisant getRequiredCurrentOrgCache()
+// → Remplacer par getOrgOrStub() ou supprimer si inutile
+```
+
+### Étape 4 : Update Documentation
+
+**Documentation à mettre à jour** :
+- README.md (retirer mentions organizations)
+- CLAUDE.md (update architecture section)
+- DEVELOPMENT.md (retirer feature flags)
+- DATABASE.md (update schemas)
+- All user-facing docs (screenshots, guides)
+
+**Changelog** :
+```markdown
+## v2.0.0 - Février 2025
+
+### BREAKING CHANGES
+- URLs simplifiées: `/dashboard` au lieu de `/orgs/:slug/dashboard`
+- Removed multi-tenant organization system
+- Simplified to user-centric architecture
+
+### Architecture
+- Migrated from Organization model to UserSubscription
+- Cleaned up legacy code (~3500 LOC removed)
+- Improved performance (-30% DB queries, -20% load time)
+
+### Migration Notes
+- All users automatically migrated
+- Bookmarks with old URLs redirect automatically
+- No action required from users
+```
+
+### Étape 5 : Tests Post-Cleanup
+
+```bash
+# 1. Tests complets
+pnpm ts               # TypeScript check
+pnpm lint             # Linting
+pnpm test:ci          # Unit tests
+pnpm test:e2e:ci      # E2E tests
+
+# 2. Build production
+pnpm build
+
+# 3. Tests manuels
+# - Login/Signup flow
+# - Dashboard navigation
+# - Signals feed
+# - Trader marketplace
+# - Pricing page
+# - Account settings
+# - Subscription management
+# - Payment flow
+
+# 4. Performance tests
+# - Load time < 2s
+# - No console errors
+# - No network errors
+```
+
+### Métriques Phase 8
+
+**Objectifs** :
+- **Code cleanup** : ~3500 LOC supprimées
+- **Tables dropped** : 4 (Organization, Member, Invitation, Subscription)
+- **Files removed** : ~50 fichiers
+- **Performance gain** : -30% queries DB, -20% load time
+- **Bundle size** : -15% (moins de code)
+
+### Validation Finale Phase 8
+
+**Checklist avant de considérer Phase 8 terminée** :
+- [ ] Backup vérifié et restaurable
+- [ ] Tables legacy droppées
+- [ ] Code legacy supprimé
+- [ ] Feature flags retirés
+- [ ] Tests 100% passants
+- [ ] Build production successful
+- [ ] Documentation updated
+- [ ] Performance metrics OK
+- [ ] Zero errors en prod 24h post-deployment
+- [ ] Validation finale utilisateur
 
 ---
 
