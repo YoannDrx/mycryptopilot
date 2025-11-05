@@ -26,6 +26,12 @@
 import { logger } from "@/lib/logger";
 import type { ExchangeTrade, PerformancePeriod } from "@/generated/prisma";
 import type { Decimal } from "@prisma/client/runtime/library";
+import {
+  calculateSharpeRatio as calculateSharpeRatioShared,
+  calculateSortinoRatio as calculateSortinoRatioShared,
+  calculateMaxDrawdown as calculateMaxDrawdownShared,
+  type TradeForDrawdown,
+} from "@/lib/trading/performance-metrics.shared";
 
 type PerformanceMetrics = {
   period: PerformancePeriod;
@@ -82,110 +88,40 @@ function decimalToNumber(value: Decimal | null): number {
 }
 
 /**
- * Calculate Sharpe Ratio
+ * Calculate Sharpe Ratio (adapter for shared implementation)
  *
- * Measures risk-adjusted returns.
- * Sharpe = (Mean Return - Risk-Free Rate) / Std Deviation of Returns
- *
- * We assume risk-free rate = 0 for simplicity.
- *
- * @param returns - Array of trade returns (PnL)
+ * @param returns - Array of trade returns (PnL as percentages)
  * @returns Sharpe ratio or null if insufficient data
  */
 function calculateSharpeRatio(returns: number[]): number | null {
-  if (returns.length < 2) {
-    return null; // Need at least 2 data points
-  }
-
-  const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-  const variance =
-    returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / returns.length;
-  const stdDev = Math.sqrt(variance);
-
-  if (stdDev === 0) {
-    return null; // Avoid division by zero
-  }
-
-  return mean / stdDev;
+  return calculateSharpeRatioShared(returns);
 }
 
 /**
- * Calculate Sortino Ratio
+ * Calculate Sortino Ratio (adapter for shared implementation)
  *
- * Similar to Sharpe but only considers downside volatility.
- * Sortino = (Mean Return - Risk-Free Rate) / Downside Deviation
- *
- * @param returns - Array of trade returns (PnL)
+ * @param returns - Array of trade returns (PnL as percentages)
  * @returns Sortino ratio or null if insufficient data
  */
 function calculateSortinoRatio(returns: number[]): number | null {
-  if (returns.length < 2) {
-    return null;
-  }
-
-  const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;
-
-  // Only consider negative returns for downside deviation
-  const negativeReturns = returns.filter((r) => r < 0);
-
-  if (negativeReturns.length === 0) {
-    return null; // No losses = infinite Sortino (no downside risk)
-  }
-
-  const downsideVariance =
-    negativeReturns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) /
-    negativeReturns.length;
-  const downsideDev = Math.sqrt(downsideVariance);
-
-  if (downsideDev === 0) {
-    return null;
-  }
-
-  return mean / downsideDev;
+  return calculateSortinoRatioShared(returns);
 }
 
 /**
- * Calculate Maximum Drawdown
+ * Calculate Maximum Drawdown (adapter for shared implementation)
  *
- * Max drawdown = largest peak-to-trough decline in cumulative PnL.
- * Expressed as a percentage.
- *
- * @param trades - Array of trades (sorted by executedAt)
+ * @param trades - Array of ExchangeTrade
  * @returns Max drawdown as percentage (0-100)
  */
 function calculateMaxDrawdown(trades: ExchangeTrade[]): number {
-  if (trades.length === 0) {
-    return 0;
-  }
+  // Convert ExchangeTrade to TradeForDrawdown format
+  const tradesForDrawdown: TradeForDrawdown[] = trades.map((trade) => ({
+    executedAt: trade.executedAt,
+    realizedPnl: decimalToNumber(trade.realizedPnl),
+  }));
 
-  let cumulativePnl = 0;
-  let peak = 0;
-  let maxDrawdown = 0;
-
-  for (const trade of trades) {
-    const pnl = decimalToNumber(trade.realizedPnl);
-    cumulativePnl += pnl;
-
-    // Update peak if we've reached a new high
-    if (cumulativePnl > peak) {
-      peak = cumulativePnl;
-    }
-
-    // Calculate drawdown from peak
-    const drawdown = peak - cumulativePnl;
-
-    // Update max drawdown
-    if (drawdown > maxDrawdown) {
-      maxDrawdown = drawdown;
-    }
-  }
-
-  // Express as percentage of peak (avoid division by zero)
-  if (peak === 0) {
-    return 0;
-  }
-
-  return (maxDrawdown / Math.abs(peak)) * 100;
+  const result = calculateMaxDrawdownShared(tradesForDrawdown);
+  return result.maxDrawdownPercent;
 }
 
 /**

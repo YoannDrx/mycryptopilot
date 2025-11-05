@@ -1,274 +1,142 @@
-# 🧹 Guide de Configuration : Sweep vers Binance
+# 🧹 Guide de configuration : Sweep vers Binance
 
-Ce guide explique comment configurer le script de **sweep automatique** des fonds crypto vers ton wallet Binance.
+Ce guide explique comment configurer et exploiter `scripts/sweep-to-binance.ts`, le script qui regroupe les fonds reçus sur les adresses de paiement Base/Tron et les transfère vers tes wallets Binance.
 
 ---
 
-## 📋 Qu'est-ce que le Sweep ?
+## ⚙️ Pré-requis
 
-**Sweep** = Récupérer automatiquement les fonds des adresses de paiement générées et les transférer vers ton wallet Binance principal.
+- **Ne partage jamais `.env.sweep`**. Stocker les seed phrases dans un gestionnaire chiffré (1Password, Bitwarden).
+- Dispose d’un minimum de gas :
+  - Base : ~0.001 ETH par adresse à balayer.
+  - Tron : ~5 TRX par adresse.
+- Vérifie que les adresses de destination sont bien des adresses de dépôt Binance sur les bons réseaux (Base / TRC20).
 
-### Pourquoi sweep vers Binance ?
+---
 
-✅ **Sécurité** : Fonds centralisés sur une plateforme sécurisée avec assurance
-✅ **Facilité** : Conversion USDC/USDT → EUR en 1 clic
-✅ **Retrait** : Virement bancaire direct depuis Binance
-✅ **Comptabilité** : Toutes les transactions visibles dans Binance
+## 1. Configurer les adresses Binance
 
-### Flow complet
+### Base (USDC)
+1. Binance → Wallet → **Fiat and Spot**.
+2. Bouton **Deposit** → Token **USDC** → Réseau **Base**.
+3. Copier l’adresse `0x...`.
 
+### Tron (USDT)
+1. Même parcours.
+2. Token **USDT** → Réseau **TRC20**.
+3. Copier l’adresse `T...`.
+
+Ajouter les valeurs dans `.env.local` (ou `.env` pour la prod) :
+```bash
+BINANCE_MASTER_WALLET_BASE="0x..."
+BINANCE_MASTER_WALLET_TRON="T..."
 ```
-User paie 49 USDC
-  → Adresse unique générée (0x123...)
-  → USDC reçu sur 0x123...
-  → Script sweep détecte balance > 10 USDC
-  → Transfert automatique vers ton wallet Binance
-  → Tu convertis en EUR et retires
-```
+
+> ℹ️ Le script peut aussi lire ces valeurs depuis `.env.sweep` si tu veux isoler la configuration sweep.
 
 ---
 
-## 🔧 Configuration
-
-### Étape 1 : Obtenir tes adresses de dépôt Binance
-
-#### Pour Base (USDC)
-
-1. **Connecte-toi à Binance** : [binance.com](https://www.binance.com)
-2. **Va dans Wallet** → **Fiat and Spot**
-3. **Clique sur "Deposit"** (Dépôt)
-4. **Sélectionne "USDC"**
-5. **Sélectionne le réseau "Base"** (très important !)
-6. **Copie l'adresse** de dépôt (format `0x...`)
-
-**Exemple** : `0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1`
-
-⚠️ **ATTENTION** : Vérifie que tu es bien sur le réseau **Base**, pas Ethereum ou autre !
-
-#### Pour Tron (USDT)
-
-1. **Même processus que ci-dessus**
-2. **Sélectionne "USDT"**
-3. **Sélectionne le réseau "TRC20" (Tron)**
-4. **Copie l'adresse** de dépôt (format `T...`)
-
-**Exemple** : `TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe`
-
----
-
-### Étape 2 : Ajouter les adresses dans .env.local
-
-Ouvre `.env.local` et ajoute ces 2 lignes à la fin :
+## 2. Créer `.env.sweep`
 
 ```bash
-# 🏦 BINANCE MASTER WALLETS (for sweep)
-BINANCE_MASTER_WALLET_BASE="0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1"  # Ton adresse Binance Base
-BINANCE_MASTER_WALLET_TRON="TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe"  # Ton adresse Binance Tron
+cp .env.sweep.example .env.sweep
 ```
 
-**Remplace par tes vraies adresses Binance !**
-
----
-
-### Étape 3 : Ajouter dans Vercel Production (optionnel)
-
-Si tu veux automatiser le sweep en production avec un cron job :
-
+Compléter avec :
 ```bash
-vercel env add BINANCE_MASTER_WALLET_BASE production
-# Colle ton adresse Binance Base
+# Seeds HD wallet (DOIT correspondre aux XPUB utilisés côté checkout)
+SWEEP_MNEMONIC_BASE="mots ..."
+SWEEP_MNEMONIC_TRON="mots ..."
 
-vercel env add BINANCE_MASTER_WALLET_TRON production
-# Colle ton adresse Binance Tron
+# Paramètres supplémentaires
+DRY_RUN="true"                # true par défaut pour prévenir les accidents
+SWEEP_MIN_THRESHOLD_USD="10"  # Minimum à balayer (USD)
 ```
+
+> Laisser `DRY_RUN` à `true` tant que tu n’as pas validé le flux en testnet.
 
 ---
 
-## 🚀 Utilisation
-
-### Tester le script localement
+## 3. Vérifier la configuration
 
 ```bash
 npx tsx scripts/sweep-to-binance.ts
 ```
 
-**Sortie attendue** :
-
+Sortie attendue (mode dry-run) :
 ```
 🧹 Starting sweep of all crypto addresses to Binance...
-
-📊 Found 5 active addresses to check
-
-🟦 Checking 3 Base addresses...
-
-  0xA69D04D4935eE5F44AF64E5628805A5Ed3b03267: 45.50 USDC
-    ⚠️  Would sweep 45.50 USDC to 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1
-    ⚠️  Transfer not implemented yet (requires private key access)
-
-  0xB123...: 3.20 USDC (skipped, below threshold)
-
-🟣 Checking 2 Tron addresses...
-
-  TABC123...: 99.00 USDT
-    ⚠️  Would sweep 99.00 USDT to TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe
-    ⚠️  Transfer not implemented yet (requires private key access)
-
-═══════════════════════════════════════════════════════════
-✅ Sweep completed!
-📦 Addresses checked: 5
-💰 Funds swept: 0 addresses (transfer not implemented)
-💵 Total amount: ~0.00 USD
-═══════════════════════════════════════════════════════════
+Mode: 🔍 DRY RUN (preview only)
+...
+🔍 [DRY RUN] Would sweep 49.50 USDC to 0x742d...
 ```
 
----
-
-## ⚠️ Limitation Actuelle
-
-**Le script est actuellement en READ-ONLY** (lecture seule). Il peut :
-
-✅ Détecter les balances sur les adresses
-✅ Identifier quelles adresses ont besoin d'un sweep
-✅ Calculer le total à transférer
-
-❌ Mais il **NE PEUT PAS ENCORE** effectuer les transferts réels
-
-### Pourquoi ?
-
-Pour transférer des fonds, le script a besoin d'accéder aux **clés privées** dérivées du mnemonic. Actuellement, on utilise seulement les **xpub** (clés publiques) pour générer les adresses.
+Le script affiche également les adresses ignorées (seuil, absence de gas) et fournit un récapitulatif final.
 
 ---
 
-## 🔐 Prochaine Étape : Implémenter les Transferts
+## 4. Envoyer un sweep réel
 
-### Option A : Script Manuel avec Mnemonic (Simple)
-
-**Durée** : 2-3h
-
-1. **Créer script sécurisé** `scripts/sweep-with-keys.ts`
-2. **Utiliser le mnemonic** pour dériver les clés privées
-3. **Signer les transactions** avec ethers.js (Base) et TronWeb (Tron)
-4. **Exécuter manuellement** quand tu veux récupérer les fonds
-
-**Sécurité** : 🟡 Moyenne (mnemonic stocké chiffré)
-
----
-
-### Option B : Service Externe (Fireblocks, Coinbase Commerce)
-
-**Durée** : 1-2 jours d'intégration
-
-Utilise un service tiers qui gère les clés privées de manière sécurisée :
-
-- [Fireblocks](https://www.fireblocks.com/) (entreprise)
-- [Coinbase Commerce](https://commerce.coinbase.com/) (simple)
-- [BitGo](https://www.bitgo.com/) (sécurité maximale)
-
-**Sécurité** : ✅ Excellente (HSM, multi-sig)
-
----
-
-### Option C : Hardware Wallet + Script (Production)
-
-**Durée** : 4-5h
-
-1. **Connecter Ledger** via USB
-2. **Script demande signature** au Ledger pour chaque transfert
-3. **Tu approuves manuellement** sur le Ledger
-
-**Sécurité** : ✅ Excellente (clés jamais exposées)
-
----
-
-## 📊 Configuration Recommandée
-
-### Pour Développement/Test
-
-✅ **Option A : Script Manuel avec Mnemonic**
-
-- Rapide à implémenter
-- Suffisant pour volumes faibles
-- Exécution manuelle (pas de risque d'automatisation)
-
----
-
-### Pour Production (> 10k$/mois)
-
-✅ **Option C : Hardware Wallet**
-
-- Sécurité maximale
-- Contrôle total
-- Pas de dépendance tiers
-
----
-
-## 🤖 Automatisation (Optionnel)
-
-### Via Vercel Cron Job
-
-Ajoute dans `vercel.json` :
-
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/sweep",
-      "schedule": "0 2 * * *"
-    }
-  ]
-}
+```bash
+DRY_RUN=false npx tsx scripts/sweep-to-binance.ts
 ```
 
-Crée `app/api/cron/sweep/route.ts` :
+1. Le script rappelle la configuration et demande de taper `CONFIRM`.
+2. Pour chaque adresse éligible :
+   - Dérive la clé privée HD.
+   - Signe la transaction (ethers.js pour Base, TronWeb pour Tron).
+   - Envoie la transaction vers l’adresse Binance correspondante.
+   - Met à jour `CryptoAddress.sweptAt` + `sweptTxHash` dans la base.
+3. Affiche le hash et le lien explorer (BaseScan / TronScan).
 
-```typescript
-import { sweepAllAddresses } from "@/scripts/sweep-to-binance";
-
-export async function GET(request: Request) {
-  // Vérifier secret CRON_SECRET
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  // Exécuter sweep
-  const results = await sweepAllAddresses();
-
-  return Response.json({ success: true, results });
-}
-```
-
-**Exécution** : Tous les jours à 2h du matin (UTC)
+> ⚠️ En mode réel, **aucun rollback** : ne lance la commande que si la configuration a été testée et sauvegardée.
 
 ---
 
-## 🆘 Troubleshooting
+## 5. Monitoring & journalisation
 
-### Erreur : "BINANCE_MASTER_WALLET_BASE not configured"
+- **Base de données** : `CryptoAddress` → champs `sweptAt`, `sweptTxHash`.
+- **Explorers** : `https://basescan.org/tx/<hash>` ou `https://tronscan.org/#/transaction/<hash>`.
+- **Logs** : le script loggue les confirmations de bloc, les erreurs RPC et les balances post-sweep.
 
-→ Tu n'as pas ajouté ton adresse Binance dans `.env.local`
-
----
-
-### Erreur : "Failed to connect to RPC"
-
-→ Vérifie que `BASE_RPC_URL` et `TRON_RPC_URL` sont bien configurés
+Pour un suivi régulier, envisager d’ajouter un dashboard (ex : Notion / Google Sheet) alimenté par une requête Prisma.
 
 ---
 
-### Balance détectée = 0 alors que j'ai reçu des fonds
+## 6. Bonnes pratiques sécurité
 
-→ Vérifie le réseau (Base vs Ethereum, TRC20 vs ERC20)
-→ Vérifie l'adresse sur [BaseScan](https://basescan.org) ou [TronScan](https://tronscan.org)
-
----
-
-## 📞 Support
-
-- Issues GitHub : [MyCryptoPilot Issues](https://github.com/YoannDrx/mycryptopilot/issues)
-- Documentation Binance : [Deposit Guide](https://www.binance.com/en/support/faq/how-to-deposit-crypto-on-binance-115003698492)
+- Limiter l’accès à `.env.sweep` et à la machine exécutant le script.
+- Utiliser des seed phrases dédiées à MyCryptoPilot (pas de wallet perso).
+- Stocker les seed phrases dans un coffre chiffré et supprimer toute copie locale après usage.
+- Tenir un registre des sweeps (date, montant, hash) pour réconciliation comptable.
 
 ---
 
-**Créé le** : 11 octobre 2025
-**Auteur** : MyCryptoPilot Team
+## 7. Mode testnet
+
+Pour valider end-to-end sans risque :
+
+1. Paramétrer `.env.local` avec les XPUB/addresses testnet (`CRYPTO_NETWORK="testnet"`).
+2. Alimenter les adresses en USDC Base Sepolia / USDT Tron Shasta.
+3. Lancer le sweep (dry-run puis réel) pour vérifier que les transactions sont signées correctement.
+
+---
+
+## 8. Déploiement automatisé (optionnel)
+
+Si tu souhaites exécuter le sweep sur un serveur ou via cron :
+
+- Stocker `.env.sweep` dans un coffre (ex : secrets manager) et l’injecter au runtime.
+- Forcer `DRY_RUN=false` via la variable d’environnement du job.
+- Logger les sorties dans un canal privé (Slack/Discord) ou un fichier auditable.
+- Ajouter une alerte en cas d’échec (ex : cron + `||` webhook).
+
+---
+
+## 9. Resources associées
+
+- `.claude/docs/CRYPTO-PAYMENTS.md`
+- `.claude/docs/ENV-VARIABLES-MAPPING.md`
+- `scripts/README-SWEEP.md`
+- `scripts/sweep-to-binance.ts`
+

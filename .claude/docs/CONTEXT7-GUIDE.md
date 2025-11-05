@@ -1,6 +1,6 @@
 # Guide Context7 MCP - MyCryptoPilot
 
-**Dernière mise à jour**: 18 octobre 2025
+**Dernière mise à jour**: 2 novembre 2025
 
 ---
 
@@ -67,7 +67,7 @@ Voici les bibliothèques principales de ton projet et leurs IDs Context7 probabl
 - **PostgreSQL** → `postgresql/postgresql`
 
 ### Authentification
-- **Better Auth** → `better-auth/better-auth` (si disponible)
+- **Better Auth** → `better-auth/better-auth` (si disponible, sinon consulter docs officielles)
 
 ### UI/UX
 - **TailwindCSS 4** → `tailwindlabs/tailwindcss`
@@ -86,15 +86,22 @@ Voici les bibliothèques principales de ton projet et leurs IDs Context7 probabl
 ### Crypto & Web3
 - **Ethers.js** → `ethers-io/ethers.js`
 - **TronWeb** → `tronprotocol/tronweb`
+- **ccxt** → `ccxt/ccxt`
+- **@scure/bip32** → `paulmillr/scure-bip32`
+- **@scure/bip39** → `paulmillr/scure-bip39`
 
 ### Testing
 - **Vitest** → `vitest-dev/vitest`
 - **Playwright** → Note: Playwright est déjà intégré nativement dans Claude Code !
 - **Testing Library** → `testing-library/react-testing-library`
 
+### AI & assistants
+- **@ai-sdk/openai** → `ai-sdk/openai` (ou `vercel/ai` pour l’intégration complète)
+
 ### Other
 - **Discord.js** → `discordjs/discord.js`
 - **date-fns** → `date-fns/date-fns`
+- **drizzle-kit** → `drizzle-team/drizzle-orm` (pour référence rapide si besoin)
 
 ## 💡 Exemples d'Usage
 

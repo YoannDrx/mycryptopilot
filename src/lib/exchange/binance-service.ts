@@ -130,6 +130,22 @@ export class BinanceService {
   }
 
   /**
+   * Fetch account balance from Binance
+   *
+   * @returns Promise<ccxt.Balances> - Account balance with total, free, and used amounts
+   * @throws Error if fetch fails
+   */
+  async fetchBalance() {
+    try {
+      logger.info("Fetching Binance balance");
+      return await this.exchange.fetchBalance();
+    } catch (error) {
+      logger.error("Failed to fetch Binance balance", { error });
+      throw error;
+    }
+  }
+
+  /**
    * Fetch recent trades from Binance (spot + futures)
    *
    * @param daysSince - Number of days to fetch (default: 30)

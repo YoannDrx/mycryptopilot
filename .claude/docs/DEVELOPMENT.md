@@ -1,790 +1,98 @@
 # Development Status & Roadmap - MyCryptoPilot
 
-**Dernière mise à jour**: 23 octobre 2025
-**Audit complet via /project-audit**: 23 octobre 2025 (18 migrations, 38 issues, 10 TODOs)
-**Phase 6 (Feed Signaux) complétée**: 13 octobre 2025
-**Phase 7 (Navigation 4 Espaces + UI Polish) complétée**: 14 octobre 2025
-**Phase 8 (Portfolio Tracking - Binance + Bybit) complétée**: 22 octobre 2025
+**Dernière mise à jour**: 2 novembre 2025 — alignée sur l’audit documentation & scripts.
 
-## 📊 Progression Globale
-
-**Projet**: 🎉 **100% MVP COMPLETE + UI POLISH!** 🎉 (Ready for Beta Launch!)
-
-### Phases Complétées
-
-#### Phase 1: Setup & Infrastructure ✅ (100%)
-
-- ✅ Next.js 15 + App Router + Turbopack
-- ✅ TypeScript strict mode
-- ✅ TailwindCSS v4 + Shadcn/UI
-- ✅ NOW.TS template adapté (B2C single-tenant)
-- ✅ Git repo + branch strategy
-
-#### Phase 2: Database & Auth ✅ (100%)
-
-- ✅ PostgreSQL (Neon) configuré
-- ✅ Prisma ORM + 5 modèles MyCryptoPilot
-- ✅ **8 migrations appliquées** (12 oct 2025)
-- ✅ Client Prisma généré (`src/generated/prisma`)
-- ✅ Better Auth avec extensions User
-
-#### Phase 2.5: UI/UX Pages ✅ (100%)
-
-- ✅ Dashboards créés (user + trader)
-- ✅ **Dashboards 100% connectés** aux données Prisma (audit 11 oct)
-- ✅ Marketplace traders 100% fonctionnelle (search/filters/pagination)
-- ✅ Pricing page fonctionnelle
-- ✅ Navigation sidebar MyCryptoPilot
-
-#### Phase 3: Core Features ✅ (100%)
-
-- ✅ **Profils traders**: Formulaire 173 lignes + actions + queries
-- ✅ **Système signaux**: Formulaire 515 lignes + TradingCard 170 lignes + webhook Discord auto
-- ✅ **Follow/Unfollow**: Actions + queries + limites plans
-- ✅ **Discord Bot**: Déployé Railway 24/7 (11 commandes slash)
-- ✅ **Subscription Management**: activateSubscription + Better Auth hook + UI components
-
-#### Phase 4: Crypto Payments ✅ (100%)
-
-- ✅ **HD wallet**: Dérivation Base + Tron (ethers.js + @scure/bip32)
-- ✅ **RPC monitoring**: checkAddressForPayments (ethers.js + TronWeb)
-- ✅ **Plans config**: Pro-rata automatique
-- ✅ **Checkout UI**: Page complète 447 lignes (QR codes + countdown + polling)
-- ✅ **API routes**: generate-address + check-payment (152 lignes)
-
-#### Phase 5: Discord Integration MVP ✅ (100%)
-
-- ✅ **Discord Bot 24/7**: Déployé sur Railway avec auto-redeploy
-- ✅ **11 Slash Commands**: 5 user + 6 admin commands
-  - User: `/link`, `/unlink`, `/check`, `/invite-accept`, `/invitation-cancel`
-  - Admin: `/admin-sync-roles`, `/admin-stats`, `/admin-check-permissions`, `/admin-bot-info`, `/admin-assign-role`, `/admin-test-signal`
-- ✅ **Auto Roles**: Attribution automatique des rôles selon le plan (Free/Pro/Ultra)
-- ✅ **Discord Channels**: Configuration #signals-free + #bot-logs
-- ✅ **Webhook Integration**: Notifications automatiques des nouveaux signaux
-- ✅ **Production Ready**: Script `start-discord-bot.ts` + env vars Railway
-
-#### Phase 6: Feed Signaux Avancé ✅ (100%)
-
-- ✅ **Query System**: `getSignalsFeed()` avec 12 paramètres de filtrage
-- ✅ **Filtres UI**: Multi-symboles, bias, status, instrumentType, trader, verified
-- ✅ **Pagination**: Cursor-based avec hasNextPage/nextCursor
-- ✅ **URL State**: Filtres persistés dans l'URL (liens partageables)
-- ✅ **Tests**: 26 tests unitaires (100% passants)
-- ✅ **Documentation**: Complète dans README + CLAUDE.md
-
-**Stats Phase 6**:
-- ~871 lignes ajoutées
-- ~367 lignes supprimées
-- 14 fichiers modifiés
-- PR #40 mergée avec succès
-
-#### Phase 7: Navigation 4 Espaces + UI Polish ✅ (100%)
-
-- ✅ **Architecture 4 Espaces**: Trading, Account, School, Tax avec sidebars dédiées
-- ✅ **Base Navigation**: `base-sidebar-layout` + recherche globale partagée
-- ✅ **Trading Cards**: Style professionnel et subtil (effets réduits de 60%)
-- ✅ **Chart Image Viewer**: Zoom full-screen + watermark MyCryptoPilot + download
-- ✅ **Image Management**: Suppression d'images + placeholder amélioré
-- ✅ **Code Quality**: Toutes erreurs ESLint corrigées (10 warnings/errors fixés)
-
-**Stats Phase 7**:
-- ~15 fichiers modifiés
-- Architecture refactorisée en 4 espaces isolés
-- UI polish complet sur trading cards
-- Chart viewer avec watermark branding
-
-#### Phase 8: Portfolio Tracking - Multi-Exchange ✅ (100%)
-
-**Issue**: #66 - Exchange Portfolio Tracking & Verified Stats
-
-##### Phase 0: Binance Integration ✅ (Complétée)
-- ✅ **Database Models**: ExchangeConnection, ExchangeTrade, TraderPerformanceSnapshot
-- ✅ **BinanceService**: Validation API keys, fetch trades spot/futures
-- ✅ **Encryption Service**: AES-256-GCM pour API keys
-- ✅ **Sync Service**: Cron job automatique every 5 minutes
-- ✅ **Performance Calculator**: Winrate, Profit Factor, Sharpe Ratio, etc.
-- ✅ **Dashboard UI**: Connections management, stats display
-- ✅ **Email Notifications**: Sync failures notifications
-- ✅ **Security**: Read-only keys validation, encrypted storage
-
-##### Phase 4: Bybit Integration ✅ (Complétée 22 Oct 2025)
-- ✅ **BybitService** (396 lignes): API Bybit v5, validation, fetch trades
-- ✅ **ExchangeServiceFactory**: Pattern factory multi-exchange
-- ✅ **sync-service.ts**: Support Binance ET Bybit
-- ✅ **Migration DB**: Enum `Exchange` avec BINANCE + BYBIT
-- ✅ **UI Selector**: RadioGroup pour choisir exchange
-- ✅ **Dynamic Instructions**: Guides conditionnels par exchange
-- ✅ **Connection Cards**: Logos & styles dynamiques (🟡 Binance / 🟠 Bybit)
-- ✅ **Documentation**: bybit-setup.mdx (234 lignes) + FAQ update
-- ✅ **Bug Fixes**: Validation readOnly, hydration errors, auto-revalidation
-
-**Stats Phase 8**:
-- 15 fichiers modifiés: +1,015 insertions, -137 suppressions
-- 5 nouveaux fichiers (BybitService, Factory, Migration, Docs, Script)
-- PR #70 mergée avec succès
-
-**Prochaines étapes Portfolio Tracking** (Phase 5-6 de #66):
-- ⏳ Phase 5: Premium Features (WebSocket sync, unlimited history, CSV exports, API access)
-- ⏳ Phase 6: Polish & Launch (Security audit, performance optimization, beta testing)
-
-#### Phase 9: Advanced Features ⏳ (Post-MVP)
-
-- ⏳ Journal de trading
-- ⏳ Console de risque
-- ⏳ Alertes custom
+Ce document dresse une vue d’ensemble de l’état fonctionnel, des travaux en cours et des prochaines étapes du projet. Toutes les références renvoient à des éléments présents dans la branche `main` au 2 novembre 2025.
 
 ---
 
-## 🧪 Tests E2E Coverage (Issue #39)
+## 📊 Synthèse actuelle
 
-**Dernière mise à jour**: 17 octobre 2025 - Inventaire complet tests manquants
-
-### État Actuel
-
-**Tests existants**: **35 tests actifs** + **1 skipped** = **36 total**
-**Coverage estimée**: **~65-70%**
-**Cible**: **100% coverage** (61 tests total)
-**Tests à ajouter**: **26 tests** (30-40h effort)
-
-### Configuration Tests & Stratégie .env
-
-#### Stratégie Environment Variables
-
-**Fichiers .env utilisés** :
-- `.env` - Variables de base (fallback)
-- `.env.local` - Dev local overrides (DB Neon vercel-dev) - **gitignored**
-- `.env.test` - Tests E2E (DB locale Postgres.app) - **gitignored**
-- `.env.example` - Template pour documentation
-
-**Fichiers .env qui N'EXISTENT PAS** :
-- ❌ `.env.production` - **N'a JAMAIS existé** (Next.js utilise variables Vercel en prod)
-- ❌ `.env.test.local` - **Pas nécessaire** (`.env.test` suffit)
-
-#### Tests Locaux (Développeur)
-
-**Configuration** :
-- **Base de données** : PostgreSQL local (Postgres.app)
-- **DATABASE_URL** : `postgresql://yoannandrieux:@localhost:5432/mycryptopilot_test`
-- **NODE_ENV** : `test` (pour build ET runtime)
-- **Setup** : `pnpm db:setup-test` (crée DB + migrations)
-- **Lancement** : `pnpm test:e2e:ci` (utilise `scripts/run-e2e-tests.sh`)
-
-**Fichier utilisé** : `.env.test`
-
-**Workflow** :
-1. Script `run-e2e-tests.sh` tue les serveurs existants
-2. Libère le port 3000
-3. Setup la DB `mycryptopilot_test` (migrations)
-4. Playwright démarre son serveur (`NODE_ENV=test`)
-5. Next.js charge `.env.test` automatiquement
-6. Tests s'exécutent contre DB locale
-
-#### Tests CI/CD (GitHub Actions)
-
-**Configuration** :
-- **Base de données** : PostgreSQL Docker (`postgres:15`)
-- **DATABASE_URL** : `postgresql://postgres:postgres@localhost:5432/mycryptopilot_test`
-- **NODE_ENV** : `test` (pour build ET runtime)
-- **Setup** : Service Docker + migrations Prisma
-- **Lancement** : Workflows GitHub Actions
-
-**Workflows GitHub Actions** :
-1. **`playwright.yml`** - Tests E2E dédiés ✅
-   - Build : `NODE_ENV=test pnpm build`
-   - Run : `NODE_ENV=test pnpm start`
-   - PostgreSQL Docker avec `postgres:postgres`
-
-2. **`ci.yml`** - Pipeline CI/CD complet ✅
-   - Build : `NODE_ENV=test pnpm build`
-   - Run : `NODE_ENV=test pnpm start`
-   - PostgreSQL Docker avec `postgres:postgres`
-
-**Secrets GitHub Actions** :
-- 15 secrets configurés (crypto keys, Discord tokens, etc.)
-- DATABASE_URL hardcodée dans workflows (Docker)
-- Pas de DB Neon en CI (PostgreSQL local Docker)
-
-#### Priorité de Chargement Next.js
-
-Next.js charge les fichiers `.env` dans cet ordre (du plus prioritaire au moins) :
-
-1. `.env.$(NODE_ENV).local` (ex: `.env.test.local`)
-2. `.env.local` (ignoré quand `NODE_ENV=test`)
-3. `.env.$(NODE_ENV)` (ex: `.env.test`) ← **UTILISÉ EN TESTS**
-4. `.env` (fallback)
-
-#### Historique & Evolution
-
-**17 octobre 2025** (commit 37b3691 - **PIVOT MAJEUR**) :
-- Création de `.env.test` pour isolation complète
-- Ajout de `prisma.config.ts` pour charger `.env.test` quand `NODE_ENV=test`
-- Fix de 11 tests E2E qui échouaient en CI (Issue #61)
-- Sécurisation des secrets crypto (migration vers GitHub Secrets)
-
-**29 octobre 2025** (corrections locales) :
-- Fix `playwright.config.mts` : `reuseExistingServer: false` (isolation)
-- Fix `.env.test` : `yoannandrieux:@` pour Postgres.app
-- Désactivation dev overlay en test (`next.config.ts`)
-- Création script `run-e2e-tests.sh` (cleanup automatique)
-- Fix `ci.yml` : Build en `NODE_ENV=test` (alignement avec `playwright.yml`)
-
-#### IMPORTANT : Différences Local vs CI
-
-| Aspect | Local (Dev) | CI (GitHub Actions) |
-|--------|-------------|---------------------|
-| **DB** | Postgres.app | PostgreSQL Docker |
-| **User** | `yoannandrieux:` | `postgres:postgres` |
-| **Setup** | `pnpm db:setup-test` | Service Docker + migrations |
-| **Fichier .env** | `.env.test` (gitignored) | Variables hardcodées dans workflow |
-| **NODE_ENV** | `test` (build + run) | `test` (build + run) |
-| **Isolation** | Serveur dédié (port 3000) | Container Docker isolé |
-
-**Note** : Les différences de DATABASE_URL sont **normales et voulues** - ce sont 2 environnements distincts avec leurs propres configurations PostgreSQL.
-
-### Tests Existants par Module
-
-| Module | Tests | Fichier | Status |
-|--------|-------|---------|--------|
-| Auth & Account | ~8 tests | `signup.spec.ts`, `account.spec.ts`, `password-reset.spec.ts` | ✅ Complet |
-| Crypto Checkout | 8 tests | `crypto-checkout.spec.ts` | ⚠️ Partiel (activation manquante) |
-| Follow/Unfollow | 3 tests | `follow-unfollow.spec.ts` | ✅ Complet |
-| Signal Creation | 4 tests | `signal-creation.spec.ts` | ✅ Complet |
-| Signals Feed Filters | 5 tests (1 skipped) | `signals-feed-filters.spec.ts` | ⚠️ Presque complet |
-| Trader Invitation | 3 tests | `trader-invitation.spec.ts` | ✅ Complet |
-| Trader Referral | 4 tests | `trader-referral.spec.ts` | ✅ Complet |
-
-### Tests Manquants pour 100% Coverage
-
-#### 🔴 P0 - CRITIQUE (MVP Beta) - 12 tests - 16-22h
-
-**1. Subscription Activation** (`e2e/subscription-activation.spec.ts`) - 4 tests - 6-8h
-- Complete payment flow activates subscription
-- Pro-rata payment grants correct days
-- Payment activates Discord role automatically
-- Payment triggers confirmation email
-
-**2. Dashboard Interactions** (`e2e/dashboard.spec.ts`) - 4 tests - 4-6h
-- User dashboard displays correct stats
-- User dashboard shows signals from followed traders
-- Free user sees blurred signals after limit
-- Dashboard tabs navigation works
-
-**3. Trader Dashboard** (`e2e/trader-dashboard.spec.ts`) - 2 tests - 3-4h
-- Trader dashboard shows published signals
-- Trader dashboard shows followers list
-
-**4. Marketplace** (`e2e/marketplace.spec.ts`) - 2 tests - 3-4h
-- Marketplace displays all traders with stats
-- Marketplace search and filters work
-
-#### 🟡 P1 - IMPORTANT (Post-Beta) - 8 tests - 8-11h
-
-**5. Trader Profile** (`e2e/trader-profile.spec.ts`) - 3 tests - 3-4h
-- Trader public profile displays all info
-- Non-logged user sees sign-in prompt on follow
-- Trader profile shows only active signals
-
-**6. Signal Expiration** (`e2e/signal-expiration.spec.ts`) - 2 tests - 2-3h
-- Signal shows TTL countdown
-- Expired signal shows EXPIRED status
-
-**7. Plan Limits** (`e2e/plan-limits.spec.ts`) - 3 tests - 3-4h
-- Free user limited to 5 signals per day
-- Pro user can follow up to 5 traders
-- Ultra user has unlimited follows and signals
-
-#### 🟢 P2 - NICE TO HAVE (Polish) - 6 tests - 5-8h
-
-**8. Pricing Page** (`e2e/pricing.spec.ts`) - 2 tests - 1-2h
-- Pricing page displays all plans correctly
-- Pricing page subscribe button redirects to checkout
-
-**9. Settings** (`e2e/settings.spec.ts`) - 2 tests - 2-3h
-- User can edit profile settings
-- User can view billing settings
-
-**10. Navigation** (`e2e/navigation.spec.ts`) - 2 tests - 2-3h
-- Navigation sidebars switch correctly
-- Global search works across all spaces
-
-### Roadmap Tests E2E
-
-**Phase 1 - MVP Beta** (Issue #39 - Sprint 1):
-- ✅ 12 tests P0 (16-22h) → **Coverage ~85%** → **READY FOR BETA LAUNCH**
-
-**Phase 2 - Post-Beta** (Sprint 2):
-- ✅ 8 tests P1 (8-11h) → **Coverage ~95%** → **Production Ready**
-
-**Phase 3 - Polish** (Sprint 3):
-- ✅ 6 tests P2 (5-8h) → **Coverage 100%** 🎉
-
-### Issues & Blocages
-
-**Test Skipped à Fix**:
-- `signals-feed-filters.spec.ts:7` - Asset filter button ne fonctionne pas (app bug)
-- **Action**: Fixer bug asset filter AVANT d'unskip le test
-
-**Helpers à Créer**:
-- `e2e/utils/payment-test.ts` - Mock crypto payment helper
-- `e2e/utils/plan-test.ts` - Upgrade user to plan helper
-
-**Lien Issue GitHub**: [#39 - Tests E2E Coverage 80%+](https://github.com/YoannDrx/mycryptopilot/issues/39)
+- **Plateforme livrée**: cœur trading social (profils, signaux, suivi traders), paiements crypto (Base USDC + Tron USDT), portfolio tracking (Binance & Bybit à lecture seule), intégration Discord, automation scripts.
+- **Infrastructure**: 23 migrations Prisma appliquées (`prisma/migrations/`), génération client automatique (`pnpm prisma generate`), scripts de setup/dev disponibles.
+- **Observations clés**:
+  - Les flux critiques sont présents dans le code mais restent dépendants d’une configuration d’environnement complète (`.claude/docs/ENV-VARIABLES-MAPPING.md`).
+  - Le bot Discord nécessite `DISCORD_BOT_ENABLED=true` pour démarrer en local (`scripts/start-discord-bot.ts`).
+  - Les scripts de sweep vers Binance sont opérationnels (dry-run par défaut) et traquent les transactions dans `CryptoAddress`.
+  - La file d’exécution automatique du copy-trading reste à implémenter (TODO dans `src/lib/trading/copy-trade.service.ts`).
 
 ---
 
-## 🎯 État Actuel Détaillé
+## ✅ Piliers livrés et vérifiés dans le code
 
-### ✅ Base de Données (100%)
+### 1. Fondations produit
+- **Stack**: Next.js 15 App Router, TypeScript strict, Tailwind v4 + Shadcn, pnpm.
+- **Auth & multi-compte**: Better Auth (`src/lib/auth.ts`) avec modèle 1 organization = 1 user pour compatibilité NOW.TS.
+- **Base de données**: Prisma (`prisma/schema.prisma`) étendue pour traders, signaux, paiements crypto, portfolio tracking.
 
-**Status**: **OPÉRATIONNELLE** (8 migrations appliquées)
+### 2. Trading & marketplace
+- Profils traders (`src/features/trader/*`, `TraderProfile`), formulaires server actions, marketplace (`app/orgs/[orgSlug]/(trading)`), agrégation des fills (`src/lib/trading/fill-aggregation.service.ts`), copy trades (`src/lib/trading/copy-trade.service.ts`).
 
-```bash
-npx prisma migrate status
-# Database schema is up to date! ✅
-```
+### 3. Paiements crypto
+- Génération addresses HD (`src/lib/crypto/address-generator.ts`), watcher Base/Tron (`src/lib/crypto/payment-watcher.ts`), checkout UI (`app/(marketing)/pricing`, `app/orgs/.../checkout`).
+- Script sweep (`scripts/sweep-to-binance.ts`) + docs `scripts/README-SWEEP.md` & `scripts/SWEEP_SETUP.md`.
 
-**Migrations appliquées**:
+### 4. Portfolio tracking
+- Intégrations Binance & Bybit (`src/lib/exchange/binance-service.ts`, `bybit-service.ts`), calculs de performance (`TraderPerformanceSnapshot`), dashboard admin (`app/admin/_actions/get-exchanges-metrics.ts`).
 
-1. `20250806031537_initail_migration` ✅
-2. `20250813011134_org_move_to_stirpe_to_org_level` ✅
-3. `20250813021925_admin_add_admin_control_of_better_auth` ✅
-4. `20251003143237_add_mycryptopilot_models` ✅
-5. `20251010090500_add_user_plan_and_discord_fields` ✅
-6. `20251010152445_add_discord_integration_enabled` ✅
-7. `20251011170618_add_trader_invitations` ✅
-8. `20251011174405_add_follow_source_tracking` ✅
+### 5. Intégration Discord
+- Bot client (`src/lib/discord/bot-client.ts`), commandes slash (`src/lib/discord/commands/*`), rôles automatiques (`src/lib/discord/roles.ts`), déploiement Railway (`scripts/deploy-railway.sh`).
 
-**Modèles disponibles**: User, TraderProfile, Signal, Follow, CryptoAddress, CryptoPayment, Subscription
-
-**Documentation**: [`.claude/docs/DATABASE.md`](.claude/docs/DATABASE.md)
-
----
-
-### ✅ Crypto Payments (100%)
-
-**Status**: **100% FONCTIONNEL** (Backend + Frontend)
-
-**Découverte audit 11 oct**: Le système est complètement implémenté!
-
-**Backend**:
-
-- ✅ HD wallet avec ethers.js v6 + @scure/bip32
-- ✅ Dérivation Base: `deriveBaseAddress(index)` (ligne 137 address-generator.ts)
-- ✅ Dérivation Tron: `deriveTronAddress(index)` (ligne 184 address-generator.ts)
-- ✅ RPC calls Base: `checkAddressForPayments(address, "BASE")` (payment-watcher.ts)
-- ✅ RPC calls Tron: `checkAddressForPayments(address, "TRON")` (payment-watcher.ts)
-- ✅ Pro-rata automatique: `calculateDaysGranted(amount, plan)`
-
-**Frontend**:
-
-- ✅ Page checkout complète: `checkout-form.tsx` (447 lignes!)
-- ✅ QR codes avec `qrcode` library
-- ✅ Countdown timer avec `react-countdown`
-- ✅ Payment status polling (toutes les 10s)
-- ✅ Copy to clipboard
-- ✅ Responsive design
-
-**API Routes**:
-
-- ✅ `POST /api/crypto/generate-address` - Génération adresses
-- ✅ `POST /api/crypto/check-payment` - Vérification paiement (152 lignes)
-
-**Documentation**: [`.claude/docs/CRYPTO-PAYMENTS.md`](.claude/docs/CRYPTO-PAYMENTS.md)
+### 6. Tooling & opérations
+- Scripts CLI regroupés dans `scripts/` + `scripts/dev-tools/` (voir `scripts/README.md`).
+- Commandes automatisées via `.claude/commands/*.md` (env sync, audit, set up issue, TDD).
+- Workflows GitHub Actions pour lint/tests (`.github/workflows/`).
 
 ---
 
-### ✅ Subscription Management (100%)
+## ⚠️ Travaux en cours / TODO détectés
 
-**Status**: **100% FONCTIONNEL** (Issue #6 complétée)
+Extraction via `rg "TODO"` (2 nov 2025) + revue manuelle.
 
-**Composants**:
+| Domaine | Fichier | Suivi |
+|---------|---------|-------|
+| Tiering & engagement | `src/lib/cron/tier-check-job.ts` | Envoyer notifications + distribuer récompenses lors d’un changement de tier.
+| Copy-trading | `src/lib/trading/copy-trade.service.ts` | Implémenter la queue d’exécution vers les exchanges utilisateurs.
+| Paywall copy-trade | `src/components/copy-trading/copy-trade-button.tsx` | Remplacer TODO par lecture réelle du plan Better Auth.
+| Connexions exchange utilisateurs | `src/lib/trading/user-exchange-connection.service.ts` | Valider les API keys côté exchanges (stub pour l’instant) et ajuster permissions.
+| Notifications e-mail | `src/lib/mail/send-signal-notification.ts`, `src/lib/exchange/email-notifications.ts` | Préférences utilisateurs + template hebdomadaire à livrer.
+| Discord | `src/lib/discord/user-management.ts` | Gestion des salons privés par trader à brancher.
 
-- ✅ Better Auth hook: Plan FREE par défaut (auth.ts lignes 61-73)
-- ✅ Subscription manager: `activateSubscription()` (435 lignes)
-- ✅ Payment integration: Appel auto depuis payment-watcher
-- ✅ Discord roles: Assignation automatique (Free/Pro/Ultra)
-- ✅ Email confirmation: React Email + Resend
-- ✅ UI components: SubscriptionCard (200 lignes) + SubscriptionCTA (180 lignes)
-
-**Flow end-to-end**:
-
-1. User paie 49 USDC
-2. Payment détecté on-chain
-3. `activateSubscription()` appelé automatiquement
-4. User.planName = "pro", User.planExpiresAt = +30 jours
-5. Discord role "Pro Trader" assigné
-6. Email confirmation envoyé
-7. Redirect dashboard
-
-**Documentation**: [`.claude/docs/SUBSCRIPTIONS.md`](.claude/docs/SUBSCRIPTIONS.md)
+Aucun TODO restant dans `scripts/sweep-to-binance.ts` (transferts prêts). Mettre à jour `scripts/README.md` en conséquence (fait au 2 nov 2025).
 
 ---
 
-### ✅ Trading System (100%)
+## 🚀 Feuille de route recommandée
 
-**Status**: **100% FONCTIONNEL** (Issues #14, #15, #16, #17 complétées)
+### Court terme (avant ouverture beta)
+1. Terminer la validation des API keys utilisateur (sécurité). 
+2. Implémenter notifications tier-check & email hebdo pour renforcer la rétention.
+3. Brancher la queue d’exécution copy-trade et définir une stratégie d’observabilité.
+4. Ajouter un tableau de bord simple pour suivre les sweeps (monitoring transactions + erreurs).
 
-#### Profils Traders (100%)
-
-- ✅ Formulaire création/édition: `become-trader-form.tsx` (173 lignes)
-- ✅ Upload photo profil (ImageFormItem intégré)
-- ✅ Actions Server: `createTraderProfileAction`, `updateTraderProfileAction`, `toggleTraderRoleAction`
-- ✅ Validation Zod (3 schemas)
-- ✅ Page profil public: `/traders/[traderId]/page.tsx`
-- ✅ Page become-trader: `/account/become-trader` (auto-switch create/edit)
-
-#### Système Signaux (100%)
-
-- ✅ Formulaire ultra-complet: `create-signal-form.tsx` (515 lignes!)
-- ✅ Tous les champs TradingCard (entry, tps, invalidation, rationales, leverage, risk, confidence, regime)
-- ✅ **Preview temps réel** avec composant TradingCard (170 lignes)
-- ✅ Action Server: `createSignalAction` avec hash SHA256
-- ✅ Validation Zod complète (TradingCardPayloadSchema)
-- ✅ **Webhook Discord automatique** (ligne 102 signal.action.ts)
-- ✅ Format TradingCard documenté (`TRADING_CARDS.md`)
-- ✅ Page création: `/dashboard/trader/signals/new`
-- ⚠️ Feed signaux avec filtres (à faire - P1)
-- ⚠️ Pagination + infinite scroll (à faire - P1)
-
-#### Follow/Unfollow (95%)
-
-- ✅ Actions Server: `followTraderAction`, `unfollowTraderAction`
-- ✅ Vérification limites plans (Free: 1, Pro: 5, Ultra: ∞)
-- ✅ Queries: 5 fonctions dans `follow-queries.ts`
-- ✅ Bouton follow: `/traders/[traderId]/follow-button.tsx`
-- ✅ **Plan user**: Récupération du plan depuis DB implémentée (lignes 19-28 follow.action.ts)
-
-#### Dashboards (100%)
-
-- ✅ **User dashboard**: 100% connecté aux données (0 TODOs)
-- ✅ **Trader dashboard**: 100% connecté aux données (0 TODOs)
-- ✅ **Marketplace**: 100% fonctionnelle avec search/filters/pagination (0 TODOs)
-
-**Documentation**: [`.claude/docs/TRADING-SYSTEM.md`](.claude/docs/TRADING-SYSTEM.md)
+### Moyen terme
+- Journal de trading et console de risque (déjà spécifiés mais non livrés).
+- Politique de préférences notifications (email/Discord) alignée sur `send-signal-notification`.
+- Packaging referral system (`.claude/docs/future-features/REFERRAL-SYSTEM.md`) quand priorisé.
 
 ---
 
-### ✅ Discord Bot (100%)
+## 🧪 Tests & Qualité
 
-**Status**: **DÉPLOYÉ RAILWAY 24/7** (Issue #3 complétée)
-
-- ✅ 5 commandes slash: /help, /status, /upgrade, /signals, /follow
-- ✅ Système rôles automatiques (5 rôles: Free/Pro/Ultra + Admin/Moderator)
-- ✅ Webhook auto pour signaux (`notifyNewSignal` dans signal.action.ts)
-- ✅ DM notifications followers
-- ✅ Création auto channel #signals
-- ✅ Documentation complète (1229 lignes, 3 fichiers)
+- **Unitaires / integration**: 21 fichiers `__tests__` (Vitest). Commandes: `pnpm test`, `pnpm test:ci`.
+- **E2E (Playwright)**: 26 scénarios (`e2e/*.spec.ts` + utilitaires). Commandes: `pnpm test:e2e`, `pnpm test:e2e:ci`, script `scripts/run-e2e-tests.sh` pour pipeline.
+- **Setup base de tests**: `scripts/setup-test-db.sh` + `.env.test`.
+- **Couverture**: non suivie automatiquement; recommander `pnpm vitest --coverage` si besoin.
+- **Diagnostics**: `scripts/dev-tools/check-test-env.sh` (postgres, prisma, playwright) et `scripts/dev-tools/test-*.ts` pour vérifications ciblées.
 
 ---
 
-## 🚨 TODOs Réels dans le Code
+## 📚 Références rapides
+
+- Architecture complète: `.claude/CLAUDE.md`
+- Base de données & modèles: `.claude/docs/DATABASE.md`
+- Payments & sweep: `.claude/docs/CRYPTO-PAYMENTS.md`
+- Portfolio tracking: `.claude/docs/PORTFOLIO-TRACKING.md`
+- Déploiement: `.claude/docs/DEPLOYMENT.md`
+- Variables d’env: `.claude/docs/ENV-VARIABLES-MAPPING.md`
 
-**Audit complet**: 12 octobre 2025 (via `grep -r "TODO" src/ app/ scripts/`)
-
-### P0 (Bloquant MVP) - 0 items
-
-Aucun! Tout est fonctionnel. 🎉
-
-### P1 (Important) - 3 items
-
-#### 1. Variable Env Discord Signals Channel
-
-**Fichier**: `src/lib/discord/webhook.ts`
-**Ligne**: 37
-**Description**: Utilise `DISCORD_GUILD_ID` au lieu de `DISCORD_FREE_SIGNALS_CHANNEL_ID`
-**Impact**: Webhooks signaux vont dans le mauvais channel
-**Fix**: Remplacer par `env.DISCORD_FREE_SIGNALS_CHANNEL_ID`
-**Temps**: 2 min
-
-#### 2. ~~Follow Button Sans Action~~ ✅ **DONE**
-
-**Fichier**: `src/features/follow/follow-button.tsx`
-**Ligne**: 20
-**Description**: Aucun TODO réel - composant 100% fonctionnel avec mutations TanStack Query
-**Impact**: Aucun (déjà complet)
-**Status**: ✅ Vérifié - Utilise `followTraderAction` et `unfollowTraderAction` correctement
-
-#### 3. ~~Payment Status Route Legacy~~ ✅ **DONE**
-
-**Fichier**: `app/api/crypto/payment-status/[addressId]/route.ts`
-**Description**: Route legacy supprimée (commit 41bd066)
-**Status**: ✅ Deleted - Utilise `/api/crypto/check-payment` à la place
-
-### P2 (Non-critique) - 4 items
-
-#### 4-7. Sweep Script TODOs (Post-MVP)
-
-**Fichier**: `scripts/sweep-to-binance.ts`
-**Lignes**: 134, 167, 201, 229 (4 TODOs)
-**Description**: Script pour transférer fonds crypto vers wallet Binance master
-**Impact**: Aucun (feature post-MVP)
-**Action**: Implémenter Phase 6 si nécessaire pour centralisation funds
-**Temps**: 2-3 heures (post-MVP)
-
-### 📝 Résumé TODOs Code
-
-- **Total**: 7 TODOs trouvés
-- **P1 (Important)**: ~~3 items~~ → ✅ **0 items** (tous complétés!)
-- **P2 (Non-critique)**: 4 items (post-MVP sweep script)
-
----
-
-## 🎯 Roadmap MVP
-
-### ✅ Déjà Fait (99%)
-
-**6 Phases complètes**: Infrastructure, DB, Auth, Core Features, Crypto Payments, Discord Integration MVP, **Feed Signaux Avancé** - **100% DONE**
-
-Tous les systèmes opérationnels:
-
-- ✅ Profils traders
-- ✅ Création signaux
-- ✅ Follow/unfollow
-- ✅ Crypto payments (HD wallet + RPC)
-- ✅ Subscriptions (activateSubscription)
-- ✅ Discord Bot 24/7 Railway (11 commandes)
-- ✅ Dashboards 100% connectés
-- ✅ **Feed signaux avec filtres avancés** (12 filtres, pagination, URL state)
-- ✅ 16 pages opérationnelles
-- ✅ 171 tests unitaires passing (+26 nouveaux)
-- ✅ 15 tests E2E passing
-
-### ✅ MVP 100% COMPLETE!
-
-#### Phase 1: Code Cleanup - ✅ **COMPLETED!**
-
-**P1 - TODOs Critiques** - ✅ **TOUS COMPLÉTÉS**:
-1. ~~Fix `webhook.ts:37`~~ - ✅ **DONE** (commit 41bd066)
-2. ~~Fix `follow-button.tsx:20`~~ - ✅ **DONE** (déjà fonctionnel, aucun TODO réel)
-3. ~~Decide `payment-status` route~~ - ✅ **DONE** (deleted, commit 41bd066)
-
-#### Phase 2: Features MVP - ✅ **COMPLETED!**
-
-**P1 - Feed Signaux** - ✅ **DONE** (PR #40, 13 oct 2025):
-- ✅ Filtres: asset, bias, status, trader, verified
-- ✅ Multi-symboles avec suggestions populaires
-- ✅ Cursor-based pagination
-- ✅ URL state management
-- ✅ 26 tests unitaires passing
-
-**P1 - Tests E2E Coverage** (optionnel):
-- Tests unitaires: 26 nouveaux tests (signals feed)
-- Tests E2E: Skipped (complexité imports ES modules)
-- Coverage: Suffisant avec tests unitaires complets
-
-**Total Restant MVP**: **✅ 0 heures - MVP 100% COMPLETE!** 🎯🚀
-
----
-
-## 📋 Issues GitHub
-
-### Issues Fermées (15 issues)
-
-Toutes fermées le 10 octobre 2025:
-
-1. ✅ #1: Branding MyCryptoPilot
-2. ✅ #2: Structure DB initiale
-3. ✅ #3: Discord Bot Foundation
-4. ✅ #4: Génération Adresses Crypto
-5. ✅ #5: Watcher On-Chain
-6. ✅ #6: Gestion Abonnements
-7. ✅ #7: Notifications Paiement
-8. ✅ #10: Génération Trading Cards
-9. ✅ #13: Migrations Prisma (BLOCAGE CRITIQUE résolu!)
-10. ✅ #14: Profils Traders
-11. ✅ #15: Système Signaux
-12. ✅ #16: Follow/Unfollow
-13. ✅ #17: Connexion Dashboards
-14. ✅ #25: Profils Traders (duplicate #14)
-15. ✅ #31: UI Checkout Crypto
-
-### Issues Ouvertes (3 issues)
-
-1. **#8**: Ingestion Données Marché (Phase 5 - Advanced)
-2. **#9**: Détection de Signaux (Phase 5 - Advanced)
-3. **#34**: UI Checkout Page (Duplicate #31? À vérifier)
-
-**Note**: Issue #34 pourrait être un duplicate de #31 (fermée). À clarifier avec user.
-
----
-
-## 🔧 Commandes Utiles
-
-### Development
-
-```bash
-# Start dev server
-pnpm dev
-
-# Build production
-pnpm build
-
-# Type checking
-pnpm ts
-
-# Lint
-pnpm lint
-
-# Format
-pnpm format
-
-# Clean (lint + ts + format)
-pnpm clean
-```
-
-### Database
-
-```bash
-# Check migration status
-npx prisma migrate status
-
-# Apply migrations
-npx prisma migrate deploy
-
-# Create new migration
-npx prisma migrate dev --name descriptive_name
-
-# Generate Prisma client
-npx prisma generate
-
-# Seed database
-pnpm prisma:seed
-
-# Prisma Studio (DB GUI)
-npx prisma studio
-```
-
-### Testing
-
-```bash
-# Unit tests (Vitest)
-pnpm test:ci
-
-# E2E tests (Playwright)
-pnpm test:e2e:ci
-```
-
-### Discord Bot
-
-```bash
-# Start Discord bot (local)
-cd discord-bot
-pnpm start
-
-# Deploy to Railway (production)
-git push railway main
-```
-
----
-
-## 📝 Notes Techniques
-
-### Performance
-
-- ✅ Prisma indexes optimisés (Signal, Follow, CryptoAddress, CryptoPayment)
-- ✅ Parallel RPC calls (Base + Tron simultanés)
-- ✅ Polling interval optimisé (10s balance perf/UX)
-- ✅ Server components par défaut (React 18)
-- ✅ Turbopack pour dev server (fast refresh)
-
-### Security
-
-- ✅ XPUB uniquement (no private keys in code)
-- ✅ HD wallet dérivation séquentielle
-- ✅ 15min expiration adresses crypto
-- ✅ Confirmations requises (1 Base, 2 Tron)
-- ✅ Idempotency checks (txHash unique)
-- ✅ Better Auth avec sessions sécurisées
-
-### Code Quality
-
-- ✅ TypeScript strict mode
-- ✅ ESLint configured
-- ✅ Prettier formatting
-- ✅ 0 TypeScript errors
-- ✅ Zod validation everywhere
-- ✅ Server actions pattern (safe-actions)
-
----
-
-## 🚀 Prochaines Étapes Post-MVP
-
-### Phase 5: Advanced Features (Après MVP)
-
-1. **Trading Journal**
-   - CRUD opérations (create, read, update, delete trades)
-   - Import CSV (Binance, ByBit, OKX)
-   - Analytics dashboards (P&L, winrate, sharpe ratio)
-   - Modèle DB: `TradingJournal`
-
-2. **Console de Risque**
-   - Position sizing calculator
-   - Risk/reward calculator
-   - Portfolio risk analyzer
-   - Kelly criterion
-   - Modèle DB: `RiskCalculation`
-
-3. **Alertes Custom**
-   - Price alerts (email + Discord DM)
-   - Signal alerts (filtered by asset/bias/trader)
-   - Subscription expiration reminders
-   - Webhook integrations (TradingView, etc.)
-
-4. **Mobile App**
-   - React Native (Expo)
-   - Push notifications
-   - Trading on-the-go
-   - Crypto wallet integration (MetaMask mobile)
-
-5. **AI Features**
-   - Signal suggestions (AI-generated)
-   - Sentiment analysis (social media scraping)
-   - Auto-trading (copy-trading automation)
-   - ML models pour winrate prediction
-
----
-
-## 📚 Documentation Disponible
-
-**Core Docs**:
-
-- [`.claude/CLAUDE.md`](.claude/CLAUDE.md) - Instructions principales (core)
-- [`.claude/docs/DATABASE.md`](.claude/docs/DATABASE.md) - Schémas Prisma + migrations
-- [`.claude/docs/CRYPTO-PAYMENTS.md`](.claude/docs/CRYPTO-PAYMENTS.md) - HD wallet + RPC + checkout UI
-- [`.claude/docs/SUBSCRIPTIONS.md`](.claude/docs/SUBSCRIPTIONS.md) - Subscription manager + Better Auth hook
-- [`.claude/docs/TRADING-SYSTEM.md`](.claude/docs/TRADING-SYSTEM.md) - Traders + Signals + Follow
-- [`.claude/docs/DEVELOPMENT.md`](.claude/docs/DEVELOPMENT.md) - Ce fichier (état actuel + roadmap)
-
-**Technical Docs**:
-
-- `docs/TRADING_CARDS.md` - Format TradingCard JSON
-- `docs/XPUB_GENERATION.md` - Guide génération XPUB keys
-- `docs/testing-guide.md` - Guide tests E2E Playwright
-
-**Project Docs**:
-
-- `README.md` - Project overview
-- `CONTRIBUTING.md` - Contribution guidelines
-- `CHANGELOG.md` - Version history
-
----
-
-## 🎉 Conclusion
-
-Le projet MyCryptoPilot est à **97% complet** pour le MVP! 🚀
-
-**Ce qui a été découvert lors de l'audit du 11 octobre**:
-
-- ✅ Le système de paiement crypto est **100% fonctionnel** (HD wallet + RPC calls + checkout UI complet)
-- ✅ Les dashboards sont **100% connectés** aux données Prisma (0 TODOs!)
-- ✅ Le parcours trader → signal → Discord est **entièrement implémenté**
-- ✅ Le système d'abonnement est **production-ready**
-
-**Seuls 3% restants** (TODOs minimaux):
-
-- 2 TODOs plan user (30 min)
-- 11 boutons cassés (1-2h)
-- Feed signaux avec filtres (1-2j)
-- Tests E2E (2-3j)
-
-**MVP fonctionnel dans 4-6 jours!** 🎯

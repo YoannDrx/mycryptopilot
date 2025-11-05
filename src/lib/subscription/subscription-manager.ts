@@ -7,6 +7,7 @@ import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
 import { awardUpgradeBonus } from "@/lib/referral/invitation-tracking-service";
+import { revalidatePath } from "next/cache";
 
 /**
  * Subscription Manager
@@ -138,6 +139,9 @@ export async function activateSubscription(
     });
 
     logger.info("User plan updated", { userId, plan, periodEnd });
+
+    // 3.1 Invalider le cache Next.js pour forcer le rafraîchissement
+    revalidatePath("/", "layout");
 
     // 4. Upsert Subscription dans l'Organization
     await prisma.subscription.upsert({

@@ -4,6 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Typography } from "../../components/nowts/typography";
 
+const HERO_HIGHLIGHTS = [
+  "Free Risk Console Demo",
+  "Binance/Bybit On-Chain Verified",
+  "Crypto Pro-Rata Payments",
+];
+
 export const Hero = () => {
   return (
     <div className="relative isolate flex flex-col">
@@ -11,42 +17,56 @@ export const Hero = () => {
       <GradientBackground />
       <main className="relative py-24 sm:py-32 lg:pb-40">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
+          <div className="mx-auto max-w-3xl text-center">
             <Typography
               variant="h1"
-              className="text-5xl font-semibold tracking-tight text-balance sm:text-7xl lg:text-7xl"
+              className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl"
             >
-              Crypto Trading Signals{" "}
+              Stop getting liquidated. Manage risk like a pro with{" "}
               <span className="relative inline-block">
-                <span>Risk-First</span>
-                <CircleSvg className="fill-primary absolute inset-0" />
+                <span>verified proof</span>
+                <CircleSvg className="fill-primary absolute inset-0 opacity-40" />
               </span>
             </Typography>
             <Typography
               variant="large"
               className="text-muted-foreground mt-8 text-lg font-medium text-pretty sm:text-xl/8"
             >
-              Follow verified traders, receive real-time signals and trade smart
-              with a risk-first approach. From 5 free signals to unlimited
-              access.
+              Risk console automated (2% rule), Binance/Bybit verified traders,
+              real-time analytics—your 360° risk-first ecosystem to trade with
+              confidence.
             </Typography>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+              {HERO_HIGHLIGHTS.map((highlight) => (
+                <span
+                  key={highlight}
+                  className="border-border bg-background/80 text-muted-foreground rounded-full border px-4 py-1 text-sm font-medium shadow-sm backdrop-blur"
+                >
+                  {highlight}
+                </span>
+              ))}
+            </div>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-x-6">
               <Link
-                href="/signin"
+                href="/auth/signup"
                 className={buttonVariants({ size: "lg", variant: "default" })}
               >
-                Get started
+                Sign Up
               </Link>
               <Link
-                href="#pricing"
-                className={buttonVariants({ size: "lg", variant: "link" })}
+                href="#ecosystem"
+                className={buttonVariants({ size: "lg", variant: "ghost" })}
               >
-                Learn more <span aria-hidden="true">→</span>
+                Explore 360° Ecosystem <span aria-hidden="true">→</span>
               </Link>
             </div>
+            <p className="text-muted-foreground/80 mt-5 text-sm">
+              No credit card needed. Upgrade anytime with USDC (Base) or USDT
+              (Tron).
+            </p>
           </div>
           <Image
-            alt="MyCryptoPilot Trader Marketplace"
+            alt="Preview of MyCryptoPilot trader marketplace with verified stats"
             src="/images/trader-marketplace.png"
             width={1280}
             height={720}

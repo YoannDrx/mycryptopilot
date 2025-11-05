@@ -14,7 +14,15 @@ import {
   handleAdminAssignRole,
   handleAdminTestSignal,
   handleAdminTestWelcome,
+  handleAdminEnsureTraderChannel,
+  handleAdminNotify,
+  handleAdminConfig,
 } from "./admin-commands";
+import { handleLinkCommand } from "./link";
+import { handlePricingCommand } from "./pricing";
+import { handleSupportCommand } from "./support";
+import { handleRiskCommand } from "./risk";
+import { handleUnfollowCommand } from "./unfollow";
 
 /**
  * Gestionnaire principal des commandes Discord
@@ -50,6 +58,26 @@ export async function handleCommand(
         await handleFollowCommand(interaction);
         break;
 
+      case "unfollow":
+        await handleUnfollowCommand(interaction);
+        break;
+
+      case "link":
+        await handleLinkCommand(interaction);
+        break;
+
+      case "pricing":
+        await handlePricingCommand(interaction);
+        break;
+
+      case "support":
+        await handleSupportCommand(interaction);
+        break;
+
+      case "risk":
+        await handleRiskCommand(interaction);
+        break;
+
       // ========================================================================
       // COMMANDES ADMIN
       // ========================================================================
@@ -80,6 +108,18 @@ export async function handleCommand(
 
       case "admin-test-welcome":
         await handleAdminTestWelcome(interaction);
+        break;
+
+      case "admin-trader-channel":
+        await handleAdminEnsureTraderChannel(interaction);
+        break;
+
+      case "admin-notify":
+        await handleAdminNotify(interaction);
+        break;
+
+      case "admin-config":
+        await handleAdminConfig(interaction);
         break;
 
       default:

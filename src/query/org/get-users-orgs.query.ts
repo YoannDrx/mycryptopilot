@@ -1,10 +1,6 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { listOrganizationsApi } from "@/lib/auth/auth-api-helper";
 
 export async function getUsersOrgs() {
-  const userOrganizations = await auth.api.listOrganizations({
-    headers: await headers(),
-  });
-
+  const userOrganizations = await listOrganizationsApi();
   return userOrganizations;
 }

@@ -24,8 +24,11 @@ export const SignalsFeed = async ({ userId }: SignalsFeedProps) => {
     select: { planName: true },
   });
 
-  const planLimits = getPlanLimits(user?.planName as MyCryptoPilotPlanName | null | undefined);
+  const planLimits = getPlanLimits(
+    user?.planName as MyCryptoPilotPlanName | null | undefined,
+  );
   const activeSignalsLimit = planLimits.activeSignalsLimit;
+  const userPlan = user?.planName ?? null;
 
   const signals = await getSignalsFromFollowedTraders(userId, {
     limit: 20,
@@ -73,6 +76,7 @@ export const SignalsFeed = async ({ userId }: SignalsFeedProps) => {
           return (
             <BlurredSignalCard
               key={signal.id}
+              signalId={signal.id}
               symbol={signal.symbol}
               payload={signal.payloadJson as TradingCardPayloadType}
               traderId={signal.traderId}
@@ -80,6 +84,8 @@ export const SignalsFeed = async ({ userId }: SignalsFeedProps) => {
               createdAt={signal.createdAt}
               expiresAt={signal.expiresAt}
               isBlurred={isBlurred}
+              userPlan={userPlan}
+              showCopyButton={!isBlurred} // Only show copy button for non-blurred signals
             />
           );
         })}

@@ -1,36 +1,76 @@
 /* eslint-disable no-console */
-import { prisma } from "../src/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { activateSubscription } from "@/lib/subscription/subscription-manager";
+import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 
-async function main() {
-  const email = "yoann.andrieux@gmail.com";
+const PLAN: MyCryptoPilotPlanName = "ultra";
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true, email: true, planName: true },
-  });
+async function upgrade(plan: MyCryptoPilotPlanName) {
+  const [, , emailArg, daysArg] = process.argv;
 
-  if (!user) {
-    console.error(`User not found: ${email}`);
+  if (!emailArg) {
+    console.error(
+      "Usage: pnpm tsx scripts/upgrade-to-ultra.ts <user-email> [daysGranted=30]",
+    );
     process.exit(1);
   }
 
-  console.log("Current user:", user);
+  // daysArg can be undefined at runtime despite ESLint thinking otherwise
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const daysGranted = Number.parseInt(daysArg ?? "30", 10);
+  if (Number.isNaN(daysGranted) || daysGranted <= 0) {
+    console.error("`daysGranted` must be a positive integer (default 30).");
+    process.exit(1);
+  }
 
-  // Update to ULTRA plan (expires in 90 days)
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 90);
+  console.log(`🔎 Searching user by email: ${emailArg}`);
 
-  const updated = await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      planName: "ultra",
-      planExpiresAt: expiresAt,
+  const user = await prisma.user.findUnique({
+    where: { email: emailArg },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      planName: true,
+      planExpiresAt: true,
     },
   });
 
-  console.log("\n✅ User upgraded to ULTRA!");
-  console.log("New plan:", updated.planName);
-  console.log("Expires:", updated.planExpiresAt?.toISOString());
+  if (!user) {
+    console.error(`User not found: ${emailArg}`);
+    process.exit(1);
+  }
+
+  console.log("👤 Current plan:", {
+    planName: user.planName,
+    planExpiresAt: user.planExpiresAt?.toISOString() ?? null,
+  });
+
+  const result = await activateSubscription({
+    userId: user.id,
+    plan,
+    daysGranted,
+    source: "admin",
+  });
+
+  if (!result.success) {
+    console.error("❌ Upgrade failed:", result.error ?? "Unknown error");
+    process.exit(1);
+  }
+
+  console.log("✅ Subscription upgraded!", {
+    userId: user.id,
+    email: user.email,
+    plan,
+    periodEnd: result.periodEnd?.toISOString() ?? null,
+  });
 }
 
-void main();
+upgrade(PLAN)
+  .catch((error) => {
+    console.error("❌ Unexpected error while upgrading plan:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

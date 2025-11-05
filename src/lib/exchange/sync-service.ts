@@ -177,8 +177,32 @@ export async function syncConnectionTrades(
       },
     });
 
-    // 7. Recalculate performance metrics for all periods
+    // 7. Aggregate new fills into TraderTrade positions
     if (importedCount > 0) {
+      logger.info("Aggregating new fills into trading positions", {
+        connectionId: connection.id,
+        traderProfileId: connection.traderProfileId,
+        newFills: importedCount,
+      });
+
+      // Import aggregation service
+      const { aggregateTraderFills } = await import(
+        "@/lib/trading/fill-aggregation.service"
+      );
+
+      // Aggregate all unassigned fills for this trader
+      const aggregationResult = await aggregateTraderFills(
+        connection.traderProfileId,
+      );
+
+      logger.info("Fill aggregation completed", {
+        connectionId: connection.id,
+        traderProfileId: connection.traderProfileId,
+        fillsProcessed: aggregationResult.fillsProcessed,
+        sessionsCreated: aggregationResult.sessionsCreated,
+      });
+
+      // Recalculate performance metrics based on TraderTrades
       logger.info("Recalculating performance snapshots", {
         connectionId: connection.id,
         traderProfileId: connection.traderProfileId,

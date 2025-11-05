@@ -22,7 +22,39 @@
 
 ## Vue d'ensemble
 
-### Objectif
+### 📌 Important: Deux Systèmes de Connexion Exchange
+
+**1. ExchangeConnection (TRADERS - READ ONLY)**:
+- **Usage**: Traders connectent leurs exchanges pour **sync automatique** des trades
+- **Permissions**: **READ-ONLY** uniquement (pas de trading, pas de withdrawals)
+- **Objectif**: Vérification des stats publiques + badge "Verified"
+- **Sécurité**: AES-256-GCM encryption, validation read-only stricte
+- **Modèle DB**: `ExchangeConnection` (ce document)
+
+**2. UserExchangeConnection (USERS - WRITE/COPY)**:
+- **Usage**: Users connectent leurs exchanges pour **copy trading automatique**
+- **Permissions**: **WRITE** (exécution d'ordres automatique en mode AUTO)
+- **Modes**:
+  - **MANUAL**: Journal personnel (pas d'exécution)
+  - **AUTO**: Exécution automatique via API (nécessite write permissions)
+- **Objectif**: Répliquer les trades des traders suivis
+- **Sécurité**: Même encryption + circuit breakers (max position size, daily limits)
+- **Modèle DB**: `UserExchangeConnection` (voir `.claude/docs/TRADING-SYSTEM.md`)
+
+**Différences clés**:
+
+| Feature | ExchangeConnection (Traders) | UserExchangeConnection (Users) |
+|---------|------------------------------|--------------------------------|
+| **Permissions** | READ-ONLY ✅ | READ + WRITE ⚠️ |
+| **Objectif** | Vérification stats | Copy trading |
+| **Sync** | Auto (cron 5min) | Manuel + Auto execution |
+| **Badge** | Verified badge | N/A |
+| **Circuit Breakers** | N/A | Max size, daily limits |
+| **Plan Gating** | FREE=0, PRO=1, ULTRA=3 | TBD |
+
+---
+
+### Objectif - ExchangeConnection (ce document)
 
 Permettre aux traders de connecter leurs comptes Binance en **read-only** pour sync automatique des trades et affichage de stats vérifiées publiques.
 

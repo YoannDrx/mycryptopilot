@@ -24,13 +24,13 @@ export const TradingCardPayloadSchema = z.object({
     .positive("Invalidation level must be positive")
     .finite("Invalidation level must be finite"),
 
-  // Take profits (array of numbers)
+  // Take profits (array of prices)
   tps: z
     .array(
       z
         .number()
-        .positive("Take profit must be positive")
-        .finite("Take profit must be finite"),
+        .positive("Take profit price must be positive")
+        .finite("Take profit price must be finite"),
     )
     .min(1, "At least one take profit is required")
     .max(5, "Maximum 5 take profits allowed"),

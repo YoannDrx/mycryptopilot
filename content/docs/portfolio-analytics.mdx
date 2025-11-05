@@ -1,0 +1,76 @@
+---
+title: "Portfolio Analytics"
+description: "Understand verified performance metrics, exchange syncs, and analytics dashboards for MyCryptoPilot traders"
+keywords: ["portfolio", "analytics", "binance", "bybit", "performance", "stats"]
+tags: ["traders", "analytics"]
+order: 6
+subcategory: "Features"
+---
+
+# Portfolio Analytics & Verified Stats
+
+MyCryptoPilot gives verified traders professional tooling to prove their edge and monitor performance in real time. This guide explains how exchange connections, sync cadences, and analytics dashboards work together.
+
+## Prerequisites
+
+- **Plan**: Pro (1 exchange) or Ultra (3 exchanges). Free accounts cannot sync data.
+- **Exchange support**: Binance Spot/Perp and Bybit Spot/USDT Perp via read-only API keys.
+- **Trader profile**: You must be approved as a trader and signed into your organization.
+
+## Connect Read-Only API Keys
+
+1. Navigate to **Account → Exchanges** (`app/orgs/[orgSlug]/(navigation)/(account)/account/exchanges/page.tsx`).
+2. Click **Connect New Exchange** and choose Binance or Bybit.
+3. Paste your API key/secret (encryption handled with AES-256-GCM).
+4. Save. The connection status shows last sync, next sync, and any error details.
+
+> **Plan limits** – Pro syncs every 5 minutes, Ultra every 1 minute. You can pause or delete connections at any time.
+
+## What Gets Synced
+
+- **Trade fills** (quantity, price, fees, PnL)
+- **Position events** (entry/exit, leverage)
+- **Performance snapshots** compiled by period (day, week, month, all time)
+
+Idempotent order IDs prevent duplicates, and failed syncs surface descriptive errors. All data stays read-only; MyCryptoPilot never holds trading permissions.
+
+## Analytics Dashboard
+
+Open **Trading → Portfolio** (`app/orgs/[orgSlug]/(navigation)/(trading)/portfolio/page.tsx`) to view:
+
+### Key Metrics
+
+- Total portfolio value and cumulative PnL
+- Win rate with badge scoring
+- Sharpe & Sortino ratios (risk-adjusted performance)
+- PnL trend vs last period
+
+### Risk Insights
+
+- Maximum drawdown
+- Value at Risk (95%)
+- Loss distribution, volatility, and downside deviation
+
+### Visualizations
+
+- **Performance chart** – Equity curve with selectable time frames
+- **Returns distribution** – Histogram of daily returns
+- **Trade history** – Filterable table of synced fills with execution timestamps
+
+### Gated Views for Followers
+
+Followers on the Free plan see win rate previews only. Upgraded subscribers unlock the full stats set, helping you convert engaged followers into paying customers.
+
+## Troubleshooting
+
+- **Sync errors**: Hover the alert in the connection list to read the latest message. Common causes include expired API keys or revoked permissions.
+- **No data**: Confirm your exchange account has recent trades within the past 30 days. Initial sync can take a few minutes depending on history.
+- **Plan downgrade**: If you revert to Free, syncs pause and analytics hide until you upgrade again.
+
+## Related Guides
+
+- [Binance API Setup Guide](/docs/binance-setup)
+- [Bybit API Setup Guide](/docs/bybit-setup)
+- [For Traders: Complete Guide](/docs/for-traders)
+
+Stay tuned for additional analytics exports and alerting as we expand the unified trading system.

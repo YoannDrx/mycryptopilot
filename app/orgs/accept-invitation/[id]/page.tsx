@@ -8,10 +8,10 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/features/page/layout";
-import { auth, SocialProviders } from "@/lib/auth";
+import { SocialProviders } from "@/lib/auth";
+import { acceptInvitationApi } from "@/lib/auth/auth-api-helper";
 import { getUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignInProviders } from "../../../auth/signin/sign-in-providers";
 
@@ -67,12 +67,7 @@ export default async function RoutePage(
               formAction={async () => {
                 "use server";
 
-                await auth.api.acceptInvitation({
-                  body: {
-                    invitationId: params.id,
-                  },
-                  headers: await headers(),
-                });
+                await acceptInvitationApi(params.id);
 
                 redirect(`/orgs/${invitation?.organization.slug}`);
               }}
