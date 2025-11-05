@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getOrgOrStub } from "@/lib/react/org-cache-dual";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -26,63 +25,61 @@ export const metadata: Metadata = {
 };
 
 export default async function AccountPage() {
-  const org = await getOrgOrStub();
-
   const accountSections = [
     {
       title: "Profile Settings",
       description: "Update your personal information and profile picture",
       icon: User,
-      href: `/orgs/${org.slug}/account/(settings)/profile`,
+      href: "/account/(settings)/profile",
     },
     {
       title: "Discord Connection",
       description: "Link your Discord account to receive real-time signals",
       icon: MessageCircle,
-      href: `/orgs/${org.slug}/account/discord`,
+      href: "/account/discord",
     },
     {
       title: "Email Preferences",
       description: "Manage your email notifications and preferences",
       icon: Mail,
-      href: `/orgs/${org.slug}/account/email`,
+      href: "/account/email",
     },
     {
       title: "Following",
       description: "Manage the traders you follow",
       icon: Users,
-      href: `/orgs/${org.slug}/account/following`,
+      href: "/account/following",
     },
     {
       title: "Become a Trader",
       description: "Start sharing your trading signals with the community",
       icon: TrendingUp,
-      href: `/orgs/${org.slug}/account/become-trader`,
+      href: "/account/become-trader",
     },
     {
       title: "Exchange Connections",
       description:
         "Connect your Binance or Bybit accounts for portfolio tracking",
       icon: CreditCard,
-      href: `/orgs/${org.slug}/account/exchanges`,
+      href: "/account/exchanges",
     },
     {
       title: "Payment History",
       description: "View your crypto payment history and subscriptions",
       icon: CreditCard,
-      href: `/orgs/${org.slug}/account/payments`,
+      href: "/account/payments",
     },
     {
       title: "Password & Security",
       description: "Change your password and manage account security",
       icon: Shield,
-      href: `/orgs/${org.slug}/account/change-password`,
+      href: "/account/change-password",
     },
     {
       title: "Danger Zone",
       description: "Delete your account or perform critical actions",
       icon: Settings,
-      href: `/orgs/${org.slug}/account/danger`,
+      href: "/account/danger",
     },
   ];
 
