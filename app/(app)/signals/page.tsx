@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getOrgOrStub } from "@/lib/react/org-cache-dual";
 import { getSignalsFeed } from "@/features/signal/signal-queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,7 +25,6 @@ type SignalsPageProps = {
 };
 
 export default async function SignalsPage({ searchParams }: SignalsPageProps) {
-  const org = await getOrgOrStub();
   const params = await searchParams;
 
   // Parse filters for count
@@ -79,10 +77,7 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <SignalsFilters
-            orgSlug={org.slug}
-            totalSignals={countSignals.length}
-          />
+          <SignalsFilters totalSignals={countSignals.length} />
         </CardContent>
       </Card>
 
@@ -101,7 +96,7 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
           </div>
         }
       >
-        <SignalsFeed orgSlug={org.slug} searchParams={params} />
+        <SignalsFeed searchParams={params} />
       </Suspense>
     </div>
   );
