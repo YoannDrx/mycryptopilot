@@ -3,8 +3,8 @@
 **Issue** : [#77](https://github.com/YoannDrx/mycryptopilot/issues/77)
 **Branche** : `feature/remove-organizations`
 **Date début** : 5 janvier 2025
-**Statut global** : 🟡 En cours - Phase 4 (Auth & Middleware)
-**Phases complètes** : 0, 1, 2, 3 ✅
+**Statut global** : 🟡 En cours - Phase 5 (UI Progressive)
+**Phases complètes** : 0, 1, 2, 3, 4 ✅
 
 ---
 
@@ -16,7 +16,7 @@
 | 1. Structures | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | d7e3906 |
 | 2. Migration données | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | fb8d321 |
 | 3. Services | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | c18194d, 05877f1 |
-| 4. Auth | ⚪ À faire | - | - | - | - |
+| 4. Auth & Middleware | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | 6d48bbe |
 | 5. UI progressive | ⚪ À faire | - | - | - | - |
 | 6. Tests | ⚪ À faire | - | - | - | - |
 | 7. Bascule prod | ⚪ À faire | - | - | - | - |
@@ -278,27 +278,96 @@
 
 ---
 
-## Phase 4 : Auth & Middleware (Preview)
+## Phase 4 : Auth & Middleware ✅ COMPLETE
 
-**Date début prévue** : 2025-01-22
-**Durée estimée** : 3-4 jours
+**Date début** : 2025-01-08
+**Date fin** : 2025-01-08
+**Durée réelle** : 1 jour
 
-### Fichiers à Adapter
+### Fichiers Adaptés
 
-- [ ] `src/lib/auth.ts`
-  - Hook `user.create.after` dual-mode
-  - Plugin `organization()` conditionnel (si flag OFF)
+- [x] `src/lib/auth.ts`
+  - Hook `user.create.after` dual-mode ✅
+  - Mode nouveau (flag ON): Crée UserSubscription directement
+  - Mode legacy (flag OFF): Crée Organization via createOrganizationApi
+  - Plugin `organization()` conditionnel (spread operator) ✅
+  - Plugin uniquement chargé si flag OFF
 
-- [ ] `middleware.ts`
-  - Redirections 307 : `/orgs/{slug}/*` → nouvelles routes
-  - Auth validation simplifiée (si flag ON)
+- [x] `middleware.ts`
+  - Dual-mode complet ✅
+  - Mode nouveau: Redirections 307 + auth simple (pas d'org switching)
+  - Mode legacy: Organisation switching complet (comportement actuel)
+  - Root redirect + admin protection communs
+
+- [x] `src/lib/auth/middleware-utils.ts`
+  - Nouvelle fonction `handleLegacyOrgRedirect()` ✅
+  - Détecte `/orgs/{slug}/*` et redirige vers `/*` (307 Temporary)
+  - Preserve query params
+  - Logs détaillés pour monitoring
+  - Actif uniquement si USER_ACCOUNT_MODE && LEGACY_ORG_REDIRECTS
+
+### Tests Phase 4
+
+- [x] TypeScript validation : ✅ Passe sans erreur
+- [x] ESLint validation : ✅ Passe sans warning
+- [x] Build check : ✅ Production build successful (72 routes)
+- [x] Backward compatibility : ✅ Mode legacy intact (organization switching fonctionne)
 
 ### Checkpoint Phase 4
 
-- [ ] Auth fonctionne dual-mode
-- [ ] Signup crée UserSubscription (si flag ON)
-- [ ] Redirections 307 testées
-- [ ] Middleware simplifié
+- [x] Auth fonctionne dual-mode ✅
+- [x] Signup crée UserSubscription (si flag ON) ✅
+- [x] Signup crée Organization (si flag OFF) ✅
+- [x] Redirections 307 implémentées ✅
+- [x] Middleware dual-mode ✅
+
+### Métriques Phase 4
+
+- **Fichiers modifiés** : 3
+- **LOC ajoutées** : +185 (logique dual-mode + redirections)
+- **LOC supprimées** : -69 (simplification conditions)
+- **Net** : +116 lignes
+
+**Commits** :
+- `6d48bbe` - Phase 4: Auth & Middleware Dual-Mode
+
+### Détails Techniques
+
+**Auth Hook Changes** :
+```typescript
+// Mode nouveau (ligne 124-147)
+if (FEATURES.USER_ACCOUNT_MODE) {
+  await prisma.userSubscription.create({
+    data: { userId, plan: "free", status: "active", periodEnd: null }
+  });
+}
+
+// Mode legacy (ligne 148-184) - Création Organization avec retry
+else {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    await createOrganizationApi({ name: "Account", slug: generateSlug(userId) });
+  }
+}
+```
+
+**Plugin Conditionnel** :
+```typescript
+plugins: [
+  ...(FEATURES.USER_ACCOUNT_MODE ? [] : [organization({ ... })]),
+  // Autres plugins...
+]
+```
+
+**Middleware Redirection** :
+```typescript
+if (FEATURES.USER_ACCOUNT_MODE) {
+  const legacyRedirect = handleLegacyOrgRedirect(request);
+  if (legacyRedirect) return legacyRedirect; // 307 redirect
+  return NextResponse.next(); // Pas d'org switching
+} else {
+  // Legacy: Organization switching logic complète
+}
+```
 
 ---
 
