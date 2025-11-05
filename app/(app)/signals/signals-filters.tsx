@@ -16,7 +16,6 @@ import { X, Filter } from "lucide-react";
 import { useState } from "react";
 
 type SignalsFiltersProps = {
-  orgSlug: string;
   totalSignals: number;
 };
 
@@ -31,7 +30,7 @@ const POPULAR_SYMBOLS = [
   "DOT-USDT",
 ];
 
-export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFiltersProps) {
+export function SignalsFilters({ totalSignals }: SignalsFiltersProps) {
   const [filters, setFilters] = useQueryStates({
     symbols: parseAsArrayOf(parseAsString),
     bias: parseAsString,
@@ -90,7 +89,7 @@ export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFilte
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Filter className="size-4 text-muted-foreground" />
+          <Filter className="text-muted-foreground size-4" />
           <h3 className="font-semibold">Filters</h3>
           {activeFiltersCount > 0 && (
             <Badge variant="secondary">{activeFiltersCount}</Badge>
@@ -98,7 +97,12 @@ export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFilte
         </div>
 
         {activeFiltersCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-8"
+          >
             Clear all
           </Button>
         )}
@@ -151,7 +155,9 @@ export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFilte
           <Select
             value={filters.instrumentType ?? "all"}
             onValueChange={(value) =>
-              void setFilters({ instrumentType: value === "all" ? null : value })
+              void setFilters({
+                instrumentType: value === "all" ? null : value,
+              })
             }
           >
             <SelectTrigger id="instrumentType">
@@ -184,7 +190,9 @@ export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFilte
           <Select
             value={filters.verifiedOnly ?? "false"}
             onValueChange={(value) =>
-              void setFilters({ verifiedOnly: value === "true" ? "true" : null })
+              void setFilters({
+                verifiedOnly: value === "true" ? "true" : null,
+              })
             }
           >
             <SelectTrigger id="verifiedOnly">
@@ -242,7 +250,7 @@ export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFilte
                 {symbol}
                 <button
                   onClick={() => removeSymbol(symbol)}
-                  className="ml-1 hover:bg-muted-foreground/20 rounded-full"
+                  className="hover:bg-muted-foreground/20 ml-1 rounded-full"
                 >
                   <X className="size-3" />
                 </button>
@@ -253,7 +261,7 @@ export function SignalsFilters({ orgSlug: _orgSlug, totalSignals }: SignalsFilte
       </div>
 
       {/* Results count */}
-      <div className="pt-3 border-t text-sm text-muted-foreground">
+      <div className="text-muted-foreground border-t pt-3 text-sm">
         {totalSignals} signal{totalSignals !== 1 ? "s" : ""} found
       </div>
     </div>

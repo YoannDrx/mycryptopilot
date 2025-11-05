@@ -13,7 +13,6 @@ import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 type SignalsFeedProps = {
-  orgSlug: string;
   searchParams: {
     symbols?: string | string[];
     bias?: string;
@@ -25,9 +24,7 @@ type SignalsFeedProps = {
   };
 };
 
-export const SignalsFeed = async ({
-  searchParams,
-}: SignalsFeedProps) => {
+export const SignalsFeed = async ({ searchParams }: SignalsFeedProps) => {
   // Parse filters from URL
   const symbols = Array.isArray(searchParams.symbols)
     ? searchParams.symbols
@@ -54,7 +51,11 @@ export const SignalsFeed = async ({
   const verifiedOnly = searchParams.verifiedOnly === "true";
 
   // Fetch signals with advanced filters
-  const { items: signals, hasNextPage, nextCursor } = await getSignalsFeed({
+  const {
+    items: signals,
+    hasNextPage,
+    nextCursor,
+  } = await getSignalsFeed({
     symbols,
     bias,
     status,
@@ -74,7 +75,11 @@ export const SignalsFeed = async ({
             No Signals Found
           </CardTitle>
           <CardDescription>
-            {symbols || bias || searchParams.traderName || status || instrumentType
+            {symbols ||
+            bias ||
+            searchParams.traderName ||
+            status ||
+            instrumentType
               ? "Try adjusting your filters to see more results"
               : "No trading signals available at the moment"}
           </CardDescription>
@@ -82,7 +87,8 @@ export const SignalsFeed = async ({
         <CardContent>
           <div className="text-muted-foreground flex flex-col items-center justify-center py-8 text-center">
             <p className="text-sm">
-              Clear your filters or check back later for new signals from traders
+              Clear your filters or check back later for new signals from
+              traders
             </p>
           </div>
         </CardContent>

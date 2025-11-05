@@ -12,7 +12,6 @@ import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { getOrgOrStub } from "@/lib/react/org-cache-dual";
 
 export const metadata: Metadata = {
   title: "Pricing - MyCryptoPilot",
@@ -21,8 +20,6 @@ export const metadata: Metadata = {
 };
 
 export default async function PricingPage() {
-  const org = await getOrgOrStub();
-
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="mx-auto max-w-6xl">
@@ -146,9 +143,7 @@ export default async function PricingPage() {
                     size="lg"
                     asChild
                   >
-                    <Link href={`/orgs/${org.slug}/checkout/${plan.name}`}>
-                      Subscribe Now
-                    </Link>
+                    <Link href={`/checkout/${plan.name}`}>Subscribe Now</Link>
                   </Button>
                 )}
               </CardFooter>
@@ -170,9 +165,7 @@ export default async function PricingPage() {
               </p>
             </div>
             <Button variant="outline" size="lg" className="shrink-0" asChild>
-              <Link href={`/orgs/${org.slug}/checkout/test`}>
-                Send $1 Test Payment
-              </Link>
+              <Link href="/checkout/test">Send $1 Test Payment</Link>
             </Button>
           </CardContent>
         </Card>
