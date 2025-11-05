@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getOrgOrStub } from "@/lib/react/org-cache-dual";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import {
   AlertCircle,
@@ -35,14 +34,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const org = await getOrgOrStub();
   const user = await getRequiredUser();
-
-  // Fetch full user with discordId from Prisma (Phase 3.4)
-  const fullUser = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { discordId: true },
-  });
 
   // Fetch user's followed traders count
   const followedTradersCount = await prisma.follow.count({
@@ -77,10 +69,8 @@ export default async function DashboardPage() {
     });
   }
 
-  // Check if user has joined Discord (Phase 3.4)
-  const hasJoinedDiscord = await hasUserJoinedDiscord(
-    fullUser?.discordId ?? null,
-  );
+  // Check if user has joined Discord
+  const hasJoinedDiscord = await hasUserJoinedDiscord(user.discordId);
   const discordInviteUrl = !hasJoinedDiscord
     ? await generatePermanentInvite()
     : null;
@@ -97,7 +87,7 @@ export default async function DashboardPage() {
             </p>
           </div>
           <Button asChild>
-            <Link href={`/orgs/${org.slug}/traders`}>
+            <Link href="/traders">
               <TrendingUp className="mr-2 size-4" />
               Follow Traders
             </Link>
@@ -145,11 +135,11 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {org.subscription?.plan ?? "Free"}
+                {user.userSubscription?.plan ?? "Free"}
               </div>
               <p className="text-muted-foreground text-xs">
-                {org.subscription?.periodEnd
-                  ? `Expires ${new Date(org.subscription.periodEnd).toLocaleDateString()}`
+                {user.userSubscription?.periodEnd
+                  ? `Expires ${new Date(user.userSubscription.periodEnd).toLocaleDateString()}`
                   : "Upgrade to Pro for more features"}
               </p>
             </CardContent>
@@ -358,7 +348,7 @@ export default async function DashboardPage() {
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
             >
-              <Link href={`/orgs/${org.slug}/traders`}>
+              <Link href="/traders">
                 <TrendingUp className="size-6" />
                 <span>Follow Traders</span>
               </Link>
@@ -368,7 +358,7 @@ export default async function DashboardPage() {
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
             >
-              <Link href={`/orgs/${org.slug}/signals`}>
+              <Link href="/signals">
                 <BarChart3 className="size-6" />
                 <span>Browse Signals</span>
               </Link>
