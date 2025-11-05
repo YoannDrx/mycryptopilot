@@ -23,7 +23,6 @@ type SendSignalNotificationParams = {
   userName: string;
   traderName: string;
   signal: SignalData;
-  userId: string;
 };
 
 /**
@@ -34,12 +33,11 @@ export const sendSignalNotificationEmail = async ({
   userName,
   traderName,
   signal,
-  userId,
 }: SendSignalNotificationParams) => {
   try {
-    // Build signal URL (dual-mode via getAppUrl)
+    // Build signal URL (user-centric)
     const basePath = `/signals?highlight=${signal.id}`;
-    const signalUrl = await getAppUrl(basePath, userId, true);
+    const signalUrl = getAppUrl(basePath, true);
 
     // Send email
     const result = await sendEmail({
@@ -131,7 +129,6 @@ export const notifyFollowersOfNewSignal = async ({
         userName: follow.user.name,
         traderName,
         signal,
-        userId: follow.user.id,
       });
     });
 

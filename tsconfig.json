@@ -32,5 +32,13 @@
     ".next/types/**/*.ts",
     "tailwind.config.js"
   ],
-  "exclude": ["node_modules", ".next", "src/generated", ".claude", ".conductor"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "src/generated",
+    ".claude",
+    ".conductor",
+    "scripts/archived-migration",
+    "e2e/archived-org-tests"
+  ]
 }

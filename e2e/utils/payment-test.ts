@@ -86,16 +86,9 @@ export async function mockCryptoPayment(options: {
   }
 
   // 5. Get the created/updated subscription
-  const subscription = await prisma.subscription.findFirst({
+  const subscription = await prisma.userSubscription.findUnique({
     where: {
-      organization: {
-        members: {
-          some: {
-            userId,
-            role: "owner",
-          },
-        },
-      },
+      userId,
     },
   });
 

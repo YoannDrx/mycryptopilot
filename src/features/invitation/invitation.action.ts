@@ -198,26 +198,11 @@ export const acceptInvitationByTokenAction = authAction
     const traderName =
       invitation.trader.traderProfile?.displayName ?? invitation.trader.name;
 
-    // Get user's org slug for redirection
-    const userMember = await prisma.member.findFirst({
-      where: { userId: user.id },
-      include: {
-        organization: {
-          select: {
-            slug: true,
-          },
-        },
-      },
-    });
-
-    const orgSlug = userMember?.organization.slug ?? "org-slug-default";
-
     return {
       success: true,
       message: `You're now following ${traderName}!`,
       traderId: invitation.traderId,
       traderName,
-      orgSlug,
     };
   });
 
