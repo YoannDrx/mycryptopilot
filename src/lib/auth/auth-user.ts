@@ -14,8 +14,9 @@ export const getUser = async () => {
     return null;
   }
 
-  // Fetch additional user fields from database (planName, planExpiresAt, etc.)
+  // Fetch additional user fields from database (planName, planExpiresAt, userSubscription, etc.)
   // Better Auth session only contains basic fields
+  // Big Bang (Issue #77 Phase 4): Include userSubscription for user-centric architecture
   const fullUser = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -30,6 +31,7 @@ export const getUser = async () => {
       planExpiresAt: true,
       createdAt: true,
       updatedAt: true,
+      userSubscription: true,
     },
   });
 
