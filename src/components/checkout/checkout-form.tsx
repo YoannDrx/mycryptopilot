@@ -47,7 +47,6 @@ import { TestPaymentSuccessDialog } from "./test-payment-success-dialog";
 
 type CheckoutFormProps = {
   plan: MyCryptoPilotPlanName;
-  orgSlug: string;
   isTestnet?: boolean;
 };
 
@@ -68,7 +67,6 @@ type PaymentStatus = "pending" | "confirmed" | "expired";
 
 export const CheckoutForm = ({
   plan,
-  orgSlug,
   isTestnet = false,
 }: CheckoutFormProps) => {
   const router = useRouter();
@@ -165,7 +163,7 @@ export const CheckoutForm = ({
 
             // Wait 2s before redirect to show success message
             setTimeout(() => {
-              router.push(`/orgs/${orgSlug}/dashboard`);
+              router.push("/dashboard");
               router.refresh();
             }, 2000);
           }
@@ -184,7 +182,7 @@ export const CheckoutForm = ({
     const interval = setInterval(checkPaymentStatus, 10000);
 
     return () => clearInterval(interval);
-  }, [addresses, paymentStatus, orgSlug, router, plan]);
+  }, [addresses, paymentStatus, router, plan]);
 
   // Handle expiration
   const handleExpiration = () => {
@@ -463,7 +461,7 @@ export const CheckoutForm = ({
       <div className="mt-8 flex justify-center">
         <Button
           variant="ghost"
-          onClick={() => router.push(`/orgs/${orgSlug}/pricing`)}
+          onClick={() => router.push("/pricing")}
           disabled={paymentStatus === "confirmed"}
         >
           Cancel and Return to Pricing
@@ -474,7 +472,6 @@ export const CheckoutForm = ({
       <TestPaymentSuccessDialog
         open={showTestSuccessDialog}
         onOpenChange={setShowTestSuccessDialog}
-        orgSlug={orgSlug}
       />
     </div>
   );
