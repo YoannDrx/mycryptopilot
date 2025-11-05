@@ -49,7 +49,7 @@ const SIGNALS_LINKS: NavigationLink[] = [
     label: "Signals Feed",
   },
   {
-    href: "/orgs/:organizationSlug/risk-console", // Pas encore migré
+    href: "/risk-console",
     Icon: Calculator,
     label: "Risk Console",
   },

@@ -13,12 +13,6 @@ import {
 import { SidebarNavigationMenu } from "@/components/ui/sidebar-utils";
 import { ContactFeedbackPopover } from "@/features/contact/feedback/contact-feedback-popover";
 import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
-import type { AuthOrganization } from "@/lib/auth/auth-type";
-import {
-  GlobalSearchCommand,
-  type SerializableGroup,
-} from "../../orgs/[orgSlug]/(navigation)/_navigation/global-search-command";
-import { OrgsSelect } from "../../orgs/[orgSlug]/(navigation)/_navigation/orgs-select";
 import { UpgradeCard } from "../../orgs/[orgSlug]/(navigation)/_navigation/upgrade-org-card";
 import { getAppNavigationGroups } from "./app-links";
 import {
@@ -30,42 +24,26 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 /**
- * App Sidebar (Root-Level Routes)
+ * App Sidebar (User-Centric)
+ * Big Bang (Issue #77 Phase 7) - Simplified user-centric sidebar
  *
- * Sidebar pour les nouvelles routes racine (Phase 5a)
- * Similaire à TradingSidebar mais adapté au dual-mode
- *
- * Différences vs TradingSidebar:
- * - Utilise getAppNavigationGroups() avec liens racine
- * - Remplace :organizationSlug par slug fourni
- * - Compatible mode legacy ET nouveau
+ * Changes from org-based sidebar:
+ * - No OrgsSelect (single user account)
+ * - No GlobalSearchCommand (simplified)
+ * - Direct URLs (no slug replacement)
+ * - User-centric navigation
  */
 export function AppSidebar({
-  slug,
-  userOrgs,
-  allLinks,
   hasTraderProfile,
 }: {
-  slug: string;
-  userOrgs: AuthOrganization[];
-  allLinks: SerializableGroup[];
   hasTraderProfile: boolean;
 }) {
   // Get navigation groups with conditional TRADER TOOLS section
   const navigationGroups = getAppNavigationGroups(hasTraderProfile);
 
-  // Replace slug in all groups
-  const groupsWithReplacedSlugs = navigationGroups.map((group) => ({
-    ...group,
-    links: group.links.map((link) => ({
-      ...link,
-      href: link.href.replace(":organizationSlug", slug),
-    })),
-  }));
-
   // State for collapsible sections (all open by default)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
-    Object.fromEntries(groupsWithReplacedSlugs.map((g) => [g.title, true])),
+    Object.fromEntries(navigationGroups.map((g) => [g.title, true])),
   );
 
   const toggleSection = (title: string) => {
@@ -75,11 +53,10 @@ export function AppSidebar({
   return (
     <Sidebar variant="inset" suppressHydrationWarning>
       <SidebarHeader className="flex flex-col gap-2">
-        <OrgsSelect orgs={userOrgs} currentOrgSlug={slug} />
-        <GlobalSearchCommand orgSlug={slug} allLinks={allLinks} />
+        {/* Simplified header - no org select, no global search */}
       </SidebarHeader>
       <SidebarContent suppressHydrationWarning>
-        {groupsWithReplacedSlugs.map((group) => (
+        {navigationGroups.map((group) => (
           <Collapsible
             key={group.title}
             open={openSections[group.title]}
