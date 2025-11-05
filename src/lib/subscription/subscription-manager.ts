@@ -8,15 +8,14 @@ import { SiteConfig } from "@/site-config";
 import MarkdownEmail from "@email/markdown.email";
 import { awardUpgradeBonus } from "@/lib/referral/invitation-tracking-service";
 import { revalidatePath } from "next/cache";
-import { FEATURES } from "@/lib/feature-flags";
 
 /**
- * Subscription Manager
+ * Subscription Manager - Big Bang (Issue #77 Phase 3)
  *
  * Module centralisé pour gérer le cycle de vie des abonnements MyCryptoPilot
  *
  * Responsabilités:
- * - Activer/étendre un abonnement (update User + Subscription)
+ * - Activer/étendre un abonnement (update User + UserSubscription)
  * - Assigner automatiquement le rôle Discord correspondant
  * - Envoyer les emails de notification (activation, renouvellement, expiration)
  *
@@ -25,6 +24,7 @@ import { FEATURES } from "@/lib/feature-flags";
  * - Appelé depuis admin actions pour gestion manuelle
  * - Utilise Discord roles.ts pour l'assignation automatique
  * - Utilise Resend pour les notifications email
+ * - User-centric: Direct User → UserSubscription relationship
  */
 
 type SubscriptionActivationParams = {
@@ -36,7 +36,6 @@ type SubscriptionActivationParams = {
 
 type SubscriptionResult = {
   success: boolean;
-  organizationId?: string;
   periodEnd?: Date;
   error?: string;
 };
@@ -44,10 +43,9 @@ type SubscriptionResult = {
 /**
  * Activer ou étendre l'abonnement d'un utilisateur
  *
- * Séquence complète (dual-mode selon feature flag):
- * 1. Update User.planName et User.planExpiresAt (toujours)
- * 2a. Si USER_ACCOUNT_MODE ON : Upsert UserSubscription directement
- * 2b. Si USER_ACCOUNT_MODE OFF : Upsert Organization.Subscription (legacy)
+ * Séquence complète (user-centric):
+ * 1. Update User.planName et User.planExpiresAt
+ * 2. Upsert UserSubscription directement
  * 3. Assigner rôle Discord (si discordId présent)
  * 4. Envoyer email de confirmation
  *
@@ -64,31 +62,149 @@ export async function activateSubscription(
     plan,
     daysGranted,
     source,
-    mode: FEATURES.USER_ACCOUNT_MODE ? "user-centric" : "legacy",
   });
 
   try {
-    if (FEATURES.USER_ACCOUNT_MODE) {
-      // ============================================
-      // MODE NOUVEAU: UserSubscription directe
-      // ============================================
-      return await activateSubscriptionUserMode({
+    // 1. Récupérer l'utilisateur
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        planName: true,
+        planExpiresAt: true,
+        discordId: true,
+        userSubscription: true,
+      },
+    });
+
+    if (!user) {
+      logger.error("User not found", { userId });
+      return {
+        success: false,
+        error: `User not found: ${userId}`,
+      };
+    }
+
+    const currentDate = new Date();
+
+    // 2. Calculer la nouvelle date d'expiration
+    let periodEnd: Date;
+    const isExtension = !!(
+      user.planExpiresAt && user.planExpiresAt > currentDate
+    );
+
+    if (isExtension && user.planExpiresAt) {
+      // Étendre l'abonnement existant
+      periodEnd = new Date(user.planExpiresAt);
+      periodEnd.setDate(periodEnd.getDate() + daysGranted);
+      logger.info("Extending existing subscription", {
         userId,
-        plan,
-        daysGranted,
-        source,
+        currentExpiry: user.planExpiresAt,
+        newExpiry: periodEnd,
       });
     } else {
-      // ============================================
-      // MODE LEGACY: Organization.Subscription
-      // ============================================
-      return await activateSubscriptionLegacyMode({
+      // Nouvel abonnement
+      periodEnd = new Date();
+      periodEnd.setDate(periodEnd.getDate() + daysGranted);
+      logger.info("Creating new subscription", {
         userId,
-        plan,
-        daysGranted,
-        source,
+        newExpiry: periodEnd,
       });
     }
+
+    const periodStart = new Date();
+
+    // 3. Update User planName et planExpiresAt
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        planName: plan,
+        planExpiresAt: periodEnd,
+      },
+    });
+
+    logger.info("User plan updated", { userId, plan, periodEnd });
+
+    // 3.1 Invalider le cache Next.js pour forcer le rafraîchissement
+    revalidatePath("/", "layout");
+
+    // 4. Upsert UserSubscription
+    await prisma.userSubscription.upsert({
+      where: { userId },
+      create: {
+        userId,
+        plan,
+        status: "active",
+        periodStart,
+        periodEnd,
+        paymentMethod: "crypto",
+      },
+      update: {
+        plan,
+        status: "active",
+        periodStart,
+        periodEnd,
+      },
+    });
+
+    logger.info("UserSubscription upserted", { userId, plan });
+
+    // 4.5. Award upgrade bonus au trader referrer si applicable (non-bloquant)
+    if (plan === "pro" || plan === "ultra") {
+      void awardUpgradeBonus(userId, plan)
+        .then((result) => {
+          if (result.success) {
+            logger.info("Upgrade bonus awarded to referrer", {
+              inviteeId: userId,
+              plan,
+              creditsAwarded: result.creditsAwarded,
+            });
+          } else {
+            // Log warning mais ne pas fail - peut être normal si pas d'invitation
+            logger.info("No upgrade bonus awarded (no referrer found)", {
+              inviteeId: userId,
+              plan,
+              reason: result.error,
+            });
+          }
+        })
+        .catch((err) => {
+          logger.error("Error awarding upgrade bonus", {
+            userId,
+            plan,
+            err,
+          });
+        });
+    }
+
+    // 5. Assigner rôle Discord (non-bloquant)
+    await handleDiscordRoleAndNotification({ user, plan, periodEnd, userId });
+
+    // 6. Envoyer email de confirmation (non-bloquant)
+    void sendSubscriptionActivationEmail({
+      user,
+      plan,
+      periodEnd,
+      isExtension,
+    }).catch((err) => {
+      logger.error("Failed to send subscription activation email", {
+        userId,
+        err,
+      });
+    });
+
+    logger.info("✅ Subscription activated successfully", {
+      userId,
+      plan,
+      periodEnd,
+    });
+
+    return {
+      success: true,
+      periodEnd,
+    };
   } catch (error) {
     logger.error("Error activating subscription", { userId, error });
     return {
@@ -99,325 +215,7 @@ export async function activateSubscription(
 }
 
 /**
- * Mode Legacy: Activation via Organization.Subscription
- */
-async function activateSubscriptionLegacyMode(
-  params: SubscriptionActivationParams,
-): Promise<SubscriptionResult> {
-  const { userId, plan, daysGranted } = params;
-
-  // 1. Récupérer l'utilisateur avec son organisation
-  const membership = await prisma.member.findFirst({
-    where: {
-      userId,
-      role: "owner",
-    },
-    include: {
-      organization: {
-        include: {
-          subscription: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          planName: true,
-          planExpiresAt: true,
-          discordId: true,
-        },
-      },
-    },
-  });
-
-  if (!membership) {
-    logger.error("No organization found for user", { userId });
-    return {
-      success: false,
-      error: `No organization found for user ${userId}`,
-    };
-  }
-
-  const org = membership.organization;
-  const user = membership.user;
-  const currentDate = new Date();
-
-  // 2. Calculer la nouvelle date d'expiration
-  let periodEnd: Date;
-  const isExtension = !!(
-    user.planExpiresAt && user.planExpiresAt > currentDate
-  );
-
-  if (isExtension && user.planExpiresAt) {
-    // Étendre l'abonnement existant
-    periodEnd = new Date(user.planExpiresAt);
-    periodEnd.setDate(periodEnd.getDate() + daysGranted);
-    logger.info("Extending existing subscription (legacy)", {
-      userId,
-      currentExpiry: user.planExpiresAt,
-      newExpiry: periodEnd,
-    });
-  } else {
-    // Nouvel abonnement
-    periodEnd = new Date();
-    periodEnd.setDate(periodEnd.getDate() + daysGranted);
-    logger.info("Creating new subscription (legacy)", {
-      userId,
-      newExpiry: periodEnd,
-    });
-  }
-
-  const periodStart = new Date();
-
-  // 3. Update User planName et planExpiresAt
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      planName: plan,
-      planExpiresAt: periodEnd,
-    },
-  });
-
-  logger.info("User plan updated (legacy)", { userId, plan, periodEnd });
-
-  // 3.1 Invalider le cache Next.js pour forcer le rafraîchissement
-  revalidatePath("/", "layout");
-
-  // 4. Upsert Subscription dans l'Organization
-  await prisma.subscription.upsert({
-    where: { referenceId: org.id },
-    create: {
-      id: `sub_${Date.now()}`,
-      referenceId: org.id,
-      plan,
-      status: "active",
-      periodStart,
-      periodEnd,
-    },
-    update: {
-      plan,
-      status: "active",
-      periodStart,
-      periodEnd,
-    },
-  });
-
-  logger.info("Subscription upserted (legacy)", {
-    organizationId: org.id,
-    plan,
-  });
-
-  // 4.5. Award upgrade bonus au trader referrer si applicable (non-bloquant)
-  if (plan === "pro" || plan === "ultra") {
-    void awardUpgradeBonus(userId, plan)
-      .then((result) => {
-        if (result.success) {
-          logger.info("Upgrade bonus awarded to referrer", {
-            inviteeId: userId,
-            plan,
-            creditsAwarded: result.creditsAwarded,
-          });
-        } else {
-          // Log warning mais ne pas fail - peut être normal si pas d'invitation
-          logger.info("No upgrade bonus awarded (no referrer found)", {
-            inviteeId: userId,
-            plan,
-            reason: result.error,
-          });
-        }
-      })
-      .catch((err) => {
-        logger.error("Error awarding upgrade bonus", {
-          userId,
-          plan,
-          err,
-        });
-      });
-  }
-
-  // 5. Assigner rôle Discord (non-bloquant)
-  await handleDiscordRoleAndNotification({ user, plan, periodEnd, userId });
-
-  // 6. Envoyer email de confirmation (non-bloquant)
-  void sendSubscriptionActivationEmail({
-    user,
-    plan,
-    periodEnd,
-    isExtension,
-  }).catch((err) => {
-    logger.error("Failed to send subscription activation email", {
-      userId,
-      err,
-    });
-  });
-
-  logger.info("✅ Subscription activated successfully (legacy)", {
-    userId,
-    organizationId: org.id,
-    plan,
-    periodEnd,
-  });
-
-  return {
-    success: true,
-    organizationId: org.id,
-    periodEnd,
-  };
-}
-
-/**
- * Mode Nouveau: Activation via UserSubscription directe
- */
-async function activateSubscriptionUserMode(
-  params: SubscriptionActivationParams,
-): Promise<SubscriptionResult> {
-  const { userId, plan, daysGranted } = params;
-
-  // 1. Récupérer l'utilisateur
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      planName: true,
-      planExpiresAt: true,
-      discordId: true,
-      userSubscription: true,
-    },
-  });
-
-  if (!user) {
-    logger.error("User not found", { userId });
-    return {
-      success: false,
-      error: `User not found: ${userId}`,
-    };
-  }
-
-  const currentDate = new Date();
-
-  // 2. Calculer la nouvelle date d'expiration
-  let periodEnd: Date;
-  const isExtension = !!(
-    user.planExpiresAt && user.planExpiresAt > currentDate
-  );
-
-  if (isExtension && user.planExpiresAt) {
-    // Étendre l'abonnement existant
-    periodEnd = new Date(user.planExpiresAt);
-    periodEnd.setDate(periodEnd.getDate() + daysGranted);
-    logger.info("Extending existing subscription (user-mode)", {
-      userId,
-      currentExpiry: user.planExpiresAt,
-      newExpiry: periodEnd,
-    });
-  } else {
-    // Nouvel abonnement
-    periodEnd = new Date();
-    periodEnd.setDate(periodEnd.getDate() + daysGranted);
-    logger.info("Creating new subscription (user-mode)", {
-      userId,
-      newExpiry: periodEnd,
-    });
-  }
-
-  const periodStart = new Date();
-
-  // 3. Update User planName et planExpiresAt
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      planName: plan,
-      planExpiresAt: periodEnd,
-    },
-  });
-
-  logger.info("User plan updated (user-mode)", { userId, plan, periodEnd });
-
-  // 3.1 Invalider le cache Next.js pour forcer le rafraîchissement
-  revalidatePath("/", "layout");
-
-  // 4. Upsert UserSubscription
-  await prisma.userSubscription.upsert({
-    where: { userId },
-    create: {
-      userId,
-      plan,
-      status: "active",
-      periodStart,
-      periodEnd,
-      paymentMethod: "crypto",
-    },
-    update: {
-      plan,
-      status: "active",
-      periodStart,
-      periodEnd,
-    },
-  });
-
-  logger.info("UserSubscription upserted (user-mode)", { userId, plan });
-
-  // 4.5. Award upgrade bonus au trader referrer si applicable (non-bloquant)
-  if (plan === "pro" || plan === "ultra") {
-    void awardUpgradeBonus(userId, plan)
-      .then((result) => {
-        if (result.success) {
-          logger.info("Upgrade bonus awarded to referrer", {
-            inviteeId: userId,
-            plan,
-            creditsAwarded: result.creditsAwarded,
-          });
-        } else {
-          // Log warning mais ne pas fail - peut être normal si pas d'invitation
-          logger.info("No upgrade bonus awarded (no referrer found)", {
-            inviteeId: userId,
-            plan,
-            reason: result.error,
-          });
-        }
-      })
-      .catch((err) => {
-        logger.error("Error awarding upgrade bonus", {
-          userId,
-          plan,
-          err,
-        });
-      });
-  }
-
-  // 5. Assigner rôle Discord (non-bloquant)
-  await handleDiscordRoleAndNotification({ user, plan, periodEnd, userId });
-
-  // 6. Envoyer email de confirmation (non-bloquant)
-  void sendSubscriptionActivationEmail({
-    user,
-    plan,
-    periodEnd,
-    isExtension,
-  }).catch((err) => {
-    logger.error("Failed to send subscription activation email", {
-      userId,
-      err,
-    });
-  });
-
-  logger.info("✅ Subscription activated successfully (user-mode)", {
-    userId,
-    plan,
-    periodEnd,
-  });
-
-  return {
-    success: true,
-    periodEnd,
-  };
-}
-
-/**
- * Helper: Gestion Discord role + notification (utilisé par les 2 modes)
+ * Helper: Gestion Discord role + notification
  */
 async function handleDiscordRoleAndNotification(params: {
   user: { discordId: string | null };
