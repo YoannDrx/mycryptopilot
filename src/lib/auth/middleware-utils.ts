@@ -1,4 +1,8 @@
-import { auth } from "@/lib/auth";
+import {
+  getFullOrganizationApiWithHeaders,
+  getSessionApi,
+  setActiveOrganizationApi,
+} from "@/lib/auth/auth-api-helper";
 import { RESERVED_SLUGS } from "@/lib/organizations/reserved-slugs";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
@@ -50,8 +54,8 @@ export const validateSession = async (request: NextRequest) => {
     if (!sessionCookie) return null;
 
     const [session, activeOrganisation] = await Promise.all([
-      auth.api.getSession({ headers: request.headers }),
-      auth.api.getFullOrganization({ headers: request.headers }),
+      getSessionApi(request.headers),
+      getFullOrganizationApiWithHeaders(request.headers),
     ]);
 
     if (!session?.session.userId) return null;
@@ -89,10 +93,7 @@ export const switchActiveOrganization = async (
   organizationId: string,
 ) => {
   try {
-    await auth.api.setActiveOrganization({
-      headers: request.headers,
-      body: { organizationId },
-    });
+    await setActiveOrganizationApi(organizationId);
 
     return NextResponse.redirect(request.url);
   } catch (error) {
@@ -119,7 +120,7 @@ export const validateAdminAccess = async (request: NextRequest) => {
 
     if (!sessionCookie) return null;
 
-    const session = await auth.api.getSession({ headers: request.headers });
+    const session = await getSessionApi(request.headers);
 
     if (!session?.user) return null;
     if (session.user.role !== "admin") return null;

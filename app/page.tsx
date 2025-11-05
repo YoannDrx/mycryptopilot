@@ -1,9 +1,12 @@
 import { EmailFormSection } from "@/features/email/email-form-section";
 import { BentoGridSection } from "@/features/landing/bento-section";
+import { ComparisonTable } from "@/features/landing/comparison-table";
 import { CTASectionCard } from "@/features/landing/cta/cta-card-section";
 import { CTAImageSection } from "@/features/landing/cta/cta-image-section";
 import { CtaSection } from "@/features/landing/cta/cta-section";
+import { EcosystemCycleSection } from "@/features/landing/ecosystem-cycle-section";
 import { FAQSection } from "@/features/landing/faq-section";
+import { FAQRiskSection } from "@/features/landing/faq-risk-section";
 import { FeaturesSection } from "@/features/landing/feature-section";
 import { Hero } from "@/features/landing/hero";
 import { LandingHeader } from "@/features/landing/landing-header";
@@ -11,6 +14,7 @@ import { PainSection } from "@/features/landing/pain";
 import { ReviewGrid } from "@/features/landing/review/review-grid";
 import { ReviewSingle } from "@/features/landing/review/review-single";
 import { ReviewTriple } from "@/features/landing/review/review-triple";
+import { RiskConsoleDemo } from "@/features/landing/risk-console-demo";
 import { SectionDivider } from "@/features/landing/section-divider";
 import { StatsSection } from "@/features/landing/stats-section";
 import { Footer } from "@/features/layout/footer";
@@ -30,11 +34,17 @@ export default function HomePage() {
 
       <Hero />
 
+      <RiskConsoleDemo />
+
       <StatsSection />
+
+      <EcosystemCycleSection />
 
       <BentoGridSection />
 
       <PainSection />
+
+      <ComparisonTable />
 
       <SectionDivider />
 
@@ -144,6 +154,8 @@ export default function HomePage() {
       <CtaSection />
 
       <Pricing />
+
+      <FAQRiskSection />
 
       <FAQSection
         faq={[

@@ -14,13 +14,31 @@ Automatically removes Git worktrees for merged pull requests and deleted branche
 ## How to use
 
 ```bash
-./clean-worktree.sh
+# From project root
+./.claude/scripts/clean-worktree.sh
+
+# Or via pnpm (recommended)
+pnpm worktree:clean
 ```
 
-No arguments needed. The script will:
+**No arguments needed.** The script will:
 
-1. Check all worktrees for merged PRs or deleted branches
-2. Remove obsolete worktrees automatically
-3. Show remaining active worktrees
+1. Fetch remote and prune deleted branches
+2. Check all worktrees for merged PRs or deleted branches
+3. Remove obsolete worktrees automatically from `~/Developer/worktrees/mycryptopilot-worktrees/`
+4. Show remaining active worktrees
 
-Run this periodically to maintain a clean development environment.
+**Example output:**
+
+```
+🧹 Cleaning up obsolete worktrees...
+Checking: issue-42-add-portfolio-page
+  → PR #42 merged, removing worktree
+Checking: issue-51-fix-auth-bug
+  → PR #51 merged, removing worktree
+
+✅ Done! Remaining worktrees:
+/Users/yoannandrieux/Projets/mycryptopilot  66498c3 [main]
+```
+
+**💡 Tip:** Run this periodically (e.g., weekly) to maintain a clean development environment and free up disk space.

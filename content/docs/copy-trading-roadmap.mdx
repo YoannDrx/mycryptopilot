@@ -1,0 +1,86 @@
+---
+title: "Copy Trading & Journal"
+description: "Current capabilities and roadmap for copy trading, trading journal, and automation in MyCryptoPilot"
+keywords: ["copy trading", "journal", "automation", "roadmap"]
+tags: ["followers", "traders", "roadmap"]
+order: 8
+subcategory: "Features"
+---
+
+# Copy Trading & Trading Journal Roadmap
+
+MyCryptoPilot focuses on risk-first education while laying the groundwork for safe automation. This document explains what’s available today, what’s coming next, and how plans map to features.
+
+## TL;DR
+
+- **Manual journal copy** is live for Pro and Ultra subscribers.
+- **Automated execution** will launch first for Ultra once the copy queue is production-ready.
+- **Trading journal analytics** are rolling out alongside automation to visualize your personal performance.
+
+## Current Experience
+
+### Manual Copy from Signals
+
+- Open any unlocked signal and click **Copy Trade** (`src/components/nowts/copy-trade-dialog.tsx`).
+- Choose **MANUAL** mode to log the trade in your journal with:
+  - Copy ratio (percentage of the trader’s size)
+  - Maximum amount to risk in USD
+  - Manual entry price (required in MANUAL mode)
+- The action stores the trade via server actions (`src/features/copy-trade/create-from-signal.action.ts`).
+- A success toast confirms the addition to your journal tab (UI placeholder today, analytics coming soon).
+
+### Plan Requirements
+
+| Feature | Free | Pro | Ultra |
+| ------- | ---- | --- | ----- |
+| Manual journal copy | ❌ | ✅ | ✅ |
+| Copy ratio / risk cap | ❌ | ✅ | ✅ |
+| Automated execution | ❌ | ❌ | 🚧 (roadmap) |
+| Advanced alerts & webhooks | ❌ | ❌ | 🚧 (roadmap) |
+
+## Coming Soon
+
+### Automated Copy Queue (Ultra)
+
+- Secure exchange key vault similar to trader syncs.
+- Real-time job queue dispatching orders to follower exchanges.
+- Slippage and partial fill handling with execution reports.
+- Safety rails (max loss, max leverage, suspension triggers).
+
+### Trading Journal Analytics (Pro & Ultra)
+
+- Dashboard tab in **Trading → Dashboard** summarizing win/loss ratios, payoff, and tag-based insights.
+- CSV export for tax tooling integration.
+
+### Followers’ Risk Console Enhancements
+
+- Pre-filled position sizing based on chosen copy ratio.
+- Sync between copy-dialog settings and risk console for consistent numbers.
+
+## Best Practices Until Automation Ships
+
+- Communicate recommended position size and risk with every signal.
+- Encourage followers to use the risk console (Pro/Ultra) for sizing alignment.
+- Share post-trade debriefs in Discord or your trader feed to maintain transparency.
+
+## FAQ
+
+### Will auto copy support every exchange?
+
+The first release targets exchanges with reliable order APIs (starting with Binance). Additional venues will be evaluated based on demand and API quality.
+
+### Can followers mix manual and auto copy?
+
+Yes. Manual journal entries remain available even when auto execution launches. Followers can switch modes per trade.
+
+### How will fees be handled?
+
+Automation will respect exchange fee tiers and surface realized PnL after fees. We’ll publish detailed billing documentation before launch.
+
+## Related Docs
+
+- [Getting Started](/docs/getting-started)
+- [For Traders](/docs/for-traders)
+- [FAQ](/docs/faq)
+
+Have feedback or needs for the automation rollout? Drop suggestions in the Discord **#copy-trade-beta** channel.

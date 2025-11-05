@@ -43,6 +43,72 @@ export function registerCommands() {
       )
       .toJSON(),
 
+    // Commande /unfollow
+    new SlashCommandBuilder()
+      .setName("unfollow")
+      .setDescription("Se désabonner d'un trader")
+      .addUserOption((option) =>
+        option
+          .setName("trader")
+          .setDescription("Le trader à arrêter de suivre")
+          .setRequired(true),
+      )
+      .toJSON(),
+
+    // Commande /link
+    new SlashCommandBuilder()
+      .setName("link")
+      .setDescription("Vérifier ou connecter ton compte Discord à MyCryptoPilot")
+      .toJSON(),
+
+    // Commande /pricing
+    new SlashCommandBuilder()
+      .setName("pricing")
+      .setDescription("Afficher les plans et le lien de paiement crypto")
+      .toJSON(),
+
+    // Commande /support
+    new SlashCommandBuilder()
+      .setName("support")
+      .setDescription("Obtenir les contacts support de MyCryptoPilot")
+      .toJSON(),
+
+    // Commande /risk
+    new SlashCommandBuilder()
+      .setName("risk")
+      .setDescription("Calculer la taille de position avec la règle des 2%")
+      .addNumberOption((option) =>
+        option
+          .setName("capital")
+          .setDescription("Capital total en dollars")
+          .setRequired(true),
+      )
+      .addNumberOption((option) =>
+        option
+          .setName("entry")
+          .setDescription("Prix d'entrée")
+          .setRequired(true),
+      )
+      .addNumberOption((option) =>
+        option
+          .setName("stop")
+          .setDescription("Stop loss")
+          .setRequired(true),
+      )
+      .addNumberOption((option) =>
+        option
+          .setName("takeprofit")
+          .setDescription("Take profit principal")
+          .setRequired(true),
+      )
+      .addNumberOption((option) =>
+        option
+          .setName("riskpercent")
+          .setDescription("% de capital à risquer (par défaut 2)")
+          .setRequired(false),
+      )
+      .toJSON(),
+
     // ========================================================================
     // COMMANDES ADMIN (Réservées aux administrateurs)
     // ========================================================================
@@ -112,6 +178,44 @@ export function registerCommands() {
       .setDescription(
         "[ADMIN] Tester le message de bienvenue en s'envoyant le DM",
       )
+      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .toJSON(),
+
+    // Commande /admin-trader-channel
+    new SlashCommandBuilder()
+      .setName("admin-trader-channel")
+      .setDescription("[ADMIN] Créer ou vérifier le channel privé d'un trader")
+      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .addUserOption((option) =>
+        option
+          .setName("trader")
+          .setDescription("Trader dont il faut vérifier le channel")
+          .setRequired(true),
+      )
+      .toJSON(),
+
+    // Commande /admin-notify
+    new SlashCommandBuilder()
+      .setName("admin-notify")
+      .setDescription("[ADMIN] Envoyer une annonce dans un channel")
+      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .addStringOption((option) =>
+        option
+          .setName("message")
+          .setDescription("Message à envoyer")
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("channel")
+          .setDescription("ID du channel cible (optionnel)"),
+      )
+      .toJSON(),
+
+    // Commande /admin-config
+    new SlashCommandBuilder()
+      .setName("admin-config")
+      .setDescription("[ADMIN] Voir la configuration du bot")
       .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
       .toJSON(),
   ];

@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import type { Exchange } from "@/generated/prisma";
+import { BinanceService } from "@/lib/exchange/binance-service";
+import { BybitService } from "@/lib/exchange/bybit-service";
+import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import { logger } from "@/lib/logger";
 
 /**
  * Get all exchange connections for a trader
@@ -148,4 +152,124 @@ export async function getConnectionTradeStats(connectionId: string) {
     firstTradeDate: firstTrade?.executedAt ?? null,
     lastTradeDate: lastTrade?.executedAt ?? null,
   };
+}
+
+/**
+ * Exchange Balance Type
+ */
+export type ExchangeBalance = {
+  exchange: "BINANCE" | "BYBIT";
+  totalUSDT: number;
+  available: number;
+  locked: number;
+  isActive: boolean;
+  lastSync: Date | null;
+};
+
+/**
+ * Get exchange balances for a user (Risk Console feature)
+ *
+ * Fetches live USDT balance from connected exchanges (Binance/Bybit).
+ * Used by Risk Console to auto-fill capital from exchange accounts.
+ *
+ * @param userId - The user ID
+ * @returns Array of exchange balances with live data
+ */
+export async function getUserExchangeBalances(
+  userId: string,
+): Promise<ExchangeBalance[]> {
+  const connections = await prisma.userExchangeConnection.findMany({
+    where: { userId, isActive: true },
+    select: {
+      exchange: true,
+      encryptedApiKey: true,
+      encryptedSecretKey: true,
+      keyIv: true,
+      keyTag: true,
+      lastSyncedAt: true,
+    },
+  });
+
+  // Fetch all balances in parallel
+  const balancePromises = connections.map(async (conn) => {
+    try {
+      // Decrypt API keys
+      const apiKey = decryptApiKey(
+        conn.encryptedApiKey,
+        conn.keyIv,
+        conn.keyTag,
+      );
+      const secretKey = decryptApiKey(
+        conn.encryptedSecretKey,
+        conn.keyIv,
+        conn.keyTag,
+      );
+
+      // Create service based on exchange type
+      const service =
+        conn.exchange === "BINANCE"
+          ? new BinanceService(apiKey, secretKey)
+          : new BybitService(apiKey, secretKey);
+
+      // Fetch balance from exchange
+      const balance = await service.fetchBalance();
+
+      // Extract USDT balance (ccxt returns object with currency keys)
+      const totalObj = balance.total as unknown as Record<
+        string,
+        number | undefined
+      >;
+      const freeObj = balance.free as unknown as Record<
+        string,
+        number | undefined
+      >;
+      const usedObj = balance.used as unknown as Record<
+        string,
+        number | undefined
+      >;
+
+      const totalUSDT = totalObj.USDT ?? 0;
+      const availableUSDT = freeObj.USDT ?? 0;
+      const lockedUSDT = usedObj.USDT ?? 0;
+
+      logger.info("Fetched exchange balance for Risk Console", {
+        userId,
+        exchange: conn.exchange,
+        available: availableUSDT,
+      });
+
+      return {
+        exchange: conn.exchange,
+        totalUSDT,
+        available: availableUSDT,
+        locked: lockedUSDT,
+        isActive: true,
+        lastSync: conn.lastSyncedAt,
+      };
+    } catch (error) {
+      logger.error("Failed to fetch balance for Risk Console", {
+        userId,
+        exchange: conn.exchange,
+        error,
+      });
+
+      // Return inactive balance on error
+      return {
+        exchange: conn.exchange,
+        totalUSDT: 0,
+        available: 0,
+        locked: 0,
+        isActive: false,
+        lastSync: conn.lastSyncedAt,
+      };
+    }
+  });
+
+  // Wait for all balance fetches to complete
+  const results = await Promise.allSettled(balancePromises);
+
+  // Extract successful results
+  return results
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => (result as PromiseFulfilledResult<ExchangeBalance>).value);
 }

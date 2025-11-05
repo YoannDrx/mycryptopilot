@@ -1,6 +1,6 @@
 # 🎮 Discord Bot - Guide de Configuration Complète
 
-**Dernière mise à jour**: 12 octobre 2025 - Phase 0.3-0.5 (ChatGPT recommendations)
+**Dernière mise à jour**: 2 novembre 2025 — ajout de `DISCORD_BOT_ENABLED` et retours Railway
 
 Ce guide détaille la configuration complète du bot Discord MyCryptoPilot, incluant:
 - Configuration Developer Portal (permissions)
@@ -20,6 +20,10 @@ Ce guide détaille la configuration complète du bot Discord MyCryptoPilot, incl
 5. [Phase 5: Structure des Channels](#phase-5-structure-des-channels)
 6. [Phase 6: Obtenir les IDs Discord](#phase-6-obtenir-les-ids-discord)
 7. [Phase 7: Variables d'Environnement](#phase-7-variables-denvironnement)
+   - [7.1 - Fichier .env (Local Development)](#71---fichier-env-local-development)
+   - [7.2 - Railway (Production Bot)](#72---railway-production-bot)
+   - [7.3 - Vercel (Production Next.js)](#73---vercel-production-nextjs)
+   - [7.4 - Développement Local (Testing)](#74---développement-local-testing)
 8. [Vérification Finale](#vérification-finale)
 
 ---
@@ -318,7 +322,7 @@ Puis remplir les valeurs:
 # Discord Bot (déjà configuré)
 DISCORD_BOT_TOKEN="your-bot-token"
 DISCORD_GUILD_ID="your-guild-id"
-DISCORD_BOT_ENABLED="true"
+DISCORD_BOT_ENABLED="true"  # Active le bot (requis pour scripts/start-discord-bot.ts). Passer à "false" pour désactiver.
 
 # Discord OAuth (déjà configuré)
 DISCORD_CLIENT_ID="your-discord-client-id"
@@ -354,6 +358,47 @@ Ajouter les variables:
 2. Settings → **Environment Variables**
 3. Ajouter les mêmes 3 variables
 4. **Redeploy** le site
+
+---
+
+### 7.4 - Développement Local (Testing)
+
+Pour tester le bot Discord localement avant déploiement:
+
+**Prérequis**:
+- ✅ `.env.local` configuré avec toutes les variables Discord (voir Phase 7.1)
+- ✅ `DISCORD_BOT_ENABLED=true` dans `.env.local`
+- ✅ Database accessible (pour les requêtes profils/signaux)
+
+**Commande**:
+
+```bash
+npx tsx scripts/start-discord-bot.ts
+```
+
+**Comportement du script**:
+1. Charge automatiquement `.env.local` (fallback `.env.development` puis `.env`)
+2. Vérifie que `DISCORD_BOT_ENABLED=true`
+3. Initialise le client Discord et enregistre les commandes slash
+4. Démarre le bot et affiche `✅ Discord bot started successfully`
+
+**Output attendu**:
+
+```
+Loaded environment from .env.local
+🚀 Starting MyCryptoPilot Discord Bot...
+✅ Discord bot started successfully as MyCryptoPilot#1234
+🎮 Bot is ready to receive commands!
+```
+
+**Arrêter le bot**: `Ctrl+C` (graceful shutdown)
+
+**Troubleshooting**:
+- Si erreur `Discord bot is disabled` → Vérifier `DISCORD_BOT_ENABLED=true` dans `.env.local`
+- Si erreur `Missing DISCORD_BOT_TOKEN` → Vérifier les variables Phase 7.1
+- Si erreur `Invalid token` → Regénérer le token sur Discord Developer Portal
+
+**Note**: En production (Railway), le script utilise directement les variables d'environnement injectées par la plateforme (pas de .env.local).
 
 ---
 

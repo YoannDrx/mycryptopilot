@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Dernière mise à jour**: 23 octobre 2025 - Audit complet projet (18 migrations, 38 issues)
+**Dernière mise à jour**: 2 novembre 2025 — Audit documentation & scripts (voir `.claude/docs/AUDIT-2025-11-02.md`)
 
 ---
 
@@ -82,80 +82,43 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 
 ## État actuel
 
-### 📊 Progression Globale: 🎉 100% MVP COMPLETE! 🎉
+### 📊 Synthèse rapide — 2 novembre 2025
 
-**Audit complet**: 23 octobre 2025 (via /project-audit - complet)
-**Phase 6 complétée**: 13 octobre 2025
-**Phase 7 complétée**: 14 octobre 2025
-**Phase 8 complétée**: 22 octobre 2025 (Portfolio Tracking Bybit)
-**MVP 100% achevé**: 14 octobre 2025
+- Dernier audit: `.claude/docs/AUDIT-2025-11-02.md` consolide l’état de la documentation et des scripts.
+- Les modules critiques (paiements crypto, signaux, portfolio tracking, Discord) sont présents et branchés dans le codebase. Les flux demeurent dépendants de la configuration des env vars décrites dans `.claude/docs/ENV-VARIABLES-MAPPING.md`.
+- Les migrations Prisma couvrent maintenant 22 itérations (voir `prisma/migrations/`), incluant l’unified trading system, les métriques portfolio et la tenue des sweeps.
+- Le bot Discord fonctionne via `src/lib/discord/bot-client.ts` mais son démarrage local nécessite la variable `DISCORD_BOT_ENABLED=true` (voir `scripts/start-discord-bot.ts`).
 
-### Phases Complétées
+### ✅ Couverture fonctionnelle vérifiée dans le code
 
-✅ **Phase 1**: Setup & Infrastructure (100%)
-✅ **Phase 2**: Database & Auth (100%)
-✅ **Phase 2.5**: UI/UX Pages (100%)
-✅ **Phase 3**: Core Features (100%)
-✅ **Phase 4**: Crypto Payments (100%)
-✅ **Phase 5**: Discord Integration MVP (100%)
-✅ **Phase 6**: Feed Signaux Avancé (100%)
-✅ **Phase 7**: Navigation 4 Espaces + UI Polish (100%)
-✅ **Phase 8**: Portfolio Tracking - Multi-Exchange Binance + Bybit (100%)
+- **Trading System** – `src/lib/trading/*`, `app/orgs/[orgSlug]/(trading)` et `src/features/trader/*` confirment profils traders, signaux, copy-trades et agrégations de fills.
+- **Crypto Payments** – `src/lib/crypto/address-generator.ts`, `payment-watcher.ts` et `checkout` montrent un flux complet Base/Tron avec HD wallet et suivi pro-rata.
+- **Portfolio Tracking** – `src/lib/exchange/*`, `TraderPerformanceSnapshot` et `UserExchangeConnection` gèrent Binance + Bybit en lecture seule et calculs de KPI.
+- **Discord** – `src/lib/discord` couvre commandes, rôles, DM, webhooks; la synchro automatique dépend de la configuration Railway décrite dans `.claude/docs/DEPLOYMENT.md`.
+- **Env Management & Tooling** – scripts sous `scripts/` et `.claude/commands/*.md` donnent des workflows automatisés (worktrees, audit, sync env, tests).
 
-### Systèmes Opérationnels
+### ⚠️ Points de vigilance / TODO connus
 
-- ✅ **Base de données**: 9 migrations appliquées, DB fonctionnelle
-- ✅ **Crypto Payments**: Backend + Frontend 100% (HD wallet + RPC + checkout UI)
-- ✅ **Subscriptions**: activateSubscription + Better Auth hook + UI components
-- ✅ **Trading System**: Profils traders + Signaux + Follow/Unfollow
-- ✅ **Dashboards**: User + Trader + Marketplace (100% connectés aux données)
-- ✅ **Discord Bot**: Déployé Railway 24/7 (11 commandes: 5 user + 6 admin)
-- ✅ **Feed Signaux**: Filtres avancés (12 paramètres) + Pagination + URL state + 26 tests
-- ✅ **Navigation 4 Espaces**: Trading, Account, School, Tax avec sidebars dédiées + recherche globale
-- ✅ **UI/UX Polish**: Trading cards professionnelles + Chart viewer + Image management
-- ✅ **Portfolio Tracking**: Binance + Bybit integration (API validation, sync engine, encrypted keys, performance metrics)
+Références relevées via `rg "TODO"` (nov 2025) :
 
-### TODOs Restants (Audit 23 octobre 2025)
+- `src/lib/cron/tier-check-job.ts`: notifications Discord/email + distribution de récompenses de tiers.
+- `src/lib/trading/user-exchange-connection.service.ts`: validation API réelle pour les connexions utilisateurs (actuellement mockée).
+- `src/components/copy-trading/copy-trade-button.tsx`: dépend encore d’une résolution automatique du plan actif.
+- `src/lib/trading/copy-trade.service.ts`: file d’exécution vers les exchanges à implémenter pour l’automatisation complète.
+- `src/lib/discord/user-management.ts`: gestion des channels privés par trader à brancher.
+- `src/lib/mail/send-signal-notification.ts`: filtrage selon les préférences email à implémenter.
+- `src/lib/exchange/email-notifications.ts`: gabarit hebdo des performances manquant.
 
-**P1 (Important)** - ✅ **TOUS COMPLÉTÉS!**
-1. ~~`webhook.ts:37`~~ - ✅ Fixed (commit 41bd066)
-2. ~~`follow-button.tsx:20`~~ - ✅ Vérifié fonctionnel (aucun TODO réel)
-3. ~~`payment-status/[addressId]/route.ts:39`~~ - ✅ Deleted (commit 41bd066)
+`scripts/sweep-to-binance.ts` n’a plus de TODO ouvert: le script peut effectuer des transferts réels (dry-run par défaut). Vérifier la présence de `.env.sweep` avant usage.
 
-**P2 (Non-critique)** - 7 TODOs restants (post-MVP):
-1. `src/lib/cron/tier-check-job.ts` - 2 TODOs (notifications email/Discord, tier rewards)
-2. `src/lib/mail/send-signal-notification.ts` - 1 TODO (email preference filter)
-3. `src/lib/discord/user-management.ts` - 1 TODO (channels privés par trader)
-4. `src/lib/exchange/email-notifications.ts` - 1 TODO (weekly performance email template)
-5. `app/admin/traders/_actions/trader-admin.actions.ts` - 1 TODO (rejection email)
-6. `scripts/sweep-to-binance.ts` - 4 TODOs (sweep implementation)
+### 🎯 Priorités suggérées
 
-**Total**: 10 TODOs non-critiques (toutes post-MVP, aucune bloquante)
+1. Finaliser la validation « real exchange » pour `user-exchange-connection.service.ts` afin de sécuriser l’onboarding utilisateur.
+2. Livrer les notifications (tier-check + email hebdo) pour améliorer la boucle de rétention.
+3. Solidifier la queue de copy-trade (actuellement synchronisation manuelle) avant communication aux utilisateurs.
+4. Documenter/monitorer les sweeps mainnet dans un tableau de bord (scripts présents mais observabilité à renforcer).
 
-### Features MVP
-
-✅ **Tous les TODOs P1 complétés!** (13 oct 2025)
-- ✅ webhook.ts fixed
-- ✅ follow-button.tsx vérifié fonctionnel
-- ✅ payment-status route deleted
-
-✅ **Feed signaux avec filtres** - **COMPLETED!** (PR #40, 13 oct 2025)
-- 12 paramètres de filtrage
-- Pagination cursor-based
-- URL state management
-- 26 tests unitaires
-
-✅ **Architecture 4 Espaces + UI Polish** - **COMPLETED!** (14 oct 2025)
-- Navigation refactorisée en 4 espaces distincts (Trading, Account, School, Tax)
-- Base sidebar layout partagée avec recherche globale
-- Trading cards avec style professionnel et subtil (effets réduits)
-- Chart image upload avec viewer full-screen + watermark + suppression
-- Placeholder amélioré (texte au lieu d'image)
-- Toutes erreurs ESLint corrigées
-
-🎉 **MVP 100% COMPLETE - READY FOR BETA LAUNCH!** 🚀
-
-📄 **Détails complets**: [`.claude/docs/DEVELOPMENT.md`](.claude/docs/DEVELOPMENT.md)
+📄 Voir également `.claude/docs/DEVELOPMENT.md` pour l’historique détaillé des phases et la roadmap courte.
 
 ---
 

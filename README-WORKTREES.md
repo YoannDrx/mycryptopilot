@@ -23,16 +23,19 @@ Git Worktrees permet d'avoir **plusieurs copies du même repo** avec des branche
 
 ## 🆚 Conductor vs Git Worktrees
 
-| Concept | Conductor | Git Worktrees |
+> **⚠️ Note importante**: Conductor était un outil de gestion de workspaces dev qui n'est **plus activement utilisé** dans ce projet. **Git Worktrees est désormais la méthode recommandée** pour travailler sur plusieurs features en parallèle.
+
+| Concept | Conductor (Legacy) | Git Worktrees (Actuel) |
 |---------|-----------|---------------|
 | **But** | Gestion workspaces dev (services, DB, env) | Branches Git parallèles |
 | **Isolation** | Services (Postgres, Redis, etc.) | Code Git uniquement |
-| **Quand utiliser** | 1 feature à la fois | Plusieurs features en parallèle |
+| **Quand utiliser** | ~~1 feature à la fois~~ (déprécié) | Plusieurs features en parallèle |
 | **Setup DB** | Auto (Postgres.app) | Manuel (copie .env) |
+| **Status** | 🔴 Scripts conservés mais non maintenus | ✅ Workflow actif et recommandé |
 
-**Ils ne s'interfacent PAS automatiquement !**
-
-Conductor gère ton environnement de dev, Git Worktrees gère tes branches Git.
+**Migration Conductor → Git Worktrees**:
+- Les scripts Conductor (`conductor-setup-script.sh`, `conductor-archive-script.sh`) sont conservés dans `scripts/` mais ne sont plus utilisés activement depuis l'adoption de Git Worktrees.
+- Si tu cherchais Conductor pour gérer plusieurs environnements dev, **utilise Git Worktrees à la place** (voir ci-dessous).
 
 ## 📋 Prérequis
 

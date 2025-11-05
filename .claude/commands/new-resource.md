@@ -9,7 +9,7 @@ Create a new resource with complete CRUD functionality including database schema
 ## Steps
 
 1. **Update Database Schema**
-   - Modify `prisma/schema/schema.prisma` with the new resource
+   - Modify `prisma/schema.prisma` with the new resource
 
 2. **Add Navigation**
    - Update `app/orgs/[orgSlug]/(navigation)/_navigation/org-navigation.links.ts`

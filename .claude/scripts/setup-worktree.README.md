@@ -14,13 +14,26 @@ Creates an isolated Git worktree for a GitHub issue with intelligent branch nami
 ## How to use
 
 ```bash
-./setup-worktree.sh <github-issue-url>
+# From project root
+./.claude/scripts/setup-worktree.sh <github-issue-url>
+
+# Or via pnpm (recommended)
+pnpm worktree:setup <github-issue-url>
 ```
 
-**Example:**
+**Examples:**
 
 ```bash
-./setup-worktree.sh https://github.com/Melvynx/nowts/issues/42
+# Example 1: Create worktree for issue #42
+pnpm worktree:setup https://github.com/YoannDrx/mycryptopilot/issues/42
+
+# Example 2: Using script directly
+./.claude/scripts/setup-worktree.sh https://github.com/YoannDrx/mycryptopilot/issues/123
 ```
 
-This creates a new worktree at `~/Developer/worktrees/<project>-worktrees/issue-XX-descriptive-name/` ready for development.
+**What happens:**
+- Creates worktree at: `~/Developer/worktrees/mycryptopilot-worktrees/issue-XX-descriptive-name/`
+- Copies all `.env*` files from main project
+- Installs dependencies (`pnpm install`)
+- Generates Prisma Client (`pnpm prisma generate`)
+- Opens Ghostty terminal with Claude in plan mode

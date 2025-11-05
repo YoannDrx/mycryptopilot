@@ -1,6 +1,6 @@
 # 🗺️ Environment Variables Mapping Guide
 
-**Dernière mise à jour**: 24 octobre 2025
+**Dernière mise à jour**: 2 novembre 2025
 **Projet**: MyCryptoPilot
 
 ---
@@ -28,6 +28,7 @@ Ce document décrit **où chaque variable d'environnement doit être configurée
 | `.env.local` | Development | Variables pour `pnpm dev` (testnet) | ✅ Oui |
 | `.env.test` | E2E Tests | Variables pour tests Playwright (testnet local) | ✅ Oui |
 | `.env.example` | Template | Template pour nouveaux devs | ❌ Non (tracké) |
+| `.env.sweep` | Sweep Binance | Secrets sweep locaux (seed, wallets) | ✅ Oui |
 
 ### Environnements Distants
 
@@ -129,6 +130,7 @@ Ces variables sont **partagées** entre tous les environnements Vercel.
 | `GOOGLE_CLIENT_SECRET` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Google |
 | `DISCORD_CLIENT_ID` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Discord (multi-redirect) |
 | `DISCORD_CLIENT_SECRET` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Discord |
+| `DISCORD_BOT_ENABLED` | `.env` | ✅ Oui (`true`) | ✅ Oui (`true` pour tests preview) | ✅ Oui (`true`) | Active le bot dans `scripts/start-discord-bot.ts` |
 | `DISCORD_BOT_TOKEN` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Discord bot (même bot dev/prod) |
 | `DISCORD_GUILD_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | ID du serveur Discord |
 | `DISCORD_FREE_SIGNALS_CHANNEL_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Channel teasers gratuits |
@@ -146,10 +148,15 @@ Ces variables sont **partagées** entre tous les environnements Vercel.
 | `ENCRYPTION_SECRET` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Chiffrement API keys (AES-256) |
 | `BINANCE_MASTER_WALLET_BASE` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Wallet Binance Base |
 | `BINANCE_MASTER_WALLET_TRON` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Wallet Binance Tron |
+| `TRON_API_KEY` | `.env` | ✅ Oui (optionnel) | ✅ Oui (optionnel) | ✅ Oui (optionnel) | Clé API TronGrid (https://www.trongrid.io) - Améliore les quotas pour le payment watcher. Optionnel mais recommandé en prod. |
 | `BINANCE_USER_API_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
 | `BINANCE_USER_SECRET_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
 | `BYBIT_USER_API_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
 | `BYBIT_USER_SECRET_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
+| `SWEEP_MIN_THRESHOLD_USD` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Seuil USD pour sweep (default 10) |
+| `DRY_RUN` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Active le mode dry-run pour sweep (default: true). Passer à `false` pour envoyer de vraies transactions. |
+| `SWEEP_MNEMONIC_BASE` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Mnemonic Base (sweep) |
+| `SWEEP_MNEMONIC_TRON` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Mnemonic Tron (sweep) |
 
 #### Stripe (Legacy - conservé pour compatibilité NOW.TS)
 
@@ -164,6 +171,18 @@ Ces variables sont **partagées** entre tous les environnements Vercel.
 | `STRIPE_ULTRA_YEARLY_PLAN_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
 
 **Note**: MyCryptoPilot utilise des **paiements crypto uniquement**. Stripe est conservé pour compatibilité avec le template NOW.TS.
+
+#### Variables sweep locales (`.env.sweep` uniquement)
+
+| Variable | Usage | Notes |
+|----------|-------|-------|
+| `DRY_RUN` | `true` par défaut | Passe à `false` pour envoyer de vraies transactions (confirmation requise). |
+| `SWEEP_MIN_THRESHOLD_USD` | Seuil minimum | Supérieur à 0 pour éviter le dust. |
+| `SWEEP_MNEMONIC_BASE` | Seed Base | Stocker chiffré (1Password). Jamais committer. |
+| `SWEEP_MNEMONIC_TRON` | Seed Tron | Idem. |
+| `BINANCE_MASTER_WALLET_BASE` / `TRON` | Peut être dupliqué ici | Surcharge locale possible si différent de `.env`. |
+
+Ces variables ne doivent **jamais** être ajoutées à Vercel/GitHub Actions. Elles sont destinées à l’opérateur qui exécute `scripts/sweep-to-binance.ts`.
 
 ---
 
@@ -180,6 +199,7 @@ Variables nécessaires pour **CI/CD** (tests E2E, type checking, lint).
 | `CRYPTO_XPUB_TRON` | `.env.test` | ✅ Oui | XPUB testnet |
 | `BASE_RPC_URL_TESTNET` | `.env.test` | ✅ Oui | RPC testnet |
 | `TRON_RPC_URL_TESTNET` | `.env.test` | ✅ Oui | RPC testnet |
+| `DISCORD_BOT_ENABLED` | `.env.test` | ✅ Oui (`true`) | Active le bot durant les tests fin de flux |
 | `RESEND_API_KEY` | `.env.test` | ✅ Oui | Pour tests email |
 | `ENCRYPTION_SECRET` | `.env.test` | ✅ Oui | Même que prod pour cohérence |
 

@@ -45,7 +45,7 @@ export default async function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3">
           {MYCRYPTOPILOT_PLANS.filter((p) => p.name !== "test").map((plan) => (
             <Card
               key={plan.name}

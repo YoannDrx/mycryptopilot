@@ -68,6 +68,11 @@ describe("zod-route", () => {
     createdAt: new Date(1, 1, 1, 1),
     updatedAt: new Date(1, 1, 1, 1),
     banned: null,
+    role: null,
+    image: null,
+    discordId: null,
+    planName: null,
+    planExpiresAt: null,
   };
 
   it("authRoute should add the user inside the context if the user is authenticated", async () => {

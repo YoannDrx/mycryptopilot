@@ -92,6 +92,12 @@ Accounts start on the Free plan automatically.
 
 Payment is detected automatically within 1-3 minutes. Your plan activates immediately after confirmation.
 
+### Can I test the payment flow first?
+
+Yes. Select the **$1 Test** plan on the pricing page. It generates the same checkout experience with a tiny invoice so you can validate your wallet, network fees, and confirmation timing before upgrading to Pro or Ultra.
+
+> See the [Crypto Payments guide](/docs/crypto-payments) for screenshots and troubleshooting tips.
+
 ### What is pro-rata pricing?
 
 You can pay **any amount** to get proportional access:
@@ -245,14 +251,11 @@ Traders can manually close or update signals anytime.
 
 ### Can I copy-trade automatically (API)?
 
-**Not yet.** MyCryptoPilot focuses on **manual execution** and education.
+**Manual journal copy is live now** for Pro and Ultra. Open a signal, hit **Copy Trade**, and log the position with copy ratio, max risk, and entry price. The trade is stored in your journal for post-analysis.
 
-**Why?**
-- Auto-trading removes the learning process
-- Manual execution teaches you to evaluate setups
-- You stay in control of your capital
+**Automated execution** is planned for Ultra subscribers. We’re building a secure copy queue that places orders on connected exchanges with slippage controls and safety rails. You’ll see the UI placeholders in the copy dialog—stay tuned for activation announcements in Discord and release notes.
 
-**Future**: API integration may come in 2025.
+> Visit the [Copy Trading & Journal roadmap](/docs/copy-trading-roadmap) for detailed timelines and best practices.
 
 ## Risk Management
 
@@ -314,14 +317,15 @@ This is part of trading. Even the best traders have losing streaks.
 
 ### What is the Trading Journal?
 
-A built-in tool to log your trades and track performance over time.
+A built-in workspace (Pro/Ultra) for logging trades copied from signals or entered manually. Today the focus is on structured data entry; advanced analytics are rolling out alongside copy-trade automation.
 
-**Features**:
-- Manual trade entry logging
-- P&L tracking
-- Win rate calculation
-- R:R analysis
-- Notes and reflections
+**Available now**:
+- Manual entries via the **Copy Trade** dialog (MANUAL mode)
+- Notes, copy ratio, and risk controls saved with each trade
+
+**Coming soon**:
+- PnL charts, win rate dashboards, and CSV exports within the journal tab
+- Automatic population for Ultra followers using exchange copy queues
 
 ### Why should I keep a journal?
 
@@ -353,6 +357,8 @@ Not yet. Currently, you must log trades manually.
 
 **Available on**: Pro (1 connection), Ultra (3 connections)
 
+> Want the full breakdown? Read the [Portfolio Analytics guide](/docs/portfolio-analytics).
+
 ### How do I connect my exchange?
 
 1. Go to **Account → Exchanges**
@@ -364,7 +370,7 @@ Not yet. Currently, you must log trades manually.
 5. Paste API Key and Secret Key
 6. Click **"Validate & Connect"**
 
-First sync fetches last 30 days of trades. Subsequent syncs run automatically every 5 minutes.
+First sync fetches last 30 days of trades. Subsequent syncs run automatically based on your plan (Pro: every 5 minutes, Ultra: every 1 minute).
 
 ### Is it safe to connect my exchange?
 
@@ -458,8 +464,8 @@ If persists, delete the API key in Binance and create new ones from scratch.
 | Plan | Frequency | Use Case |
 |------|-----------|----------|
 | FREE | N/A | No connections allowed |
-| PRO | Every 1 minute | Near real-time updates |
-| ULTRA | Every 5 seconds | Real-time tracking |
+| PRO | Every 5 minutes | Frequent performance updates |
+| ULTRA | Every 1 minute | Near real-time tracking |
 
 You can also click **"Sync Now"** anytime to force immediate sync.
 

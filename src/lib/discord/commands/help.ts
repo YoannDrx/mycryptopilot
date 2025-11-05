@@ -34,9 +34,34 @@ export async function handleHelpCommand(
         inline: false,
       },
       {
+        name: "🚫 /unfollow @trader",
+        value: "Arrête de suivre un trader en un clic",
+        inline: false,
+      },
+      {
         name: "⬆️ /upgrade",
         value:
           "Obtiens le lien pour upgrader ton abonnement (Pro ou Ultra) et débloquer plus de signaux",
+        inline: false,
+      },
+      {
+        name: "🔗 /link",
+        value: "Vérifie ou connecte ton compte Discord à MyCryptoPilot",
+        inline: false,
+      },
+      {
+        name: "💳 /pricing",
+        value: "Affiche les plans et le lien vers le checkout crypto",
+        inline: false,
+      },
+      {
+        name: "🛟 /support",
+        value: "Retrouve tous les contacts support (email, Twitter, docs)",
+        inline: false,
+      },
+      {
+        name: "🧮 /risk",
+        value: "Calcule ta taille de position avec la règle des 2%",
         inline: false,
       },
       {

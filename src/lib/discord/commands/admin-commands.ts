@@ -7,6 +7,8 @@ import { DISCORD_CONFIG } from "../config";
 import { SiteConfig } from "@/site-config";
 import { assignRoleToUser } from "../roles";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { createTraderChannel } from "../trader-channels";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Commandes Admin Discord
@@ -642,4 +644,178 @@ export async function handleAdminTestWelcome(
       "❌ Erreur lors de l'envoi du message de bienvenue.",
     );
   }
+}
+
+/**
+ * /admin-trader-channel - Créer ou vérifier le channel privé d'un trader
+ */
+export async function handleAdminEnsureTraderChannel(
+  interaction: ChatInputCommandInteraction,
+): Promise<void> {
+  if (!isUserAdmin(interaction)) {
+    await interaction.reply({
+      content: "❌ Cette commande est réservée aux administrateurs.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const traderUser = interaction.options.getUser("trader", true);
+
+  await interaction.deferReply({ ephemeral: true });
+
+  try {
+    const trader = await prisma.user.findFirst({
+      where: { discordId: traderUser.id },
+      select: {
+        id: true,
+        traderProfile: {
+          select: {
+            displayName: true,
+          },
+        },
+      },
+    });
+
+    if (!trader?.id || !trader.traderProfile) {
+      await interaction.editReply(
+        `❌ ${traderUser.tag} n'est pas reconnu comme trader vérifié.`,
+      );
+      return;
+    }
+
+    const channelId = await createTraderChannel(
+      trader.id,
+      trader.traderProfile.displayName,
+    );
+
+    if (!channelId) {
+      await interaction.editReply(
+        "❌ Impossible de créer ou récupérer le channel privé.",
+      );
+      return;
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor(0x10b981)
+      .setTitle("✅ Channel trader prêt")
+      .setDescription(
+        `Le channel privé de **${trader.traderProfile.displayName}** est disponible.`,
+      )
+      .addFields({
+        name: "Channel",
+        value: `<#${channelId}>`,
+      })
+      .setFooter({ text: `Exécuté par ${interaction.user.tag}` })
+      .setTimestamp();
+
+    await interaction.editReply({ embeds: [embed] });
+  } catch (error) {
+    logger.error("Error in handleAdminEnsureTraderChannel:", error);
+    await interaction.editReply("❌ Erreur lors de la création du channel.");
+  }
+}
+
+/**
+ * /admin-notify - Envoyer une annonce dans un channel
+ */
+export async function handleAdminNotify(
+  interaction: ChatInputCommandInteraction,
+): Promise<void> {
+  if (!isUserAdmin(interaction)) {
+    await interaction.reply({
+      content: "❌ Cette commande est réservée aux administrateurs.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const message = interaction.options.getString("message", true);
+  const channelId =
+    interaction.options.getString("channel") ?? DISCORD_CONFIG.channels.LOGS;
+
+  await interaction.deferReply({ ephemeral: true });
+
+  try {
+    const client = discordBot.getClient();
+    if (!client) {
+      await interaction.editReply("❌ Bot non initialisé.");
+      return;
+    }
+
+    if (!channelId) {
+      await interaction.editReply(
+        "❌ Aucun channel configuré (DISCORD_LOG_CHANNEL_ID manquant).",
+      );
+      return;
+    }
+
+    const channel = await client.channels.fetch(channelId);
+    if (!channel || !channel.isTextBased() || !("send" in channel)) {
+      await interaction.editReply("❌ Channel invalide.");
+      return;
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor(0x3b82f6)
+      .setTitle("📢 Annonce MyCryptoPilot")
+      .setDescription(message)
+      .setFooter({ text: `Envoyé par ${interaction.user.tag}` })
+      .setTimestamp();
+
+    await channel.send({ embeds: [embed] });
+    await interaction.editReply("✅ Annonce envoyée.");
+  } catch (error) {
+    logger.error("Error in handleAdminNotify:", error);
+    await interaction.editReply("❌ Erreur lors de l'envoi de l'annonce.");
+  }
+}
+
+/**
+ * /admin-config - Afficher la configuration actuelle du bot
+ */
+export async function handleAdminConfig(
+  interaction: ChatInputCommandInteraction,
+): Promise<void> {
+  if (!isUserAdmin(interaction)) {
+    await interaction.reply({
+      content: "❌ Cette commande est réservée aux administrateurs.",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const embed = new EmbedBuilder()
+    .setColor(0x6366f1)
+    .setTitle("⚙️ Configuration Discord Bot")
+    .addFields(
+      {
+        name: "Enabled",
+        value: DISCORD_CONFIG.isEnabled() ? "✅" : "❌",
+        inline: true,
+      },
+      {
+        name: "Guild ID",
+        value: process.env.DISCORD_GUILD_ID ?? "Non défini",
+        inline: true,
+      },
+      {
+        name: "Channel Free Signals",
+        value: DISCORD_CONFIG.channels.FREE_SIGNALS || "Non défini",
+        inline: true,
+      },
+      {
+        name: "Channel Logs",
+        value: DISCORD_CONFIG.channels.LOGS || "Non défini",
+        inline: true,
+      },
+      {
+        name: "Admin Role",
+        value: DISCORD_CONFIG.adminRoleId || "Non défini",
+        inline: true,
+      },
+    )
+    .setTimestamp();
+
+  await interaction.reply({ embeds: [embed], ephemeral: true });
 }

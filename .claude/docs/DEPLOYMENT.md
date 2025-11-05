@@ -117,6 +117,7 @@ railway logs
 
 | Variable | Source | Exemple |
 |----------|--------|---------|
+| `DISCORD_BOT_ENABLED` | Vercel / Railway | `true` |
 | `DISCORD_BOT_TOKEN` | Discord Developer Portal | `MTI3...xyz` |
 | `DISCORD_GUILD_ID` | Discord Server (right-click) | `127...890` |
 | `DATABASE_URL` | Neon Console | `postgresql://...` |

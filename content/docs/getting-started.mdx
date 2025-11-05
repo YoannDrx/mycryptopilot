@@ -23,195 +23,129 @@ MyCryptoPilot connects retail traders with verified professional traders who sha
 - **Detailed rationales** explaining the setup
 - **Market context** and analysis
 
+## Platform Overview
+
+The navigation is split into dedicated workspaces so you always know where to go:
+
+- **Trading** – dashboards, signal feed, trader marketplace, pricing, checkout, and trader tools.
+- **Account** – profile, Discord/email preferences, followed traders, payments, and exchange connections.
+- **Crypto School** – structured learning content (coming soon) with progress tracking for Pro/Ultra subscribers.
+- **Tax & Declaration** – CSV imports, reconciliations, and future reporting utilities (Ultra roadmap).
+
 ## Quick Start (5 minutes)
 
-### 1. Create Your Free Account
+### 1. Create Your Account
 
-1. Visit [mycryptopilot.app](https://mycryptopilot.app)
-2. Click "Sign Up" (top right)
-3. Choose your sign-up method:
-   - Email + password
-   - Magic link (passwordless)
-   - Discord OAuth (recommended for community access)
-   - GitHub OAuth
-   - Google OAuth
+1. Visit [mycryptopilot.app](https://mycryptopilot.app) and click **Sign Up**.
+2. Choose email/password, magic link, or OAuth (Discord, GitHub, Google).
+3. You start on the **Free plan** with one trader slot and three active signals.
 
-Your account starts on the **Free plan** automatically.
+### 2. Complete the Onboarding Essentials
 
-### 2. Connect Your Discord (Optional but Recommended)
+- **Connect Discord** in **Account → Discord** to receive instant alerts and auto-assigned roles.
+- **Enable emails** in **Account → Email** if you prefer inbox notifications.
+- Review your plan limits under **Trading → Dashboard** and the **Pricing** page.
 
-Discord integration allows you to:
+### 3. Discover Traders & Signals
 
-- Receive instant signal notifications
-- Access the MCP community
-- Get auto-assigned Discord roles based on your plan
+- Navigate to **Trading → Traders** to browse verified profiles with win rate, payoff, drawdown, and style badges.
+- Follow a trader; the Free plan allows one active follow. Pro and Ultra raise the cap (see plan table below).
+- Signals you unlock appear in **Trading → Dashboard**, **Trading → Signals**, Discord (if linked), and email (if opted-in).
 
-To connect:
+### 4. Explore the Signals Feed
 
-1. Go to **Account → Discord**
-2. Click "Connect Discord Account"
-3. Authorize the MyCryptoPilot bot
+The feed includes advanced filters for asset, bias, instrument type, trader name, verification, confidence, and publication window. Use them to focus on the setups that match your playbook.
 
-### 3. Browse the Traders Marketplace
+### 5. (Optional) Try Copy Trading & Journaling
 
-1. Navigate to **Trading → Traders**
-2. View verified traders with transparent stats:
-   - Win rate %
-   - Payoff ratio (R:R)
-   - Max drawdown
-   - Total signals sent
-   - Trading style (SPOT, PERP, timeframe)
+- From any signal, open the **Copy Trade** dialog to log the trade manually in your journal today (Pro/Ultra).
+- Ultra will unlock automated execution once exchange copy queues ship; the dialog already shows the upgrade requirements.
 
-### 4. Follow Your First Trader
+### 6. Upgrade When Ready
 
-1. Click on a trader's profile
-2. Review their stats and recent signals
-3. Click "Follow" button
+- Visit **Trading → Pricing** to review plans and start the crypto checkout flow.
+- Payments support **USDC (Base)** and **USDT (Tron)** with unique deposit addresses, QR codes, and a 15-minute timer.
+- Unsure? Use the **$1 Test Payment** plan to validate your wallet before committing.
 
-**Free plan**: Follow 1 trader, track up to 3 active signals.
+## Managing Your Account
 
-### 5. Receive Your First Signal
+### Trading Dashboard (followers)
 
-Signals appear in:
+- Tracks active signals, followed traders, plan status, and Discord connection state.
+- Offers quick links to marketplace discovery and upgrade CTAs.
 
-- **Dashboard** (Trading → Dashboard)
-- **Signals Feed** (Trading → Signals)
-- **Discord** (if connected)
-- **Email** (if enabled in Account → Email)
+### Traders Dashboard (verified traders)
 
-## Understanding Your Dashboard
+- Provides follower counts, active/total signal metrics, and quick creation of new TradingCard signals.
+- Surfaces verification progress, revenue tracking, and performance snapshots powered by your exchange syncs.
 
-### User Dashboard (Trading → Dashboard)
+### Portfolio Analytics (traders)
 
-Displays:
+- Connect Binance or Bybit read-only APIs via **Account → Exchanges** (plan-gated: Pro=1, Ultra=3).
+- Access rich analytics in **Trading → Portfolio**: PnL, Sharpe/Sortino, VaR, drawdown, returns distribution, and trade history.
+- Syncs run automatically based on plan refresh intervals (Pro 5 min, Ultra 1 min).
 
-- Recent signals from traders you follow
-- Active signals summary
-- Your subscription status
-- Quick actions (upgrade, follow more traders)
+## Subscription Plans & Limits
 
-### Trader Dashboard (for verified traders)
+| Plan      | Price  | Active Signals | Traders Follow | Key Features |
+| --------- | ------ | -------------- | -------------- | ------------ |
+| **Free**  | $0/mo  | 3              | 1              | Signal previews, basic dashboard, Discord alerts |
+| **Pro**   | $49/mo | 15             | 5              | Risk console, trading journal, Crypto School access, 1 exchange sync |
+| **Ultra** | $99/mo | Unlimited      | Unlimited      | Advanced filters, custom alerts, Tax workspace, 3 exchange syncs, copy-trade auto execution (roadmap) |
 
-If you're a verified trader:
+**Crypto checkout highlights**
 
-- Navigate to **Trading → Trader Dashboard**
-- Create new signals (**Trader Dashboard → New Signal**)
-- View your published signals
-- Track follower count
+- Automatic plan activation once the transaction confirms on-chain.
+- Pro-rata billing lets you prepay any USD amount; days are granted proportionally.
+- Payment history with explorer links lives in **Account → Payments**.
 
-## Subscription Plans
+## Copy Trading & Trading Journal
 
-| Plan      | Price  | Active Signals | Traders     | Features                             |
-| --------- | ------ | -------------- | ----------- | ------------------------------------ |
-| **Free**  | $0/mo  | 3 active       | 1 trader    | Basic signals                        |
-| **Pro**   | $49/mo | 15 active      | 5 traders   | Risk console, journal, Crypto School |
-| **Ultra** | $99/mo | ∞ unlimited    | ∞ unlimited | Everything + Tax Help, custom alerts |
-
-### How to Upgrade
-
-1. Go to **Trading → Pricing**
-2. Choose your plan (Pro or Ultra)
-3. Click "Subscribe Now"
-4. Pay with:
-   - **USDC** (Base network)
-   - **USDT** (Tron network)
-
-Pro-rata supported: Pay any amount, get proportional access (e.g., $25 = 15 days Pro).
-
-## Using the Risk Console (Pro/Ultra)
-
-The risk console helps you calculate optimal position sizing:
-
-1. Enter your **total capital** (e.g., $5,000)
-2. Set your **risk tolerance** (e.g., 2% per trade = $100)
-3. Select a signal
-4. The console calculates:
-   - Position size (in USD or crypto)
-   - Quantity to buy
-   - Max loss if SL hit
-   - Potential profit if TP hit
-
-**Formula**: `Position Size = (Capital × Risk%) / (Entry - SL)`
-
-## Becoming a Verified Trader
-
-Want to share your signals and earn revenue?
-
-### Requirements:
-
-- Minimum **6 months** consistent trading
-- At least **50 recorded trades**
-- Transparent track record
-- Win rate and R:R documented
-
-### How to Apply:
-
-1. Go to **Account → Become Trader**
-2. Fill out the application form:
-   - Trading experience
-   - Strategy description
-   - Track record upload
-3. Submit for review
-
-Review time: 7-14 days. You'll be notified via email.
+- **Manual journal mode** records trades with optional copy ratio and max-risk controls.
+- **Auto execution** is in development; ULTRA users already see the settings and will be first to access it.
+- Journal analytics will appear in the dashboard’s dedicated tab as the feature rolls out.
 
 ## FAQs
 
 ### How often are signals sent?
 
-Depends on the trader's style:
+Depends on the trader’s style:
 
-- **Scalpers**: 5-15 signals/day
-- **Day traders**: 2-5 signals/day
-- **Swing traders**: 1-3 signals/week
+- **Scalpers**: 5–15 signals/day
+- **Day traders**: 2–5 signals/day
+- **Swing traders**: 1–3 signals/week
 
-### Can I copy trade automatically?
+### Can I automate execution today?
 
-Not yet. MyCryptoPilot focuses on **education** and **transparency**. Signals are meant to be understood and executed manually, helping you learn.
+Manual journaling is available now. Exchange-backed copy trading is on the roadmap for Ultra subscribers; the UI already reflects upcoming controls so you can plan ahead.
 
-Auto-trading via API may come in future updates.
+### Which exchanges are supported?
 
-### What exchanges do you support?
+- Signals are compatible with any exchange where the pair exists.
+- Verified stats currently sync from **Binance** and **Bybit** via read-only API keys.
 
-Signals work on any exchange:
+### What about the Crypto School and Tax tools?
 
-- Binance, Bybit, OKX, Kraken, Coinbase, etc.
-- Both SPOT and PERPETUAL markets
+Both spaces are live in the navigation with **Coming Soon** content. Pro grants early access to courses; Ultra unlocks tax import/report automation once released.
 
-Each signal specifies the exact pair (e.g., "BTC/USDT PERP").
+### How do I cancel or pause?
 
-### Are results guaranteed?
+Crypto subscriptions are prepaid. Stop sending renewals and access will expire automatically on the displayed end date.
 
-**No.** Trading involves risk. Past performance doesn't guarantee future results. MyCryptoPilot provides **tools and education**, not financial advice.
+### I paid the wrong amount—now what?
 
-Always:
+The checkout engine detects the received USD value:
 
-- Trade with risk capital only
-- Use stop-losses
-- Never risk more than 1-2% per trade
-
-### How do I cancel my subscription?
-
-Crypto subscriptions are pay-as-you-go:
-
-- Simply **stop sending payments**
-- Your access expires at the end of your paid period
-- No cancellation needed
-
-### I paid the wrong amount, what happens?
-
-The system detects your payment amount automatically:
-
-- **Overpaid**: Get extra days proportionally
-- **Underpaid**: Get partial access (pro-rata)
-- **Wrong wallet**: Contact support with TX hash
+- **Overpay** → extra access days granted.
+- **Underpay** → partial access for the equivalent number of days.
+- **Wrong network/token** → reach support with your TX hash for manual review.
 
 ## Support & Community
 
-- **Discord community**: Join our server for real-time updates
-- **Email support**: contact@mycryptopilot.app
-- **Documentation**: Visit our comprehensive docs
+- **Discord**: Real-time signals, private trader channels, community Q&A.
+- **Email**: contact@mycryptopilot.app for billing or product support.
+- **Docs**: You’re here—browse guides by persona or feature.
 
 ---
 
-Ready to start? [Sign up now](/auth/signup) or [browse traders](/traders).
+Ready to start? [Sign up](/auth/signup), [browse traders](/traders), or [preview plans](/pricing).

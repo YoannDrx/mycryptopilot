@@ -1,9 +1,16 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   encryptApiKey,
   decryptApiKey,
   verifyEncryptionSetup,
 } from "@/lib/crypto/encryption-service";
+
+// Mock env module to provide ENCRYPTION_SECRET
+vi.mock("@/lib/env", () => ({
+  env: {
+    ENCRYPTION_SECRET: "test-encryption-secret-32-chars-minimum",
+  },
+}));
 
 vi.mock("@/lib/logger", () => ({
   logger: {
@@ -16,6 +23,12 @@ vi.mock("@/lib/logger", () => ({
 describe("EncryptionService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock ENCRYPTION_SECRET for tests
+    process.env.ENCRYPTION_SECRET = "test-encryption-secret-32-chars-minimum";
+  });
+
+  afterEach(() => {
+    delete process.env.ENCRYPTION_SECRET;
   });
 
   describe("encryptApiKey", () => {
@@ -52,7 +65,8 @@ describe("EncryptionService", () => {
 
       const encrypted = encryptApiKey(plaintext);
 
-      expect(encrypted.encrypted).toBeTruthy();
+      // Empty string encryption is valid - check structure exists
+      expect(encrypted.encrypted).toBeDefined(); // Empty string returns ""
       expect(encrypted.iv).toBeTruthy();
       expect(encrypted.tag).toBeTruthy();
     });
@@ -221,8 +235,10 @@ describe("EncryptionService", () => {
 
       const encrypted = encryptApiKey(plaintext);
 
-      // Tamper with encrypted data (flip one bit)
-      const tamperedEncrypted = `a${encrypted.encrypted.slice(1)}`;
+      // Tamper with encrypted data (flip first hex character to its complement)
+      const firstChar = encrypted.encrypted.charAt(0);
+      const flippedChar = firstChar === "a" ? "b" : "a";
+      const tamperedEncrypted = flippedChar + encrypted.encrypted.slice(1);
 
       // Decryption should fail due to auth tag mismatch
       expect(() => {

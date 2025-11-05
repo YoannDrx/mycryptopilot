@@ -156,6 +156,11 @@ export const LIMITS_CONFIG: Record<
 export const ADDITIONAL_FEATURES = {
   free: [
     {
+      icon: Zap,
+      label: "5 Risk Calculations/day",
+      description: "Calculate position sizing with 2% rule",
+    },
+    {
       icon: Shield,
       label: "Blurred Premium Signals",
       description: "See teasers of premium signals",
@@ -164,7 +169,7 @@ export const ADDITIONAL_FEATURES = {
   pro: [
     {
       icon: Zap,
-      label: "Risk Console",
+      label: "50 Risk Calculations/day",
       description: "Calculate optimal position sizing",
     },
     {
@@ -179,6 +184,11 @@ export const ADDITIONAL_FEATURES = {
     },
   ],
   ultra: [
+    {
+      icon: Zap,
+      label: "∞ Unlimited Risk Calculations",
+      description: "Calculate position sizing without limits",
+    },
     {
       icon: Zap,
       label: "Custom Alerts",

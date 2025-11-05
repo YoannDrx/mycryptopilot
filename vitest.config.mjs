@@ -19,6 +19,7 @@ export default defineConfig({
       NEXT_PUBLIC_EMAIL_CONTACT: "test@test.com",
       CODELINE_SERVER_URL: "http://localhost:3000",
       IS_REACT_ACT_ENVIRONMENT: "true",
+      ENCRYPTION_SECRET: "test-encryption-secret-32-chars-minimum",
     },
     include: ["__tests__/**/*.[jt]s?(x)"],
     exclude: [

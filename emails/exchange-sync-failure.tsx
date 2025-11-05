@@ -14,6 +14,7 @@ type ExchangeSyncFailureEmailProps = {
   errorMessage: string;
   lastSuccessfulSync?: Date;
   connectionId: string;
+  orgSlug: string | null;
 };
 
 export function ExchangeSyncFailureEmail({
@@ -22,11 +23,17 @@ export function ExchangeSyncFailureEmail({
   errorMessage,
   lastSuccessfulSync,
   connectionId,
+  orgSlug,
 }: ExchangeSyncFailureEmailProps) {
   const isKeyError =
     errorMessage.includes("Invalid API") ||
     errorMessage.includes("401") ||
     errorMessage.includes("IP address");
+
+  // Build correct URL with orgSlug
+  const exchangesUrl = orgSlug
+    ? `${SiteConfig.prodUrl}/orgs/${orgSlug}/account/exchanges`
+    : `${SiteConfig.prodUrl}/login`; // Fallback to login if no orgSlug
 
   return (
     <EmailLayout>
@@ -96,7 +103,7 @@ export function ExchangeSyncFailureEmail({
 
           <Section className="my-6 text-center">
             <Button
-              href={`${SiteConfig.prodUrl}/orgs/account/exchanges`}
+              href={exchangesUrl}
               className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
             >
               🔑 Reconnecter mon exchange
@@ -129,7 +136,7 @@ export function ExchangeSyncFailureEmail({
 
           <Section className="my-6 text-center">
             <Button
-              href={`${SiteConfig.prodUrl}/orgs/account/exchanges`}
+              href={exchangesUrl}
               className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
             >
               📊 Voir mes exchanges

@@ -1,6 +1,5 @@
-import { headers } from "next/headers";
 import { unauthorized } from "next/navigation";
-import { auth } from "../auth";
+import { hasPermissionApi } from "../auth/auth-api-helper";
 import type { AuthPermission, AuthRole } from "../auth/auth-permissions";
 import { getSession } from "../auth/auth-user";
 import { prisma } from "../prisma";
@@ -55,12 +54,7 @@ export const getCurrentOrg = async (params?: OrgParams) => {
   }
 
   if (params?.permissions) {
-    const hasPermission = await auth.api.hasPermission({
-      headers: await headers(),
-      body: {
-        permission: params.permissions,
-      },
-    });
+    const hasPermission = await hasPermissionApi(params.permissions);
 
     if (!hasPermission.success) {
       return null;

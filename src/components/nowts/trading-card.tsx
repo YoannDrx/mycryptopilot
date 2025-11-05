@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
 import { ChartImageViewer } from "./chart-image-viewer";
+import { CopyTradeButton } from "./copy-trade-button";
 
 export type TradingCardProps = {
   symbol: string;
@@ -25,6 +26,12 @@ export type TradingCardProps = {
   expiresAt?: Date;
   className?: string;
   compact?: boolean; // New prop to enable compact mode
+  /** Signal ID for copy trading functionality */
+  signalId?: string;
+  /** User's current plan for copy trading access check */
+  userPlan?: string | null;
+  /** Whether to show copy trade button */
+  showCopyButton?: boolean;
 };
 
 export const TradingCard = ({
@@ -34,6 +41,9 @@ export const TradingCard = ({
   expiresAt,
   className,
   compact = false,
+  signalId,
+  userPlan,
+  showCopyButton = false,
 }: TradingCardProps) => {
   const [isExpanded, setIsExpanded] = useState(!compact);
   const isLong = payload.bias === "LONG";
@@ -310,6 +320,19 @@ export const TradingCard = ({
                 </Badge>
               )}
             </div>
+
+            {/* Copy Trade Button */}
+            {showCopyButton && signalId && traderName && !isExpired && (
+              <div className="mt-4 border-t border-slate-700/30 pt-4">
+                <CopyTradeButton
+                  signalId={signalId}
+                  symbol={symbol}
+                  traderName={traderName}
+                  entryPrice={payload.entry}
+                  userPlan={userPlan ?? null}
+                />
+              </div>
+            )}
           </CardContent>
         )}
       </Card>

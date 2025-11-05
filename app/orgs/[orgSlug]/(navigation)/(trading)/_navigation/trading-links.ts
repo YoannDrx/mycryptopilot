@@ -4,6 +4,7 @@ import type {
 } from "@/features/navigation/navigation.type";
 import {
   BarChart3,
+  Calculator,
   TrendingUp,
   Users,
   DollarSign,
@@ -43,6 +44,11 @@ const SIGNALS_LINKS: NavigationLink[] = [
     label: "Signals Feed",
   },
   {
+    href: `${ORGANIZATION_PATH}/risk-console`,
+    Icon: Calculator,
+    label: "Risk Console",
+  },
+  {
     href: `${ORGANIZATION_PATH}/traders`,
     Icon: Users,
     label: "Traders Marketplace",
@@ -60,6 +66,11 @@ const TRADER_TOOLS_LINKS: NavigationLink[] = [
     href: `${ORGANIZATION_PATH}/dashboard/trader`,
     Icon: BarChart3,
     label: "Trader Dashboard",
+  },
+  {
+    href: `${ORGANIZATION_PATH}/portfolio`,
+    Icon: LineChart,
+    label: "Portfolio Analytics",
   },
   {
     href: `${ORGANIZATION_PATH}/dashboard/trader/signals/new`,
