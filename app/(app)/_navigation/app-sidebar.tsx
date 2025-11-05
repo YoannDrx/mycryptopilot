@@ -13,7 +13,7 @@ import {
 import { SidebarNavigationMenu } from "@/components/ui/sidebar-utils";
 import { ContactFeedbackPopover } from "@/features/contact/feedback/contact-feedback-popover";
 import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
-import { UpgradeCard } from "../../orgs/[orgSlug]/(navigation)/_navigation/upgrade-org-card";
+import { SubscriptionCTA } from "@/components/nowts/subscription-cta";
 import { getAppNavigationGroups } from "./app-links";
 import {
   Collapsible,
@@ -80,7 +80,7 @@ export function AppSidebar({
         ))}
       </SidebarContent>
       <SidebarFooter className="flex flex-col gap-2">
-        <UpgradeCard />
+        <SubscriptionCTA variant="compact" planToPromote="pro" />
         <ContactFeedbackPopover />
         <SidebarUserButton />
       </SidebarFooter>

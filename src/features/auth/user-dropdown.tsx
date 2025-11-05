@@ -27,7 +27,6 @@ import {
   User2,
 } from "lucide-react";
 
-import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
@@ -37,14 +36,10 @@ import { UserDropdownStopImpersonating } from "./user-dropdown-stop-impersonatin
 export const UserDropdown = ({ children }: PropsWithChildren) => {
   const session = useSession();
   const theme = useTheme();
-  const currentOrg = useCurrentOrg();
 
   if (!session.data?.user) {
     return null;
   }
-
-  // Build base path with orgSlug if available
-  const basePath = currentOrg?.slug ? `/orgs/${currentOrg.slug}` : "/orgs";
 
   return (
     <DropdownMenu>
@@ -64,25 +59,25 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={`${basePath}/dashboard`}>
+          <Link href="/dashboard">
             <BarChart3 className="mr-2 size-4" />
             Trading
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`${basePath}/courses`}>
+          <Link href="/courses">
             <BookOpen className="mr-2 size-4" />
             Crypto School
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`${basePath}/import`}>
+          <Link href="/import">
             <FileText className="mr-2 size-4" />
             Tax & Declaration
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`${basePath}/account`}>
+          <Link href="/account">
             <User2 className="mr-2 size-4" />
             Account Settings
           </Link>

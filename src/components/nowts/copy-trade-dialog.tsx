@@ -27,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { createTradeFromSignalAction } from "@/features/copy-trade/create-from-signal.action";
 import { toast } from "sonner";
 import { AlertCircle, CheckCircle2, Copy, Loader2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const copyTradeSchema = z
   .object({
@@ -83,9 +83,7 @@ export function CopyTradeDialog({
   hasCopyAccess,
 }: CopyTradeDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const params = useParams();
   const router = useRouter();
-  const orgSlug = params.orgSlug as string;
 
   const form = useZodForm({
     schema: copyTradeSchema,
@@ -165,10 +163,7 @@ export function CopyTradeDialog({
             <Button onClick={onClose} variant="outline" className="flex-1">
               Cancel
             </Button>
-            <Button
-              onClick={() => router.push(`/orgs/${orgSlug}/pricing`)}
-              className="flex-1"
-            >
+            <Button onClick={() => router.push("/pricing")} className="flex-1">
               View Plans
             </Button>
           </div>

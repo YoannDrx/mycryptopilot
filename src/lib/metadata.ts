@@ -1,6 +1,4 @@
 import type { Metadata, ResolvingMetadata } from "next";
-import { unstable_cache as cache } from "next/cache";
-import { prisma } from "./prisma";
 
 /**
  * Add a suffix to the title of the parent metadata
@@ -27,29 +25,8 @@ export const combineWithParentMetadata =
   };
 
 /**
- * This method help us to cache the metadata to avoid to call the database every time.
+ * DEPRECATED: orgMetadata removed - Big Bang (Issue #77 Phase 10)
  *
- * The cache is revalidate every 100 seconds.
+ * Organization-based metadata is no longer needed in user-centric architecture.
+ * Use direct metadata exports in page.tsx files instead.
  */
-export const orgMetadata = cache(
-  async (orgSlug: string): Promise<Metadata> => {
-    const org = await prisma.organization.findFirst({
-      where: {
-        slug: orgSlug,
-      },
-    });
-
-    if (!org) {
-      return {
-        title: "Organization not found",
-      };
-    }
-
-    return {
-      title: `${org.name}`,
-      description: "Your organization dashboard",
-    };
-  },
-  ["org-metadata"],
-  { revalidate: 100 },
-);
