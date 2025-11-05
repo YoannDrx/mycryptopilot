@@ -6,6 +6,7 @@ import {
 import { RESERVED_SLUGS } from "@/lib/organizations/reserved-slugs";
 import { prisma } from "@/lib/prisma";
 import { SiteConfig } from "@/site-config";
+import { FEATURES } from "@/lib/feature-flags";
 import { logger } from "@/lib/logger";
 import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
@@ -145,4 +146,54 @@ export const isAdminRoute = (pathname: string) => {
 
 export const isReservedSlug = (slug: string) => {
   return RESERVED_SLUGS.includes(slug);
+};
+
+/**
+ * Handle legacy /orgs/{slug}/* redirects to new routes
+ *
+ * Only active when FEATURES.USER_ACCOUNT_MODE = true AND FEATURES.LEGACY_ORG_REDIRECTS = true
+ * Returns 307 temporary redirect (preserves POST data, signals temporary change to search engines)
+ *
+ * @example
+ * /orgs/abc123/dashboard → /dashboard (307)
+ * /orgs/abc123/traders?filter=verified → /traders?filter=verified (307)
+ */
+export const handleLegacyOrgRedirect = (
+  request: NextRequest,
+): NextResponse | null => {
+  // Only redirect in new mode with redirects enabled
+  if (!FEATURES.USER_ACCOUNT_MODE || !FEATURES.LEGACY_ORG_REDIRECTS) {
+    return null;
+  }
+
+  const { pathname, search } = request.nextUrl;
+
+  // Check if this is a legacy org URL
+  if (!pathname.startsWith("/orgs/")) {
+    return null;
+  }
+
+  const slug = extractOrgSlug(pathname);
+  if (!slug) {
+    return null;
+  }
+
+  // Extract the path after /orgs/{slug}
+  const orgPrefix = `/orgs/${slug}`;
+  if (!pathname.startsWith(orgPrefix)) {
+    return null;
+  }
+
+  // Build new path without /orgs/{slug} prefix
+  const newPath = pathname.slice(orgPrefix.length) || "/dashboard"; // Default to /dashboard if empty
+  const url = request.nextUrl.clone();
+  url.pathname = newPath;
+  url.search = search; // Preserve query params
+
+  logger.info(
+    `[LEGACY REDIRECT] 307 redirect: ${pathname}${search} → ${newPath}${search}`,
+  );
+
+  // 307 Temporary Redirect (preserves HTTP method + signals temporary to search engines)
+  return NextResponse.redirect(url, { status: 307 });
 };
