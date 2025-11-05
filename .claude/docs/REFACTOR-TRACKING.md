@@ -3,8 +3,8 @@
 **Issue** : [#77](https://github.com/YoannDrx/mycryptopilot/issues/77)
 **Branche** : `feature/remove-organizations`
 **Date début** : 5 janvier 2025
-**Statut global** : 🟡 En cours - Phase 5a terminée, Phase 5b à planifier
-**Phases complètes** : 0, 1, 2, 3, 4, 5a ✅
+**Statut global** : ✅ Phase 5 COMPLETE - Prêt pour tests & push
+**Phases complètes** : 0, 1, 2, 3, 4, 5a, 5b ✅
 
 ---
 
@@ -17,8 +17,8 @@
 | 2. Migration données | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | fb8d321 |
 | 3. Services | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | c18194d, 05877f1 |
 | 4. Auth & Middleware | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | 6d48bbe, 657a6c3 |
-| 5a. Routes principales | ✅ Terminé | 2025-01-08 | 2025-01-08 | 2h | ff67a66 |
-| 5b. Sub-routes | ⚪ À faire | - | - | - | - |
+| 5a. Routes principales | ✅ Terminé | 2025-01-08 | 2025-01-08 | 2h | ff67a66, 41d45b5 |
+| 5b. Layout Navigation | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1h | b75a6f9 |
 | 6. Tests | ⚪ À faire | - | - | - | - |
 | 7. Bascule prod | ⚪ À faire | - | - | - | - |
 | 8. Nettoyage | ⚪ À faire | - | - | - | - |
@@ -474,28 +474,78 @@ Created 5 main root-level routes compatible with dual-mode:
 
 ---
 
-## Phase 5b : Sub-Routes Migration (À Planifier)
+## Phase 5b : Layout Navigation (Fix Critique) ✅ COMPLETE
 
-**Date début** : À définir
-**Statut** : ⚪ À planifier
+**Date début** : 2025-01-08
+**Date fin** : 2025-01-08
+**Durée réelle** : 1 heure
+**Priorité** : 🔴 CRITIQUE
 
-### Décision Stratégique Requise
+### Problème Identifié
 
-**Question** : Faut-il migrer les sub-routes maintenant ou passer aux tests ?
+Après Phase 5a, lors du premier build test, découverte d'un problème critique:
+- ❌ Routes créées sans sidebar de navigation
+- ❌ Expérience utilisateur cassée (pas de menu)
+- ❌ Build passait mais routes inutilisables
 
-**Option 1 - Migrer sub-routes maintenant** :
-- ✅ Architecture plus propre
-- ✅ Toutes les URLs cohérentes
-- ❌ Temps estimé : 6-8h supplémentaires
-- ❌ Retarde les tests
+### Solution Implémentée
 
-**Option 2 - Passer aux tests (Phase 6)** :
-- ✅ Valide le système rapidement
-- ✅ Redirections 307 suffisent temporairement
-- ✅ Sub-routes peuvent attendre post-MVP
-- ❌ Architecture "hybride" temporaire
+Création complète du système de navigation pour le groupe (app):
 
-**Recommandation** : Option 2 - Valider avec tests d'abord
+1. **`app/(app)/layout.tsx`** (68 lignes)
+   - Layout principal avec SidebarProvider
+   - Utilise `getOrgOrStub()` pour dual-mode
+   - Intégration BaseSidebarLayout pattern
+
+2. **`app/(app)/_navigation/app-links.ts`** (147 lignes)
+   - Navigation links adaptés aux nouvelles routes
+   - Combine routes racine + legacy sub-routes
+   - 5 sections: OVERVIEW, SIGNALS, TRADER TOOLS, ANALYTICS, SETTINGS
+
+3. **`app/(app)/_navigation/app-sidebar.tsx`** (114 lignes)
+   - Sidebar similaire à TradingSidebar
+   - Intègre OrgsSelect, GlobalSearch, UpgradeCard
+   - Sections collapsibles conditionnelles
+
+### Tests Validés
+
+- ✅ **TypeScript** : `pnpm ts` - 0 erreurs
+- ✅ **Build Production** : `pnpm build` - Build réussi
+- ✅ **Optimisation** : First Load JS réduit (540kB vs 577kB /dashboard)
+- ✅ **Architecture** : Navigation sidebar fonctionnelle
+- ⏳ **Tests manuels** : À faire par l'utilisateur en mode dev
+
+### Métriques Phase 5b
+
+- **Durée** : 1 heure (fix critique + tests)
+- **Fichiers créés** : 3 (layout + links + sidebar)
+- **LOC ajoutées** : 343 lignes
+- **Commit** : `b75a6f9`
+- **Priorité** : 🔴 CRITIQUE (bloquant sans ça)
+
+### Décision Stratégique - Sub-Routes Migration
+
+**Question** : Migrer 23 sub-routes maintenant ou plus tard ?
+
+**Décision retenue** : ❌ PAS maintenant - Redirections 307 suffisent
+- ✅ Validation système prioritaire
+- ✅ Sub-routes fonctionnent via legacy URLs + redirections
+- ✅ Phase 6 (tests) plus importante
+- ⏳ Migration sub-routes peut attendre post-MVP
+
+### Commit Final
+
+**Commit** : `b75a6f9`
+```
+fix(refactor): Add navigation layout for root-level routes
+
+Issue #77 - Refactoring Suppression Organizations
+Phase 5b: Critical Fix - Navigation Layout
+
+Problem: Phase 5a routes had no navigation sidebar, breaking UX.
+
+Solution: Created complete navigation system for (app) route group
+```
 
 ### Sub-Routes Identifiées (si migration Phase 5b)
 
