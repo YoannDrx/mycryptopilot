@@ -637,16 +637,4 @@ model UserSubscription {
   @@map("user_subscriptions")
 }
 
-/// LegacyOrgSlug: Backup table for old /orgs/{slug} URLs
-/// Used for 307 redirects during Phase 7 (before cleanup)
-/// Can be dropped in Phase 8 after all redirects are validated
-model LegacyOrgSlug {
-  id        String   @id @default(cuid())
-  orgId     String   @unique @map("org_id")
-  slug      String   @unique
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("legacy_org_slugs")
-}
+// LegacyOrgSlug removed - Not needed in Big Bang approach (Issue #77 Phase 1)
