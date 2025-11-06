@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 import {
   Card,
   CardContent,
@@ -188,11 +189,12 @@ export function UserSubscriptionManagement({
                 {user.userSubscription.periodStart && (
                   <div className="text-muted-foreground text-sm">
                     Period:{" "}
-                    {new Date(
-                      user.userSubscription.periodStart,
-                    ).toLocaleDateString()}
+                    {format(
+                      new Date(user.userSubscription.periodStart),
+                      "MMM d, yyyy",
+                    )}
                     {user.userSubscription.periodEnd &&
-                      ` → ${new Date(user.userSubscription.periodEnd).toLocaleDateString()}`}
+                      ` → ${format(new Date(user.userSubscription.periodEnd), "MMM d, yyyy")}`}
                   </div>
                 )}
               </div>

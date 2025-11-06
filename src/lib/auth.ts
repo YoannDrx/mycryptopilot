@@ -291,7 +291,11 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: SiteConfig.appId,
+    storeIPAddress: true, // Store user IP addresses in sessions
+    useSecureCookies: env.NODE_ENV === "production",
   },
+  trustedOrigins: [getServerUrl()],
+  trustProxy: true, // Required to read IP from X-Forwarded-For header (Vercel, proxies)
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
