@@ -65,13 +65,13 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/courses">
+          <Link href="/school/courses">
             <BookOpen className="mr-2 size-4" />
             Crypto School
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/import">
+          <Link href="/tax/import">
             <FileText className="mr-2 size-4" />
             Tax & Declaration
           </Link>
