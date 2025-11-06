@@ -18,8 +18,10 @@ import { getRequiredAdmin } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { UserActions } from "./_components/user-actions";
+import { UserCryptoPayments } from "./_components/user-crypto-payments";
 import { UserSessions } from "./_components/user-sessions";
 import { UserDetailsCard } from "../../_components/user-details-card";
+import { UserSubscriptionManagement } from "./_components/user-subscription-management";
 
 export default async function RoutePage(props: {
   params: Promise<{ userId: string }>;
@@ -55,56 +57,10 @@ export default async function RoutePage(props: {
 
       <LayoutContent className="flex flex-col gap-4">
         <UserDetailsCard user={userData} />
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Subscription</CardTitle>
-                <CardDescription>User subscription details</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {!userData.userSubscription ? (
-              <div className="text-muted-foreground py-4 text-center">
-                No active subscription (Free plan)
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between rounded-lg border p-3">
-                  <div className="flex flex-1 flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          userData.userSubscription.status === "active"
-                            ? "default"
-                            : userData.userSubscription.status === "canceled"
-                              ? "destructive"
-                              : "secondary"
-                        }
-                      >
-                        {userData.userSubscription.plan.toUpperCase()}
-                      </Badge>
-                      <span className="text-muted-foreground text-sm">
-                        {userData.userSubscription.status}
-                      </span>
-                    </div>
-                    {userData.userSubscription.periodStart && (
-                      <div className="text-muted-foreground text-sm">
-                        Period:{" "}
-                        {new Date(
-                          userData.userSubscription.periodStart,
-                        ).toLocaleDateString()}
-                        {userData.userSubscription.periodEnd &&
-                          ` → ${new Date(userData.userSubscription.periodEnd).toLocaleDateString()}`}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
+        <UserSubscriptionManagement user={userData} />
+
+        <UserCryptoPayments userId={userData.id} />
 
         {userData.traderProfile && (
           <Card>

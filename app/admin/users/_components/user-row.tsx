@@ -13,7 +13,15 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Ban, Crown, Eye, MoreHorizontal, UserCheck } from "lucide-react";
+import {
+  Ban,
+  Crown,
+  Eye,
+  MoreHorizontal,
+  UserCheck,
+  UserCircle,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { UserTableCell } from "../../_components/user-table-cell";
@@ -147,6 +155,13 @@ export const UserRow = ({ user }: UserRowProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/users/${user.id}`}>
+                  <UserCircle className="mr-2 size-4" />
+                  See Profile
+                </Link>
+              </DropdownMenuItem>
+
               {!user.banned && (
                 <DropdownMenuItem
                   onClick={() => impersonateMutation.mutate(user.id)}
