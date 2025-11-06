@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 import { unwrapSafePromise } from "@/lib/promises";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Ban, Crown, Eye, MoreHorizontal, UserCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ type UserActionsProps = {
 
 export function UserActions({ user }: UserActionsProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const impersonateMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -40,7 +41,8 @@ export function UserActions({ user }: UserActionsProps) {
     },
     onSuccess: () => {
       toast.success("Impersonation started");
-      router.push("/app");
+      void queryClient.invalidateQueries();
+      window.location.href = "/dashboard";
     },
     onError: (error: Error) => {
       toast.error(`Failed to impersonate user: ${error.message}`);

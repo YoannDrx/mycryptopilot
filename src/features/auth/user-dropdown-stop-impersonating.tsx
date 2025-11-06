@@ -5,17 +5,14 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export const UserDropdownStopImpersonating = () => {
-  const router = useRouter();
-
   const stopImpersonating = useMutation({
     mutationFn: async () => {
       return authClient.admin.stopImpersonating();
     },
     onSuccess: () => {
-      router.push("/admin");
+      window.location.href = "/admin/users";
     },
   });
 
