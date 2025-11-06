@@ -182,9 +182,7 @@ export default async function InviteLandingPage({
               <div className="flex items-center gap-2">
                 <TrendingUp className="text-muted-foreground size-4" />
                 <span className="text-2xl font-bold">
-                  {stats?.winrate
-                    ? `${stats.winrate.toFixed(1)}%`
-                    : "--%"}
+                  {stats?.winrate ? `${stats.winrate.toFixed(1)}%` : "--%"}
                 </span>
               </div>
             </CardContent>

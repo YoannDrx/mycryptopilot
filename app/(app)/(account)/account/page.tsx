@@ -30,7 +30,7 @@ export default async function AccountPage() {
       title: "Profile Settings",
       description: "Update your personal information and profile picture",
       icon: User,
-      href: "/account/(settings)/profile",
+      href: "/account/(settings)",
     },
     {
       title: "Discord Connection",
