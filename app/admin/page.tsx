@@ -17,17 +17,23 @@ import { FollowsCard } from "./_components/follows-card";
 import { ReferralsCard } from "./_components/referrals-card";
 import { ExchangesCard } from "./_components/exchanges-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Home } from "lucide-react";
 
 export default async function AdminPage() {
   await getRequiredAdmin();
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>Admin Dashboard</LayoutTitle>
-        <LayoutDescription>
-          MyCryptoPilot Overview - Treasury and Key Metrics
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Home className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Admin Dashboard</LayoutTitle>
+          <LayoutDescription>
+            MyCryptoPilot Overview - Treasury and Key Metrics
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent>

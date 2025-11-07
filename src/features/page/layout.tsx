@@ -24,15 +24,7 @@ export const Layout = (
 };
 
 export const LayoutHeader = (props: ComponentPropsWithoutRef<"div">) => {
-  return (
-    <div
-      {...props}
-      className={cn(
-        "flex w-full min-w-[200px] flex-col items-start gap-2 md:flex-1",
-        props.className,
-      )}
-    />
-  );
+  return <div {...props} className={cn("mb-6 w-full", props.className)} />;
 };
 
 export const LayoutTitle = (props: ComponentPropsWithoutRef<"h1">) => {
@@ -40,7 +32,10 @@ export const LayoutTitle = (props: ComponentPropsWithoutRef<"h1">) => {
     <Typography
       {...props}
       variant="h2"
-      className={cn("text-3xl font-semibold", props.className)}
+      className={cn(
+        "scroll-m-0 text-3xl leading-none font-semibold",
+        props.className,
+      )}
     />
   );
 };

@@ -54,9 +54,11 @@ export default async function ReferralProgramPage() {
 
   return (
     <>
-      <LayoutHeader className="flex items-center gap-3">
-        <Gift className="size-8" />
-        <div className="flex-1">
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Gift className="size-5" />
+        </div>
+        <div>
           <LayoutTitle>Referral Program</LayoutTitle>
           <LayoutDescription>
             Invite followers, earn rewards, and grow your audience
@@ -70,7 +72,7 @@ export default async function ReferralProgramPage() {
 
       <LayoutContent className="space-y-8">
         {/* Quick Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <ReferralLinkCard
             traderId={user.id}
             traderName={traderProfile.displayName}
@@ -97,7 +99,7 @@ export default async function ReferralProgramPage() {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
             {/* Conversion Stats */}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Suspense fallback={<Skeleton className="h-64 w-full" />}>
                 <ConversionStatsCard traderId={user.id} />
               </Suspense>
@@ -162,11 +164,11 @@ export default async function ReferralProgramPage() {
             </div>
 
             {/* Funnel & Top Invitees */}
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               <Suspense
-                fallback={<Skeleton className="h-96 w-full md:col-span-2" />}
+                fallback={<Skeleton className="h-96 w-full lg:col-span-2" />}
               >
-                <div className="md:col-span-2">
+                <div className="lg:col-span-2">
                   <DetailedFunnelCard traderId={user.id} />
                 </div>
               </Suspense>

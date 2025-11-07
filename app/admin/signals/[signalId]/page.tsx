@@ -19,7 +19,7 @@ import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import { getRequiredAdmin } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Signal as SignalIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -59,19 +59,24 @@ export default async function SignalDetailPage(props: {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin/signals">
-              <ArrowLeft className="mr-2 size-4" />
-              Back to Signals
-            </Link>
-          </Button>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <SignalIcon className="size-5" />
         </div>
-        <LayoutTitle>Signal Details</LayoutTitle>
-        <LayoutDescription>
-          View complete signal information and metadata
-        </LayoutDescription>
+        <div className="flex-1">
+          <div className="mb-2 flex items-center gap-4">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/admin/signals">
+                <ArrowLeft className="mr-2 size-4" />
+                Back to Signals
+              </Link>
+            </Button>
+          </div>
+          <LayoutTitle>Signal Details</LayoutTitle>
+          <LayoutDescription>
+            View complete signal information and metadata
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent className="flex flex-col gap-4">

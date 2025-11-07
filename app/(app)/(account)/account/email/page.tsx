@@ -2,6 +2,13 @@ import { getRequiredUser } from "@/lib/auth/auth-user";
 import { combineWithParentMetadata } from "@/lib/metadata";
 import { prisma } from "@/lib/prisma";
 import { EmailPreferencesForm } from "./_components/email-preferences-form";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
+import { Mail } from "lucide-react";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Email Preferences",
@@ -29,5 +36,23 @@ export default async function EmailPreferencesPage() {
     throw new Error("User preferences not found");
   }
 
-  return <EmailPreferencesForm initialPreferences={userPreferences} />;
+  return (
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Mail className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Email Preferences</LayoutTitle>
+          <LayoutDescription>
+            Manage your email notifications and preferences
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
+
+      <LayoutContent>
+        <EmailPreferencesForm initialPreferences={userPreferences} />
+      </LayoutContent>
+    </>
+  );
 }

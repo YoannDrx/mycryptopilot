@@ -32,24 +32,20 @@ export async function BaseSidebarLayout({
     <SidebarProvider>
       {sidebar}
       <SidebarInset className="border-accent border">
-        {/* Sidebar Toggle Button - Top-left corner */}
-        <div className="absolute top-4 left-4 z-50">
-          <SidebarTrigger
-            size="lg"
-            variant="outline"
-            className="size-9 cursor-pointer"
-          />
-        </div>
-
         {/* Breadcrumb Header */}
         <header className="flex h-16 shrink-0 items-center gap-2">
           <Layout size="lg" className="flex items-center gap-2">
+            <SidebarTrigger
+              size="lg"
+              variant="outline"
+              className="size-9 cursor-pointer"
+            />
             <PageBreadcrumb />
           </Layout>
         </header>
 
         {/* Main Content */}
-        <Layout size="lg" className="flex flex-1 flex-col gap-4 pt-0">
+        <Layout size="lg" className="flex flex-col gap-4 pt-0 pb-8">
           {children}
         </Layout>
       </SidebarInset>

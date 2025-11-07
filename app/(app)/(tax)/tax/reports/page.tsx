@@ -28,8 +28,10 @@ export default async function TaxReportsPage() {
 
   return (
     <>
-      <LayoutHeader className="flex items-center gap-3">
-        <FileText className="size-8" />
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <FileText className="size-5" />
+        </div>
         <div>
           <LayoutTitle>Tax Reports</LayoutTitle>
           <LayoutDescription>

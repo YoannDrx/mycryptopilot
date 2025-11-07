@@ -14,6 +14,7 @@ import {
 } from "nuqs/server";
 import { Suspense } from "react";
 import { PaymentsTable } from "./_components/payments-table";
+import { DollarSign } from "lucide-react";
 
 const searchParamsCache = createSearchParamsCache({
   network: parseAsString.withDefault("all"),
@@ -32,11 +33,16 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>Crypto Payments</LayoutTitle>
-        <LayoutDescription>
-          Monitor all crypto payments and subscription activations
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <DollarSign className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Crypto Payments</LayoutTitle>
+          <LayoutDescription>
+            Monitor all crypto payments and subscription activations
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent>

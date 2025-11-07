@@ -14,6 +14,7 @@ import {
 } from "nuqs/server";
 import { Suspense } from "react";
 import { SignalsTable } from "./_components/signals-table";
+import { Signal } from "lucide-react";
 
 const searchParamsCache = createSearchParamsCache({
   q: parseAsString.withDefault(""),
@@ -31,11 +32,16 @@ export default async function AdminSignalsPage({ searchParams }: PageProps) {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>Signal Management</LayoutTitle>
-        <LayoutDescription>
-          View and moderate all trading signals published by traders
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Signal className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Signal Management</LayoutTitle>
+          <LayoutDescription>
+            View and moderate all trading signals published by traders
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent>
