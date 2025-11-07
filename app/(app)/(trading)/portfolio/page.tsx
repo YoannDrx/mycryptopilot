@@ -30,9 +30,16 @@ import {
   Award,
   AlertTriangle,
   BarChart3,
+  LineChart,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 // Loading components
 function MetricCardSkeleton() {
@@ -245,74 +252,79 @@ export default async function PortfolioPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Portfolio Analytics
-        </h1>
-        <p className="text-muted-foreground">
-          Track your trading performance and risk metrics
-        </p>
-      </div>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <LineChart className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Portfolio Analytics</LayoutTitle>
+          <LayoutDescription>
+            Track your trading performance and risk metrics
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
 
-      {/* Key Metrics */}
-      <Suspense
-        fallback={
-          <MetricCardGrid columns={4}>
-            <MetricCardSkeleton />
-            <MetricCardSkeleton />
-            <MetricCardSkeleton />
-            <MetricCardSkeleton />
-          </MetricCardGrid>
-        }
-      >
-        <PortfolioMetrics />
-      </Suspense>
+      <LayoutContent className="space-y-8">
+        {/* Key Metrics */}
+        <Suspense
+          fallback={
+            <MetricCardGrid columns={4}>
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+              <MetricCardSkeleton />
+            </MetricCardGrid>
+          }
+        >
+          <PortfolioMetrics />
+        </Suspense>
 
-      {/* Tabs for different views */}
-      <Tabs defaultValue="performance" className="mt-8">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
-          <TabsTrigger value="trades">Trade History</TabsTrigger>
-        </TabsList>
+        {/* Tabs for different views */}
+        <Tabs defaultValue="performance" className="mt-8">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="risk">Risk Analysis</TabsTrigger>
+            <TabsTrigger value="trades">Trade History</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="performance" className="mt-6">
-          <div className="grid grid-cols-3 gap-6">
+          <TabsContent value="performance" className="mt-6">
+            <div className="grid grid-cols-3 gap-6">
+              <Suspense
+                fallback={
+                  <>
+                    <ChartSkeleton />
+                    <ChartSkeleton />
+                    <ChartSkeleton />
+                  </>
+                }
+              >
+                <PerformanceChartSection />
+              </Suspense>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="risk" className="mt-6">
             <Suspense
               fallback={
-                <>
-                  <ChartSkeleton />
-                  <ChartSkeleton />
-                  <ChartSkeleton />
-                </>
+                <MetricCardGrid columns={3}>
+                  <MetricCardSkeleton />
+                  <MetricCardSkeleton />
+                  <MetricCardSkeleton />
+                </MetricCardGrid>
               }
             >
-              <PerformanceChartSection />
+              <RiskMetrics />
             </Suspense>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="risk" className="mt-6">
-          <Suspense
-            fallback={
-              <MetricCardGrid columns={3}>
-                <MetricCardSkeleton />
-                <MetricCardSkeleton />
-                <MetricCardSkeleton />
-              </MetricCardGrid>
-            }
-          >
-            <RiskMetrics />
-          </Suspense>
-        </TabsContent>
-
-        <TabsContent value="trades" className="mt-6">
-          <Suspense fallback={<Skeleton className="h-[500px] w-full" />}>
-            <TradeHistorySection />
-          </Suspense>
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="trades" className="mt-6">
+            <Suspense fallback={<Skeleton className="h-[500px] w-full" />}>
+              <TradeHistorySection />
+            </Suspense>
+          </TabsContent>
+        </Tabs>
+      </LayoutContent>
+    </>
   );
 }

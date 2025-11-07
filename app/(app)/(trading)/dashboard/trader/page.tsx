@@ -27,6 +27,13 @@ import Link from "next/link";
 import { TraderSignalsList } from "./_components/trader-signals-list";
 import { PerformanceTabContent } from "./_components/performance-tab-content";
 import { redirect } from "next/navigation";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutActions,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Trader Dashboard - MyCryptoPilot",
@@ -84,26 +91,29 @@ export default async function TraderDashboardPage() {
   } | null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Trader Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Create signals and manage your trading profile
-            </p>
-          </div>
-          <Button asChild>
-            <Link href="/dashboard/trader/signals/new">
-              <PlusCircle className="mr-2 size-4" />
-              Create Signal
-            </Link>
-          </Button>
+    <>
+      {/* Header */}
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <BarChart3 className="size-5" />
         </div>
+        <div>
+          <LayoutTitle>Trader Dashboard</LayoutTitle>
+          <LayoutDescription>
+            Create signals and manage your trading profile
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
+      <LayoutActions>
+        <Button asChild>
+          <Link href="/dashboard/trader/signals/new">
+            <PlusCircle className="mr-2 size-4" />
+            Create Signal
+          </Link>
+        </Button>
+      </LayoutActions>
 
+      <LayoutContent className="space-y-8">
         {/* Quick Stats */}
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
@@ -322,7 +332,7 @@ export default async function TraderDashboardPage() {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }

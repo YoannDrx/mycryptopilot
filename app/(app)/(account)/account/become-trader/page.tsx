@@ -9,6 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
+import { TrendingUp } from "lucide-react";
 
 export default async function BecomeTraderPage() {
   const user = await getRequiredUser();
@@ -20,43 +27,69 @@ export default async function BecomeTraderPage() {
   if (traderProfile) {
     // Edit mode if profile exists
     return (
-      <div className="container max-w-2xl py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit my trader profile</CardTitle>
-            <CardDescription>
+      <>
+        <LayoutHeader className="flex flex-row items-center gap-3">
+          <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+            <TrendingUp className="size-5" />
+          </div>
+          <div>
+            <LayoutTitle>Edit Trader Profile</LayoutTitle>
+            <LayoutDescription>
               Update your trader profile information
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <EditTraderProfileForm
-              defaultValues={{
-                displayName: traderProfile.displayName,
-                bio: traderProfile.bio,
-                image: fullUser.image,
-              }}
-            />
-          </CardContent>
-        </Card>
-      </div>
+            </LayoutDescription>
+          </div>
+        </LayoutHeader>
+        <LayoutContent className="max-w-2xl">
+          <Card>
+            <CardHeader>
+              <CardTitle>Edit my trader profile</CardTitle>
+              <CardDescription>
+                Update your trader profile information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EditTraderProfileForm
+                defaultValues={{
+                  displayName: traderProfile.displayName,
+                  bio: traderProfile.bio,
+                  image: fullUser.image,
+                }}
+              />
+            </CardContent>
+          </Card>
+        </LayoutContent>
+      </>
     );
   }
 
   // Creation mode if no profile
   return (
-    <div className="container max-w-2xl py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Become a Trader</CardTitle>
-          <CardDescription>
-            Create your trader profile to start publishing trading signals and
-            gain followers.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <BecomeTraderForm />
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <TrendingUp className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Become a Trader</LayoutTitle>
+          <LayoutDescription>
+            Create your trader profile to start publishing signals
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
+      <LayoutContent className="max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>Become a Trader</CardTitle>
+            <CardDescription>
+              Create your trader profile to start publishing trading signals and
+              gain followers.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BecomeTraderForm />
+          </CardContent>
+        </Card>
+      </LayoutContent>
+    </>
   );
 }

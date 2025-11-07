@@ -16,6 +16,7 @@ import { getSignalsByTraderId } from "@/features/signal/signal-queries";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import { CheckCircle2, TrendingUp, Users } from "lucide-react";
 import { notFound } from "next/navigation";
+import { LayoutContent } from "@/features/page/layout";
 
 type TraderProfilePageProps = {
   params: Promise<{
@@ -59,7 +60,7 @@ export default async function TraderProfilePage({
     > | null) ?? {};
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-8 py-8">
+    <LayoutContent className="space-y-8">
       {/* Header avec profil trader */}
       <Card>
         <CardHeader>
@@ -169,6 +170,6 @@ export default async function TraderProfilePage({
           </div>
         )}
       </div>
-    </div>
+    </LayoutContent>
   );
 }

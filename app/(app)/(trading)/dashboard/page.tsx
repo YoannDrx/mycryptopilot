@@ -18,6 +18,7 @@ import {
   TrendingUp,
   MessageCircle,
   CheckCircle2,
+  Home,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -27,6 +28,13 @@ import {
   hasUserJoinedDiscord,
   generatePermanentInvite,
 } from "@/lib/discord/invitations";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutActions,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Dashboard - MyCryptoPilot",
@@ -76,24 +84,29 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground mt-2">
-              Welcome back! Here's your trading activity overview.
-            </p>
-          </div>
-          <Button asChild>
-            <Link href="/traders">
-              <TrendingUp className="mr-2 size-4" />
-              Follow Traders
-            </Link>
-          </Button>
+    <>
+      {/* Header */}
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Home className="size-5" />
         </div>
+        <div>
+          <LayoutTitle>Dashboard</LayoutTitle>
+          <LayoutDescription>
+            Welcome back! Here's your trading activity overview.
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
+      <LayoutActions>
+        <Button asChild>
+          <Link href="/traders">
+            <TrendingUp className="mr-2 size-4" />
+            Follow Traders
+          </Link>
+        </Button>
+      </LayoutActions>
 
+      <LayoutContent className="space-y-8">
         {/* Quick Stats */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
@@ -365,7 +378,7 @@ export default async function DashboardPage() {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }

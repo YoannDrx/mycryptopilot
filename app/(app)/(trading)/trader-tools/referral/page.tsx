@@ -21,6 +21,13 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Metadata } from "next";
 import { Gift, TrendingUp, Users } from "lucide-react";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutActions,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Referral Program - MyCryptoPilot",
@@ -46,22 +53,22 @@ export default async function ReferralProgramPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-              <Gift className="size-8" />
-              Referral Program
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Invite followers, earn rewards, and grow your audience
-            </p>
-          </div>
-          <InviteFollowerDialog />
+    <>
+      <LayoutHeader className="flex items-center gap-3">
+        <Gift className="size-8" />
+        <div className="flex-1">
+          <LayoutTitle>Referral Program</LayoutTitle>
+          <LayoutDescription>
+            Invite followers, earn rewards, and grow your audience
+          </LayoutDescription>
         </div>
+      </LayoutHeader>
 
+      <LayoutActions>
+        <InviteFollowerDialog />
+      </LayoutActions>
+
+      <LayoutContent className="space-y-8">
         {/* Quick Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3">
           <ReferralLinkCard
@@ -195,7 +202,7 @@ export default async function ReferralProgramPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }

@@ -18,6 +18,12 @@ import {
   TrendingUp,
   CreditCard,
 } from "lucide-react";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Account Settings - MyCryptoPilot",
@@ -84,18 +90,20 @@ export default async function AccountPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Account Settings
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your account preferences and settings
-          </p>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Settings className="size-5" />
         </div>
+        <div>
+          <LayoutTitle>Account Settings</LayoutTitle>
+          <LayoutDescription>
+            Manage your account preferences and settings
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
 
+      <LayoutContent>
         {/* Account Sections Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {accountSections.map((section) => {
@@ -123,7 +131,7 @@ export default async function AccountPage() {
             );
           })}
         </div>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }

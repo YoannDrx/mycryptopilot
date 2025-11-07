@@ -10,12 +10,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, PlusCircle, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  PlusCircle,
+  TrendingUp,
+  Link as LinkIcon,
+} from "lucide-react";
 import { ConnectExchangeForm } from "./_components/connect-exchange-form";
 import { ExchangeConnectionsList } from "./_components/exchange-connections-list";
 import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Exchange Connections - MyCryptoPilot",
@@ -69,19 +80,21 @@ export default async function ExchangeConnectionsPage() {
   const isFreePlan = planName === "free";
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="space-y-8">
-        {/* Header */}
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <LinkIcon className="size-5" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Exchange Connections
-          </h1>
-          <p className="text-muted-foreground mt-2">
+          <LayoutTitle>Exchange Connections</LayoutTitle>
+          <LayoutDescription>
             Connect your exchange accounts to automatically sync trades and
             display verified performance stats
-          </p>
+          </LayoutDescription>
         </div>
+      </LayoutHeader>
 
+      <LayoutContent className="space-y-8">
         {/* Plan Info */}
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader>
@@ -183,7 +196,7 @@ export default async function ExchangeConnectionsPage() {
             </p>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }

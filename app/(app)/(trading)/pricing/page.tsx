@@ -10,8 +10,14 @@ import {
 } from "@/components/ui/card";
 import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
 import type { Metadata } from "next";
-import { Check } from "lucide-react";
+import { Check, CreditCard } from "lucide-react";
 import Link from "next/link";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Pricing - MyCryptoPilot",
@@ -21,22 +27,28 @@ export const metadata: Metadata = {
 
 export default async function PricingPage() {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="mx-auto max-w-6xl">
-        {/* Header */}
-        <div className="mb-16 text-center">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight lg:text-5xl">
-            Simple, Transparent Pricing
-          </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
-            Pay with crypto. No credit card required. Cancel anytime.
-          </p>
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <Badge variant="secondary">USDC (Base)</Badge>
-            <Badge variant="secondary">USDT (Tron)</Badge>
-          </div>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <CreditCard className="size-5" />
         </div>
+        <div>
+          <LayoutTitle>Simple, Transparent Pricing</LayoutTitle>
+          <LayoutDescription>
+            Pay with crypto. No credit card required. Cancel anytime.
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
 
+      <LayoutContent className="space-y-6">
+        {/* Badges */}
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">USDC (Base)</Badge>
+          <Badge variant="secondary">USDT (Tron)</Badge>
+        </div>
+      </LayoutContent>
+
+      <LayoutContent className="space-y-16">
         {/* Pricing Cards */}
         <div className="grid gap-8 lg:grid-cols-3">
           {MYCRYPTOPILOT_PLANS.filter((p) => p.name !== "test").map((plan) => (
@@ -257,7 +269,7 @@ export default async function PricingPage() {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }

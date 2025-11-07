@@ -20,6 +20,12 @@ import { CheckCircle2, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
 import { MarketplaceFilters } from "./marketplace-filters";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 const filterOptions = ["all", "verified"] as const;
 const sortOptions = ["recent", "winrate", "followers", "signals"] as const;
@@ -83,19 +89,22 @@ export function TradersListClient({
   const verifiedTraders = traders.filter((t) => t.verified).length;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight">
-            Traders Marketplace
-          </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
+    <>
+      {/* Header */}
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Users className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Traders Marketplace</LayoutTitle>
+          <LayoutDescription>
             Discover professional crypto traders and follow their signals.
             Verified track records and transparent statistics.
-          </p>
+          </LayoutDescription>
         </div>
+      </LayoutHeader>
 
+      <LayoutContent className="space-y-8">
         {/* Search and Filters */}
         <MarketplaceFilters
           defaultSearch={filters.search}
@@ -219,8 +228,8 @@ export function TradersListClient({
             </Button>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </LayoutContent>
+    </>
   );
 }
 
@@ -323,7 +332,9 @@ function TraderCard({ trader, userId }: TraderCardProps) {
           <div>
             <p className="text-muted-foreground text-xs">Payoff</p>
             <p className="text-xl font-bold">
-              {typeof stats.payoff === "number" ? stats.payoff.toFixed(1) : "--"}
+              {typeof stats.payoff === "number"
+                ? stats.payoff.toFixed(1)
+                : "--"}
             </p>
           </div>
           <div>
