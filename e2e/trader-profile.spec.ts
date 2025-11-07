@@ -19,18 +19,13 @@ test.describe("Trader Public Profile", () => {
 
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 3. Navigate to trader public profile
-    await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+    await page.goto(`/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
     // 4. Verify all trader info is displayed
@@ -99,23 +94,20 @@ test.describe("Trader Public Profile", () => {
       // Redirected to sign-in page
       expect(currentUrl).toMatch(/signin/);
     } else {
-      // Alternative: Try with org context (might need auth first)
-      // Let's sign in first to get an org, then sign out and try
+      // Alternative: Try with auth context (might need auth first)
+      // Let's sign in first, then sign out and try
       await createTestAccount({
         page,
-        callbackURL: "/orgs",
+        callbackURL: "/dashboard",
       });
 
-      await page.waitForURL(/\/orgs\/.*/);
-
-      const orgUrl = page.url();
-      const orgSlug = orgUrl.split("/orgs/")[1]?.split("/")[0];
+      await page.waitForURL(/\/dashboard$/);
 
       // Sign out again
       await signOutAccount({ page });
 
       // Now try to access trader profile
-      await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+      await page.goto(`/traders/${trader.id}`);
       await page.waitForLoadState("networkidle");
 
       // Wait for page to settle
@@ -180,16 +172,13 @@ test.describe("Trader Public Profile", () => {
 
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 4. Navigate to trader profile
-    await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+    await page.goto(`/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
     // 5. Verify only active signals are displayed

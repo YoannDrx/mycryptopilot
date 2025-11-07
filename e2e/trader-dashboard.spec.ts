@@ -7,12 +7,7 @@ test.describe("Trader Dashboard", () => {
     // 1. Create a trader
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Publish 5 signals
     await Promise.all([
@@ -44,7 +39,7 @@ test.describe("Trader Dashboard", () => {
     ]);
 
     // 3. Navigate to trader dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
     // 4. Verify "My Signals" tab is active by default
@@ -69,10 +64,7 @@ test.describe("Trader Dashboard", () => {
     // 1. Create a trader
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Create 3 followers manually in database
     // Note: We create followers directly in DB rather than creating full accounts
@@ -138,7 +130,7 @@ test.describe("Trader Dashboard", () => {
     });
 
     // 4. Navigate to trader dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
     // 5. Verify Followers stat card shows 3
