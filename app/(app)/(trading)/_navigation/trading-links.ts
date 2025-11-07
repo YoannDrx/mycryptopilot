@@ -7,12 +7,10 @@ import {
   Calculator,
   TrendingUp,
   Users,
-  DollarSign,
+  CreditCard,
   Home,
   LineChart,
   PlusCircle,
-  UserCheck,
-  Wallet,
   Gift,
 } from "lucide-react";
 
@@ -59,7 +57,7 @@ const SIGNALS_LINKS: NavigationLink[] = [
   },
   {
     href: "/following",
-    Icon: UserCheck,
+    Icon: Users,
     label: "Following",
   },
 ];
@@ -78,7 +76,7 @@ const TRADER_TOOLS_LINKS: NavigationLink[] = [
   },
   {
     href: "/portfolio",
-    Icon: Wallet,
+    Icon: LineChart,
     label: "Portfolio Analytics",
   },
   {
@@ -101,7 +99,7 @@ const ANALYTICS_LINKS: NavigationLink[] = [
 const SETTINGS_LINKS: NavigationLink[] = [
   {
     href: "/pricing",
-    Icon: DollarSign,
+    Icon: CreditCard,
     label: "Pricing & Plans",
   },
 ];
