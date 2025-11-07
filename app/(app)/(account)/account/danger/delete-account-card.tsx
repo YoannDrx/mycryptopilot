@@ -58,10 +58,10 @@ export function DeleteAccountCard() {
           <div className="flex items-start gap-4">
             <Building2 className="text-muted-foreground mt-0.5 size-5" />
             <div className="space-y-1">
-              <p className="leading-none font-medium">Organization Data</p>
+              <p className="leading-none font-medium">Account Data</p>
               <p className="text-muted-foreground text-sm">
-                If you&apos;re an organization owner, all organization data will
-                be deleted and subscriptions cancelled
+                All your account data will be permanently deleted and
+                subscriptions cancelled
               </p>
             </div>
           </div>

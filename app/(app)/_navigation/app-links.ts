@@ -19,17 +19,18 @@ import {
 /**
  * App Navigation Links (Root-Level Routes)
  *
- * Navigation pour les nouvelles routes racine (Phase 5a)
- * Compatible avec le système dual-mode
+ * Navigation pour les routes racine (B2C architecture)
+ * Tous les liens pointent vers les routes sans /orgs/:slug
  *
- * Routes migrées:
- * - /dashboard (au lieu de /orgs/:slug)
- * - /signals (au lieu de /orgs/:slug/signals)
- * - /traders (au lieu de /orgs/:slug/traders)
- * - /pricing (au lieu de /orgs/:slug/pricing)
- * - /account (au lieu de /orgs/:slug/account)
- *
- * Sub-routes restent temporairement sous /orgs/:slug/ avec redirections 307
+ * Routes disponibles:
+ * - /dashboard - User dashboard
+ * - /signals - Signals feed
+ * - /traders - Traders marketplace
+ * - /pricing - Pricing page
+ * - /account - Account settings
+ * - /dashboard/trader - Trader dashboard
+ * - /portfolio - Portfolio analytics
+ * - /analytics - Platform analytics
  */
 
 // Section 1: OVERVIEW
@@ -68,22 +69,22 @@ const SIGNALS_LINKS: NavigationLink[] = [
 // Section 3: TRADER TOOLS (traders uniquement)
 const TRADER_TOOLS_LINKS: NavigationLink[] = [
   {
-    href: "/orgs/:organizationSlug/dashboard/trader", // Pas encore migré
+    href: "/dashboard/trader",
     Icon: BarChart3,
     label: "Trader Dashboard",
   },
   {
-    href: "/orgs/:organizationSlug/portfolio", // Pas encore migré
+    href: "/portfolio",
     Icon: LineChart,
     label: "Portfolio Analytics",
   },
   {
-    href: "/orgs/:organizationSlug/dashboard/trader/signals/new", // Pas encore migré
+    href: "/dashboard/trader/signals/new",
     Icon: PlusCircle,
     label: "Create Signal",
   },
   {
-    href: "/orgs/:organizationSlug/trader-tools/referral", // Pas encore migré
+    href: "/trader-tools/referral",
     Icon: Gift,
     label: "Referral Program",
   },
@@ -92,7 +93,7 @@ const TRADER_TOOLS_LINKS: NavigationLink[] = [
 // Section 4: ANALYTICS
 const ANALYTICS_LINKS: NavigationLink[] = [
   {
-    href: "/orgs/:organizationSlug/analytics", // Pas encore migré
+    href: "/analytics",
     Icon: LineChart,
     label: "Platform Analytics",
   },
