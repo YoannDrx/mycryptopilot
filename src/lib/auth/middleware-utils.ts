@@ -1,9 +1,9 @@
-import { getSessionApi } from "@/lib/auth/auth-api-helper";
 import { SiteConfig } from "@/site-config";
 import { logger } from "@/lib/logger";
 import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { getSessionWithHeaders } from "./get-session";
 
 /**
  * Middleware Utils - Big Bang (Issue #77 Phase 3)
@@ -42,7 +42,7 @@ export const validateAdminAccess = async (request: NextRequest) => {
 
     if (!sessionCookie) return null;
 
-    const session = await getSessionApi(request.headers);
+    const session = await getSessionWithHeaders(request.headers);
 
     if (!session?.user) return null;
     if (session.user.role !== "admin") return null;

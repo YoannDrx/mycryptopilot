@@ -11,19 +11,14 @@ test.describe("User Dashboard", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
     });
-
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
 
     // 2. Create 2 traders directly in DB (faster, no UI interaction)
     const { user: trader1 } = await createTestTraderDirectly();
@@ -55,7 +50,7 @@ test.describe("User Dashboard", () => {
     await createTestSignal({ traderId: trader2.id, symbol: "DOT-USDT" });
 
     // 4. Navigate to dashboard (already logged in as follower user)
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 5. Verify stats cards display correct information
@@ -81,17 +76,14 @@ test.describe("User Dashboard", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
     });
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
     // 2. Create 2 traders directly in DB (faster, no UI interaction)
     const { user: trader1 } = await createTestTraderDirectly();
@@ -147,7 +139,7 @@ test.describe("User Dashboard", () => {
     });
 
     // 4. Navigate to dashboard (already logged in as follower user)
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 5. Verify all 6 signals are displayed
@@ -183,10 +175,10 @@ test.describe("User Dashboard", () => {
   test("free user sees blurred signals after limit", async ({ page }) => {
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
@@ -194,9 +186,6 @@ test.describe("User Dashboard", () => {
 
     // Verify user is on Free plan
     expect(user.planName).toBe("free");
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
     // Create a trader directly in DB with 10 signals
     const { user: trader } = await createTestTraderDirectly();
@@ -226,7 +215,7 @@ test.describe("User Dashboard", () => {
     expect(dbSignals).toBe(10);
 
     // Navigate to dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // Verify all 10 signal cards are rendered
@@ -289,16 +278,13 @@ test.describe("User Dashboard", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify default tab is "Signals Feed" (active by default)
