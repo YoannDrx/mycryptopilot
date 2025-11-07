@@ -97,10 +97,10 @@ export const notifyFollowersOfNewSignal = async ({
       where: {
         traderId: traderId,
         status: "ACTIVE",
-        // TODO: Add email notification preference filter when field exists
-        // user: {
-        //   emailNotificationsEnabled: true,
-        // },
+        user: {
+          emailNotificationsEnabled: true,
+          emailNotifyNewSignals: true,
+        },
       },
       include: {
         user: {

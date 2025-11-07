@@ -68,6 +68,8 @@ export async function sendSyncFailureNotification(
                 id: true,
                 name: true,
                 email: true,
+                emailNotificationsEnabled: true,
+                emailNotifyExchangeSyncFailures: true,
               },
             },
           },
@@ -99,6 +101,18 @@ export async function sendSyncFailureNotification(
 
     if (!user.email) {
       logger.warn("User has no email address for notification", {
+        userId: user.id,
+        connectionId,
+      });
+      return false;
+    }
+
+    // Check email preferences
+    if (
+      !user.emailNotificationsEnabled ||
+      !user.emailNotifyExchangeSyncFailures
+    ) {
+      logger.info("Skipping sync failure email (user preferences disabled)", {
         userId: user.id,
         connectionId,
       });

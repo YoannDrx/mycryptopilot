@@ -5,7 +5,8 @@ import { assignRoleToUser } from "@/lib/discord/roles";
 import { notifyPlanUpdated } from "@/lib/discord/dm-notifications";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { SiteConfig } from "@/site-config";
-import MarkdownEmail from "@email/markdown.email";
+import BilingualMarkdownEmail from "@email/bilingual-markdown.email";
+import SubscriptionActivationEmail from "@email/subscription-activation";
 import { awardUpgradeBonus } from "@/lib/referral/invitation-tracking-service";
 import { revalidatePath } from "next/cache";
 
@@ -282,67 +283,21 @@ async function sendSubscriptionActivationEmail(params: {
     plan === "free" ? "Free" : plan === "pro" ? "Pro" : "Ultra";
   const actionVerb = isExtension ? "extended" : "activated";
 
-  const markdown = `
-# Subscription ${actionVerb === "extended" ? "Extended" : "Activated"} 🎉
-
-Hi ${user.name},
-
-Your **${planDisplayName}** plan has been successfully ${actionVerb}!
-
-**Plan Details:**
-- Plan: **${planDisplayName}**
-- Valid until: **${periodEnd.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}**
-
-**What's included:**
-${getPlanFeatures(plan)}
-
-You can now access all ${planDisplayName} features on [${SiteConfig.title}](${SiteConfig.prodUrl}).
-
-${user.email ? `If you have any questions, feel free to reply to this email.` : ""}
-`;
-
   await sendEmail({
     to: user.email,
     subject: `Your ${planDisplayName} subscription has been ${actionVerb}`,
-    html: MarkdownEmail({ markdown }),
+    html: SubscriptionActivationEmail({
+      userName: user.name,
+      plan,
+      periodEnd,
+      isExtension,
+    }),
   });
 
   logger.info("Subscription activation email sent", {
     email: user.email,
     plan,
   });
-}
-
-/**
- * Obtenir les features d'un plan pour l'email
- */
-function getPlanFeatures(plan: MyCryptoPilotPlanName): string {
-  switch (plan) {
-    case "free":
-      return `
-- ✅ 5 trading signals per day
-- ✅ Follow 1 trader
-- ✅ Access to public marketplace
-`;
-    case "pro":
-      return `
-- ✅ 50 trading signals per day
-- ✅ Follow up to 5 traders
-- ✅ Risk console & trading journal
-- ✅ 1-minute screener refresh
-`;
-    case "ultra":
-      return `
-- ✅ **Unlimited** trading signals
-- ✅ Follow **unlimited** traders
-- ✅ Advanced risk console & analytics
-- ✅ 5-second screener refresh
-- ✅ Custom alerts
-- ✅ Priority support
-`;
-    default:
-      return "";
-  }
 }
 
 /**
@@ -379,10 +334,10 @@ export async function sendExpirationWarningEmail(
         ? "Pro"
         : "Ultra";
 
-  const markdown = `
+  const markdownEN = `
 # Your ${planDisplayName} subscription is expiring soon ⏰
 
-Hi ${user.name},
+Hello **${user.name}**,
 
 Your **${planDisplayName}** plan will expire in **${daysRemaining} day${daysRemaining > 1 ? "s" : ""}**.
 
@@ -390,14 +345,31 @@ Your **${planDisplayName}** plan will expire in **${daysRemaining} day${daysRema
 
 To continue enjoying ${planDisplayName} features, you can renew your subscription on [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
 
-Don't lose access to:
-${getPlanFeatures(user.planName as MyCryptoPilotPlanName)}
+[🔄 Renew my subscription](${SiteConfig.prodUrl}/pricing)
+`;
+
+  const markdownFR = `
+# Ton abonnement ${planDisplayName} expire bientôt ⏰
+
+Bonjour **${user.name}**,
+
+Ton abonnement **${planDisplayName}** expirera dans **${daysRemaining} jour${daysRemaining > 1 ? "s" : ""}**.
+
+**Date d'expiration :** ${user.planExpiresAt.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}
+
+Pour continuer à profiter des fonctionnalités ${planDisplayName}, tu peux renouveler ton abonnement sur [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
+
+[🔄 Renouveler mon abonnement](${SiteConfig.prodUrl}/pricing)
 `;
 
   await sendEmail({
     to: user.email,
     subject: `Your ${planDisplayName} subscription expires in ${daysRemaining} days`,
-    html: MarkdownEmail({ markdown }),
+    html: BilingualMarkdownEmail({
+      markdownEN,
+      markdownFR,
+      preview: `Your subscription expires in ${daysRemaining} days - Ton abonnement expire dans ${daysRemaining} jours`,
+    }),
   });
 
   logger.info("Expiration warning email sent", {
@@ -427,6 +399,8 @@ export async function downgradeExpiredSubscription(
         planName: true,
         planExpiresAt: true,
         discordId: true,
+        emailNotificationsEnabled: true,
+        emailNotifySubscriptionReminders: true,
       },
     });
 
@@ -457,26 +431,60 @@ export async function downgradeExpiredSubscription(
     }
 
     // Envoyer email de notification (non-bloquant)
-    if (user.email) {
-      const markdown = `
+    if (
+      user.email &&
+      user.emailNotificationsEnabled &&
+      user.emailNotifySubscriptionReminders
+    ) {
+      const markdownEN = `
 # Your subscription has expired
 
-Hi ${user.name},
+Hello **${user.name}**,
 
 Your subscription has expired and your account has been downgraded to the **Free** plan.
 
 **Free plan includes:**
-${getPlanFeatures("free")}
+- ✅ 5 trading signals per day
+- ✅ Follow 1 trader
+- ✅ Access to public marketplace
 
 To regain access to premium features, you can upgrade anytime on [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
+
+[🚀 Upgrade now](${SiteConfig.prodUrl}/pricing)
+`;
+
+      const markdownFR = `
+# Ton abonnement a expiré
+
+Bonjour **${user.name}**,
+
+Ton abonnement a expiré et ton compte a été rétrogradé vers le plan **Gratuit**.
+
+**Le plan Gratuit inclut :**
+- ✅ 5 signaux de trading par jour
+- ✅ Suivre 1 trader
+- ✅ Accès à la marketplace publique
+
+Pour retrouver l'accès aux fonctionnalités premium, tu peux upgrader à tout moment sur [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
+
+[🚀 Upgrader maintenant](${SiteConfig.prodUrl}/pricing)
 `;
 
       void sendEmail({
         to: user.email,
         subject: "Your subscription has expired",
-        html: MarkdownEmail({ markdown }),
+        html: BilingualMarkdownEmail({
+          markdownEN,
+          markdownFR,
+          preview: "Your subscription has expired - Ton abonnement a expiré",
+        }),
       }).catch((err) => {
         logger.error("Failed to send downgrade email", { userId, err });
+      });
+    } else if (user.email) {
+      logger.info("Skipping downgrade email (user preferences disabled)", {
+        userId,
+        email: user.email,
       });
     }
 

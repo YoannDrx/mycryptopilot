@@ -108,6 +108,29 @@ export const inviteFollowerByEmailAction = authAction
       },
     );
 
+    // Check if invitee already exists and has email preferences
+    const invitee = await prisma.user.findUnique({
+      where: { email: parsedInput.email },
+      select: {
+        emailNotificationsEnabled: true,
+        emailNotifyTraderInvitations: true,
+      },
+    });
+
+    // If invitee exists and has disabled invitation emails, skip email but keep invitation
+    if (
+      invitee &&
+      (!invitee.emailNotificationsEnabled ||
+        !invitee.emailNotifyTraderInvitations)
+    ) {
+      logger.info("Skipping invitation email (user preferences disabled)", {
+        email: parsedInput.email,
+        traderId: user.id,
+      });
+      // Return success but don't send email - user can still see invitation on platform
+      return { success: true };
+    }
+
     // Send email via Resend
     const invitationUrl = `${SiteConfig.appUrl}/invite/${token}`;
 

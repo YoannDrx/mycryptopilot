@@ -2,6 +2,7 @@ import { SiteConfig } from "@/site-config";
 import {
   Button,
   Heading,
+  Hr,
   Preview,
   Section,
   Text,
@@ -15,7 +16,79 @@ type GoodbyeEmailProps = {
 export function GoodbyeEmail({ userName }: GoodbyeEmailProps) {
   return (
     <EmailLayout>
-      <Preview>Ton compte a été supprimé - {SiteConfig.title}</Preview>
+      <Preview>
+        Your account has been deleted - Ton compte a été supprimé -{" "}
+        {SiteConfig.title}
+      </Preview>
+
+      {/* English Section */}
+      <Text className="mt-4 mb-3 text-sm font-semibold text-gray-600">
+        🇬🇧 English
+      </Text>
+
+      <Heading className="text-2xl font-bold text-gray-900">
+        Goodbye {userName} 👋
+      </Heading>
+
+      <Text className="text-base text-gray-700">
+        Your account has been permanently deleted from {SiteConfig.title}.
+      </Text>
+
+      <Section className="my-6">
+        <Text className="text-base text-gray-700">
+          <strong>What has been deleted:</strong>
+        </Text>
+        <ul className="list-disc pl-5 text-base text-gray-700">
+          <li>All your personal data</li>
+          <li>Your trading signals and history</li>
+          <li>Your subscriptions and payment information</li>
+          <li>Your trader profile (if you had one)</li>
+          <li>Your access to premium Discord channels</li>
+        </ul>
+      </Section>
+
+      <Text className="text-base text-gray-700">
+        If you had linked a Discord account, your access to premium channels has
+        been revoked. You can still stay in the public Discord server if you
+        wish.
+      </Text>
+
+      <Text className="text-base text-gray-700">
+        We're sad to see you go, but we hope you had a good experience with us.
+        You're always welcome to come back! 🚀
+      </Text>
+
+      <Section className="my-6 text-center">
+        <Button
+          href={`https://${SiteConfig.domain}`}
+          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+        >
+          Return to {SiteConfig.title}
+        </Button>
+      </Section>
+
+      <Text className="text-sm text-gray-500">
+        Questions? Contact us at{" "}
+        <a
+          href={`mailto:${SiteConfig.email.contact}`}
+          className="text-indigo-600 no-underline"
+        >
+          {SiteConfig.email.contact}
+        </a>
+      </Text>
+
+      <Text className="text-xs text-gray-400">
+        This deletion is permanent and cannot be undone. If this was a mistake,
+        you can always create a new account.
+      </Text>
+
+      {/* Horizontal Separator */}
+      <Hr className="my-8 border-gray-300" />
+
+      {/* French Section */}
+      <Text className="mb-3 text-sm font-semibold text-gray-600">
+        🇫🇷 Français
+      </Text>
 
       <Heading className="text-2xl font-bold text-gray-900">
         Au revoir {userName} 👋
