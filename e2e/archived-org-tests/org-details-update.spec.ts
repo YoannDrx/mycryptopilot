@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker";
 import { expect, test } from "@playwright/test";
-import { createTestAccount } from "./utils/auth-test";
+import { createTestAccount } from "../utils/auth-test";
 
 /**
  * ⏭️ SKIPPED - UI removed in 4-space architecture refactoring

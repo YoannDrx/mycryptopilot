@@ -6,7 +6,7 @@ import {
   createTestAccount,
   getUserEmail,
   signOutAccount,
-} from "./utils/auth-test";
+} from "../utils/auth-test";
 
 /**
  * ⏭️ SKIPPED - Not applicable to MyCryptoPilot B2C model
