@@ -8,10 +8,10 @@ test.describe("Subscription Activation Flow", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     // Get user from database
     const user = await prisma.user.findUniqueOrThrow({
@@ -22,13 +22,8 @@ test.describe("Subscription Activation Flow", () => {
     expect(user.planName).toBe("free");
     expect(user.planExpiresAt).toBeNull();
 
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
-
     // 2. Navigate to checkout page for Pro plan
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+    await page.goto("/checkout/pro", {
       waitUntil: "domcontentloaded",
     });
     await page.waitForLoadState("networkidle", { timeout: 60000 });
@@ -85,7 +80,7 @@ test.describe("Subscription Activation Flow", () => {
     }
 
     // 8. Navigate to dashboard and verify upgraded status
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // Verify "Pro" plan badge or indicator visible
@@ -98,10 +93,10 @@ test.describe("Subscription Activation Flow", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
@@ -159,10 +154,10 @@ test.describe("Subscription Activation Flow", () => {
     // 1. Create user with Discord ID (simulate linked Discord account)
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
@@ -204,10 +199,10 @@ test.describe("Subscription Activation Flow", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },

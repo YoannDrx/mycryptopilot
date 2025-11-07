@@ -9,18 +9,13 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to checkout page for Pro plan
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+    await page.goto("/checkout/pro", {
       waitUntil: "domcontentloaded",
     });
     await page.waitForLoadState("networkidle", { timeout: 60000 });
@@ -86,16 +81,13 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to checkout page for Ultra plan
-    await page.goto(`/orgs/${orgSlug}/checkout/ultra`);
+    await page.goto("/checkout/ultra");
     await page.waitForLoadState("networkidle");
 
     // 3. Select Base (USDC) network
@@ -123,16 +115,13 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Test Pro plan checkout
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+    await page.goto("/checkout/pro", {
       waitUntil: "domcontentloaded",
     });
     await page.waitForLoadState("networkidle", { timeout: 60000 });
@@ -156,7 +145,7 @@ test.describe("Crypto Checkout Flow", () => {
     await expect(page.getByText(/time remaining/i)).toBeVisible();
 
     // 3. Test Ultra plan checkout
-    await page.goto(`/orgs/${orgSlug}/checkout/ultra`, {
+    await page.goto("/checkout/ultra", {
       waitUntil: "domcontentloaded",
     });
     await page.waitForLoadState("networkidle", { timeout: 60000 });
@@ -182,16 +171,13 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to checkout
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.goto("/checkout/pro");
     await page.waitForLoadState("networkidle");
 
     // 3. Click back/cancel button
@@ -210,10 +196,10 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
@@ -222,11 +208,8 @@ test.describe("Crypto Checkout Flow", () => {
     // Verify user is on Free plan
     expect(user.planName).toBe("free");
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 2. Navigate to dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify upgrade CTA visible
@@ -254,16 +237,13 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to checkout for Pro plan ($49)
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`, {
+    await page.goto("/checkout/pro", {
       waitUntil: "domcontentloaded",
     });
     await page.waitForLoadState("networkidle", { timeout: 60000 });
@@ -294,16 +274,13 @@ test.describe("Crypto Checkout Flow", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to checkout
-    await page.goto(`/orgs/${orgSlug}/checkout/pro`);
+    await page.goto("/checkout/pro");
     await page.waitForLoadState("networkidle");
 
     // 3. Select network and generate address
