@@ -2,6 +2,12 @@ import { getRequiredUser } from "@/lib/auth/auth-user";
 import { getUserRiskCalculations } from "@/features/risk-console/risk-console-queries";
 import { RiskCalculationHistory } from "./_components/risk-calculation-history";
 import type { Metadata } from "next";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 export const metadata: Metadata = {
   title: "Risk Console History - MyCryptoPilot",
@@ -13,14 +19,17 @@ export default async function RiskConsoleHistoryPage() {
   const calculations = await getUserRiskCalculations(user.id, 50);
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Risk Console History</h1>
-        <p className="text-muted-foreground mt-2">
+    <>
+      <LayoutHeader>
+        <LayoutTitle>Risk Console History</LayoutTitle>
+        <LayoutDescription>
           View and reload your past risk calculations
-        </p>
-      </div>
-      <RiskCalculationHistory calculations={calculations} />
-    </div>
+        </LayoutDescription>
+      </LayoutHeader>
+
+      <LayoutContent>
+        <RiskCalculationHistory calculations={calculations} />
+      </LayoutContent>
+    </>
   );
 }

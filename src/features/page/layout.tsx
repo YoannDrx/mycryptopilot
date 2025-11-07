@@ -36,11 +36,22 @@ export const LayoutHeader = (props: ComponentPropsWithoutRef<"div">) => {
 };
 
 export const LayoutTitle = (props: ComponentPropsWithoutRef<"h1">) => {
-  return <Typography {...props} variant="h2" className={cn(props.className)} />;
+  return (
+    <Typography
+      {...props}
+      variant="h2"
+      className={cn("text-3xl font-semibold", props.className)}
+    />
+  );
 };
 
 export const LayoutDescription = (props: ComponentPropsWithoutRef<"p">) => {
-  return <Typography {...props} className={cn(props.className)} />;
+  return (
+    <Typography
+      {...props}
+      className={cn("text-muted-foreground text-base", props.className)}
+    />
+  );
 };
 
 export const LayoutActions = (props: ComponentPropsWithoutRef<"div">) => {

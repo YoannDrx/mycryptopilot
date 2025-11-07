@@ -8,6 +8,12 @@ import {
 } from "@/components/ui/card";
 import { Typography } from "@/components/nowts/typography";
 import { FileText } from "lucide-react";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 /**
  * Tax Reports Page
@@ -21,37 +27,39 @@ export default async function TaxReportsPage() {
   await getRequiredUser();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
+    <>
+      <LayoutHeader className="flex items-center gap-3">
         <FileText className="size-8" />
         <div>
-          <Typography variant="h1">Tax Reports</Typography>
-          <Typography variant="muted">
+          <LayoutTitle>Tax Reports</LayoutTitle>
+          <LayoutDescription>
             Generate comprehensive tax reports for your jurisdiction
-          </Typography>
+          </LayoutDescription>
         </div>
-      </div>
+      </LayoutHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>No reports available yet</CardTitle>
-          <CardDescription>
-            Import your transactions first to generate tax reports
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Typography variant="muted">
-            Available report formats will include:
-          </Typography>
-          <ul className="text-muted-foreground mt-3 ml-6 list-disc space-y-1">
-            <li>IRS Form 8949 (USA)</li>
-            <li>HMRC Crypto Assets Report (UK)</li>
-            <li>Annual tax summary (all jurisdictions)</li>
-            <li>Transaction history CSV export</li>
-            <li>PDF reports for accountants</li>
-          </ul>
-        </CardContent>
-      </Card>
-    </div>
+      <LayoutContent>
+        <Card>
+          <CardHeader>
+            <CardTitle>No reports available yet</CardTitle>
+            <CardDescription>
+              Import your transactions first to generate tax reports
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="muted">
+              Available report formats will include:
+            </Typography>
+            <ul className="text-muted-foreground mt-3 ml-6 list-disc space-y-1">
+              <li>IRS Form 8949 (USA)</li>
+              <li>HMRC Crypto Assets Report (UK)</li>
+              <li>Annual tax summary (all jurisdictions)</li>
+              <li>Transaction history CSV export</li>
+              <li>PDF reports for accountants</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </LayoutContent>
+    </>
   );
 }

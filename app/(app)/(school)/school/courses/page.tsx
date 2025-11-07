@@ -8,6 +8,12 @@ import {
 } from "@/components/ui/card";
 import { Typography } from "@/components/nowts/typography";
 import { BookOpen } from "lucide-react";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 /**
  * Courses Page
@@ -21,37 +27,40 @@ export default async function CoursesPage() {
   await getRequiredUser();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
+    <>
+      <LayoutHeader className="flex items-center gap-3">
         <BookOpen className="size-8" />
         <div>
-          <Typography variant="h1">Crypto School</Typography>
-          <Typography variant="muted">
+          <LayoutTitle>Crypto School</LayoutTitle>
+          <LayoutDescription>
             Learn crypto trading from verified professionals
-          </Typography>
+          </LayoutDescription>
         </div>
-      </div>
+      </LayoutHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Coming Soon</CardTitle>
-          <CardDescription>
-            Crypto School feature is under development
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Typography variant="muted">
-            We're building a comprehensive learning platform that will include:
-          </Typography>
-          <ul className="text-muted-foreground mt-3 ml-6 list-disc space-y-1">
-            <li>Beginner to advanced trading courses</li>
-            <li>Technical analysis tutorials</li>
-            <li>Risk management strategies</li>
-            <li>Market psychology and discipline</li>
-            <li>Certifications from verified traders</li>
-          </ul>
-        </CardContent>
-      </Card>
-    </div>
+      <LayoutContent>
+        <Card>
+          <CardHeader>
+            <CardTitle>Coming Soon</CardTitle>
+            <CardDescription>
+              Crypto School feature is under development
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="muted">
+              We're building a comprehensive learning platform that will
+              include:
+            </Typography>
+            <ul className="text-muted-foreground mt-3 ml-6 list-disc space-y-1">
+              <li>Beginner to advanced trading courses</li>
+              <li>Technical analysis tutorials</li>
+              <li>Risk management strategies</li>
+              <li>Market psychology and discipline</li>
+              <li>Certifications from verified traders</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </LayoutContent>
+    </>
   );
 }

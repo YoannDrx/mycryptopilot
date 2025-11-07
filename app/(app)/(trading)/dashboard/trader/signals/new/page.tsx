@@ -1,8 +1,14 @@
-import { Typography } from "@/components/nowts/typography";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
 import { redirect } from "next/navigation";
 import { CreateSignalForm } from "./create-signal-form";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
+import { PlusCircle } from "lucide-react";
 
 /**
  * New Signal Page
@@ -23,15 +29,22 @@ export default async function NewSignalPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl py-8">
-      <div className="mb-8">
-        <Typography variant="h1">Create New Signal</Typography>
-        <Typography variant="muted">
-          Share your trading analysis with your followers
-        </Typography>
-      </div>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <PlusCircle className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Create New Signal</LayoutTitle>
+          <LayoutDescription>
+            Share your trading analysis with your followers
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
 
-      <CreateSignalForm traderName={traderProfile.displayName} />
-    </div>
+      <LayoutContent>
+        <CreateSignalForm traderName={traderProfile.displayName} />
+      </LayoutContent>
+    </>
   );
 }

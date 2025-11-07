@@ -11,10 +11,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SiteConfig } from "@/site-config";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { env } from "@/lib/env";
 import Link from "next/link";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+} from "@/features/page/layout";
 
 export const generateMetadata = combineWithParentMetadata({
   title: "Payment History",
@@ -35,13 +40,18 @@ export default async function PaymentHistoryPage() {
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-3xl font-bold">Payment History</h1>
-        <p className="text-muted-foreground mt-2">
-          View all your crypto payments and their status
-        </p>
-      </div>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <CreditCard className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Payment History</LayoutTitle>
+          <LayoutDescription>
+            View all your crypto payments and their status
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
 
       {payments.length === 0 ? (
         <Card>
@@ -185,6 +195,6 @@ export default async function PaymentHistoryPage() {
           })}
         </div>
       )}
-    </div>
+    </>
   );
 }

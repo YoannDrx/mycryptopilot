@@ -8,6 +8,12 @@ import {
 } from "@/components/ui/card";
 import { Typography } from "@/components/nowts/typography";
 import { FileUp } from "lucide-react";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 /**
  * Import Transactions Page
@@ -21,39 +27,41 @@ export default async function ImportTransactionsPage() {
   await getRequiredUser();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
+    <>
+      <LayoutHeader className="flex items-center gap-3">
         <FileUp className="size-8" />
         <div>
-          <Typography variant="h1">Import Transactions</Typography>
-          <Typography variant="muted">
+          <LayoutTitle>Import Transactions</LayoutTitle>
+          <LayoutDescription>
             Upload your exchange transactions for tax reporting
-          </Typography>
+          </LayoutDescription>
         </div>
-      </div>
+      </LayoutHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Coming Soon</CardTitle>
-          <CardDescription>
-            Tax declaration feature is under development
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Typography variant="muted">
-            We're building comprehensive tax tools that will support:
-          </Typography>
-          <ul className="text-muted-foreground mt-3 ml-6 list-disc space-y-1">
-            <li>
-              CSV import from major exchanges (Binance, Bybit, Coinbase, etc.)
-            </li>
-            <li>Automatic transaction categorization</li>
-            <li>Cost basis calculation (FIFO, LIFO, HIFO)</li>
-            <li>Capital gains/losses reporting</li>
-            <li>Multi-jurisdiction compliance</li>
-          </ul>
-        </CardContent>
-      </Card>
-    </div>
+      <LayoutContent>
+        <Card>
+          <CardHeader>
+            <CardTitle>Coming Soon</CardTitle>
+            <CardDescription>
+              Tax declaration feature is under development
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="muted">
+              We're building comprehensive tax tools that will support:
+            </Typography>
+            <ul className="text-muted-foreground mt-3 ml-6 list-disc space-y-1">
+              <li>
+                CSV import from major exchanges (Binance, Bybit, Coinbase, etc.)
+              </li>
+              <li>Automatic transaction categorization</li>
+              <li>Cost basis calculation (FIFO, LIFO, HIFO)</li>
+              <li>Capital gains/losses reporting</li>
+              <li>Multi-jurisdiction compliance</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </LayoutContent>
+    </>
   );
 }
