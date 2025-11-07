@@ -2,6 +2,7 @@ import { SiteConfig } from "@/site-config";
 import {
   Button,
   Heading,
+  Hr,
   Preview,
   Section,
   Text,
@@ -27,7 +28,14 @@ export function SubscriptionReminderEmail({
   const urgencyEmoji =
     urgencyLevel === "high" ? "🚨" : urgencyLevel === "medium" ? "⚠️" : "ℹ️";
 
-  const urgencyMessage =
+  const urgencyMessageEN =
+    urgencyLevel === "high"
+      ? "Your subscription expires tomorrow!"
+      : urgencyLevel === "medium"
+        ? "Your subscription expires soon."
+        : "Reminder: your subscription is expiring.";
+
+  const urgencyMessageFR =
     urgencyLevel === "high"
       ? "Ton abonnement expire demain !"
       : urgencyLevel === "medium"
@@ -37,11 +45,85 @@ export function SubscriptionReminderEmail({
   return (
     <EmailLayout>
       <Preview>
-        {urgencyEmoji} Rappel d'expiration - {SiteConfig.title}
+        {urgencyEmoji} Subscription expiring - Rappel d'expiration -{" "}
+        {SiteConfig.title}
       </Preview>
 
+      {/* English Section */}
+      <Text className="mt-4 mb-3 text-sm font-semibold text-gray-600">
+        🇬🇧 English
+      </Text>
+
       <Heading className="text-2xl font-bold text-gray-900">
-        {urgencyEmoji} {urgencyMessage}
+        {urgencyEmoji} {urgencyMessageEN}
+      </Heading>
+
+      <Text className="text-base text-gray-700">
+        Hello <strong>{userName}</strong>,
+      </Text>
+
+      <Text className="text-base text-gray-700">
+        Your <strong>{planName.toUpperCase()}</strong> subscription expires in{" "}
+        <strong>
+          {daysRemaining} day{daysRemaining > 1 ? "s" : ""}
+        </strong>{" "}
+        (on {expiresAt.toLocaleDateString("en-US")}).
+      </Text>
+
+      <Section className="my-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <Text className="mb-2 text-sm font-semibold text-amber-900">
+          ⏰ Expiration Date
+        </Text>
+        <Text className="text-base font-bold text-amber-900">
+          {expiresAt.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </Text>
+      </Section>
+
+      <Text className="text-base text-gray-700">
+        After expiration, your account will automatically downgrade to the{" "}
+        <strong>FREE Plan</strong> and you will lose access to the following
+        features:
+      </Text>
+
+      <Section className="my-6">
+        <ul className="list-disc pl-5 text-base text-gray-700">
+          <li>❌ Full real-time signals (limited to 5 teasers/day)</li>
+          <li>❌ Unlimited traders (limited to 1 trader)</li>
+          <li>❌ Risk console and trading journal</li>
+          <li>❌ Access to traders' private Discord channels</li>
+          <li>❌ Real-time screeners (downgraded to 5min refresh)</li>
+        </ul>
+      </Section>
+
+      <Section className="my-6 text-center">
+        <Button
+          href={`${SiteConfig.prodUrl}/orgs/pricing`}
+          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+        >
+          🔄 Renew my subscription
+        </Button>
+      </Section>
+
+      <Text className="text-sm text-gray-500">
+        💡 <strong>Crypto payment only</strong>: USDC on Base or USDT on Tron.
+        Renewal is instant after transaction confirmation.
+      </Text>
+
+      {/* Horizontal Separator */}
+      <Hr className="my-8 border-gray-300" />
+
+      {/* French Section */}
+      <Text className="mb-3 text-sm font-semibold text-gray-600">
+        🇫🇷 Français
+      </Text>
+
+      <Heading className="text-2xl font-bold text-gray-900">
+        {urgencyEmoji} {urgencyMessageFR}
       </Heading>
 
       <Text className="text-base text-gray-700">
@@ -99,17 +181,6 @@ export function SubscriptionReminderEmail({
         💡 <strong>Paiement en crypto uniquement</strong> : USDC sur Base ou
         USDT sur Tron. Le renouvellement est instantané après confirmation de
         transaction.
-      </Text>
-
-      <Text className="text-sm text-gray-500">
-        Questions ? Contacte-nous à{" "}
-        <a
-          href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
-        >
-          {SiteConfig.email.contact}
-        </a>
-        .
       </Text>
     </EmailLayout>
   );

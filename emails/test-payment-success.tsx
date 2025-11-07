@@ -2,6 +2,7 @@ import { SiteConfig } from "@/site-config";
 import {
   Button,
   Heading,
+  Hr,
   Preview,
   Section,
   Text,
@@ -32,7 +33,14 @@ export function TestPaymentSuccessEmail({
 
   return (
     <EmailLayout>
-      <Preview>Test Payment Confirmed - {SiteConfig.title}</Preview>
+      <Preview>
+        Test Payment Confirmed - Paiement de test confirmé - {SiteConfig.title}
+      </Preview>
+
+      {/* English Section */}
+      <Text className="mt-4 mb-3 text-sm font-semibold text-gray-600">
+        🇬🇧 English
+      </Text>
 
       <Heading className="text-2xl font-bold text-gray-900">
         🎉 Test Payment Successful!
@@ -110,6 +118,100 @@ export function TestPaymentSuccessEmail({
 
       <Text className="text-sm text-gray-500">
         Questions about crypto payments? Contact us at{" "}
+        <a
+          href={`mailto:${SiteConfig.email.contact}`}
+          className="text-indigo-600 no-underline"
+        >
+          {SiteConfig.email.contact}
+        </a>
+        .
+      </Text>
+
+      {/* Horizontal Separator */}
+      <Hr className="my-8 border-gray-300" />
+
+      {/* French Section */}
+      <Text className="mb-3 text-sm font-semibold text-gray-600">
+        🇫🇷 Français
+      </Text>
+
+      <Heading className="text-2xl font-bold text-gray-900">
+        🎉 Paiement de test réussi !
+      </Heading>
+
+      <Text className="text-base text-gray-700">Bonjour {userName},</Text>
+
+      <Text className="text-base text-gray-700">
+        Bonne nouvelle ! Ton paiement de test de <strong>${amountUSD}</strong> a
+        été confirmé on-chain. Le système de paiement crypto fonctionne
+        parfaitement !
+      </Text>
+
+      <Section className="my-6 rounded-lg border border-green-200 bg-green-50 p-4">
+        <Text className="mb-2 text-sm font-semibold text-green-900">
+          ✓ Détails du paiement
+        </Text>
+        <ul className="list-none space-y-1 pl-0 text-sm text-green-800">
+          <li>
+            <strong>Montant :</strong> ${amountUSD} USD
+          </li>
+          <li>
+            <strong>Réseau :</strong>{" "}
+            {network === "BASE" ? "Base (USDC)" : "Tron (USDT)"}
+          </li>
+          <li>
+            <strong>Statut :</strong> Confirmé
+          </li>
+          <li>
+            <strong>Heure :</strong> {confirmedAt.toLocaleString("fr-FR")}
+          </li>
+        </ul>
+      </Section>
+
+      <Text className="text-base text-gray-700">
+        Tu peux voir ta transaction sur l'explorateur de blockchain :
+      </Text>
+
+      <Section className="my-4 text-center">
+        <Button
+          href={explorerUrl}
+          className="rounded-lg bg-gray-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+        >
+          Voir la transaction
+        </Button>
+      </Section>
+
+      <Section className="my-6">
+        <Heading className="text-lg font-bold text-gray-900">
+          Et maintenant ?
+        </Heading>
+        <ul className="list-disc pl-5 text-base text-gray-700">
+          <li>
+            <strong>Tu as vérifié que le système fonctionne</strong> - Les
+            paiements crypto sont traités automatiquement
+          </li>
+          <li>
+            <strong>Le paiement de test est dans ton historique</strong> -
+            Consulte ton dashboard pour le voir
+          </li>
+          <li>
+            <strong>Prêt à t'abonner ?</strong> - Choisis le plan Pro ou Ultra
+            pour un accès complet
+          </li>
+        </ul>
+      </Section>
+
+      <Section className="my-6 text-center">
+        <Button
+          href={pricingUrl}
+          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+        >
+          Voir les plans & S'abonner
+        </Button>
+      </Section>
+
+      <Text className="text-sm text-gray-500">
+        Questions sur les paiements crypto ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
           className="text-indigo-600 no-underline"

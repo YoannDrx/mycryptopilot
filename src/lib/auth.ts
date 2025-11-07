@@ -10,7 +10,7 @@ import {
 
 import { sendEmail } from "@/lib/mail/send-email";
 import { SiteConfig } from "@/site-config";
-import MarkdownEmail from "@email/markdown.email";
+import BilingualMarkdownEmail from "@email/bilingual-markdown.email";
 import { setupResendCustomer } from "./auth/auth-config-setup";
 import { sendDiscordInviteEmail } from "./discord/invitations";
 import { env } from "./env";
@@ -299,17 +299,35 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
+      // Fetch user name from database (Better Auth only provides email)
+      const userData = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { name: true },
+      });
+      const userName = userData?.name ?? user.email.split("@")[0];
+
       await sendEmail({
         to: user.email,
         subject: "Reset your password",
-        html: MarkdownEmail({
+        html: BilingualMarkdownEmail({
           preview: `Reset your password for ${SiteConfig.title}`,
-          markdown: `
-          Hello,
+          markdownEN: `
+Hello **${userName}**,
 
-          You requested to reset your password.
+You requested to reset your password.
 
-          [Click here to reset your password](${url})
+[Click here to reset your password](${url})
+
+If you didn't request this, you can safely ignore this email.
+          `,
+          markdownFR: `
+Bonjour **${userName}**,
+
+Vous avez demandé à réinitialiser votre mot de passe.
+
+[Cliquez ici pour réinitialiser votre mot de passe](${url})
+
+Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email en toute sécurité.
           `,
         }),
       });
@@ -319,17 +337,35 @@ export const auth = betterAuth({
     changeEmail: {
       enabled: true,
       sendChangeEmailVerification: async ({ newEmail, url }) => {
+        // Try to get user name from new email (might not exist yet)
+        const userData = await prisma.user.findUnique({
+          where: { email: newEmail },
+          select: { name: true },
+        });
+        const userName = userData?.name ?? newEmail.split("@")[0];
+
         await sendEmail({
           to: newEmail,
           subject: "Change email address",
-          html: MarkdownEmail({
+          html: BilingualMarkdownEmail({
             preview: `Change your email address for ${SiteConfig.title}`,
-            markdown: `
-            Hello,
+            markdownEN: `
+Hello **${userName}**,
 
-            You requested to change your email address.
+You requested to change your email address.
 
-            [Click here to verify your new email address](${url})
+[Click here to verify your new email address](${url})
+
+If you didn't request this, please contact support immediately.
+            `,
+            markdownFR: `
+Bonjour **${userName}**,
+
+Vous avez demandé à changer votre adresse email.
+
+[Cliquez ici pour vérifier votre nouvelle adresse email](${url})
+
+Si vous n'avez pas fait cette demande, veuillez contacter le support immédiatement.
             `,
           }),
         });
@@ -339,17 +375,40 @@ export const auth = betterAuth({
       enabled: true,
       sendDeleteAccountVerification: async ({ user, token }) => {
         const url = `${getServerUrl()}/auth/confirm-delete?token=${token}&callbackUrl=/auth/goodbye`;
+
+        // Fetch user name from database
+        const userData = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { name: true },
+        });
+        const userName = userData?.name ?? user.email.split("@")[0];
+
         await sendEmail({
           to: user.email,
           subject: "Delete your account",
-          html: MarkdownEmail({
+          html: BilingualMarkdownEmail({
             preview: `Delete your account from ${SiteConfig.title}`,
-            markdown: `
-            Hello,
+            markdownEN: `
+Hello **${userName}**,
 
-            You requested to delete your account.
+You requested to delete your account.
 
-            [Click here to confirm account deletion](${url})
+**⚠️ Warning:** This action is permanent and cannot be undone. All your data will be permanently deleted.
+
+[Click here to confirm account deletion](${url})
+
+If you didn't request this, please secure your account immediately.
+            `,
+            markdownFR: `
+Bonjour **${userName}**,
+
+Vous avez demandé à supprimer votre compte.
+
+**⚠️ Attention :** Cette action est permanente et ne peut pas être annulée. Toutes vos données seront définitivement supprimées.
+
+[Cliquez ici pour confirmer la suppression du compte](${url})
+
+Si vous n'avez pas fait cette demande, veuillez sécuriser votre compte immédiatement.
             `,
           }),
         });
@@ -358,17 +417,39 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      // Fetch user name from database
+      const userData = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { name: true },
+      });
+      const userName = userData?.name ?? user.email.split("@")[0];
+
       await sendEmail({
         to: user.email,
         subject: "Verify your email address",
-        html: MarkdownEmail({
+        html: BilingualMarkdownEmail({
           preview: `Verify your email for ${SiteConfig.title}`,
-          markdown: `
-          Hello,
+          markdownEN: `
+Hello **${userName}**,
 
-          Welcome to ${SiteConfig.title}! Please verify your email address.
+Welcome to **${SiteConfig.title}**! 🎉
 
-          [Click here to verify your email](${url})
+To get started, please verify your email address.
+
+[Click here to verify your email](${url})
+
+Once verified, you'll have access to all features.
+          `,
+          markdownFR: `
+Bonjour **${userName}**,
+
+Bienvenue sur **${SiteConfig.title}** ! 🎉
+
+Pour commencer, veuillez vérifier votre adresse email.
+
+[Cliquez ici pour vérifier votre email](${url})
+
+Une fois vérifié, vous aurez accès à toutes les fonctionnalités.
           `,
         }),
       });
@@ -380,17 +461,36 @@ export const auth = betterAuth({
     emailOTP({
       sendVerificationOTP: async ({ email, otp }) => {
         logger.debug("Sending OTP", { email, otp });
+
+        // Fetch user name from database
+        const userData = await prisma.user.findUnique({
+          where: { email },
+          select: { name: true },
+        });
+        const userName = userData?.name ?? email.split("@")[0];
+
         await sendEmail({
           to: email,
-          subject: `Your code to sign in to ${SiteConfig.title} ${otp}`,
-          html: MarkdownEmail({
+          subject: `Your code to sign in to ${SiteConfig.title}`,
+          html: BilingualMarkdownEmail({
             preview: `Your code to sign in to ${SiteConfig.title}`,
-            markdown: `
-            Hello,
+            markdownEN: `
+Hello **${userName}**,
 
-            Your code to sign in: **${otp}**
+Your verification code to sign in: **${otp}**
 
-            [Or click here to sign in automatically](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
+This code will expire in 10 minutes.
+
+[Or click here to sign in automatically](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
+            `,
+            markdownFR: `
+Bonjour **${userName}**,
+
+Votre code de vérification pour vous connecter : **${otp}**
+
+Ce code expirera dans 10 minutes.
+
+[Ou cliquez ici pour vous connecter automatiquement](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
             `,
           }),
         });
