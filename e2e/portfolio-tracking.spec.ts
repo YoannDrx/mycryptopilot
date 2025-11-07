@@ -11,11 +11,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     // 1. Create a trader with PRO plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade user to PRO plan (required for 1 exchange connection)
     await prisma.user.update({
@@ -29,7 +25,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     });
 
     // 2. Navigate to exchanges page
-    await page.goto(`/orgs/${orgSlug}/account/exchanges`);
+    await page.goto("/account/exchanges");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify page title
@@ -53,7 +49,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await expect(page.getByText(/active/i)).toBeVisible();
 
     // 7. Navigate to Trader Dashboard > Performance tab
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
     // Click Performance tab
@@ -80,7 +76,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await expect(page.getByText(/net pnl/i)).toBeVisible();
 
     // 11. Disconnect exchange
-    await page.goto(`/orgs/${orgSlug}/account/exchanges`);
+    await page.goto("/account/exchanges");
     await page.waitForLoadState("networkidle");
 
     // Click disconnect button
@@ -107,10 +103,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     // 1. Create a trader with PRO plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to PRO
     await prisma.user.update({
@@ -129,7 +122,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     });
 
     // 3. Navigate to exchanges page
-    await page.goto(`/orgs/${orgSlug}/account/exchanges`);
+    await page.goto("/account/exchanges");
     await page.waitForLoadState("networkidle");
 
     // 4. Verify "Sync Now" button is visible
@@ -157,10 +150,7 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     // 1. Create a trader with PRO plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to PRO
     await prisma.user.update({
@@ -180,7 +170,7 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     });
 
     // 3. Navigate to Trader Dashboard > Performance tab
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
     const performanceTab = page.getByRole("tab", { name: /performance/i });
@@ -219,10 +209,7 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     // 1. Create a trader with PRO plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to PRO
     await prisma.user.update({
@@ -242,7 +229,7 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     });
 
     // 3. Navigate to Performance tab
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
     const performanceTab = page.getByRole("tab", { name: /performance/i });
@@ -276,10 +263,7 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     // 1. Create a trader with FREE plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Ensure user is on FREE plan
     await prisma.user.update({
@@ -299,7 +283,7 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     });
 
     // 3. Navigate to Performance tab
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
     const performanceTab = page.getByRole("tab", { name: /performance/i });
@@ -341,10 +325,7 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     // 1. Create a trader with FREE plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Ensure user is on FREE plan
     await prisma.user.update({
@@ -353,7 +334,7 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     });
 
     // 2. Navigate to exchanges page
-    await page.goto(`/orgs/${orgSlug}/account/exchanges`);
+    await page.goto("/account/exchanges");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify upgrade blocker is displayed
@@ -379,10 +360,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
     // 1. Create a trader with PRO plan (NOT verified initially)
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to PRO
     await prisma.user.update({
@@ -413,7 +391,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
     expect(updatedProfile.verifiedAt).not.toBeNull();
 
     // 5. Navigate to marketplace to see verified badge
-    await page.goto(`/orgs/${orgSlug}/traders`);
+    await page.goto("/traders");
     await page.waitForLoadState("networkidle");
 
     // Search for the trader by display name
@@ -433,10 +411,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
     // 1. Create a trader with PRO plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to PRO
     await prisma.user.update({
@@ -493,7 +468,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
     expect(profile.verifiedAt).toBeNull();
 
     // 5. Navigate to marketplace to verify badge is gone
-    await page.goto(`/orgs/${orgSlug}/traders`);
+    await page.goto("/traders");
     await page.waitForLoadState("networkidle");
 
     // Trader should still be visible but WITHOUT verified badge
@@ -506,7 +481,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
     // 1. Create a trader with ULTRA plan (3 connections)
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to ULTRA
     await prisma.user.update({

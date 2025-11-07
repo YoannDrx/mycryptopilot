@@ -1,7 +1,7 @@
 /**
  * Portfolio Page E2E Tests
  *
- * Tests the /orgs/[orgSlug]/portfolio page UI functionality:
+ * Tests the /portfolio page UI functionality:
  * - Page loading and layout
  * - Tab navigation (Performance, Risk Analysis, Trade History)
  * - Filters (symbol, status, sort)
@@ -23,14 +23,10 @@ test.describe("Portfolio Page - Access & Navigation", () => {
     // 1. Create a regular user (not a trader)
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // Get user from database
     const user = await prisma.user.findUniqueOrThrow({
@@ -44,7 +40,7 @@ test.describe("Portfolio Page - Access & Navigation", () => {
     expect(traderProfile).toBeNull();
 
     // 2. Try to access portfolio page
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify redirect to become-trader page
@@ -59,10 +55,7 @@ test.describe("Portfolio Page - Access & Navigation", () => {
     // 1. Create a trader with PRO plan
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // Upgrade to PRO
     await prisma.user.update({
@@ -71,7 +64,7 @@ test.describe("Portfolio Page - Access & Navigation", () => {
     });
 
     // 2. Navigate to portfolio page
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify page loaded successfully (exact text from page.tsx line 248)
@@ -86,10 +79,7 @@ test.describe("Portfolio Page - Tab Navigation", () => {
     // 1. Create a trader with data
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -104,7 +94,7 @@ test.describe("Portfolio Page - Tab Navigation", () => {
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
     // 2. Navigate to portfolio page
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify all tabs are visible (exact text from page.tsx lines 273-275)
@@ -121,10 +111,7 @@ test.describe("Portfolio Page - Tab Navigation", () => {
     // 1. Create trader with portfolio data
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -138,7 +125,7 @@ test.describe("Portfolio Page - Tab Navigation", () => {
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
     // 2. Navigate to portfolio page
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // 3. Performance tab is active by default (page.tsx line 271)
@@ -167,10 +154,7 @@ test.describe("Portfolio Page - Performance Tab", () => {
   test("displays key metrics cards", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -183,7 +167,7 @@ test.describe("Portfolio Page - Performance Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Verify key metrics are displayed (page.tsx lines 76-123)
@@ -196,10 +180,7 @@ test.describe("Portfolio Page - Performance Tab", () => {
   test("displays performance chart", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -212,7 +193,7 @@ test.describe("Portfolio Page - Performance Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Performance tab to ensure it's active
@@ -228,10 +209,7 @@ test.describe("Portfolio Page - Risk Analysis Tab", () => {
   test("displays risk metrics", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -244,7 +222,7 @@ test.describe("Portfolio Page - Risk Analysis Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Risk Analysis tab
@@ -264,10 +242,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
   test("displays trade history table with columns", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -280,7 +255,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
@@ -308,10 +283,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
   test("filters trades by status", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -324,7 +296,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
@@ -345,10 +317,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
   test("filters trades by symbol", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -361,7 +330,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
@@ -383,10 +352,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
   test("paginates trade history", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -399,7 +365,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
@@ -433,10 +399,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
   test("sorts trades by column", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -449,7 +412,7 @@ test.describe("Portfolio Page - Trade History Tab", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
@@ -473,10 +436,7 @@ test.describe("Portfolio Page - Empty States", () => {
   test("shows empty state when no trades exist", async ({ page }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -484,7 +444,7 @@ test.describe("Portfolio Page - Empty States", () => {
     });
 
     // Navigate to portfolio without creating any trades
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
@@ -500,10 +460,7 @@ test.describe("Portfolio Page - Empty States", () => {
   }) => {
     const { user: trader } = await createTestTrader({ page });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     await prisma.user.update({
       where: { id: trader.id },
@@ -516,7 +473,7 @@ test.describe("Portfolio Page - Empty States", () => {
 
     await createCompletePortfolioData({ traderProfileId: traderProfile.id });
 
-    await page.goto(`/orgs/${orgSlug}/portfolio`);
+    await page.goto("/portfolio");
     await page.waitForLoadState("networkidle");
 
     // Click Trade History tab
