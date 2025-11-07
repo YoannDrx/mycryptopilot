@@ -3,6 +3,13 @@ import { DiscordConnectionCard } from "./discord-connection-card";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { redirect } from "next/navigation";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
+import { MessageCircle } from "lucide-react";
 
 export default async function RoutePage({
   searchParams,
@@ -77,8 +84,22 @@ export default async function RoutePage({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <DiscordConnectionCard user={user} />
-    </div>
+    <>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <MessageCircle className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Discord Connection</LayoutTitle>
+          <LayoutDescription>
+            Link your Discord account to receive real-time trading signals
+          </LayoutDescription>
+        </div>
+      </LayoutHeader>
+
+      <LayoutContent>
+        <DiscordConnectionCard user={user} />
+      </LayoutContent>
+    </>
   );
 }

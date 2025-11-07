@@ -88,11 +88,16 @@ export default async function RoutePage(props: {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>User Details</LayoutTitle>
-        <LayoutDescription>
-          View and manage user information and subscription
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Users className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>User Details</LayoutTitle>
+          <LayoutDescription>
+            View and manage user information and subscription
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
       <LayoutActions>
         <UserActions user={userData} />

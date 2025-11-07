@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import { searchParamsCache } from "./_actions/search-params";
 import { AdminFilters } from "./_components/admin-filters";
 import { UserTable } from "./_components/user-table";
+import { Users } from "lucide-react";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -23,11 +24,16 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>User Management</LayoutTitle>
-        <LayoutDescription>
-          View and manage all users in the system
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <Users className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>User Management</LayoutTitle>
+          <LayoutDescription>
+            View and manage all users in the system
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent>

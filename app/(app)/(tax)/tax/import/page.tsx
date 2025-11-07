@@ -28,8 +28,10 @@ export default async function ImportTransactionsPage() {
 
   return (
     <>
-      <LayoutHeader className="flex items-center gap-3">
-        <FileUp className="size-8" />
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <FileUp className="size-5" />
+        </div>
         <div>
           <LayoutTitle>Import Transactions</LayoutTitle>
           <LayoutDescription>

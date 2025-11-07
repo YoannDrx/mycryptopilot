@@ -15,6 +15,7 @@ import {
 import { Suspense } from "react";
 import { TraderFilters } from "./_components/trader-filters";
 import { TradersTable } from "./_components/traders-table";
+import { TrendingUp } from "lucide-react";
 
 const searchParamsCache = createSearchParamsCache({
   q: parseAsString.withDefault(""),
@@ -33,12 +34,17 @@ export default async function AdminTradersPage({ searchParams }: PageProps) {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>Trader Management</LayoutTitle>
-        <LayoutDescription>
-          View and manage all trader profiles, verify traders, and monitor their
-          activity
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <TrendingUp className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Trader Management</LayoutTitle>
+          <LayoutDescription>
+            View and manage all trader profiles, verify traders, and monitor
+            their activity
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent>
