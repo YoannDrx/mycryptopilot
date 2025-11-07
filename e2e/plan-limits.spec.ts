@@ -35,10 +35,10 @@ test.describe("Plan Limits", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -47,11 +47,8 @@ test.describe("Plan Limits", () => {
     // Verify user is on Free plan
     expect(follower.planName).toBe("free");
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Follow the trader
-    await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+    await page.goto(`/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
     await page
@@ -63,7 +60,7 @@ test.describe("Plan Limits", () => {
     ).toBeVisible({ timeout: 10000 });
 
     // 4. Navigate to dashboard to see signals
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 5. Verify first 3 signals are clear (activeSignalsLimit = 3 for Free)
@@ -89,10 +86,10 @@ test.describe("Plan Limits", () => {
     // 1. Create a Pro user
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
@@ -104,9 +101,6 @@ test.describe("Plan Limits", () => {
       plan: "pro",
       daysGranted: 30,
     });
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
     // 2. Create 6 traders in parallel (DB direct, no UI navigation)
     const tradersData = await Promise.all(
@@ -125,13 +119,13 @@ test.describe("Plan Limits", () => {
       .first()
       .click();
 
-    await page.waitForURL(/\/orgs\/.*/, { timeout: 10000 });
+    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
     // 4. Follow first 5 traders (should all succeed - Pro limit is 5)
 
     for (let i = 0; i < 5; i++) {
       // eslint-disable-next-line no-await-in-loop
-      await page.goto(`/orgs/${orgSlug}/traders/${traders[i]?.id}`);
+      await page.goto(`/traders/${traders[i]?.id}`);
       // eslint-disable-next-line no-await-in-loop
       await page.waitForLoadState("networkidle");
 
@@ -147,7 +141,7 @@ test.describe("Plan Limits", () => {
     }
 
     // 5. Try to follow 6th trader (should fail - exceeds Pro limit)
-    await page.goto(`/orgs/${orgSlug}/traders/${traders[5]?.id}`);
+    await page.goto(`/traders/${traders[5]?.id}`);
     await page.waitForLoadState("networkidle");
 
     await page
@@ -176,10 +170,10 @@ test.describe("Plan Limits", () => {
     // 1. Create an Ultra user
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: userData.email },
@@ -191,9 +185,6 @@ test.describe("Plan Limits", () => {
       plan: "ultra",
       daysGranted: 30,
     });
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
 
     // 2. Create 3 traders in parallel (DB direct, no UI navigation)
     // Note: 3 is sufficient to prove unlimited access (more than Free limit of 1)
@@ -213,13 +204,13 @@ test.describe("Plan Limits", () => {
       .first()
       .click();
 
-    await page.waitForURL(/\/orgs\/.*/, { timeout: 10000 });
+    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
     // 4. Follow all 3 traders (should all succeed - Ultra has no limit)
 
     for (const trader of traders) {
       // eslint-disable-next-line no-await-in-loop
-      await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+      await page.goto(`/traders/${trader.id}`);
       // eslint-disable-next-line no-await-in-loop
       await page.waitForLoadState("networkidle");
 
@@ -246,7 +237,7 @@ test.describe("Plan Limits", () => {
 
     // 6. Verify Ultra user can see unlimited signals
     // Navigate to dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // Ultra plan has activeSignalsLimit: 999 (unlimited)

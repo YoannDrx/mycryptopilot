@@ -7,17 +7,13 @@ test.describe("Settings Page", () => {
     // 1. Create a test account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to settings page (account settings)
-    await page.goto(`/orgs/${orgSlug}/account`);
+    await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify profile form is displayed
@@ -69,17 +65,13 @@ test.describe("Settings Page", () => {
     // 1. Create a test account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to account settings
-    await page.goto(`/orgs/${orgSlug}/account`);
+    await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify user is on Free plan (default)
@@ -98,7 +90,7 @@ test.describe("Settings Page", () => {
     expect(pageContent).toBeTruthy();
 
     // 5. Navigate to pricing page to see upgrade options
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     // Verify pricing page displays plans (plan names are lowercase in DOM)
@@ -107,7 +99,7 @@ test.describe("Settings Page", () => {
     await expect(page.getByText(/^ultra$/i).first()).toBeVisible();
 
     // 6. Verify user can navigate to following page (another settings-related page)
-    await page.goto(`/orgs/${orgSlug}/account/following`);
+    await page.goto("/account/following");
     await page.waitForLoadState("networkidle");
 
     // Should see "No traders followed" message for new user
@@ -125,7 +117,7 @@ test.describe("Settings Page", () => {
     }
 
     // 7. Navigate back to account settings
-    await page.goto(`/orgs/${orgSlug}/account`);
+    await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
     // Verify we're back on settings page

@@ -9,13 +9,7 @@ test.describe("Trader Referral System", () => {
     const { user: trader, traderProfile } = await createTestTrader({ page });
 
     // Navigate to referral program page
-    await page.goto("/orgs");
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1].split("/")[0];
-
-    await page.goto(`/orgs/${orgSlug}/trader-tools/referral`);
+    await page.goto("/trader-tools/referral");
     await page.waitForLoadState("networkidle");
 
     // 2. Get referral link
@@ -42,7 +36,7 @@ test.describe("Trader Referral System", () => {
     const followerEmail = `follower-${Date.now()}@test.com`;
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       initialUserData: {
         name: "Test Follower",
         email: followerEmail,
@@ -50,7 +44,7 @@ test.describe("Trader Referral System", () => {
       },
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     // 6. Navigate to referral link
     await page.goto(referralUrl);
@@ -81,7 +75,7 @@ test.describe("Trader Referral System", () => {
     // Should redirect to dashboard after follow (or already be there)
     // Use a more lenient check - just verify URL changed from /follow page
     try {
-      await page.waitForURL(/\/orgs\/.*\/dashboard/, { timeout: 10000 });
+      await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
     } catch {
       // If redirect didn't happen in time, that's okay - check DB instead
       // The follow relationship will be verified below anyway
@@ -123,7 +117,7 @@ test.describe("Trader Referral System", () => {
     const followerEmail = `follower-${Date.now()}@test.com`;
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       initialUserData: {
         name: "Test Follower",
         email: followerEmail,
@@ -131,7 +125,7 @@ test.describe("Trader Referral System", () => {
       },
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerEmail },
@@ -151,7 +145,7 @@ test.describe("Trader Referral System", () => {
     await page.goto(referralUrl);
 
     // Should redirect to dashboard with query param
-    await page.waitForURL(/\/orgs\/.*\/dashboard.*already_following/, {
+    await page.waitForURL(/\/dashboard.*already_following/, {
       timeout: 10000,
     });
 
@@ -215,7 +209,7 @@ test.describe("Trader Referral System", () => {
     const followerEmail = `follower-${Date.now()}@test.com`;
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       initialUserData: {
         name: "Test Follower",
         email: followerEmail,

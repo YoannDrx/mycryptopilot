@@ -12,11 +12,11 @@ test("password reset flow", async ({ page }) => {
   // 1. Create a test account
   const userData = await createTestAccount({
     page,
-    callbackURL: "/orgs",
+    callbackURL: "/dashboard",
   });
 
-  // Wait to be on the orgs page (will redirect to user's org)
-  await page.waitForURL(/\/orgs/, { timeout: 10000 });
+  // Wait to be on the dashboard page
+  await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
   // 2. Sign out
   await signOutAccount({ page });
@@ -63,7 +63,7 @@ test("password reset flow", async ({ page }) => {
       email: userData.email,
       password: newPassword,
     },
-    callbackURL: "/orgs",
+    callbackURL: "/dashboard",
   });
 
   // Clean up - delete the test user

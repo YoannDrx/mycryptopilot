@@ -19,16 +19,13 @@ test.describe("Signal Expiration", () => {
 
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 3. Navigate to trader profile to see the signal
-    await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+    await page.goto(`/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
     // 4. Verify signal is visible
@@ -75,16 +72,13 @@ test.describe("Signal Expiration", () => {
 
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 3. Navigate to signals feed (includes expired if explicitly enabled)
-    await page.goto(`/orgs/${orgSlug}/signals`);
+    await page.goto("/signals");
     await page.waitForLoadState("networkidle");
 
     // Note: By default, trader profile shows only ACTIVE signals (includeExpired: false)
