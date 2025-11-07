@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerUrl } from "@/lib/server-url";
 import { faker } from "@faker-js/faker";
-import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 import {
   createTestAccount,
@@ -9,30 +8,18 @@ import {
   signOutAccount,
 } from "./utils/auth-test";
 
-const extractOrgSlug = (page: Page) => {
-  const url = new URL(page.url());
-  const match = url.pathname.match(/\/orgs\/([^/]+)/);
-
-  if (!match) {
-    throw new Error("Active organization slug not found in URL");
-  }
-
-  return match[1];
-};
-
 test.describe("account", () => {
   test("delete account flow", async ({ page }) => {
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/[^/]+$/, { timeout: 10000 });
-    const orgSlug = extractOrgSlug(page);
+    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
-    await page.goto(`/orgs/${orgSlug}/account`);
+    await page.goto("/account");
     await page.getByRole("link", { name: /danger zone/i }).click();
-    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/account/danger`), {
+    await page.waitForURL(/\/account\/danger$/, {
       timeout: 10000,
     });
     await page.getByRole("button", { name: "Delete" }).click();
@@ -89,12 +76,11 @@ test.describe("account", () => {
   });
 
   test("update name flow", async ({ page }) => {
-    await createTestAccount({ page, callbackURL: "/orgs" });
+    await createTestAccount({ page, callbackURL: "/dashboard" });
 
-    await page.waitForURL(/\/orgs\/[^/]+$/, { timeout: 10000 });
-    const orgSlug = extractOrgSlug(page);
+    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
-    await page.goto(`/orgs/${orgSlug}/account`);
+    await page.goto("/account");
 
     const newName = faker.person.fullName();
     const input = page.getByRole("textbox", { name: "Name" });
@@ -103,7 +89,7 @@ test.describe("account", () => {
 
     await expect(page.getByText("Profile updated")).toBeVisible();
     await page.reload();
-    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/account`), {
+    await page.waitForURL(/\/account$/, {
       timeout: 10000,
     });
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -114,18 +100,15 @@ test.describe("account", () => {
   test("change password flow", async ({ page }) => {
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/[^/]+$/, { timeout: 10000 });
-    const orgSlug = extractOrgSlug(page);
+    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
-    const accountPath = `/orgs/${orgSlug}/account`;
-
-    await page.goto(accountPath);
+    await page.goto("/account");
 
     await page.getByRole("link", { name: /change password/i }).click();
-    await page.waitForURL(new RegExp(`${accountPath}/change-password`), {
+    await page.waitForURL(/\/account\/change-password$/, {
       timeout: 10000,
     });
 
@@ -142,7 +125,7 @@ test.describe("account", () => {
     await expect(page.getByText("Password changed successfully")).toBeVisible();
 
     // Wait for navigation back to /account
-    await page.waitForURL(new RegExp(`${accountPath}$`), { timeout: 5000 });
+    await page.waitForURL(/\/account$/, { timeout: 5000 });
 
     await signOutAccount({ page });
 
@@ -152,10 +135,10 @@ test.describe("account", () => {
         email: userData.email,
         password: newPassword,
       },
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/, { timeout: 10000 });
+    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
     const user = await prisma.user.findUnique({
       where: { email: userData.email },
