@@ -126,11 +126,6 @@ vi.mock("@/lib/auth/auth-user", () => ({
   getUser: vi.fn(),
   getRequiredUser: vi.fn(),
 }));
-vi.mock("@/lib/organizations/get-org", () => ({
-  getCurrentOrg: vi.fn(),
-  getRequiredCurrentOrg: vi.fn(),
-}));
-
 // Define the type for our global helper
 
 declare global {

@@ -187,7 +187,7 @@ export function NewSignalNotificationEmail({
         You'll receive a notification for every new signal from traders you
         follow. You can manage your preferences in{" "}
         <a
-          href={`${SiteConfig.prodUrl}/orgs/account/email`}
+          href={`${SiteConfig.prodUrl}/account/email`}
           className="text-indigo-600 no-underline"
         >
           email settings
@@ -340,7 +340,7 @@ export function NewSignalNotificationEmail({
         Tu recevras une notification pour chaque nouveau signal des traders que
         tu suis. Tu peux gérer tes préférences dans{" "}
         <a
-          href={`${SiteConfig.prodUrl}/orgs/account/email`}
+          href={`${SiteConfig.prodUrl}/account/email`}
           className="text-indigo-600 no-underline"
         >
           les paramètres email

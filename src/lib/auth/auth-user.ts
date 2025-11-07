@@ -1,10 +1,11 @@
 import { unauthorized } from "next/navigation";
-import { getSessionApi } from "./auth-api-helper";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { getSessionWithHeaders } from "./get-session";
 
 export const getSession = async () => {
-  const session = await getSessionApi();
-  return session;
+  const sessionHeaders = await headers();
+  return getSessionWithHeaders(sessionHeaders);
 };
 
 export const getUser = async () => {

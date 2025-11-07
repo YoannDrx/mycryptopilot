@@ -36,18 +36,13 @@ test.describe("Traders Marketplace", () => {
 
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 3. Navigate to traders marketplace
-    await page.goto(`/orgs/${orgSlug}/traders`);
+    await page.goto("/traders");
     await page.waitForLoadState("networkidle");
 
     // 4. Verify page title and header
@@ -140,16 +135,13 @@ test.describe("Traders Marketplace", () => {
     // 2. Create a follower account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 3. Navigate to marketplace
-    await page.goto(`/orgs/${orgSlug}/traders`);
+    await page.goto("/traders");
     await page.waitForLoadState("networkidle");
 
     // 4. Verify all 3 traders are visible initially

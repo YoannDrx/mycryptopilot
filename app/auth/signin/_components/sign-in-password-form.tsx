@@ -52,7 +52,7 @@ export const SignInPasswordForm = (props: {
       toast.error(error.message);
     },
     onSuccess: () => {
-      const callbackUrl = getCallbackUrl(props.callbackUrl ?? "/orgs");
+      const callbackUrl = getCallbackUrl(props.callbackUrl ?? "/dashboard");
       window.location.href = callbackUrl;
     },
   });
