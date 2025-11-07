@@ -165,10 +165,9 @@ Références relevées via `rg "TODO"` (nov 2025) :
 
 ### Authentication
 
-- Use `getUser()` for optional user (server-side)
-- Use `getRequiredUser()` for required user (server-side)
+- Use `getUser()` for optional user (server-side) - returns user with subscription data
+- Use `getRequiredUser()` for required user (server-side) - throws if not authenticated
 - Use `useSession()` from `auth-client.ts` (client-side)
-- Use `getCurrentOrgCache()` to get the current org
 
 ### Database
 
