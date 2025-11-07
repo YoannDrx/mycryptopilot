@@ -1,12 +1,12 @@
 import type { NavigationLink } from "@/features/navigation/navigation.type";
 import {
-  User2,
-  MessageSquare,
+  Settings,
+  MessageCircle,
   Mail,
   Users,
-  AlertCircle,
-  BarChart3,
-  Receipt,
+  Shield,
+  Link as LinkIcon,
+  CreditCard,
 } from "lucide-react";
 
 /**
@@ -17,9 +17,9 @@ import {
  * - Direct URLs (no slug replacement needed)
  *
  * 7 liens pour la section Account Settings :
- * - Profile (settings principal)
+ * - Account Settings (settings principal)
  * - Discord Integration
- * - Portfolio Tracking (Binance/Bybit connections)
+ * - Exchange Connections (Binance/Bybit connections)
  * - Payment History (crypto payments history)
  * - Email Preferences
  * - Following (traders suivis)
@@ -28,22 +28,22 @@ import {
 export const ACCOUNT_LINKS: NavigationLink[] = [
   {
     href: "/account",
-    Icon: User2,
-    label: "Profile",
+    Icon: Settings,
+    label: "Account Settings",
   },
   {
     href: "/account/discord",
-    Icon: MessageSquare,
+    Icon: MessageCircle,
     label: "Discord Integration",
   },
   {
     href: "/account/exchanges",
-    Icon: BarChart3,
-    label: "Portfolio Tracking",
+    Icon: LinkIcon,
+    label: "Exchange Connections",
   },
   {
     href: "/account/payments",
-    Icon: Receipt,
+    Icon: CreditCard,
     label: "Payment History",
   },
   {
@@ -58,7 +58,7 @@ export const ACCOUNT_LINKS: NavigationLink[] = [
   },
   {
     href: "/account/danger",
-    Icon: AlertCircle,
+    Icon: Shield,
     label: "Danger Zone",
   },
 ];
