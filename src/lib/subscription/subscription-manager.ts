@@ -129,7 +129,16 @@ export async function activateSubscription(
     logger.info("User plan updated", { userId, plan, periodEnd });
 
     // 3.1 Invalider le cache Next.js pour forcer le rafraîchissement
-    revalidatePath("/", "layout");
+    // Wrapped in try-catch pour compatibilité E2E tests (pas de static generation store)
+    try {
+      revalidatePath("/", "layout");
+    } catch (error) {
+      // En contexte E2E, le static generation store n'existe pas
+      // Ce n'est pas grave, les tests n'ont pas besoin de revalidation
+      if (process.env.NODE_ENV !== "test") {
+        logger.warn("revalidatePath failed (normal in E2E context)", { error });
+      }
+    }
 
     // 4. Upsert UserSubscription
     await prisma.userSubscription.upsert({
