@@ -80,7 +80,7 @@ test.describe("account", () => {
 
     await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
-    await page.goto("/account");
+    await page.goto("/account/settings");
 
     const newName = faker.person.fullName();
     const input = page.getByRole("textbox", { name: "Name" });
@@ -89,7 +89,7 @@ test.describe("account", () => {
 
     await expect(page.getByText("Profile updated")).toBeVisible();
     await page.reload();
-    await page.waitForURL(/\/account$/, {
+    await page.waitForURL(/\/account\/settings$/, {
       timeout: 10000,
     });
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(
@@ -105,7 +105,7 @@ test.describe("account", () => {
 
     await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
-    await page.goto("/account");
+    await page.goto("/account/settings");
 
     await page.getByRole("link", { name: /change password/i }).click();
     await page.waitForURL(/\/account\/change-password$/, {
@@ -124,8 +124,8 @@ test.describe("account", () => {
     // Wait for toast to appear (uses default 15s timeout from playwright.config.ts)
     await expect(page.getByText("Password changed successfully")).toBeVisible();
 
-    // Wait for navigation back to /account
-    await page.waitForURL(/\/account$/, { timeout: 5000 });
+    // Wait for navigation back to /account/settings
+    await page.waitForURL(/\/account\/settings$/, { timeout: 5000 });
 
     await signOutAccount({ page });
 

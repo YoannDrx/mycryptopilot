@@ -32,13 +32,12 @@ test.describe("Navigation System", () => {
       page.getByRole("link", { name: /pricing/i }).first(),
     ).toBeVisible();
 
-    // 3. Navigate to Account space
+    // 3. Navigate to Account space (hub with cards)
     await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
-    // Verify Account sidebar is displayed
-    // Should see different navigation links for account settings
-    await expect(page.getByLabel(/name/i)).toBeVisible();
+    // Verify Account hub is displayed with cards
+    await expect(page.getByText(/profile settings/i)).toBeVisible();
 
     // Account sidebar should have links like: Settings, Following, etc.
     const accountSidebarLinks =
@@ -125,8 +124,8 @@ test.describe("Navigation System", () => {
     // Verify navigation happened
     await expect(page).toHaveURL(/\/traders$/);
 
-    // 4. Try global search from another space (Account)
-    await page.goto("/account");
+    // 4. Try global search from another space (Account settings)
+    await page.goto("/account/settings");
     await page.waitForLoadState("networkidle");
 
     // Open search again

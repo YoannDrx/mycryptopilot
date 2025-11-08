@@ -12,8 +12,8 @@ test.describe("Settings Page", () => {
 
     await page.waitForURL(/\/dashboard$/);
 
-    // 2. Navigate to settings page (account settings)
-    await page.goto("/account");
+    // 2. Navigate to settings page (B2C: /account/settings)
+    await page.goto("/account/settings");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify profile form is displayed
@@ -51,14 +51,6 @@ test.describe("Settings Page", () => {
 
     const nameInputAfterReload = page.getByLabel(/name/i);
     await expect(nameInputAfterReload).toHaveValue(newName);
-
-    // 11. Verify "Change email" and "Change password" links exist
-    await expect(
-      page.getByRole("link", { name: /change email/i }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: /change password/i }),
-    ).toBeVisible();
   });
 
   test("user can view billing settings", async ({ page }) => {
@@ -70,7 +62,7 @@ test.describe("Settings Page", () => {
 
     await page.waitForURL(/\/dashboard$/);
 
-    // 2. Navigate to account settings
+    // 2. Navigate to account hub (cards overview)
     await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
@@ -116,12 +108,11 @@ test.describe("Settings Page", () => {
       expect(hasNoTradersMessage).toBe(true);
     }
 
-    // 7. Navigate back to account settings
+    // 7. Navigate back to account hub
     await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
-    // Verify we're back on settings page
-    await expect(page.getByLabel(/name/i)).toBeVisible();
-    await expect(page.getByText(userData.email).first()).toBeVisible();
+    // Verify we're back on account hub (cards page)
+    await expect(page.getByText(/profile settings/i)).toBeVisible();
   });
 });
