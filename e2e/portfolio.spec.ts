@@ -48,7 +48,9 @@ test.describe("Portfolio Page - Access & Navigation", () => {
     expect(page.url()).toContain("/account/become-trader");
 
     // 4. Verify become-trader page content (exact text from page.tsx line 50)
-    await expect(page.getByText(/become a trader/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /become a trader/i }),
+    ).toBeVisible();
   });
 
   test("trader can access portfolio page", async ({ page }) => {
@@ -68,7 +70,9 @@ test.describe("Portfolio Page - Access & Navigation", () => {
     await page.waitForLoadState("networkidle");
 
     // 3. Verify page loaded successfully (exact text from page.tsx line 248)
-    await expect(page.getByText(/portfolio analytics/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /portfolio analytics/i }),
+    ).toBeVisible();
   });
 });
 
