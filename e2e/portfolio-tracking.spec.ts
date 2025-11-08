@@ -125,7 +125,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await page.goto("/account/exchanges");
     await page.waitForLoadState("networkidle");
 
-    // 4. Verify "Sync Now" button is visible
+    // 4. Verify "Manual Sync" button is visible
     const syncButton = page.getByRole("button", { name: /sync now/i });
     await expect(syncButton).toBeVisible();
 
