@@ -29,7 +29,9 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // 3. Verify page title
-    await expect(page.getByText("Exchange Connections")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Exchange Connections" }),
+    ).toBeVisible();
     await expect(
       page.getByText(/connect your exchange to automatically track/i),
     ).toBeVisible();
@@ -126,7 +128,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // 4. Verify "Manual Sync" button is visible
-    const syncButton = page.getByRole("button", { name: /sync now/i });
+    const syncButton = page.getByRole("button", { name: /manual sync/i });
     await expect(syncButton).toBeVisible();
 
     // Note: We don't click the sync button in E2E tests because:
@@ -174,6 +176,12 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     await page.waitForLoadState("networkidle");
 
     const performanceTab = page.getByRole("tab", { name: /performance/i });
+    await performanceTab.click();
+    await page.waitForTimeout(1000);
+
+    // Reload to ensure fresh data is loaded
+    await page.reload();
+    await page.waitForLoadState("networkidle");
     await performanceTab.click();
     await page.waitForTimeout(1000);
 
@@ -233,6 +241,12 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     await page.waitForLoadState("networkidle");
 
     const performanceTab = page.getByRole("tab", { name: /performance/i });
+    await performanceTab.click();
+    await page.waitForTimeout(1000);
+
+    // Reload to ensure fresh data is loaded
+    await page.reload();
+    await page.waitForLoadState("networkidle");
     await performanceTab.click();
     await page.waitForTimeout(1000);
 
