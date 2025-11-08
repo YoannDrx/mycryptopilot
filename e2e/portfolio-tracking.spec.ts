@@ -304,6 +304,12 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     await performanceTab.click();
     await page.waitForTimeout(1000);
 
+    // Reload to ensure fresh data is loaded
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    await performanceTab.click();
+    await page.waitForTimeout(1000);
+
     // 4. Verify FREE user sees ONLY winrate card
     await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
@@ -352,9 +358,11 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     await page.waitForLoadState("networkidle");
 
     // 3. Verify upgrade blocker is displayed
-    await expect(page.getByText(/upgrade required/i)).toBeVisible();
     await expect(
-      page.getByText(/portfolio tracking is a premium feature/i),
+      page.getByText(/upgrade to pro to connect exchanges/i),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/upgrade to sync your trades automatically/i),
     ).toBeVisible();
 
     // 4. Verify connect form is NOT visible
