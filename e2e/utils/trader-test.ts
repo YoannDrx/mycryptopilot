@@ -58,12 +58,12 @@ export async function createTestTrader(options: {
   // Create a test account
   const userData = await createTestAccount({
     page: options.page,
-    callbackURL: "/orgs",
+    callbackURL: "/dashboard",
     initialUserData: options.initialUserData,
   });
 
-  // Wait for URL to settle
-  await options.page.waitForURL(/\/orgs\/.*/);
+  // Wait for URL to settle (B2C: root-level routes, no /orgs prefix)
+  await options.page.waitForURL(/\/dashboard/);
 
   // Get user from database (with retry to handle DB transaction timing)
   const user = await retry(
