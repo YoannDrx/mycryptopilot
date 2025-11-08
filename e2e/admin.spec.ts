@@ -5,7 +5,7 @@ test.describe("admin", () => {
   test("verify admin navigation and pages", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
@@ -50,7 +50,7 @@ test.describe("admin", () => {
   test("verify traders page displays correctly", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
@@ -73,7 +73,7 @@ test.describe("admin", () => {
   test("verify signals page displays correctly", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
@@ -88,7 +88,7 @@ test.describe("admin", () => {
   test("verify payments page displays correctly", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
