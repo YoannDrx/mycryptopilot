@@ -139,9 +139,12 @@ test.describe("Crypto Checkout Flow", () => {
     ).toBeVisible({
       timeout: 30000,
     });
-    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 30000,
-    });
+    await expect(page.locator("h1, h2").first()).toContainText(
+      /complete your payment/i,
+      {
+        timeout: 30000,
+      },
+    );
     await expect(page.getByText(/\$49/i).first()).toBeVisible({
       timeout: 30000,
     });
@@ -165,9 +168,12 @@ test.describe("Crypto Checkout Flow", () => {
     ).toBeVisible({
       timeout: 30000,
     });
-    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 30000,
-    });
+    await expect(page.locator("h1, h2").first()).toContainText(
+      /complete your payment/i,
+      {
+        timeout: 30000,
+      },
+    );
     await expect(page.getByText(/\$99/i).first()).toBeVisible({
       timeout: 30000,
     });
@@ -270,9 +276,12 @@ test.describe("Crypto Checkout Flow", () => {
     ).toBeVisible({
       timeout: 30000,
     });
-    await expect(page.locator("h1")).toContainText(/complete your payment/i, {
-      timeout: 30000,
-    });
+    await expect(page.locator("h1, h2").first()).toContainText(
+      /complete your payment/i,
+      {
+        timeout: 30000,
+      },
+    );
 
     // 4. Verify payment info displayed (price in the description)
     await expect(page.getByText(/send.*\$49/i).first()).toBeVisible({
