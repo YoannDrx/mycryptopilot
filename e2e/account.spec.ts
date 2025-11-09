@@ -124,8 +124,8 @@ test.describe("account", () => {
     // Wait for toast to appear (uses default 15s timeout from playwright.config.ts)
     await expect(page.getByText("Password changed successfully")).toBeVisible();
 
-    // Wait for navigation back to /account/settings
-    await page.waitForURL(/\/account\/settings$/, { timeout: 5000 });
+    // Wait for navigation back to /account (B2C migration changed route)
+    await page.waitForURL(/\/account$/, { timeout: 5000 });
 
     await signOutAccount({ page });
 
