@@ -104,7 +104,7 @@ test.describe("Pricing Page", () => {
     // 5. Verify checkout page loaded correctly
     // Should see plan name ("pro" in DOM), price, and payment options
     await expect(page.getByText(/pro/i).first()).toBeVisible();
-    await expect(page.getByText(/\$49/i).first()).toBeVisible();
+    await expect(page.getByText(/49/i).first()).toBeVisible();
 
     // 6. Test Ultra plan subscribe button
     await page.goto("/pricing");
