@@ -16,7 +16,7 @@ import {
 } from "@/features/page/layout";
 import { getRequiredAdmin } from "@/lib/auth/auth-user";
 import { getFeedbackById } from "@/query/feedback/get-feedback";
-import { Angry, Frown, Meh, SmilePlus } from "lucide-react";
+import { Angry, Frown, Meh, SmilePlus, MessageSquare } from "lucide-react";
 import { notFound } from "next/navigation";
 import { UserDetailsCard } from "../../_components/user-details-card";
 
@@ -59,11 +59,16 @@ export default async function FeedbackDetailPage(props: {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>Feedback</LayoutTitle>
-        <LayoutDescription>
-          Submitted {new Date(feedback.createdAt).toLocaleDateString()}
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <MessageSquare className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Feedback</LayoutTitle>
+          <LayoutDescription>
+            Submitted {new Date(feedback.createdAt).toLocaleDateString()}
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent className="space-y-6">

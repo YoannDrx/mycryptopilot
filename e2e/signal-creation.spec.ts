@@ -9,11 +9,7 @@ test.describe("Signal Creation Flow", () => {
     const { user } = await createTestTrader({ page });
 
     // 2. Navigate to create signal page
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
-
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
+    await page.goto("/dashboard/trader/signals/new");
     await page.waitForLoadState("networkidle");
 
     // Wait for form to be visible
@@ -134,10 +130,7 @@ test.describe("Signal Creation Flow", () => {
     await createTestTrader({ page });
 
     // 2. Navigate to create signal page
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
+    await page.goto("/dashboard/trader/signals/new");
     await page.waitForLoadState("networkidle");
 
     // Wait for form to be visible
@@ -162,10 +155,7 @@ test.describe("Signal Creation Flow", () => {
     const { user } = await createTestTrader({ page });
 
     // 2. Navigate to create signal page
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
+    await page.goto("/dashboard/trader/signals/new");
     await page.waitForLoadState("networkidle");
 
     // Wait for form to be visible
@@ -245,10 +235,10 @@ test.describe("Signal Creation Flow", () => {
     // 2. Create a follower account
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -282,13 +272,10 @@ test.describe("Signal Creation Flow", () => {
     await page.getByLabel(/^email/i).fill(trader.email);
     await page.getByLabel(/^password/i).fill(traderPassword);
     await page.getByRole("button", { name: /^sign in$/i }).click();
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     // 5. Navigate to create signal page
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
-    await page.goto(`/orgs/${orgSlug}/dashboard/trader/signals/new`);
+    await page.goto("/dashboard/trader/signals/new");
     await page.waitForLoadState("networkidle");
 
     // Wait for form to be visible

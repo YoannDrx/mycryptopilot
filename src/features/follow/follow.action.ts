@@ -16,48 +16,14 @@ import {
   isFollowingTrader,
 } from "./follow-queries";
 import { FollowTraderSchema, UnfollowTraderSchema } from "./follow.schema";
+import { getUserSubscription } from "@/lib/subscription/get-user-subscription";
 
 /**
- * Helper pour récupérer le plan d'un user depuis son organisation
- * MyCryptoPilot: 1 Organization = 1 User, donc on récupère le plan depuis l'organization.subscription
+ * Helper pour récupérer le plan d'un user (dual-mode via getUserSubscription)
  */
 const getUserPlan = async (userId: string): Promise<MyCryptoPilotPlanName> => {
-  // Récupérer l'organization de l'utilisateur avec sa subscription
-  const member = await prisma.member.findFirst({
-    where: { userId },
-    include: {
-      organization: {
-        include: {
-          subscription: {
-            select: {
-              plan: true,
-              status: true,
-              periodEnd: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!member?.organization) {
-    // Si pas d'organization, retourner le plan free par défaut
-    return "free";
-  }
-
-  const subscription = member.organization.subscription;
-
-  // Vérifier que la subscription est active et non expirée
-  if (
-    !subscription ||
-    !["active", "trialing"].includes(subscription.status ?? "") ||
-    (subscription.periodEnd && subscription.periodEnd < new Date())
-  ) {
-    return "free";
-  }
-
-  // Retourner le plan de la subscription
-  return subscription.plan as MyCryptoPilotPlanName;
+  const subscription = await getUserSubscription(userId);
+  return subscription.plan;
 };
 
 /**
@@ -133,9 +99,24 @@ export const followTraderAction = authAction
       );
     }
 
-    // Créer le follow
-    const follow = await prisma.follow.create({
-      data: {
+    // Créer ou réactiver le follow (upsert pour gérer le cas où l'entrée existe avec status CANCELLED)
+    const follow = await prisma.follow.upsert({
+      where: {
+        userId_traderId: {
+          userId: user.id,
+          traderId,
+        },
+      },
+      update: {
+        // Si l'entrée existe (status CANCELLED), on la réactive
+        status: "ACTIVE",
+        source,
+        invitationId,
+        startedAt: new Date(),
+        expiresAt: null, // Reset expiration
+      },
+      create: {
+        // Si l'entrée n'existe pas, on la crée
         userId: user.id,
         traderId,
         status: "ACTIVE",
@@ -169,17 +150,17 @@ export const followTraderAction = authAction
     });
 
     // Ajouter follower au channel Discord trader (Phase 2.3)
-    if (
-      process.env.DISCORD_BOT_ENABLED === "true" &&
-      follow.user.discordId
-    ) {
+    if (process.env.DISCORD_BOT_ENABLED === "true" && follow.user.discordId) {
       try {
         await addFollowerToTraderChannel(traderId, follow.user.discordId);
         logger.info(
           `Discord: Added follower ${user.id} to trader ${traderId} channel`,
         );
       } catch (error) {
-        logger.error("Failed to add follower to Discord trader channel:", error);
+        logger.error(
+          "Failed to add follower to Discord trader channel:",
+          error,
+        );
         // Ne pas bloquer si Discord échoue
       }
     }
@@ -250,10 +231,7 @@ export const unfollowTraderAction = authAction
     });
 
     // Retirer follower du channel Discord trader (Phase 2.3)
-    if (
-      process.env.DISCORD_BOT_ENABLED === "true" &&
-      fullUser?.discordId
-    ) {
+    if (process.env.DISCORD_BOT_ENABLED === "true" && fullUser?.discordId) {
       try {
         await removeFollowerFromTraderChannel(traderId, fullUser.discordId);
         logger.info(

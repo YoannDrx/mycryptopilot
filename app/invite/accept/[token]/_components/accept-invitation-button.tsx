@@ -30,10 +30,10 @@ export const AcceptInvitationButton = ({
 
       return result.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success(`You're now following ${traderName}!`);
       // Redirect to user dashboard where they can see signals from followed traders
-      router.push(`/orgs/${data.orgSlug}/dashboard`);
+      router.push("/dashboard");
       router.refresh();
     },
     onError: (error: Error) => {

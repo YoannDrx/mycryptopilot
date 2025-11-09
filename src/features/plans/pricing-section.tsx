@@ -5,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "@/lib/auth-client";
 import { MYCRYPTOPILOT_PLANS } from "@/lib/crypto/mycryptopilot-plans";
-import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 import Link from "next/link";
 import { LandingPricingCard } from "./landing-pricing-card";
 import { PricingComparisonTable } from "./pricing-comparison-table";
 
 export function Pricing() {
   const { data: session } = useSession();
-  const currentOrg = useCurrentOrg();
   return (
     <section
       id="pricing"
@@ -43,8 +41,8 @@ export function Pricing() {
           ))}
         </div>
 
-        {/* Test Payment CTA - Only for logged-in users with an org */}
-        {session?.user && currentOrg?.slug && (
+        {/* Test Payment CTA - Only for logged-in users */}
+        {session?.user && (
           <Card className="bg-muted/30 mx-auto mt-12 max-w-3xl border-2 border-dashed">
             <CardContent className="flex flex-col items-center justify-center gap-6 py-8 text-center sm:flex-row sm:text-left">
               <div className="flex-1">
@@ -58,9 +56,7 @@ export function Pricing() {
                 </p>
               </div>
               <Button variant="outline" size="lg" className="shrink-0" asChild>
-                <Link href={`/orgs/${currentOrg.slug}/checkout/test`}>
-                  Send $1 Test Payment
-                </Link>
+                <Link href="/checkout/test">Send $1 Test Payment</Link>
               </Button>
             </CardContent>
           </Card>

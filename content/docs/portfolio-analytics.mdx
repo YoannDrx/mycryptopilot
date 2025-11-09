@@ -15,11 +15,11 @@ MyCryptoPilot gives verified traders professional tooling to prove their edge an
 
 - **Plan**: Pro (1 exchange) or Ultra (3 exchanges). Free accounts cannot sync data.
 - **Exchange support**: Binance Spot/Perp and Bybit Spot/USDT Perp via read-only API keys.
-- **Trader profile**: You must be approved as a trader and signed into your organization.
+- **Trader profile**: You must be approved as a trader and signed into your account.
 
 ## Connect Read-Only API Keys
 
-1. Navigate to **Account → Exchanges** (`app/orgs/[orgSlug]/(navigation)/(account)/account/exchanges/page.tsx`).
+1. Navigate to **Account → Exchanges** (`app/(app)/(account)/account/exchanges/page.tsx`).
 2. Click **Connect New Exchange** and choose Binance or Bybit.
 3. Paste your API key/secret (encryption handled with AES-256-GCM).
 4. Save. The connection status shows last sync, next sync, and any error details.
@@ -36,7 +36,7 @@ Idempotent order IDs prevent duplicates, and failed syncs surface descriptive er
 
 ## Analytics Dashboard
 
-Open **Trading → Portfolio** (`app/orgs/[orgSlug]/(navigation)/(trading)/portfolio/page.tsx`) to view:
+Open **Trading → Portfolio** (`app/(app)/(trading)/portfolio/page.tsx`) to view:
 
 ### Key Metrics
 

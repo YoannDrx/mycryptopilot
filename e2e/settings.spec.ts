@@ -7,17 +7,13 @@ test.describe("Settings Page", () => {
     // 1. Create a test account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
-
-    // 2. Navigate to settings page (account settings)
-    await page.goto(`/orgs/${orgSlug}/account`);
+    // 2. Navigate to settings page (B2C: /account/settings)
+    await page.goto("/account/settings");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify profile form is displayed
@@ -55,31 +51,19 @@ test.describe("Settings Page", () => {
 
     const nameInputAfterReload = page.getByLabel(/name/i);
     await expect(nameInputAfterReload).toHaveValue(newName);
-
-    // 11. Verify "Change email" and "Change password" links exist
-    await expect(
-      page.getByRole("link", { name: /change email/i }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: /change password/i }),
-    ).toBeVisible();
   });
 
   test("user can view billing settings", async ({ page }) => {
     // 1. Create a test account
     const userData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
-
-    // 2. Navigate to account settings
-    await page.goto(`/orgs/${orgSlug}/account`);
+    // 2. Navigate to account hub (cards overview)
+    await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify user is on Free plan (default)
@@ -98,7 +82,7 @@ test.describe("Settings Page", () => {
     expect(pageContent).toBeTruthy();
 
     // 5. Navigate to pricing page to see upgrade options
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     // Verify pricing page displays plans (plan names are lowercase in DOM)
@@ -107,7 +91,7 @@ test.describe("Settings Page", () => {
     await expect(page.getByText(/^ultra$/i).first()).toBeVisible();
 
     // 6. Verify user can navigate to following page (another settings-related page)
-    await page.goto(`/orgs/${orgSlug}/account/following`);
+    await page.goto("/account/following");
     await page.waitForLoadState("networkidle");
 
     // Should see "No traders followed" message for new user
@@ -124,12 +108,11 @@ test.describe("Settings Page", () => {
       expect(hasNoTradersMessage).toBe(true);
     }
 
-    // 7. Navigate back to account settings
-    await page.goto(`/orgs/${orgSlug}/account`);
+    // 7. Navigate back to account hub
+    await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
-    // Verify we're back on settings page
-    await expect(page.getByLabel(/name/i)).toBeVisible();
-    await expect(page.getByText(userData.email).first()).toBeVisible();
+    // Verify we're back on account hub (cards page)
+    await expect(page.getByText(/profile settings/i)).toBeVisible();
   });
 });

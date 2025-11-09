@@ -15,7 +15,6 @@ import Link from "next/link";
 type TestPaymentSuccessDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  orgSlug: string;
 };
 
 /**
@@ -31,7 +30,6 @@ type TestPaymentSuccessDialogProps = {
 export function TestPaymentSuccessDialog({
   open,
   onOpenChange,
-  orgSlug,
 }: TestPaymentSuccessDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,9 +79,7 @@ export function TestPaymentSuccessDialog({
 
         <DialogFooter className="flex flex-col gap-2 sm:flex-col">
           <Button asChild size="lg" className="w-full">
-            <Link href={`/orgs/${orgSlug}/pricing`}>
-              View Plans & Subscribe
-            </Link>
+            <Link href="/pricing">View Plans & Subscribe</Link>
           </Button>
           <Button
             variant="outline"

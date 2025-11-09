@@ -8,17 +8,13 @@ test.describe("Navigation System", () => {
     // 1. Create a test account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Start in Trading space (dashboard)
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // Verify Trading sidebar is displayed
@@ -36,13 +32,12 @@ test.describe("Navigation System", () => {
       page.getByRole("link", { name: /pricing/i }).first(),
     ).toBeVisible();
 
-    // 3. Navigate to Account space
-    await page.goto(`/orgs/${orgSlug}/account`);
+    // 3. Navigate to Account space (hub with cards)
+    await page.goto("/account");
     await page.waitForLoadState("networkidle");
 
-    // Verify Account sidebar is displayed
-    // Should see different navigation links for account settings
-    await expect(page.getByLabel(/name/i)).toBeVisible();
+    // Verify Account hub is displayed with cards
+    await expect(page.getByText(/profile settings/i)).toBeVisible();
 
     // Account sidebar should have links like: Settings, Following, etc.
     const accountSidebarLinks =
@@ -51,7 +46,7 @@ test.describe("Navigation System", () => {
     expect(accountSidebarLinks).toBe(true);
 
     // 4. Navigate to Pricing (back to Trading space)
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     // Verify we're back in Trading sidebar context
@@ -60,7 +55,7 @@ test.describe("Navigation System", () => {
     ).toBeVisible();
 
     // 5. Navigate to Traders marketplace (Trading space)
-    await page.goto(`/orgs/${orgSlug}/traders`);
+    await page.goto("/traders");
     await page.waitForLoadState("networkidle");
 
     // Verify Traders page loaded
@@ -91,17 +86,13 @@ test.describe("Navigation System", () => {
     // 1. Create a user account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to dashboard (Trading space)
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 3. Test global search command dialog (Cmd+K)
@@ -131,10 +122,10 @@ test.describe("Navigation System", () => {
     await tradersLink.click();
 
     // Verify navigation happened
-    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/traders`));
+    await expect(page).toHaveURL(/\/traders$/);
 
-    // 4. Try global search from another space (Account)
-    await page.goto(`/orgs/${orgSlug}/account`);
+    // 4. Try global search from another space (Account settings)
+    await page.goto("/account/settings");
     await page.waitForLoadState("networkidle");
 
     // Open search again
@@ -158,6 +149,6 @@ test.describe("Navigation System", () => {
     await mySignalsLink.click();
 
     // Verify navigation happened (My Signals points to /dashboard)
-    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard`));
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 });

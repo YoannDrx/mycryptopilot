@@ -24,23 +24,29 @@ export const Layout = (
 };
 
 export const LayoutHeader = (props: ComponentPropsWithoutRef<"div">) => {
+  return <div {...props} className={cn("mb-6 w-full", props.className)} />;
+};
+
+export const LayoutTitle = (props: ComponentPropsWithoutRef<"h1">) => {
   return (
-    <div
+    <Typography
       {...props}
+      variant="h2"
       className={cn(
-        "flex w-full min-w-[200px] flex-col items-start gap-2 md:flex-1",
+        "scroll-m-0 text-3xl leading-none font-semibold",
         props.className,
       )}
     />
   );
 };
 
-export const LayoutTitle = (props: ComponentPropsWithoutRef<"h1">) => {
-  return <Typography {...props} variant="h2" className={cn(props.className)} />;
-};
-
 export const LayoutDescription = (props: ComponentPropsWithoutRef<"p">) => {
-  return <Typography {...props} className={cn(props.className)} />;
+  return (
+    <Typography
+      {...props}
+      className={cn("text-muted-foreground text-base", props.className)}
+    />
+  );
 };
 
 export const LayoutActions = (props: ComponentPropsWithoutRef<"div">) => {

@@ -1,10 +1,11 @@
 import { unauthorized } from "next/navigation";
-import { getSessionApi } from "./auth-api-helper";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { getSessionWithHeaders } from "./get-session";
 
 export const getSession = async () => {
-  const session = await getSessionApi();
-  return session;
+  const sessionHeaders = await headers();
+  return getSessionWithHeaders(sessionHeaders);
 };
 
 export const getUser = async () => {
@@ -14,8 +15,9 @@ export const getUser = async () => {
     return null;
   }
 
-  // Fetch additional user fields from database (planName, planExpiresAt, etc.)
+  // Fetch additional user fields from database (planName, planExpiresAt, userSubscription, etc.)
   // Better Auth session only contains basic fields
+  // Big Bang (Issue #77 Phase 4): Include userSubscription for user-centric architecture
   const fullUser = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -30,6 +32,7 @@ export const getUser = async () => {
       planExpiresAt: true,
       createdAt: true,
       updatedAt: true,
+      userSubscription: true,
     },
   });
 

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { useSession } from "@/lib/auth-client";
 import type { MyCryptoPilotPlan } from "@/lib/crypto/mycryptopilot-plans";
-import { useCurrentOrg } from "@app/orgs/[orgSlug]/use-current-org";
 import { Check } from "lucide-react";
 import Link from "next/link";
 
@@ -22,23 +21,9 @@ type LandingPricingCardProps = {
 
 export function LandingPricingCard({ plan }: LandingPricingCardProps) {
   const { data: session } = useSession();
-  const currentOrg = useCurrentOrg();
 
   // Determine the subscribe link based on auth status
-  const getSubscribeLink = () => {
-    if (!session?.user) {
-      return "/auth/signup";
-    }
-
-    if (currentOrg?.slug) {
-      return `/orgs/${currentOrg.slug}/pricing`;
-    }
-
-    // Fallback: redirect to /orgs for auto-select
-    return "/orgs";
-  };
-
-  const subscribeLink = getSubscribeLink();
+  const subscribeLink = session?.user ? "/pricing" : "/auth/signup";
   const isFree = plan.priceUSD === 0;
 
   return (

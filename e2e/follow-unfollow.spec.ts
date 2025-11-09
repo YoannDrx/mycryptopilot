@@ -17,23 +17,18 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     // Get follower from database
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
     });
 
-    // Extract org slug
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
-
     // 3. Navigate to traders marketplace
-    await page.goto(`/orgs/${orgSlug}/traders`);
+    await page.goto("/traders");
     // Wait for TanStack Query API call (hybrid architecture)
     await page.waitForResponse(
       (response) => response.url().includes("/api/traders/search"),
@@ -42,19 +37,29 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     // 4. Wait for trader card to be visible and click "View Profile"
     // Since we just created this trader, they should be the first/only one in the list
-    await expect(page.getByText(traderProfile.displayName)).toBeVisible();
+    await expect(
+      page.getByText(traderProfile.displayName).first(),
+    ).toBeVisible();
     await page
       .getByRole("link", { name: /view profile/i })
       .first()
       .click();
 
-    // Wait for trader profile page to load (URL: /orgs/[slug]/traders/[id])
+    // Wait for trader profile page to load (URL: /traders/[id])
     await page.waitForURL(/\/traders\/[^/]+/, { timeout: 10000 });
 
     // 5. Click Follow button (use .first() - multiple Follow buttons on page)
     const followButton = page.getByRole("button", { name: /follow/i }).first();
     await expect(followButton).toBeVisible({ timeout: 5000 });
     await followButton.click();
+
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 10000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
 
     // Wait for success message
     await expect(
@@ -74,7 +79,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(followRelation?.traderId).toBe(trader.id);
 
     // 7. Navigate to following page to verify trader appears there and test Unfollow
-    await page.goto(`/orgs/${orgSlug}/account/following`);
+    await page.goto("/account/following");
     await page.waitForLoadState("networkidle");
 
     // Verify trader appears in following list
@@ -97,6 +102,14 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await expect(unfollowBtn).toBeVisible({ timeout: 5000 });
     await unfollowBtn.click();
 
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 10000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
+
     // Wait for success message
     await expect(
       page.getByText(/unfollowed this trader|no longer following/i),
@@ -114,7 +127,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     expect(followRelationAfterUnfollow?.status).toBe("CANCELLED");
 
     // 11. Verify trader no longer appears in following list
-    await page.goto(`/orgs/${orgSlug}/account/following`);
+    await page.goto("/account/following");
     await page.waitForLoadState("networkidle");
 
     // Trader should not be in the list anymore (or list is empty)
@@ -133,10 +146,10 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     // 2. Create a free user
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -145,20 +158,26 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     // Verify user is on Free plan
     expect(follower.planName).toBe("free");
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Follow first trader (should succeed)
-    await page.goto(`/orgs/${orgSlug}/traders/${trader1.id}`);
+    await page.goto(`/traders/${trader1.id}`);
     await page.waitForLoadState("networkidle");
 
     await page.getByRole("button", { name: /follow/i }).click();
+
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 10000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
+
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
 
     // 4. Try to follow second trader (should fail with plan limit message)
-    await page.goto(`/orgs/${orgSlug}/traders/${trader2.id}`);
+    await page.goto(`/traders/${trader2.id}`);
     await page.waitForLoadState("networkidle");
 
     await page.getByRole("button", { name: /follow/i }).click();
@@ -199,27 +218,33 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
+    await page.waitForURL(/\/dashboard$/);
 
     // 3. Follow the trader
-    await page.goto(`/orgs/${orgSlug}/traders/${trader.id}`);
+    await page.goto(`/traders/${trader.id}`);
     await page.waitForLoadState("networkidle");
 
     const followBtn = page.getByRole("button", { name: /follow/i }).first();
     await expect(followBtn).toBeVisible({ timeout: 10000 });
     await followBtn.click();
+
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 10000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
+
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
 
     // 4. Navigate to user dashboard
-    await page.goto(`/orgs/${orgSlug}/dashboard`);
+    await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
     // 5. Verify signals from followed trader appear

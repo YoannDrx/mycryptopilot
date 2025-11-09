@@ -5,17 +5,18 @@ import { assignRoleToUser } from "@/lib/discord/roles";
 import { notifyPlanUpdated } from "@/lib/discord/dm-notifications";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { SiteConfig } from "@/site-config";
-import MarkdownEmail from "@email/markdown.email";
+import BilingualMarkdownEmail from "@email/bilingual-markdown.email";
+import SubscriptionActivationEmail from "@email/subscription-activation";
 import { awardUpgradeBonus } from "@/lib/referral/invitation-tracking-service";
 import { revalidatePath } from "next/cache";
 
 /**
- * Subscription Manager
+ * Subscription Manager - Big Bang (Issue #77 Phase 3)
  *
  * Module centralisé pour gérer le cycle de vie des abonnements MyCryptoPilot
  *
  * Responsabilités:
- * - Activer/étendre un abonnement (update User + Subscription)
+ * - Activer/étendre un abonnement (update User + UserSubscription)
  * - Assigner automatiquement le rôle Discord correspondant
  * - Envoyer les emails de notification (activation, renouvellement, expiration)
  *
@@ -24,6 +25,7 @@ import { revalidatePath } from "next/cache";
  * - Appelé depuis admin actions pour gestion manuelle
  * - Utilise Discord roles.ts pour l'assignation automatique
  * - Utilise Resend pour les notifications email
+ * - User-centric: Direct User → UserSubscription relationship
  */
 
 type SubscriptionActivationParams = {
@@ -35,7 +37,6 @@ type SubscriptionActivationParams = {
 
 type SubscriptionResult = {
   success: boolean;
-  organizationId?: string;
   periodEnd?: Date;
   error?: string;
 };
@@ -43,9 +44,9 @@ type SubscriptionResult = {
 /**
  * Activer ou étendre l'abonnement d'un utilisateur
  *
- * Séquence complète:
+ * Séquence complète (user-centric):
  * 1. Update User.planName et User.planExpiresAt
- * 2. Upsert Subscription liée à l'Organization
+ * 2. Upsert UserSubscription directement
  * 3. Assigner rôle Discord (si discordId présent)
  * 4. Envoyer email de confirmation
  *
@@ -65,41 +66,28 @@ export async function activateSubscription(
   });
 
   try {
-    // 1. Récupérer l'utilisateur avec son organisation
-    const membership = await prisma.member.findFirst({
-      where: {
-        userId,
-        role: "owner",
-      },
-      include: {
-        organization: {
-          include: {
-            subscription: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            planName: true,
-            planExpiresAt: true,
-            discordId: true,
-          },
-        },
+    // 1. Récupérer l'utilisateur
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        planName: true,
+        planExpiresAt: true,
+        discordId: true,
+        userSubscription: true,
       },
     });
 
-    if (!membership) {
-      logger.error("No organization found for user", { userId });
+    if (!user) {
+      logger.error("User not found", { userId });
       return {
         success: false,
-        error: `No organization found for user ${userId}`,
+        error: `User not found: ${userId}`,
       };
     }
 
-    const org = membership.organization;
-    const user = membership.user;
     const currentDate = new Date();
 
     // 2. Calculer la nouvelle date d'expiration
@@ -141,18 +129,27 @@ export async function activateSubscription(
     logger.info("User plan updated", { userId, plan, periodEnd });
 
     // 3.1 Invalider le cache Next.js pour forcer le rafraîchissement
-    revalidatePath("/", "layout");
+    // Wrapped in try-catch pour compatibilité E2E tests (pas de static generation store)
+    try {
+      revalidatePath("/", "layout");
+    } catch (error) {
+      // En contexte E2E, le static generation store n'existe pas
+      // Ce n'est pas grave, les tests n'ont pas besoin de revalidation
+      if (process.env.NODE_ENV !== "test") {
+        logger.warn("revalidatePath failed (normal in E2E context)", { error });
+      }
+    }
 
-    // 4. Upsert Subscription dans l'Organization
-    await prisma.subscription.upsert({
-      where: { referenceId: org.id },
+    // 4. Upsert UserSubscription
+    await prisma.userSubscription.upsert({
+      where: { userId },
       create: {
-        id: `sub_${Date.now()}`,
-        referenceId: org.id,
+        userId,
         plan,
         status: "active",
         periodStart,
         periodEnd,
+        paymentMethod: "crypto",
       },
       update: {
         plan,
@@ -162,7 +159,7 @@ export async function activateSubscription(
       },
     });
 
-    logger.info("Subscription upserted", { organizationId: org.id, plan });
+    logger.info("UserSubscription upserted", { userId, plan });
 
     // 4.5. Award upgrade bonus au trader referrer si applicable (non-bloquant)
     if (plan === "pro" || plan === "ultra") {
@@ -193,41 +190,7 @@ export async function activateSubscription(
     }
 
     // 5. Assigner rôle Discord (non-bloquant)
-    if (user.discordId) {
-      void assignRoleToUser(user.discordId, plan)
-        .then((success) => {
-          if (success) {
-            logger.info(
-              `Discord role ${plan.toUpperCase()} assigned to user ${userId}`,
-            );
-          } else {
-            logger.warn(`Failed to assign Discord role to user ${userId}`);
-          }
-        })
-        .catch((err) => {
-          logger.error("Error assigning Discord role", { userId, err });
-        });
-
-      // 5.1 Envoyer DM Discord de confirmation (non-bloquant)
-      void notifyPlanUpdated(user.discordId, plan, periodEnd)
-        .then((success) => {
-          if (success) {
-            logger.info(`Discord DM sent to user ${userId} for plan update`);
-          } else {
-            logger.warn(`Failed to send Discord DM to user ${userId}`);
-          }
-        })
-        .catch((err) => {
-          logger.error("Error sending Discord DM notification", {
-            userId,
-            err,
-          });
-        });
-    } else {
-      logger.info("User has no Discord ID, skipping role assignment", {
-        userId,
-      });
-    }
+    await handleDiscordRoleAndNotification({ user, plan, periodEnd, userId });
 
     // 6. Envoyer email de confirmation (non-bloquant)
     void sendSubscriptionActivationEmail({
@@ -244,14 +207,12 @@ export async function activateSubscription(
 
     logger.info("✅ Subscription activated successfully", {
       userId,
-      organizationId: org.id,
       plan,
       periodEnd,
     });
 
     return {
       success: true,
-      organizationId: org.id,
       periodEnd,
     };
   } catch (error) {
@@ -260,6 +221,54 @@ export async function activateSubscription(
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
     };
+  }
+}
+
+/**
+ * Helper: Gestion Discord role + notification
+ */
+async function handleDiscordRoleAndNotification(params: {
+  user: { discordId: string | null };
+  plan: MyCryptoPilotPlanName;
+  periodEnd: Date;
+  userId: string;
+}): Promise<void> {
+  const { user, plan, periodEnd, userId } = params;
+
+  if (user.discordId) {
+    void assignRoleToUser(user.discordId, plan)
+      .then((success) => {
+        if (success) {
+          logger.info(
+            `Discord role ${plan.toUpperCase()} assigned to user ${userId}`,
+          );
+        } else {
+          logger.warn(`Failed to assign Discord role to user ${userId}`);
+        }
+      })
+      .catch((err) => {
+        logger.error("Error assigning Discord role", { userId, err });
+      });
+
+    // Envoyer DM Discord de confirmation (non-bloquant)
+    void notifyPlanUpdated(user.discordId, plan, periodEnd)
+      .then((success) => {
+        if (success) {
+          logger.info(`Discord DM sent to user ${userId} for plan update`);
+        } else {
+          logger.warn(`Failed to send Discord DM to user ${userId}`);
+        }
+      })
+      .catch((err) => {
+        logger.error("Error sending Discord DM notification", {
+          userId,
+          err,
+        });
+      });
+  } else {
+    logger.info("User has no Discord ID, skipping role assignment", {
+      userId,
+    });
   }
 }
 
@@ -283,67 +292,21 @@ async function sendSubscriptionActivationEmail(params: {
     plan === "free" ? "Free" : plan === "pro" ? "Pro" : "Ultra";
   const actionVerb = isExtension ? "extended" : "activated";
 
-  const markdown = `
-# Subscription ${actionVerb === "extended" ? "Extended" : "Activated"} 🎉
-
-Hi ${user.name},
-
-Your **${planDisplayName}** plan has been successfully ${actionVerb}!
-
-**Plan Details:**
-- Plan: **${planDisplayName}**
-- Valid until: **${periodEnd.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}**
-
-**What's included:**
-${getPlanFeatures(plan)}
-
-You can now access all ${planDisplayName} features on [${SiteConfig.title}](${SiteConfig.prodUrl}).
-
-${user.email ? `If you have any questions, feel free to reply to this email.` : ""}
-`;
-
   await sendEmail({
     to: user.email,
     subject: `Your ${planDisplayName} subscription has been ${actionVerb}`,
-    html: MarkdownEmail({ markdown }),
+    html: SubscriptionActivationEmail({
+      userName: user.name,
+      plan,
+      periodEnd,
+      isExtension,
+    }),
   });
 
   logger.info("Subscription activation email sent", {
     email: user.email,
     plan,
   });
-}
-
-/**
- * Obtenir les features d'un plan pour l'email
- */
-function getPlanFeatures(plan: MyCryptoPilotPlanName): string {
-  switch (plan) {
-    case "free":
-      return `
-- ✅ 5 trading signals per day
-- ✅ Follow 1 trader
-- ✅ Access to public marketplace
-`;
-    case "pro":
-      return `
-- ✅ 50 trading signals per day
-- ✅ Follow up to 5 traders
-- ✅ Risk console & trading journal
-- ✅ 1-minute screener refresh
-`;
-    case "ultra":
-      return `
-- ✅ **Unlimited** trading signals
-- ✅ Follow **unlimited** traders
-- ✅ Advanced risk console & analytics
-- ✅ 5-second screener refresh
-- ✅ Custom alerts
-- ✅ Priority support
-`;
-    default:
-      return "";
-  }
 }
 
 /**
@@ -380,10 +343,10 @@ export async function sendExpirationWarningEmail(
         ? "Pro"
         : "Ultra";
 
-  const markdown = `
+  const markdownEN = `
 # Your ${planDisplayName} subscription is expiring soon ⏰
 
-Hi ${user.name},
+Hello **${user.name}**,
 
 Your **${planDisplayName}** plan will expire in **${daysRemaining} day${daysRemaining > 1 ? "s" : ""}**.
 
@@ -391,14 +354,31 @@ Your **${planDisplayName}** plan will expire in **${daysRemaining} day${daysRema
 
 To continue enjoying ${planDisplayName} features, you can renew your subscription on [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
 
-Don't lose access to:
-${getPlanFeatures(user.planName as MyCryptoPilotPlanName)}
+[🔄 Renew my subscription](${SiteConfig.prodUrl}/pricing)
+`;
+
+  const markdownFR = `
+# Ton abonnement ${planDisplayName} expire bientôt ⏰
+
+Bonjour **${user.name}**,
+
+Ton abonnement **${planDisplayName}** expirera dans **${daysRemaining} jour${daysRemaining > 1 ? "s" : ""}**.
+
+**Date d'expiration :** ${user.planExpiresAt.toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}
+
+Pour continuer à profiter des fonctionnalités ${planDisplayName}, tu peux renouveler ton abonnement sur [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
+
+[🔄 Renouveler mon abonnement](${SiteConfig.prodUrl}/pricing)
 `;
 
   await sendEmail({
     to: user.email,
     subject: `Your ${planDisplayName} subscription expires in ${daysRemaining} days`,
-    html: MarkdownEmail({ markdown }),
+    html: BilingualMarkdownEmail({
+      markdownEN,
+      markdownFR,
+      preview: `Your subscription expires in ${daysRemaining} days - Ton abonnement expire dans ${daysRemaining} jours`,
+    }),
   });
 
   logger.info("Expiration warning email sent", {
@@ -428,6 +408,8 @@ export async function downgradeExpiredSubscription(
         planName: true,
         planExpiresAt: true,
         discordId: true,
+        emailNotificationsEnabled: true,
+        emailNotifySubscriptionReminders: true,
       },
     });
 
@@ -458,26 +440,60 @@ export async function downgradeExpiredSubscription(
     }
 
     // Envoyer email de notification (non-bloquant)
-    if (user.email) {
-      const markdown = `
+    if (
+      user.email &&
+      user.emailNotificationsEnabled &&
+      user.emailNotifySubscriptionReminders
+    ) {
+      const markdownEN = `
 # Your subscription has expired
 
-Hi ${user.name},
+Hello **${user.name}**,
 
 Your subscription has expired and your account has been downgraded to the **Free** plan.
 
 **Free plan includes:**
-${getPlanFeatures("free")}
+- ✅ 5 trading signals per day
+- ✅ Follow 1 trader
+- ✅ Access to public marketplace
 
 To regain access to premium features, you can upgrade anytime on [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
+
+[🚀 Upgrade now](${SiteConfig.prodUrl}/pricing)
+`;
+
+      const markdownFR = `
+# Ton abonnement a expiré
+
+Bonjour **${user.name}**,
+
+Ton abonnement a expiré et ton compte a été rétrogradé vers le plan **Gratuit**.
+
+**Le plan Gratuit inclut :**
+- ✅ 5 signaux de trading par jour
+- ✅ Suivre 1 trader
+- ✅ Accès à la marketplace publique
+
+Pour retrouver l'accès aux fonctionnalités premium, tu peux upgrader à tout moment sur [${SiteConfig.title}](${SiteConfig.prodUrl}/pricing).
+
+[🚀 Upgrader maintenant](${SiteConfig.prodUrl}/pricing)
 `;
 
       void sendEmail({
         to: user.email,
         subject: "Your subscription has expired",
-        html: MarkdownEmail({ markdown }),
+        html: BilingualMarkdownEmail({
+          markdownEN,
+          markdownFR,
+          preview: "Your subscription has expired - Ton abonnement a expiré",
+        }),
       }).catch((err) => {
         logger.error("Failed to send downgrade email", { userId, err });
+      });
+    } else if (user.email) {
+      logger.info("Skipping downgrade email (user preferences disabled)", {
+        userId,
+        email: user.email,
       });
     }
 

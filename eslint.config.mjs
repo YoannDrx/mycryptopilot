@@ -159,6 +159,8 @@ export default [
       "src/generated",
       ".claude",
       ".conductor",
+      "scripts/archived-migration/**",
+      "e2e/archived-org-tests/**",
     ],
   },
 ];

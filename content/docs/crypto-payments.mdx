@@ -20,7 +20,7 @@ MyCryptoPilot uses crypto-native payments to activate subscriptions instantly af
 ## Checkout Flow
 
 1. Choose a plan from **Trading → Pricing** and click **Subscribe Now**.
-2. You’ll be redirected to `/orgs/[orgSlug]/checkout/[plan]` (`app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/page.tsx`).
+2. You'll be redirected to `/checkout/[plan]` (`app/(app)/(trading)/checkout/[plan]/page.tsx`).
 3. MyCryptoPilot generates unique Base & Tron deposit addresses (`src/components/checkout/checkout-form.tsx`).
 4. Scan the QR code or copy the address. Payments expire after 15 minutes to avoid stale invoices.
 5. Keep the page open while we poll every 10 seconds for confirmation.
@@ -30,7 +30,7 @@ MyCryptoPilot uses crypto-native payments to activate subscriptions instantly af
 
 ## Payment Status & History
 
-- View historical payments in **Account → Payments** (`app/orgs/[orgSlug]/(navigation)/(account)/account/payments/page.tsx`).
+- View historical payments in **Account → Payments** (`app/(app)/(account)/account/payments/page.tsx`).
 - Each record includes amount in USD/token, network, confirmations, days granted, and on-chain explorer links.
 - Pending, confirmed, and failed statuses are color-coded with badges for quick scanning.
 
@@ -41,7 +41,7 @@ Send any USD amount and the system converts it into plan days automatically. Exa
 - $25 for Pro → 15 days of access
 - $150 for Ultra → roughly 45 days
 
-The tracker credits your organization accordingly and extends existing subscriptions instead of overwriting them.
+The tracker credits your account accordingly and extends existing subscriptions instead of overwriting them.
 
 ## Handling Mistakes
 

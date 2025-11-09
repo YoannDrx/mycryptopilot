@@ -20,6 +20,16 @@ model User {
   discordIntegrationEnabled Boolean @default(true) // true = veut les notifications Discord, false = a explicitement unlinked
   isFirstConnection Boolean        @default(true) // true = première connexion, envoyer email Discord bienvenue
   onboardingCompleted Boolean      @default(false) // true = a terminé l'onboarding wizard
+
+  // Email Preferences (granular control)
+  emailNotificationsEnabled Boolean @default(true) // Master toggle for all non-critical emails
+  emailNotifyNewSignals Boolean @default(true) // Trading signals from followed traders
+  emailNotifySubscriptionReminders Boolean @default(true) // Subscription expiration reminders
+  emailNotifyExchangeSyncFailures Boolean @default(true) // Exchange sync failure alerts
+  emailNotifyTraderInvitations Boolean @default(true) // Invitations from traders
+  emailNotifyWeeklyPerformance Boolean @default(true) // Weekly performance summary (traders only)
+  emailNotifyMarketingUpdates Boolean @default(false) // Newsletter & product updates
+
   trialEndsAt     DateTime? // Date de fin du trial (14 jours Pro gratuit)
   trialPlan       String? // Plan du trial: "pro" ou "ultra"
   feedbacks        Feedback[]
@@ -28,8 +38,6 @@ model User {
   cryptoPayments   CryptoPayment[]
   followers        Follow[]            @relation("TraderFollowers")
   follows          Follow[]            @relation("UserFollows")
-  invitations      Invitation[]
-  members          Member[]
   sessions         Session[]
   signals          Signal[]
   traderProfile    TraderProfile?
@@ -40,6 +48,9 @@ model User {
   userExchangeConnections UserExchangeConnection[]
   copyTrades       CopyTrade[]
   riskCalculations RiskCalculation[]
+
+  // Refactoring Issue #77: New user-centric models
+  userSubscription UserSubscription?
 
   @@map("user")
 }
@@ -53,7 +64,6 @@ model Session {
   ipAddress            String?
   userAgent            String?
   userId               String
-  activeOrganizationId String?
   impersonatedBy       String?
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -90,60 +100,4 @@ model Verification {
   @@map("verification")
 }
 
-model Organization {
-  id               String        @id
-  name             String
-  slug             String?       @unique
-  logo             String?
-  createdAt        DateTime
-  metadata         String?
-  stripeCustomerId String?
-  email            String?
-  invitations      Invitation[]
-  members          Member[]
-  subscription     Subscription?
-
-  @@map("organization")
-}
-
-model Member {
-  id             String       @id
-  organizationId String
-  userId         String
-  role           String
-  createdAt      DateTime
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("member")
-}
-
-model Invitation {
-  id             String       @id
-  organizationId String
-  email          String
-  role           String?
-  status         String
-  expiresAt      DateTime
-  inviterId      String
-  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@map("invitation")
-}
-
-model Subscription {
-  id                   String       @id
-  plan                 String
-  referenceId          String       @unique
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  status               String?
-  periodStart          DateTime?
-  periodEnd            DateTime?
-  cancelAtPeriodEnd    Boolean?
-  seats                Int?
-  organization         Organization @relation(fields: [referenceId], references: [id], onDelete: Cascade)
-
-  @@map("subscription")
-}
+// Organization, Member, Invitation, Subscription models removed - Phase 1 Big Bang (Issue #77)

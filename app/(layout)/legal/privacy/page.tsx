@@ -19,7 +19,7 @@ MyCryptoPilot ("we", "us", or "our") is committed to protecting your privacy. Th
 - Email address
 - Full name
 - Profile picture (optional)
-- Organization name (auto-generated, 1 per user)
+- Account identifier (auto-generated)
 
 **Trader Profile Information** (if you become a trader)
 - Display name
@@ -226,7 +226,7 @@ We implement industry-standard security measures to protect your information:
 - **Database Security**: Access controls and encrypted connections
 - **Private Keys**: Never stored (HD wallet derivation from xpub only)
 
-### 6.2 Organizational Safeguards
+### 6.2 Company Safeguards
 - Limited employee access to personal data
 - Regular security audits
 - Incident response procedures

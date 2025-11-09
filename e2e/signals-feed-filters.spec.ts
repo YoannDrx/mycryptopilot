@@ -45,10 +45,10 @@ test.describe("Signals Feed with Filters", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -63,11 +63,8 @@ test.describe("Signals Feed with Filters", () => {
       },
     });
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Navigate to signals feed
-    await page.goto(`/orgs/${orgSlug}/signals`);
+    await page.goto("/signals");
     await page.waitForLoadState("networkidle");
 
     // 4. Verify all signals visible initially
@@ -118,10 +115,10 @@ test.describe("Signals Feed with Filters", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -135,11 +132,8 @@ test.describe("Signals Feed with Filters", () => {
       },
     });
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Navigate to signals feed
-    await page.goto(`/orgs/${orgSlug}/signals`);
+    await page.goto("/signals");
     await page.waitForLoadState("networkidle");
 
     // 4. Filter by LONG bias
@@ -185,10 +179,10 @@ test.describe("Signals Feed with Filters", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -201,11 +195,8 @@ test.describe("Signals Feed with Filters", () => {
       },
     });
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Navigate to signals feed
-    await page.goto(`/orgs/${orgSlug}/signals`);
+    await page.goto("/signals");
     await page.waitForLoadState("networkidle");
 
     // 4. Set risk level range (1-2) to show only low risk
@@ -246,10 +237,10 @@ test.describe("Signals Feed with Filters", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -263,11 +254,8 @@ test.describe("Signals Feed with Filters", () => {
       },
     });
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Navigate to signals feed
-    await page.goto(`/orgs/${orgSlug}/signals`);
+    await page.goto("/signals");
     await page.waitForLoadState("networkidle");
 
     // 4. Search for "BREAKOUT" - use more specific selector for signals page search
@@ -298,10 +286,10 @@ test.describe("Signals Feed with Filters", () => {
 
     const followerData = await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
+    await page.waitForURL(/\/dashboard$/);
 
     const follower = await prisma.user.findUniqueOrThrow({
       where: { email: followerData.email },
@@ -315,11 +303,8 @@ test.describe("Signals Feed with Filters", () => {
       },
     });
 
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-
     // 3. Navigate to signals feed
-    await page.goto(`/orgs/${orgSlug}/signals`);
+    await page.goto("/signals");
     await page.waitForLoadState("networkidle");
 
     // 4. Apply filter (bias = LONG)

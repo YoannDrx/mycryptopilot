@@ -1,6 +1,7 @@
 import { Typography } from "@/components/nowts/typography";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 import {
   Card,
   CardContent,
@@ -25,7 +26,7 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
   return (
     <Card>
       <CardHeader className="flex items-center gap-2 space-y-0">
-        <Avatar className="mr-2 size-10">
+        <Avatar className="mr-2 size-30">
           <AvatarImage src={user.image ?? undefined} />
           <AvatarFallback>{user.name?.charAt(0) ?? "?"}</AvatarFallback>
         </Avatar>
@@ -56,7 +57,7 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
           {" • "}
         </Typography>
         <Typography variant="muted" className="text-sm">
-          Created: {new Date(user.createdAt).toLocaleDateString()}
+          Created: {format(new Date(user.createdAt), "MMM d, yyyy")}
         </Typography>
       </CardContent>
     </Card>
