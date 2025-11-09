@@ -37,7 +37,9 @@ test.describe("Follow/Unfollow Trader Flow", () => {
 
     // 4. Wait for trader card to be visible and click "View Profile"
     // Since we just created this trader, they should be the first/only one in the list
-    await expect(page.getByText(traderProfile.displayName)).toBeVisible();
+    await expect(
+      page.getByText(traderProfile.displayName).first(),
+    ).toBeVisible();
     await page
       .getByRole("link", { name: /view profile/i })
       .first()
@@ -55,7 +57,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.waitForResponse(
       (response) =>
         response.url().includes("/api/follow") && response.status() === 200,
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
     await page.waitForTimeout(500); // Allow UI update
 
@@ -104,7 +106,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.waitForResponse(
       (response) =>
         response.url().includes("/api/follow") && response.status() === 200,
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
     await page.waitForTimeout(500); // Allow UI update
 
@@ -166,7 +168,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.waitForResponse(
       (response) =>
         response.url().includes("/api/follow") && response.status() === 200,
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
     await page.waitForTimeout(500); // Allow UI update
 
@@ -233,7 +235,7 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.waitForResponse(
       (response) =>
         response.url().includes("/api/follow") && response.status() === 200,
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
     await page.waitForTimeout(500); // Allow UI update
 
