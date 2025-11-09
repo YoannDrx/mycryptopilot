@@ -51,6 +51,14 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await expect(followButton).toBeVisible({ timeout: 5000 });
     await followButton.click();
 
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 5000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
+
     // Wait for success message
     await expect(
       page.getByText(/successfully followed|now following/i),
@@ -91,6 +99,14 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     const unfollowBtn = page.getByRole("button", { name: /^unfollow$/i });
     await expect(unfollowBtn).toBeVisible({ timeout: 5000 });
     await unfollowBtn.click();
+
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 5000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
 
     // Wait for success message
     await expect(
@@ -145,6 +161,15 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await page.waitForLoadState("networkidle");
 
     await page.getByRole("button", { name: /follow/i }).click();
+
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 5000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
+
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
@@ -203,6 +228,15 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     const followBtn = page.getByRole("button", { name: /follow/i }).first();
     await expect(followBtn).toBeVisible({ timeout: 10000 });
     await followBtn.click();
+
+    // Wait for API response to complete
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/follow") && response.status() === 200,
+      { timeout: 5000 },
+    );
+    await page.waitForTimeout(500); // Allow UI update
+
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
