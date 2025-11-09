@@ -76,17 +76,33 @@ export function UserSessions({ userId }: UserSessionsProps) {
 
   const revokeAllSessionsMutation = useMutation({
     mutationFn: async () => {
-      return unwrapSafePromise(
+      // Check BEFORE revoking if we're revoking our own sessions
+      const currentSession = await authClient.getSession();
+      const isRevokingOwnSessions =
+        currentSession.data && currentSession.data.user.id === userId;
+
+      const result = await unwrapSafePromise(
         authClient.admin.revokeUserSessions({
           userId,
         }),
       );
+
+      return { result, isRevokingOwnSessions };
     },
-    onSuccess: () => {
-      toast.success("All sessions revoked successfully");
-      void queryClient.invalidateQueries({
-        queryKey: ["user-sessions", userId],
-      });
+    onSuccess: ({ isRevokingOwnSessions }) => {
+      if (isRevokingOwnSessions) {
+        // Admin revoked their own sessions - clear cache and redirect immediately
+        toast.info("Logging out...");
+        queryClient.clear();
+        // Immediate redirect - no delay to prevent user clicking elsewhere
+        window.location.href = "/auth/signin?callbackUrl=/";
+      } else {
+        // Revoked someone else's sessions - just update the list
+        toast.success("All sessions revoked successfully");
+        void queryClient.invalidateQueries({
+          queryKey: ["user-sessions", userId],
+        });
+      }
     },
     onError: (error: Error) => {
       toast.error(`Failed to revoke all sessions: ${error.message}`);

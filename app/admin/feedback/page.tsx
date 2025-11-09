@@ -15,6 +15,7 @@ import {
 import { Suspense } from "react";
 import { FeedbackFilters } from "./_components/feedback-filters";
 import { FeedbackTable } from "./_components/feedback-table";
+import { MessageSquare } from "lucide-react";
 
 const feedbackSearchParams = {
   page: parseAsInteger.withDefault(1),
@@ -34,11 +35,16 @@ export default async function AdminFeedbackPage({ searchParams }: PageProps) {
 
   return (
     <Layout size="lg">
-      <LayoutHeader>
-        <LayoutTitle>Feedback Management</LayoutTitle>
-        <LayoutDescription>
-          View and manage all user feedback submissions
-        </LayoutDescription>
+      <LayoutHeader className="flex flex-row items-center gap-3">
+        <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
+          <MessageSquare className="size-5" />
+        </div>
+        <div>
+          <LayoutTitle>Feedback Management</LayoutTitle>
+          <LayoutDescription>
+            View and manage all user feedback submissions
+          </LayoutDescription>
+        </div>
       </LayoutHeader>
 
       <LayoutContent>

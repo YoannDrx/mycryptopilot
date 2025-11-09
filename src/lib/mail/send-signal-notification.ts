@@ -1,7 +1,7 @@
 import { NewSignalNotificationEmail } from "@email/new-signal-notification";
 import { logger } from "@/lib/logger";
 import { sendEmail } from "./send-email";
-import { SiteConfig } from "@/site-config";
+import { getAppUrl } from "@/lib/urls/app-urls";
 
 type SignalData = {
   id: string;
@@ -23,7 +23,6 @@ type SendSignalNotificationParams = {
   userName: string;
   traderName: string;
   signal: SignalData;
-  orgSlug?: string;
 };
 
 /**
@@ -34,13 +33,11 @@ export const sendSignalNotificationEmail = async ({
   userName,
   traderName,
   signal,
-  orgSlug,
 }: SendSignalNotificationParams) => {
   try {
-    // Build signal URL
-    const signalUrl = orgSlug
-      ? `${SiteConfig.prodUrl}/orgs/${orgSlug}/signals?highlight=${signal.id}`
-      : `${SiteConfig.prodUrl}/signals`;
+    // Build signal URL (user-centric)
+    const basePath = `/signals?highlight=${signal.id}`;
+    const signalUrl = getAppUrl(basePath, true);
 
     // Send email
     const result = await sendEmail({
@@ -100,10 +97,10 @@ export const notifyFollowersOfNewSignal = async ({
       where: {
         traderId: traderId,
         status: "ACTIVE",
-        // TODO: Add email notification preference filter when field exists
-        // user: {
-        //   emailNotificationsEnabled: true,
-        // },
+        user: {
+          emailNotificationsEnabled: true,
+          emailNotifyNewSignals: true,
+        },
       },
       include: {
         user: {
@@ -127,22 +124,11 @@ export const notifyFollowersOfNewSignal = async ({
 
     // Send emails to all followers (in parallel)
     const emailPromises = followers.map(async (follow) => {
-      // Get user's organization slug (assuming 1 org = 1 user in MyCryptoPilot)
-      const userOrg = await prisma.member.findFirst({
-        where: { userId: follow.user.id },
-        select: {
-          organization: {
-            select: { slug: true },
-          },
-        },
-      });
-
       return sendSignalNotificationEmail({
         userEmail: follow.user.email,
         userName: follow.user.name,
         traderName,
         signal,
-        orgSlug: userOrg?.organization.slug ?? undefined,
       });
     });
 

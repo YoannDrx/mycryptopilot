@@ -6,19 +6,19 @@ import { useRouter } from "next/navigation";
 type FollowTraderButtonProps = {
   traderId: string;
   traderName: string;
-  orgSlug: string;
+  userId?: string;
 };
 
 export const FollowTraderButton = ({
   traderId,
   traderName,
-  orgSlug,
+  userId,
 }: FollowTraderButtonProps) => {
   const router = useRouter();
 
   const handleFollowSuccess = () => {
     // Redirect to dashboard after successful follow
-    router.push(`/orgs/${orgSlug}/dashboard`);
+    router.push("/dashboard");
     router.refresh();
   };
 
@@ -27,6 +27,7 @@ export const FollowTraderButton = ({
       traderId={traderId}
       traderName={traderName}
       isFollowing={false}
+      userId={userId}
       variant="default"
       size="lg"
       source="REFERRAL"

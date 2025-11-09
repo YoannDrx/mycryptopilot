@@ -96,6 +96,15 @@ export const EmailLayout = (
             <Text className="text-sm text-gray-500">
               {SiteConfig.company.address}
             </Text>
+            <Text className="text-sm text-gray-500">
+              Contact:{" "}
+              <a
+                href="mailto:contact@mycryptopilot.app"
+                className="text-indigo-600 underline"
+              >
+                contact@mycryptopilot.app
+              </a>
+            </Text>
           </Tailwind>
         </Container>
       </Body>

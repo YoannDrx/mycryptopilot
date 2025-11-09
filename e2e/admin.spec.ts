@@ -5,7 +5,7 @@ test.describe("admin", () => {
   test("verify admin navigation and pages", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
@@ -13,15 +13,12 @@ test.describe("admin", () => {
 
     // Test Admin section navigation
     await expect(page.getByRole("link", { name: "Users" })).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Organizations" }),
-    ).toBeVisible();
 
-    // Test Trading section navigation (new)
+    // Test Trading section navigation
     await expect(page.getByRole("link", { name: "Traders" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Signals" })).toBeVisible();
 
-    // Test Finance section navigation (new)
+    // Test Finance section navigation
     await expect(
       page.getByRole("link", { name: "Crypto Payments" }),
     ).toBeVisible();
@@ -29,10 +26,6 @@ test.describe("admin", () => {
     // Navigate to Users
     await page.getByRole("link", { name: "Users" }).click();
     await expect(page).toHaveURL("/admin/users");
-
-    // Navigate to Organizations
-    await page.getByRole("link", { name: "Organizations" }).click();
-    await expect(page).toHaveURL("/admin/organizations");
 
     // Navigate to Traders (new)
     await page.getByRole("link", { name: "Traders" }).click();
@@ -50,7 +43,7 @@ test.describe("admin", () => {
   test("verify traders page displays correctly", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
@@ -73,7 +66,7 @@ test.describe("admin", () => {
   test("verify signals page displays correctly", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 
@@ -88,7 +81,7 @@ test.describe("admin", () => {
   test("verify payments page displays correctly", async ({ page }) => {
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
       admin: true,
     });
 

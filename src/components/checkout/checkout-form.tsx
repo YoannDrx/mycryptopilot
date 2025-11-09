@@ -44,10 +44,15 @@ import { logger } from "@/lib/logger";
 import { TestnetBadge } from "./testnet-badge";
 import { SiteConfig } from "@/site-config";
 import { TestPaymentSuccessDialog } from "./test-payment-success-dialog";
+import {
+  LayoutHeader,
+  LayoutTitle,
+  LayoutDescription,
+  LayoutContent,
+} from "@/features/page/layout";
 
 type CheckoutFormProps = {
   plan: MyCryptoPilotPlanName;
-  orgSlug: string;
   isTestnet?: boolean;
 };
 
@@ -68,7 +73,6 @@ type PaymentStatus = "pending" | "confirmed" | "expired";
 
 export const CheckoutForm = ({
   plan,
-  orgSlug,
   isTestnet = false,
 }: CheckoutFormProps) => {
   const router = useRouter();
@@ -165,7 +169,7 @@ export const CheckoutForm = ({
 
             // Wait 2s before redirect to show success message
             setTimeout(() => {
-              router.push(`/orgs/${orgSlug}/dashboard`);
+              router.push("/dashboard");
               router.refresh();
             }, 2000);
           }
@@ -184,7 +188,7 @@ export const CheckoutForm = ({
     const interval = setInterval(checkPaymentStatus, 10000);
 
     return () => clearInterval(interval);
-  }, [addresses, paymentStatus, orgSlug, router, plan]);
+  }, [addresses, paymentStatus, router, plan]);
 
   // Handle expiration
   const handleExpiration = () => {
@@ -205,7 +209,7 @@ export const CheckoutForm = ({
   // Loading state
   if (generateMutation.isPending || !addresses || !expiresAt) {
     return (
-      <div className="container mx-auto max-w-4xl py-8">
+      <LayoutContent>
         <Card>
           <CardHeader>
             <CardTitle>Generating Payment Addresses...</CardTitle>
@@ -218,264 +222,264 @@ export const CheckoutForm = ({
             </div>
           </CardContent>
         </Card>
-      </div>
+      </LayoutContent>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="mb-2 flex items-center gap-3">
-          <h1 className="text-3xl font-bold">
+    <>
+      <LayoutHeader className="flex items-center gap-3">
+        <div className="flex-1">
+          <LayoutTitle>
             Complete Your Payment - {planData.name} Plan
-          </h1>
-          <TestnetBadge isTestnet={isTestnet} />
+          </LayoutTitle>
+          <LayoutDescription>
+            Send ${planData.priceUSD} in USDC (Base) or USDT (Tron) to one of
+            the addresses below
+          </LayoutDescription>
         </div>
-        <p className="text-muted-foreground">
-          Send ${planData.priceUSD} in USDC (Base) or USDT (Tron) to one of the
-          addresses below
-        </p>
-      </div>
+        <TestnetBadge isTestnet={isTestnet} />
+      </LayoutHeader>
 
-      {/* Payment Status Alert */}
-      {paymentStatus === "confirmed" && (
-        <Alert className="mb-6 border-green-500 bg-green-50">
-          <CheckCircle2 className="size-5 text-green-600" />
-          <AlertDescription className="text-green-800">
-            Payment confirmed! Activating your subscription...
-          </AlertDescription>
-        </Alert>
-      )}
+      <LayoutContent className="space-y-6">
+        {/* Payment Status Alert */}
+        {paymentStatus === "confirmed" && (
+          <Alert className="mb-6 border-green-500 bg-green-50">
+            <CheckCircle2 className="size-5 text-green-600" />
+            <AlertDescription className="text-green-800">
+              Payment confirmed! Activating your subscription...
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {paymentStatus === "expired" && (
-        <Alert className="mb-6 border-red-500 bg-red-50">
-          <Timer className="size-5 text-red-600" />
-          <AlertDescription className="text-red-800">
-            Payment session expired. Please refresh to generate new addresses.
-          </AlertDescription>
-        </Alert>
-      )}
+        {paymentStatus === "expired" && (
+          <Alert className="mb-6 border-red-500 bg-red-50">
+            <Timer className="size-5 text-red-600" />
+            <AlertDescription className="text-red-800">
+              Payment session expired. Please refresh to generate new addresses.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {/* Timer Card */}
-      {paymentStatus === "pending" && (
-        <Card className="mb-6">
-          <CardContent className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Timer className="size-5" />
-              <span className="font-medium">Time Remaining:</span>
-            </div>
-            <Countdown
-              date={expiresAt}
-              onComplete={handleExpiration}
-              renderer={({ minutes, seconds }) => (
-                <Badge variant="secondary" className="font-mono text-lg">
-                  {String(minutes).padStart(2, "0")}:
-                  {String(seconds).padStart(2, "0")}
-                </Badge>
-              )}
-            />
-          </CardContent>
-        </Card>
-      )}
+        {/* Timer Card */}
+        {paymentStatus === "pending" && (
+          <Card className="mb-6">
+            <CardContent className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Timer className="size-5" />
+                <span className="font-medium">Time Remaining:</span>
+              </div>
+              <Countdown
+                date={expiresAt}
+                onComplete={handleExpiration}
+                renderer={({ minutes, seconds }) => (
+                  <Badge variant="secondary" className="font-mono text-lg">
+                    {String(minutes).padStart(2, "0")}:
+                    {String(seconds).padStart(2, "0")}
+                  </Badge>
+                )}
+              />
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Payment Instructions */}
-      <div className="mb-6 flex flex-col gap-8 lg:flex-row">
-        {/* Base Network */}
-        <Card className="flex-1">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="size-5 text-blue-500" />
-                {isTestnet
-                  ? SiteConfig.crypto.testnet.base.name
-                  : SiteConfig.crypto.networks.base.name}{" "}
-                (USDC)
-              </CardTitle>
-              <Badge variant="secondary">Recommended</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-4">
-              {/* QR Code */}
-              {qrCodes?.base && (
-                <div className="flex justify-center">
-                  <img
-                    src={qrCodes.base}
-                    alt="Base USDC Address QR Code"
-                    className="rounded-lg border"
-                  />
+        {/* Payment Instructions */}
+        <div className="mb-6 flex flex-col gap-8 lg:flex-row">
+          {/* Base Network */}
+          <Card className="flex-1">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="size-5 text-blue-500" />
+                  {isTestnet
+                    ? SiteConfig.crypto.testnet.base.name
+                    : SiteConfig.crypto.networks.base.name}{" "}
+                  (USDC)
+                </CardTitle>
+                <Badge variant="secondary">Recommended</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-4">
+                {/* QR Code */}
+                {qrCodes?.base && (
+                  <div className="flex justify-center">
+                    <img
+                      src={qrCodes.base}
+                      alt="Base USDC Address QR Code"
+                      className="rounded-lg border"
+                    />
+                  </div>
+                )}
+
+                {/* Address */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium">Send USDC to:</span>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
+                      {addresses.base.address}
+                    </code>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () =>
+                        copyToClipboard(addresses.base.address, "Base")
+                      }
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-              )}
 
-              {/* Address */}
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium">Send USDC to:</span>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
-                    {addresses.base.address}
-                  </code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={async () =>
-                      copyToClipboard(addresses.base.address, "Base")
-                    }
+                {/* Amount */}
+                <div className="bg-muted/50 rounded-lg border p-4">
+                  <p className="text-sm font-medium">
+                    <span className="font-semibold">Amount:</span> $
+                    {planData.priceUSD} USDC
+                  </p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Lower fees • Faster confirmation (1 block)
+                  </p>
+                </div>
+
+                {/* Explorer Link */}
+                <Button variant="link" size="sm" asChild className="self-start">
+                  <a
+                    href={`${isTestnet ? SiteConfig.crypto.testnet.base.explorerUrl : SiteConfig.crypto.networks.base.explorerUrl}/address/${addresses.base.address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    <Copy className="size-4" />
-                  </Button>
-                </div>
+                    View on {isTestnet ? "Sepolia BaseScan" : "BaseScan"}{" "}
+                    <ExternalLink className="ml-1 size-3" />
+                  </a>
+                </Button>
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Amount */}
-              <div className="bg-muted/50 rounded-lg border p-4">
-                <p className="text-sm font-medium">
-                  <span className="font-semibold">Amount:</span> $
-                  {planData.priceUSD} USDC
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Lower fees • Faster confirmation (1 block)
-                </p>
+          {/* Tron Network */}
+          <Card className="flex-1">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="size-5 text-red-500" />
+                  {isTestnet
+                    ? SiteConfig.crypto.testnet.tron.name
+                    : SiteConfig.crypto.networks.tron.name}{" "}
+                  (USDT)
+                </CardTitle>
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-4">
+                {/* QR Code */}
+                {qrCodes?.tron && (
+                  <div className="flex justify-center">
+                    <img
+                      src={qrCodes.tron}
+                      alt="Tron USDT Address QR Code"
+                      className="rounded-lg border"
+                    />
+                  </div>
+                )}
 
-              {/* Explorer Link */}
-              <Button variant="link" size="sm" asChild className="self-start">
-                <a
-                  href={`${isTestnet ? SiteConfig.crypto.testnet.base.explorerUrl : SiteConfig.crypto.networks.base.explorerUrl}/address/${addresses.base.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View on {isTestnet ? "Sepolia BaseScan" : "BaseScan"}{" "}
-                  <ExternalLink className="ml-1 size-3" />
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tron Network */}
-        <Card className="flex-1">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="size-5 text-red-500" />
-                {isTestnet
-                  ? SiteConfig.crypto.testnet.tron.name
-                  : SiteConfig.crypto.networks.tron.name}{" "}
-                (USDT)
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-4">
-              {/* QR Code */}
-              {qrCodes?.tron && (
-                <div className="flex justify-center">
-                  <img
-                    src={qrCodes.tron}
-                    alt="Tron USDT Address QR Code"
-                    className="rounded-lg border"
-                  />
+                {/* Address */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium">
+                    Send USDT (TRC-20) to:
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
+                      {addresses.tron.address}
+                    </code>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () =>
+                        copyToClipboard(addresses.tron.address, "Tron")
+                      }
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-              )}
 
-              {/* Address */}
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium">
-                  Send USDT (TRC-20) to:
-                </span>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
-                    {addresses.tron.address}
-                  </code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={async () =>
-                      copyToClipboard(addresses.tron.address, "Tron")
-                    }
+                {/* Amount */}
+                <div className="bg-muted/50 rounded-lg border p-4">
+                  <p className="text-sm font-medium">
+                    <span className="font-semibold">Amount:</span> $
+                    {planData.priceUSD} USDT
+                  </p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    TRC-20 only • Requires 2 confirmations
+                  </p>
+                </div>
+
+                {/* Explorer Link */}
+                <Button variant="link" size="sm" asChild className="self-start">
+                  <a
+                    href={`${isTestnet ? SiteConfig.crypto.testnet.tron.explorerUrl : SiteConfig.crypto.networks.tron.explorerUrl}/#/address/${addresses.tron.address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    <Copy className="size-4" />
-                  </Button>
-                </div>
+                    View on {isTestnet ? "Shasta TronScan" : "TronScan"}{" "}
+                    <ExternalLink className="ml-1 size-3" />
+                  </a>
+                </Button>
               </div>
+            </CardContent>
+          </Card>
+        </div>
 
-              {/* Amount */}
-              <div className="bg-muted/50 rounded-lg border p-4">
-                <p className="text-sm font-medium">
-                  <span className="font-semibold">Amount:</span> $
-                  {planData.priceUSD} USDT
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  TRC-20 only • Requires 2 confirmations
-                </p>
-              </div>
-
-              {/* Explorer Link */}
-              <Button variant="link" size="sm" asChild className="self-start">
-                <a
-                  href={`${isTestnet ? SiteConfig.crypto.testnet.tron.explorerUrl : SiteConfig.crypto.networks.tron.explorerUrl}/#/address/${addresses.tron.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View on {isTestnet ? "Shasta TronScan" : "TronScan"}{" "}
-                  <ExternalLink className="ml-1 size-3" />
-                </a>
-              </Button>
+        {/* Status Indicator */}
+        <Card className="border-2 border-dashed">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center gap-3">
+              {paymentStatus === "pending" && (
+                <>
+                  <Loader2 className="size-5 animate-spin text-blue-600" />
+                  <span className="text-muted-foreground text-sm font-medium">
+                    Waiting for payment confirmation...
+                  </span>
+                </>
+              )}
+              {paymentStatus === "confirmed" && (
+                <>
+                  <CheckCircle2 className="size-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-700">
+                    Payment confirmed! Redirecting...
+                  </span>
+                </>
+              )}
+            </div>
+            <div className="mt-4 space-y-2">
+              <p className="text-muted-foreground text-center text-xs">
+                Your payment will be detected automatically.
+              </p>
+              <p className="text-center text-xs font-semibold text-amber-600">
+                ⚠️ Do not leave this page until payment is detected.
+              </p>
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Status Indicator */}
-      <Card className="border-2 border-dashed">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-center gap-3">
-            {paymentStatus === "pending" && (
-              <>
-                <Loader2 className="size-5 animate-spin text-blue-600" />
-                <span className="text-muted-foreground text-sm font-medium">
-                  Waiting for payment confirmation...
-                </span>
-              </>
-            )}
-            {paymentStatus === "confirmed" && (
-              <>
-                <CheckCircle2 className="size-5 text-green-600" />
-                <span className="text-sm font-medium text-green-700">
-                  Payment confirmed! Redirecting...
-                </span>
-              </>
-            )}
-          </div>
-          <div className="mt-4 space-y-2">
-            <p className="text-muted-foreground text-center text-xs">
-              Your payment will be detected automatically.
-            </p>
-            <p className="text-center text-xs font-semibold text-amber-600">
-              ⚠️ Do not leave this page until payment is detected.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Cancel Button */}
+        <div className="mt-8 flex justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/pricing")}
+            disabled={paymentStatus === "confirmed"}
+          >
+            Cancel and Return to Pricing
+          </Button>
+        </div>
 
-      {/* Cancel Button */}
-      <div className="mt-8 flex justify-center">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/orgs/${orgSlug}/pricing`)}
-          disabled={paymentStatus === "confirmed"}
-        >
-          Cancel and Return to Pricing
-        </Button>
-      </div>
-
-      {/* Test Payment Success Dialog */}
-      <TestPaymentSuccessDialog
-        open={showTestSuccessDialog}
-        onOpenChange={setShowTestSuccessDialog}
-        orgSlug={orgSlug}
-      />
-    </div>
+        {/* Test Payment Success Dialog */}
+        <TestPaymentSuccessDialog
+          open={showTestSuccessDialog}
+          onOpenChange={setShowTestSuccessDialog}
+        />
+      </LayoutContent>
+    </>
   );
 };

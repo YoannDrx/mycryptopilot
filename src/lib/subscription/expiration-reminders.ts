@@ -63,6 +63,8 @@ async function getUsersWithExpiringSubscriptions(
         gte: startOfDay,
         lte: endOfDay,
       },
+      emailNotificationsEnabled: true,
+      emailNotifySubscriptionReminders: true,
     },
     select: {
       id: true,
@@ -106,6 +108,8 @@ async function getUsersWithExpiredSubscriptions(): Promise<
       planExpiresAt: {
         lt: now, // Expiré
       },
+      emailNotificationsEnabled: true,
+      emailNotifySubscriptionReminders: true,
     },
     select: {
       id: true,
@@ -148,7 +152,13 @@ async function sendExpirationReminderEmail(params: {
         : "Free";
 
   const urgencyEmoji =
-    daysLeft === 7 ? "ℹ️" : daysLeft === 3 ? "⚠️" : daysLeft === 1 ? "🚨" : "⏰";
+    daysLeft === 7
+      ? "ℹ️"
+      : daysLeft === 3
+        ? "⚠️"
+        : daysLeft === 1
+          ? "🚨"
+          : "⏰";
 
   const urgencyText =
     daysLeft === 7

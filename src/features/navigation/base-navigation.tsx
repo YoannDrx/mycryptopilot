@@ -15,7 +15,7 @@ import {
 import { SidebarMenuButtonLink } from "@/components/ui/sidebar-utils";
 import { Layout } from "@/features/page/layout";
 import { SiteConfig } from "@/site-config";
-import { Building2, Home, User } from "lucide-react";
+import { Home, User } from "lucide-react";
 import type { PropsWithChildren } from "react";
 import { SidebarUserButton } from "../sidebar/sidebar-user-button";
 
@@ -46,12 +46,6 @@ const BaseSidebar = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButtonLink href="/orgs">
-              <Building2 />
-              <span>Organization</span>
-            </SidebarMenuButtonLink>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButtonLink href="/home">
               <Home />

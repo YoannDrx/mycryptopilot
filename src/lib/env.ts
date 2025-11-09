@@ -37,6 +37,8 @@ type TestEnv = {
   TRON_API_KEY?: string;
   CRYPTO_XPUB_BASE?: string;
   CRYPTO_XPUB_TRON?: string;
+  CRYPTO_XPUB_BASE_TESTNET?: string;
+  CRYPTO_XPUB_TRON_TESTNET?: string;
   // Binance sweep wallets
   BINANCE_MASTER_WALLET_BASE?: string;
   BINANCE_MASTER_WALLET_TRON?: string;
@@ -125,6 +127,8 @@ function createProductionEnv() {
       // HD Wallet XPUBs (use different values in .env vs .env.local)
       CRYPTO_XPUB_BASE: z.string().optional(),
       CRYPTO_XPUB_TRON: z.string().optional(),
+      CRYPTO_XPUB_BASE_TESTNET: z.string().optional(),
+      CRYPTO_XPUB_TRON_TESTNET: z.string().optional(),
       // Binance master wallets for sweep
       BINANCE_MASTER_WALLET_BASE: z.string().optional(),
       BINANCE_MASTER_WALLET_TRON: z.string().optional(),

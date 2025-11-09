@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export type DialogType = "org-plan";
+/**
+ * DEPRECATED: Global dialog system kept for future use
+ * "org-plan" dialog removed - Big Bang (Issue #77 Phase 11)
+ * No active dialogs - reserved for future features
+ */
+export type DialogType = never;
 
 export const useGlobalDialogStore = create<{
   openDialog: DialogType | null;

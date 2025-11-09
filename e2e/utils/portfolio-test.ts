@@ -36,6 +36,13 @@ export async function createMockExchangeConnection(options: {
     },
   });
 
+  // ✅ FIX: Update traderProfile.verified when connecting first exchange
+  // This ensures tests that check verification badge work correctly
+  await prisma.traderProfile.update({
+    where: { id: options.traderProfileId },
+    data: { verified: true, verifiedAt: now },
+  });
+
   return connection;
 }
 
@@ -211,11 +218,21 @@ export async function createCompletePortfolioData(options: {
   tradesCount?: number;
   winrate?: number;
 }) {
-  // 1. Create exchange connection
-  const connection = await createMockExchangeConnection({
-    traderProfileId: options.traderProfileId,
-    isActive: true,
+  // 1. Create exchange connection (or reuse existing to avoid unique constraint violation)
+  // ✅ FIX: Use findFirst to check if connection already exists, or create new one
+  const existingConnection = await prisma.exchangeConnection.findFirst({
+    where: {
+      traderProfileId: options.traderProfileId,
+      exchange: "BINANCE",
+    },
   });
+
+  const connection =
+    existingConnection ??
+    (await createMockExchangeConnection({
+      traderProfileId: options.traderProfileId,
+      isActive: true,
+    }));
 
   // 2. Create trades
   const trades = await createMockExchangeTrades({

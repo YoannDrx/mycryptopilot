@@ -156,7 +156,7 @@ export async function postSignalTeaser(signal: {
         name: "💡 Upgrade vers Pro",
         value:
           "Pour accéder aux **prix d'entrée, targets, invalidation** et jusqu'à **50 signaux/jour**:\n\n" +
-          `🔗 [Upgrade maintenant](${SiteConfig.prodUrl}/orgs/pricing)`,
+          `🔗 [Upgrade maintenant](${SiteConfig.prodUrl}/pricing)`,
         inline: false,
       })
       .setFooter({
@@ -182,51 +182,23 @@ export async function postSignalTeaser(signal: {
 /**
  * Vérifier si un user a un plan FREE (ne devrait voir que des teasers)
  *
+ * Utilise getUserSubscription() pour dual-mode support
+ *
  * @param userId - User ID
  * @returns true si le user est en plan FREE
  */
 export async function isUserFreePlan(userId: string): Promise<boolean> {
   try {
     // Importer dynamiquement pour éviter circular deps
-    const { prisma } = await import("../prisma");
+    const { getUserSubscription } = await import(
+      "../subscription/get-user-subscription"
+    );
 
-    // Récupérer le plan de l'organisation du user
-    const member = await prisma.member.findFirst({
-      where: { userId },
-      include: {
-        organization: {
-          include: {
-            subscription: {
-              select: {
-                plan: true,
-                status: true,
-                periodEnd: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    // Récupérer la subscription (dual-mode)
+    const subscription = await getUserSubscription(userId);
 
-    if (!member?.organization) {
-      // Pas d'organization = FREE par défaut
-      return true;
-    }
-
-    const subscription = member.organization.subscription;
-
-    // Si pas de subscription active, ou expirée, ou plan = "free"
-    if (
-      !subscription ||
-      !["active", "trialing"].includes(subscription.status ?? "") ||
-      (subscription.periodEnd && subscription.periodEnd < new Date()) ||
-      subscription.plan === "free"
-    ) {
-      return true;
-    }
-
-    // Sinon, c'est un plan payant (pro/ultra)
-    return false;
+    // Si plan = "free" ou status n'est pas actif, retourner true
+    return subscription.plan === "free";
   } catch (error) {
     logger.error("Error checking if user is FREE plan:", error);
     // En cas d'erreur, considérer comme FREE par sécurité

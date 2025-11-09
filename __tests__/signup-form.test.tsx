@@ -83,8 +83,8 @@ describe("SignUpCredentialsForm", () => {
       });
     });
 
-    // Check if redirect happened
-    expect(window.location.href).toBe("http://localhost:3000/orgs");
+    // Check if redirect happened (B2C: default is /dashboard)
+    expect(window.location.href).toBe("http://localhost:3000/dashboard");
   });
 
   it("should use custom callback URL from searchParams", async () => {
@@ -109,7 +109,7 @@ describe("SignUpCredentialsForm", () => {
       expect(authClient.signUp.email).toHaveBeenCalled();
     });
 
-    // Check if redirected to custom URL
-    expect(window.location.href).toBe("http://localhost:3000/orgs");
+    // Check if redirected to custom URL (B2C: /dashboard)
+    expect(window.location.href).toBe("http://localhost:3000/dashboard");
   });
 });

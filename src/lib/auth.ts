@@ -6,22 +6,17 @@ import {
   emailOTP,
   lastLoginMethod,
   multiSession,
-  organization,
 } from "better-auth/plugins";
-import { ac, roles } from "./auth/auth-permissions";
 
 import { sendEmail } from "@/lib/mail/send-email";
 import { SiteConfig } from "@/site-config";
-import MarkdownEmail from "@email/markdown.email";
-import { createOrganizationApi } from "./auth/auth-api-helper";
+import BilingualMarkdownEmail from "@email/bilingual-markdown.email";
 import { setupResendCustomer } from "./auth/auth-config-setup";
 import { sendDiscordInviteEmail } from "./discord/invitations";
 import { env } from "./env";
-import { generateSlug } from "./format/id";
 import { logger } from "./logger";
 import { prisma } from "./prisma";
 import { getServerUrl } from "./server-url";
-import { stripe } from "./stripe";
 type SocialProvidersType = Parameters<typeof betterAuth>[0]["socialProviders"];
 
 export const SocialProviders: SocialProvidersType = {};
@@ -117,37 +112,25 @@ export const auth = betterAuth({
             }
           })();
 
-          // Create organization with retry (critical but should not block user creation)
-          // Better Auth hooks should never throw - log errors instead
-          const maxRetries = 3;
-
-          for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-              // eslint-disable-next-line no-await-in-loop
-              await createOrganizationApi({
-                name: `Account`, // Simplified name for MyCryptoPilot - this is a personal account, not a shared org
-                slug: generateSlug(user.id), // Use user ID for unique slug
-              });
-              logger.info(`Organization created for user ${user.id}`);
-              break; // Success, exit loop
-            } catch (err) {
-              logger.error(
-                `Failed to create organization for user ${user.id} (attempt ${attempt}/${maxRetries})`,
-                { err },
-              );
-              if (attempt < maxRetries) {
-                // Wait before retry (exponential backoff)
-                // eslint-disable-next-line no-await-in-loop
-                await new Promise((resolve) =>
-                  setTimeout(resolve, 100 * Math.pow(2, attempt)),
-                );
-              } else {
-                // Last attempt failed - log critical error but don't throw
-                logger.error(
-                  `CRITICAL: Failed to create organization after ${maxRetries} attempts for user ${user.id}`,
-                );
-              }
-            }
+          // ============================================
+          // Create UserSubscription (Big Bang - Issue #77)
+          // ============================================
+          try {
+            await prisma.userSubscription.create({
+              data: {
+                userId: user.id,
+                plan: "free",
+                status: "active",
+                periodEnd: null, // Free plan has no expiration
+              },
+            });
+            logger.info(`UserSubscription created for user ${user.id}`);
+          } catch (err) {
+            logger.error("Failed to create UserSubscription", {
+              err,
+              userId: user.id,
+            });
+            // Don't throw - user creation should not fail
           }
         },
       },
@@ -308,21 +291,43 @@ export const auth = betterAuth({
   },
   advanced: {
     cookiePrefix: SiteConfig.appId,
+    storeIPAddress: true, // Store user IP addresses in sessions
+    useSecureCookies: env.NODE_ENV === "production",
   },
+  trustedOrigins: [getServerUrl()],
+  trustProxy: true, // Required to read IP from X-Forwarded-For header (Vercel, proxies)
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
+      // Fetch user name from database (Better Auth only provides email)
+      const userData = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { name: true },
+      });
+      const userName = userData?.name ?? user.email.split("@")[0];
+
       await sendEmail({
         to: user.email,
         subject: "Reset your password",
-        html: MarkdownEmail({
+        html: BilingualMarkdownEmail({
           preview: `Reset your password for ${SiteConfig.title}`,
-          markdown: `
-          Hello,
+          markdownEN: `
+Hello **${userName}**,
 
-          You requested to reset your password.
+You requested to reset your password.
 
-          [Click here to reset your password](${url})
+[Click here to reset your password](${url})
+
+If you didn't request this, you can safely ignore this email.
+          `,
+          markdownFR: `
+Bonjour **${userName}**,
+
+Vous avez demandé à réinitialiser votre mot de passe.
+
+[Cliquez ici pour réinitialiser votre mot de passe](${url})
+
+Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email en toute sécurité.
           `,
         }),
       });
@@ -332,17 +337,35 @@ export const auth = betterAuth({
     changeEmail: {
       enabled: true,
       sendChangeEmailVerification: async ({ newEmail, url }) => {
+        // Try to get user name from new email (might not exist yet)
+        const userData = await prisma.user.findUnique({
+          where: { email: newEmail },
+          select: { name: true },
+        });
+        const userName = userData?.name ?? newEmail.split("@")[0];
+
         await sendEmail({
           to: newEmail,
           subject: "Change email address",
-          html: MarkdownEmail({
+          html: BilingualMarkdownEmail({
             preview: `Change your email address for ${SiteConfig.title}`,
-            markdown: `
-            Hello,
+            markdownEN: `
+Hello **${userName}**,
 
-            You requested to change your email address.
+You requested to change your email address.
 
-            [Click here to verify your new email address](${url})
+[Click here to verify your new email address](${url})
+
+If you didn't request this, please contact support immediately.
+            `,
+            markdownFR: `
+Bonjour **${userName}**,
+
+Vous avez demandé à changer votre adresse email.
+
+[Cliquez ici pour vérifier votre nouvelle adresse email](${url})
+
+Si vous n'avez pas fait cette demande, veuillez contacter le support immédiatement.
             `,
           }),
         });
@@ -352,17 +375,40 @@ export const auth = betterAuth({
       enabled: true,
       sendDeleteAccountVerification: async ({ user, token }) => {
         const url = `${getServerUrl()}/auth/confirm-delete?token=${token}&callbackUrl=/auth/goodbye`;
+
+        // Fetch user name from database
+        const userData = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { name: true },
+        });
+        const userName = userData?.name ?? user.email.split("@")[0];
+
         await sendEmail({
           to: user.email,
           subject: "Delete your account",
-          html: MarkdownEmail({
+          html: BilingualMarkdownEmail({
             preview: `Delete your account from ${SiteConfig.title}`,
-            markdown: `
-            Hello,
+            markdownEN: `
+Hello **${userName}**,
 
-            You requested to delete your account.
+You requested to delete your account.
 
-            [Click here to confirm account deletion](${url})
+**⚠️ Warning:** This action is permanent and cannot be undone. All your data will be permanently deleted.
+
+[Click here to confirm account deletion](${url})
+
+If you didn't request this, please secure your account immediately.
+            `,
+            markdownFR: `
+Bonjour **${userName}**,
+
+Vous avez demandé à supprimer votre compte.
+
+**⚠️ Attention :** Cette action est permanente et ne peut pas être annulée. Toutes vos données seront définitivement supprimées.
+
+[Cliquez ici pour confirmer la suppression du compte](${url})
+
+Si vous n'avez pas fait cette demande, veuillez sécuriser votre compte immédiatement.
             `,
           }),
         });
@@ -371,17 +417,39 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      // Fetch user name from database
+      const userData = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { name: true },
+      });
+      const userName = userData?.name ?? user.email.split("@")[0];
+
       await sendEmail({
         to: user.email,
         subject: "Verify your email address",
-        html: MarkdownEmail({
+        html: BilingualMarkdownEmail({
           preview: `Verify your email for ${SiteConfig.title}`,
-          markdown: `
-          Hello,
+          markdownEN: `
+Hello **${userName}**,
 
-          Welcome to ${SiteConfig.title}! Please verify your email address.
+Welcome to **${SiteConfig.title}**! 🎉
 
-          [Click here to verify your email](${url})
+To get started, please verify your email address.
+
+[Click here to verify your email](${url})
+
+Once verified, you'll have access to all features.
+          `,
+          markdownFR: `
+Bonjour **${userName}**,
+
+Bienvenue sur **${SiteConfig.title}** ! 🎉
+
+Pour commencer, veuillez vérifier votre adresse email.
+
+[Cliquez ici pour vérifier votre email](${url})
+
+Une fois vérifié, vous aurez accès à toutes les fonctionnalités.
           `,
         }),
       });
@@ -389,60 +457,40 @@ export const auth = betterAuth({
   },
   socialProviders: SocialProviders,
   plugins: [
-    organization({
-      ac: ac,
-      roles: roles,
-      organizationLimit: 5,
-      membershipLimit: 10,
-      autoCreateOrganizationOnSignUp: true,
-
-      organizationCreation: {
-        async afterCreate(data) {
-          const stripeCustomer = await stripe.customers.create({
-            email: data.user.email,
-            name: data.organization.name,
-            metadata: {
-              organizationId: data.organization.id,
-            },
-          });
-          await prisma.organization.update({
-            where: { id: data.organization.id },
-            data: { stripeCustomerId: stripeCustomer.id },
-          });
-        },
-      },
-      async sendInvitationEmail({ id, email }) {
-        const inviteLink = `${getServerUrl()}/orgs/accept-invitation/${id}`;
-        await sendEmail({
-          to: email,
-          subject: "You are invited to join an organization",
-          html: MarkdownEmail({
-            preview: `Join an organization on ${SiteConfig.title}`,
-            markdown: `
-            Hello,
-
-            You have been invited to join an organization on ${SiteConfig.title}.
-
-            [Click here to accept the invitation](${inviteLink})
-            `,
-          }),
-        });
-      },
-    }),
+    // Organization plugin removed - Big Bang (Issue #77 Phase 2)
     emailOTP({
       sendVerificationOTP: async ({ email, otp }) => {
         logger.debug("Sending OTP", { email, otp });
+
+        // Fetch user name from database
+        const userData = await prisma.user.findUnique({
+          where: { email },
+          select: { name: true },
+        });
+        const userName = userData?.name ?? email.split("@")[0];
+
         await sendEmail({
           to: email,
-          subject: `Your code to sign in to ${SiteConfig.title} ${otp}`,
-          html: MarkdownEmail({
+          subject: `Your code to sign in to ${SiteConfig.title}`,
+          html: BilingualMarkdownEmail({
             preview: `Your code to sign in to ${SiteConfig.title}`,
-            markdown: `
-            Hello,
+            markdownEN: `
+Hello **${userName}**,
 
-            Your code to sign in: **${otp}**
+Your verification code to sign in: **${otp}**
 
-            [Or click here to sign in automatically](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
+This code will expire in 10 minutes.
+
+[Or click here to sign in automatically](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
+            `,
+            markdownFR: `
+Bonjour **${userName}**,
+
+Votre code de vérification pour vous connecter : **${otp}**
+
+Ce code expirera dans 10 minutes.
+
+[Ou cliquez ici pour vous connecter automatiquement](${getServerUrl()}/auth/signin/otp?email=${email}&otp=${otp})
             `,
           }),
         });

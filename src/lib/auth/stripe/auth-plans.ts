@@ -1,4 +1,3 @@
-import type { Subscription } from "@/generated/prisma";
 import { logger } from "@/lib/logger";
 import {
   Clock,
@@ -35,20 +34,17 @@ export type AppAuthPlan = {
   group?: string;
   freeTrial?: {
     days: number;
-    onTrialStart?: (subscription: Subscription, ctx: HookCtx) => Promise<void>;
+    onTrialStart?: (subscription: unknown, ctx: HookCtx) => Promise<void>;
     onTrialEnd?: (
       data: {
-        subscription: Subscription;
+        subscription: unknown;
       },
       ctx: HookCtx,
     ) => Promise<void>;
-    onTrialExpired?: (
-      subscription: Subscription,
-      ctx: HookCtx,
-    ) => Promise<void>;
+    onTrialExpired?: (subscription: unknown, ctx: HookCtx) => Promise<void>;
   };
   onSubscriptionCanceled?: (
-    subscription: Subscription,
+    subscription: unknown,
     ctx: HookCtx,
   ) => Promise<void>;
 } & {

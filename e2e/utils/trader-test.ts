@@ -27,27 +27,6 @@ export async function createTestTraderDirectly() {
     },
   });
 
-  // Create organization for user
-  const org = await prisma.organization.create({
-    data: {
-      id: randomUUID(),
-      name: `${name}'s Org`,
-      slug: `org-${faker.string.alphanumeric(8).toLowerCase()}`,
-      createdAt: now,
-    },
-  });
-
-  // Create membership
-  await prisma.member.create({
-    data: {
-      id: randomUUID(),
-      organizationId: org.id,
-      userId: user.id,
-      role: "owner",
-      createdAt: now,
-    },
-  });
-
   // Create trader profile
   const traderProfile = await prisma.traderProfile.create({
     data: {
@@ -65,7 +44,6 @@ export async function createTestTraderDirectly() {
 
   return {
     user,
-    org,
     traderProfile,
   };
 }
@@ -80,12 +58,12 @@ export async function createTestTrader(options: {
   // Create a test account
   const userData = await createTestAccount({
     page: options.page,
-    callbackURL: "/orgs",
+    callbackURL: "/dashboard",
     initialUserData: options.initialUserData,
   });
 
-  // Wait for URL to settle
-  await options.page.waitForURL(/\/orgs\/.*/);
+  // Wait for URL to settle (B2C: root-level routes, no /orgs prefix)
+  await options.page.waitForURL(/\/dashboard/);
 
   // Get user from database (with retry to handle DB transaction timing)
   const user = await retry(

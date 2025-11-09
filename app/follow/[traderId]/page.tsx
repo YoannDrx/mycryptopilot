@@ -13,7 +13,6 @@ import { isFollowingTrader } from "@/features/follow/follow-queries";
 import { countTotalSignalsByTrader } from "@/features/signal/signal-queries";
 import { getTraderById } from "@/features/trader/trader-queries";
 import { getUser } from "@/lib/auth/auth-user";
-import { prisma } from "@/lib/prisma";
 import { CheckCircle2, Signal, TrendingUp } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -66,23 +65,9 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
   // Check if already following this trader
   const isFollowing = await isFollowingTrader(user.id, params.traderId);
 
-  // Get user's org slug for redirection
-  const userMember = await prisma.member.findFirst({
-    where: { userId: user.id },
-    include: {
-      organization: {
-        select: {
-          slug: true,
-        },
-      },
-    },
-  });
-
-  const orgSlug = userMember?.organization.slug ?? "org-slug-default";
-
-  // If already following, show they're already following with redirect to dashboard
+  // If already following, redirect to dashboard
   if (isFollowing) {
-    redirect(`/orgs/${orgSlug}/dashboard?already_following=${params.traderId}`);
+    redirect(`/dashboard?already_following=${params.traderId}`);
   }
 
   // Count trader's signals
@@ -185,20 +170,20 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
               <FollowTraderButton
                 traderId={params.traderId}
                 traderName={traderProfile.displayName}
-                orgSlug={orgSlug}
+                userId={user.id}
               />
             </div>
 
             {/* Additional links */}
             <div className="flex flex-col gap-2 border-t pt-4">
               <Button variant="outline" asChild>
-                <Link href={`/orgs/${orgSlug}/traders/${params.traderId}`}>
+                <Link href={`/traders/${params.traderId}`}>
                   <TrendingUp className="mr-2 size-4" />
                   View full profile
                 </Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link href={`/orgs/${orgSlug}/traders`}>View all traders</Link>
+                <Link href="/traders">View all traders</Link>
               </Button>
             </div>
           </CardContent>

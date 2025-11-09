@@ -605,3 +605,36 @@ enum CopyStatus {
   FAILED     // Execution failed
   CANCELLED  // Cancelled by user
 }
+
+// ============================================================================
+// REFACTORING ISSUE #77: User-Centric Architecture
+// ============================================================================
+// Phase 1: New models for migration from Organization → User
+// RFC: .claude/docs/DEVELOPMENT.md (RFC-001)
+
+/// UserSubscription: Direct User → Subscription relationship
+/// Replaces the legacy Organization.Subscription model
+/// Coexists with legacy during Phases 1-7, becomes primary in Phase 8
+model UserSubscription {
+  id                String    @id @default(cuid())
+  userId            String    @unique @map("user_id")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Plan information
+  plan              String    // "free" | "pro" | "ultra"
+  status            String    // "active" | "trialing" | "expired"
+  periodStart       DateTime? @map("period_start")
+  periodEnd         DateTime? @map("period_end")
+  paymentMethod     String?   @map("payment_method") // "crypto" | "stripe_legacy"
+
+  // Audit trail (for migration traceability)
+  migratedFromOrgId String?   @map("migrated_from_org_id")
+
+  // Timestamps
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("user_subscriptions")
+}
+
+// LegacyOrgSlug removed - Not needed in Big Bang approach (Issue #77 Phase 1)

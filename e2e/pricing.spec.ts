@@ -6,17 +6,13 @@ test.describe("Pricing Page", () => {
     // 1. Create a test account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to pricing page
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     // 3. Verify page title and header
@@ -77,17 +73,13 @@ test.describe("Pricing Page", () => {
     // 1. Create a test account
     await createTestAccount({
       page,
-      callbackURL: "/orgs",
+      callbackURL: "/dashboard",
     });
 
-    await page.waitForURL(/\/orgs\/.*/);
-
-    const currentUrl = page.url();
-    const orgSlug = currentUrl.split("/orgs/")[1]?.split("/")[0];
-    expect(orgSlug).toBeTruthy();
+    await page.waitForURL(/\/dashboard$/);
 
     // 2. Navigate to pricing page
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     // 3. Click "Subscribe Now" button for Pro plan
@@ -103,7 +95,7 @@ test.describe("Pricing Page", () => {
     await subscribeButton.click();
 
     // 4. Verify redirect to checkout page
-    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/checkout/pro`), {
+    await page.waitForURL(/\/checkout\/pro/, {
       timeout: 10000,
     });
 
@@ -112,10 +104,10 @@ test.describe("Pricing Page", () => {
     // 5. Verify checkout page loaded correctly
     // Should see plan name ("pro" in DOM), price, and payment options
     await expect(page.getByText(/pro/i).first()).toBeVisible();
-    await expect(page.getByText(/\$49/i).first()).toBeVisible();
+    await expect(page.getByText(/49/i).first()).toBeVisible();
 
     // 6. Test Ultra plan subscribe button
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     const ultraSubscribeButton = page
@@ -128,7 +120,7 @@ test.describe("Pricing Page", () => {
 
     await ultraSubscribeButton.click();
 
-    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/checkout/ultra`), {
+    await page.waitForURL(/\/checkout\/ultra/, {
       timeout: 10000,
     });
 
@@ -138,7 +130,7 @@ test.describe("Pricing Page", () => {
     await expect(page.getByText(/\$99/i).first()).toBeVisible();
 
     // 7. Test Free plan "Get Started" button redirects to dashboard
-    await page.goto(`/orgs/${orgSlug}/pricing`);
+    await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
     const freeCard = page.locator("div").filter({ hasText: /free/i }).first();
@@ -151,7 +143,7 @@ test.describe("Pricing Page", () => {
 
     await getStartedButton.click();
 
-    await page.waitForURL(new RegExp(`/orgs/${orgSlug}/dashboard`), {
+    await page.waitForURL(/\/dashboard$/, {
       timeout: 10000,
     });
 

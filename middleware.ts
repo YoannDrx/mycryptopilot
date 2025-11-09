@@ -1,25 +1,29 @@
 import {
-  extractOrgSlug,
-  findUserOrganization,
   handleRootRedirect,
   isAdminRoute,
-  isReservedSlug,
-  redirectToOrgList,
   redirectToRoot,
-  switchActiveOrganization,
   validateAdminAccess,
-  validateSession,
 } from "@/lib/auth/middleware-utils";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+/**
+ * Middleware - Big Bang (Issue #77 Phase 3)
+ *
+ * Simplified middleware without organization switching logic:
+ * - Root redirect
+ * - Admin route protection
+ * - No organization validation (user-centric architecture)
+ */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Root redirect
   if (pathname === "/") {
     return handleRootRedirect(request) ?? NextResponse.next();
   }
 
+  // Admin route protection
   if (isAdminRoute(pathname)) {
     const adminUser = await validateAdminAccess(request);
     if (!adminUser) {
@@ -28,29 +32,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const slug = extractOrgSlug(pathname);
-  if (!slug) return NextResponse.next();
-
-  if (isReservedSlug(slug)) {
-    return NextResponse.next();
-  }
-
-  const sessionData = await validateSession(request);
-  if (!sessionData) return NextResponse.next();
-
-  const { session, activeOrganisation } = sessionData;
-
-  if (activeOrganisation?.slug === slug) {
-    return NextResponse.next();
-  }
-
-  const org = await findUserOrganization(slug, session.session.userId);
-
-  if (!org) {
-    return redirectToOrgList(request);
-  }
-
-  return switchActiveOrganization(request, org.id);
+  // No organization logic needed
+  return NextResponse.next();
 }
 
 export const config = {
