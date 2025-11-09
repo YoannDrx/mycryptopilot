@@ -33,7 +33,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
       page.getByRole("heading", { name: "Exchange Connections" }),
     ).toBeVisible();
     await expect(
-      page.getByText(/connect your exchange to automatically track/i),
+      page.getByText(/connect.*exchange.*automatically.*sync/i),
     ).toBeVisible();
 
     // 4. Create a mock connection (simulates API key validation + connection)
