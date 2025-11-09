@@ -144,6 +144,7 @@ export default async function FollowingPage() {
                         traderId={trader.id}
                         traderName={traderProfile.displayName}
                         isFollowing={true}
+                        userId={user.id}
                         variant="outline"
                       />
                     </div>

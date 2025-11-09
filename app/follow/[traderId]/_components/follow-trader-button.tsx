@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 type FollowTraderButtonProps = {
   traderId: string;
   traderName: string;
+  userId?: string;
 };
 
 export const FollowTraderButton = ({
   traderId,
   traderName,
+  userId,
 }: FollowTraderButtonProps) => {
   const router = useRouter();
 
@@ -25,6 +27,7 @@ export const FollowTraderButton = ({
       traderId={traderId}
       traderName={traderName}
       isFollowing={false}
+      userId={userId}
       variant="default"
       size="lg"
       source="REFERRAL"

@@ -99,9 +99,24 @@ export const followTraderAction = authAction
       );
     }
 
-    // Créer le follow
-    const follow = await prisma.follow.create({
-      data: {
+    // Créer ou réactiver le follow (upsert pour gérer le cas où l'entrée existe avec status CANCELLED)
+    const follow = await prisma.follow.upsert({
+      where: {
+        userId_traderId: {
+          userId: user.id,
+          traderId,
+        },
+      },
+      update: {
+        // Si l'entrée existe (status CANCELLED), on la réactive
+        status: "ACTIVE",
+        source,
+        invitationId,
+        startedAt: new Date(),
+        expiresAt: null, // Reset expiration
+      },
+      create: {
+        // Si l'entrée n'existe pas, on la crée
         userId: user.id,
         traderId,
         status: "ACTIVE",
