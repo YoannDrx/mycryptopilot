@@ -170,6 +170,7 @@ export default async function FollowTraderPage(props: FollowTraderPageProps) {
               <FollowTraderButton
                 traderId={params.traderId}
                 traderName={traderProfile.displayName}
+                userId={user.id}
               />
             </div>
 

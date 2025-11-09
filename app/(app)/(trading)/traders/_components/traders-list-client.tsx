@@ -12,9 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FollowButton } from "@/components/nowts/follow-button";
-import { countTraderFollowers } from "@/features/follow/follow-queries";
-import { isFollowingTrader } from "@/features/follow/follow-queries";
-import { countTotalSignalsByTrader } from "@/features/signal/signal-queries";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
@@ -257,25 +254,43 @@ type TraderCardProps = {
 };
 
 function TraderCard({ trader, userId }: TraderCardProps) {
-  // Fetch trader data (followers, signals, isFollowing)
+  // Fetch trader data (followers, signals, isFollowing) via API routes
   const { data: followersCount } = useQuery({
     queryKey: ["trader-followers", trader.userId],
-    // eslint-disable-next-line @typescript-eslint/promise-function-async
-    queryFn: () => countTraderFollowers(trader.userId),
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/follow/count-followers?traderId=${trader.userId}`,
+      );
+      if (!res.ok) return 0;
+      const data = (await res.json()) as { count: number };
+      return data.count;
+    },
     initialData: 0,
   });
 
   const { data: signalsCount } = useQuery({
     queryKey: ["trader-signals", trader.userId],
-    // eslint-disable-next-line @typescript-eslint/promise-function-async
-    queryFn: () => countTotalSignalsByTrader(trader.userId),
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/signals/count-by-trader?traderId=${trader.userId}`,
+      );
+      if (!res.ok) return 0;
+      const data = (await res.json()) as { count: number };
+      return data.count;
+    },
     initialData: 0,
   });
 
   const { data: isFollowing } = useQuery({
     queryKey: ["is-following", userId, trader.userId],
-    // eslint-disable-next-line @typescript-eslint/promise-function-async
-    queryFn: () => isFollowingTrader(userId, trader.userId),
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/follow/is-following?traderId=${trader.userId}`,
+      );
+      if (!res.ok) return false;
+      const data = (await res.json()) as { isFollowing: boolean };
+      return data.isFollowing;
+    },
     initialData: false,
   });
 
@@ -353,6 +368,7 @@ function TraderCard({ trader, userId }: TraderCardProps) {
           traderId={trader.userId}
           traderName={trader.displayName}
           isFollowing={isFollowing}
+          userId={userId}
           variant="default"
         />
         <Button variant="outline" asChild>

@@ -26,6 +26,7 @@ type FollowButtonProps = {
   traderId: string;
   traderName: string;
   isFollowing: boolean;
+  userId?: string; // Pour la query key
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
   source?: "DIRECT" | "INVITATION" | "REFERRAL";
@@ -37,6 +38,7 @@ export const FollowButton = ({
   traderId,
   traderName,
   isFollowing,
+  userId,
   variant = "default",
   size = "default",
   source = "DIRECT",
@@ -47,7 +49,7 @@ export const FollowButton = ({
   const queryClient = useQueryClient();
   const [showUnfollowDialog, setShowUnfollowDialog] = useState(false);
 
-  // Mutation pour suivre un trader
+  // Mutation pour suivre un trader avec optimistic updates
   const followMutation = useMutation({
     mutationFn: async () => {
       const result = await followTraderAction({ traderId, source });
@@ -58,11 +60,30 @@ export const FollowButton = ({
 
       return result.data;
     },
+    onMutate: async () => {
+      // Annuler toutes les queries en cours pour éviter les conflits
+      await queryClient.cancelQueries({ queryKey: ["is-following"] });
+
+      // Snapshot de la valeur précédente (utiliser userId si fourni pour matcher la query key)
+      const queryKey = userId
+        ? ["is-following", userId, traderId]
+        : ["is-following", traderId];
+      const previousIsFollowing = queryClient.getQueryData(queryKey);
+
+      // Optimistic update : on met à jour immédiatement l'UI
+      queryClient.setQueryData(queryKey, true);
+
+      // Retourner le context avec la valeur précédente pour le rollback
+      return { previousIsFollowing, queryKey };
+    },
     onSuccess: (data) => {
       toast.success(data.message);
-      // Invalider les queries pour rafraîchir les données
+      // Invalider les queries pour rafraîchir les données depuis le serveur
       void queryClient.invalidateQueries({ queryKey: ["traders"] });
       void queryClient.invalidateQueries({ queryKey: ["following"] });
+      void queryClient.invalidateQueries({ queryKey: ["is-following"] });
+      void queryClient.invalidateQueries({ queryKey: ["trader-followers"] });
+      void queryClient.invalidateQueries({ queryKey: ["trader-signals"] });
       // Force Server Component revalidation
       router.refresh();
       // Call custom success handler if provided
@@ -70,12 +91,16 @@ export const FollowButton = ({
         onFollowSuccess();
       }
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context) => {
+      // En cas d'erreur, rollback à la valeur précédente
+      if (context) {
+        queryClient.setQueryData(context.queryKey, context.previousIsFollowing);
+      }
       toast.error(error.message);
     },
   });
 
-  // Mutation pour ne plus suivre un trader
+  // Mutation pour ne plus suivre un trader avec optimistic updates
   const unfollowMutation = useMutation({
     mutationFn: async () => {
       const result = await unfollowTraderAction({ traderId });
@@ -86,16 +111,39 @@ export const FollowButton = ({
 
       return result.data;
     },
+    onMutate: async () => {
+      // Annuler toutes les queries en cours pour éviter les conflits
+      await queryClient.cancelQueries({ queryKey: ["is-following"] });
+
+      // Snapshot de la valeur précédente (utiliser userId si fourni pour matcher la query key)
+      const queryKey = userId
+        ? ["is-following", userId, traderId]
+        : ["is-following", traderId];
+      const previousIsFollowing = queryClient.getQueryData(queryKey);
+
+      // Optimistic update : on met à jour immédiatement l'UI
+      queryClient.setQueryData(queryKey, false);
+
+      // Retourner le context avec la valeur précédente pour le rollback
+      return { previousIsFollowing, queryKey };
+    },
     onSuccess: (data) => {
       toast.success(data.message);
-      // Invalider les queries pour rafraîchir les données
+      // Invalider les queries pour rafraîchir les données depuis le serveur
       void queryClient.invalidateQueries({ queryKey: ["traders"] });
       void queryClient.invalidateQueries({ queryKey: ["following"] });
+      void queryClient.invalidateQueries({ queryKey: ["is-following"] });
+      void queryClient.invalidateQueries({ queryKey: ["trader-followers"] });
+      void queryClient.invalidateQueries({ queryKey: ["trader-signals"] });
       // Force Server Component revalidation
       router.refresh();
       setShowUnfollowDialog(false);
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context) => {
+      // En cas d'erreur, rollback à la valeur précédente
+      if (context) {
+        queryClient.setQueryData(context.queryKey, context.previousIsFollowing);
+      }
       toast.error(error.message);
       setShowUnfollowDialog(false);
     },

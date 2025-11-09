@@ -11,12 +11,15 @@ import { TradingCard } from "@/components/nowts/trading-card";
 import { Typography } from "@/components/nowts/typography";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { isFollowingTrader } from "@/features/follow/follow-queries";
+import { countTraderFollowers } from "@/features/follow/follow-queries";
 import { getUserWithTraderProfile } from "@/features/trader/trader-queries";
 import { getSignalsByTraderId } from "@/features/signal/signal-queries";
+import { countTotalSignalsByTrader } from "@/features/signal/signal-queries";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
-import { CheckCircle2, TrendingUp, Users } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { LayoutContent } from "@/features/page/layout";
+import { TraderProfileStats } from "./_components/trader-profile-stats";
 
 type TraderProfilePageProps = {
   params: Promise<{
@@ -45,6 +48,12 @@ export default async function TraderProfilePage({
 
   // Vérifier si l'utilisateur suit déjà ce trader
   const isFollowing = await isFollowingTrader(currentUser.id, traderId);
+
+  // Récupérer les compteurs initiaux (SSR) pour éviter les flash de contenu
+  const [followersCount, signalsCount] = await Promise.all([
+    countTraderFollowers(traderId),
+    countTotalSignalsByTrader(traderId),
+  ]);
 
   // Récupérer les signaux récents du trader
   const signals = await getSignalsByTraderId(traderId, {
@@ -95,32 +104,17 @@ export default async function TraderProfilePage({
                   </Typography>
                 )}
 
-                {/* Stats */}
-                <div className="flex flex-wrap gap-4 pt-2">
-                  <div className="flex items-center gap-1.5">
-                    <Users className="text-muted-foreground size-4" />
-                    <span className="text-sm">
-                      {typeof stats.followers === "number"
-                        ? stats.followers
-                        : 0}{" "}
-                      followers
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <TrendingUp className="text-muted-foreground size-4" />
-                    <span className="text-sm">
-                      {typeof stats.totalSignals === "number"
-                        ? stats.totalSignals
-                        : 0}{" "}
-                      signals
-                    </span>
-                  </div>
-                  {typeof stats.winrate === "number" && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm">Winrate: {stats.winrate}%</span>
-                    </div>
-                  )}
-                </div>
+                {/* Stats - Client Component pour mise à jour en temps réel */}
+                <TraderProfileStats
+                  traderId={traderId}
+                  initialFollowersCount={followersCount}
+                  initialSignalsCount={signalsCount}
+                  winrate={
+                    typeof stats.winrate === "number"
+                      ? stats.winrate
+                      : undefined
+                  }
+                />
               </div>
             </div>
 
@@ -129,6 +123,7 @@ export default async function TraderProfilePage({
               traderId={traderId}
               traderName={traderProfile.displayName}
               isFollowing={isFollowing}
+              userId={currentUser.id}
               size="lg"
             />
           </div>
