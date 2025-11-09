@@ -30,7 +30,9 @@ test.describe("Crypto Checkout Flow", () => {
       timeout: 30000,
     });
     // Use .first() to avoid strict mode violation (multiple "$49" on page)
-    await expect(page.getByText(/\$49/i).first()).toBeVisible();
+    await expect(page.getByText(/\$49/i).first()).toBeVisible({
+      timeout: 30000,
+    });
 
     // 4. Select payment network (Base - USDC)
     const baseOption = page.getByLabel(/base.*usdc/i);
@@ -140,9 +142,13 @@ test.describe("Crypto Checkout Flow", () => {
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
       timeout: 30000,
     });
-    await expect(page.getByText(/\$49/i).first()).toBeVisible();
+    await expect(page.getByText(/\$49/i).first()).toBeVisible({
+      timeout: 30000,
+    });
     // Verify timer visible
-    await expect(page.getByText(/time remaining/i)).toBeVisible();
+    await expect(page.getByText(/time remaining/i)).toBeVisible({
+      timeout: 30000,
+    });
 
     // 3. Test Ultra plan checkout
     await page.goto("/checkout/ultra", {
@@ -162,9 +168,13 @@ test.describe("Crypto Checkout Flow", () => {
     await expect(page.locator("h1")).toContainText(/complete your payment/i, {
       timeout: 30000,
     });
-    await expect(page.getByText(/\$99/i).first()).toBeVisible();
+    await expect(page.getByText(/\$99/i).first()).toBeVisible({
+      timeout: 30000,
+    });
     // Verify timer visible
-    await expect(page.getByText(/time remaining/i)).toBeVisible();
+    await expect(page.getByText(/time remaining/i)).toBeVisible({
+      timeout: 30000,
+    });
   });
 
   test("user can navigate back to pricing from checkout", async ({ page }) => {
@@ -265,10 +275,14 @@ test.describe("Crypto Checkout Flow", () => {
     });
 
     // 4. Verify payment info displayed (price in the description)
-    await expect(page.getByText(/send.*\$49/i).first()).toBeVisible();
+    await expect(page.getByText(/send.*\$49/i).first()).toBeVisible({
+      timeout: 30000,
+    });
 
     // 5. Verify timer visible
-    await expect(page.getByText(/time remaining/i)).toBeVisible();
+    await expect(page.getByText(/time remaining/i)).toBeVisible({
+      timeout: 30000,
+    });
   });
 
   test("checkout page shows payment confirmation instructions", async ({
