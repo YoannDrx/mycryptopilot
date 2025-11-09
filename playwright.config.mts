@@ -89,8 +89,9 @@ const config: PlaywrightTestConfig = {
           url: SERVER_URL,
           // Dev server starts faster than build+start
           timeout: process.env.CI ? 120 * 1000 : 60 * 1000,
-          // Always start a fresh server for tests (isolation)
-          reuseExistingServer: false,
+          // Reuse server in dev for faster individual test runs, fresh server in CI for isolation
+          reuseExistingServer:
+            process.env.NODE_ENV === "development" ? !process.env.CI : true,
         },
       }
     : {}),
