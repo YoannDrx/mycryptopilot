@@ -31,14 +31,20 @@ const POPULAR_SYMBOLS = [
 ];
 
 export function SignalsFilters({ totalSignals }: SignalsFiltersProps) {
-  const [filters, setFilters] = useQueryStates({
-    symbols: parseAsArrayOf(parseAsString),
-    bias: parseAsString,
-    status: parseAsString,
-    traderName: parseAsString,
-    instrumentType: parseAsString,
-    verifiedOnly: parseAsString,
-  });
+  const [filters, setFilters] = useQueryStates(
+    {
+      symbols: parseAsArrayOf(parseAsString),
+      bias: parseAsString,
+      status: parseAsString,
+      traderName: parseAsString,
+      instrumentType: parseAsString,
+      verifiedOnly: parseAsString,
+    },
+    {
+      // Force server-side re-fetch on filter changes (not shallow navigation)
+      shallow: false,
+    },
+  );
 
   const [symbolInput, setSymbolInput] = useState("");
 
