@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getSignalsFeed } from "@/features/signal/signal-queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignalsFeed } from "./signals-feed";
@@ -20,6 +19,9 @@ export const metadata: Metadata = {
     "Browse all trading signals from verified traders. Filter by asset, direction, status, and more.",
 };
 
+// Force dynamic rendering to ensure filters work correctly
+export const dynamic = "force-dynamic";
+
 type SignalsPageProps = {
   searchParams: Promise<{
     symbols?: string | string[];
@@ -34,39 +36,6 @@ type SignalsPageProps = {
 
 export default async function SignalsPage({ searchParams }: SignalsPageProps) {
   const params = await searchParams;
-
-  // Parse filters for count
-  const symbols = Array.isArray(params.symbols)
-    ? params.symbols
-    : params.symbols
-      ? [params.symbols]
-      : undefined;
-
-  const bias =
-    params.bias === "LONG" || params.bias === "SHORT" ? params.bias : undefined;
-
-  const status =
-    params.status === "ACTIVE" || params.status === "EXPIRED"
-      ? params.status
-      : undefined;
-
-  const instrumentType =
-    params.instrumentType === "SPOT" || params.instrumentType === "PERP"
-      ? params.instrumentType
-      : undefined;
-
-  const verifiedOnly = params.verifiedOnly === "true";
-
-  // Get total count for filters component
-  const { items: countSignals } = await getSignalsFeed({
-    symbols,
-    bias,
-    status,
-    instrumentType,
-    traderName: params.traderName,
-    verifiedOnly,
-    limit: 100, // Get more for accurate count
-  });
 
   return (
     <>
@@ -94,7 +63,7 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <SignalsFilters totalSignals={countSignals.length} />
+            <SignalsFilters />
           </CardContent>
         </Card>
 
