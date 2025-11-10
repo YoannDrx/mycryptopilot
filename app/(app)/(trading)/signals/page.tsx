@@ -14,7 +14,7 @@ import {
 import { TrendingUp } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Trading Signals - MyCryptoPilot",
+  title: "Signals Feed - MyCryptoPilot",
   description:
     "Browse all trading signals from verified traders. Filter by asset, direction, status, and more.",
 };
@@ -75,7 +75,7 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
           <TrendingUp className="size-5" />
         </div>
         <div>
-          <LayoutTitle>Trading Signals</LayoutTitle>
+          <LayoutTitle>Signals Feed</LayoutTitle>
           <LayoutDescription>
             Browse all trading signals from our community of verified traders.
             Filter by asset, direction, and more.
