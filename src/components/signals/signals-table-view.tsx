@@ -135,18 +135,21 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
 
                   {/* Entry */}
                   <TableCell className="text-right font-mono text-sm">
-                    ${payload.entry.toLocaleString()}
+                    {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                    ${payload.entry?.toLocaleString() ?? "N/A"}
                   </TableCell>
 
                   {/* Invalidation */}
                   <TableCell className="text-destructive text-right font-mono text-sm">
-                    ${payload.invalidation.toLocaleString()}
+                    {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                    ${payload.invalidation?.toLocaleString() ?? "N/A"}
                   </TableCell>
 
                   {/* Take Profits (collapsed) */}
                   <TableCell>
                     <div className="flex gap-1">
-                      {payload.tps.slice(0, 2).map((tp, idx) => (
+                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                      {(payload.tps ?? []).slice(0, 2).map((tp, idx) => (
                         <Badge
                           key={idx}
                           variant="outline"
@@ -155,9 +158,11 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
                           TP{idx + 1}
                         </Badge>
                       ))}
-                      {payload.tps.length > 2 && (
+                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                      {(payload.tps?.length ?? 0) > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{payload.tps.length - 2}
+                          {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                          +{(payload.tps?.length ?? 0) - 2}
                         </Badge>
                       )}
                     </div>
@@ -168,7 +173,8 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
                     <div className="flex items-center justify-center gap-1">
                       <Shield className="text-muted-foreground size-3" />
                       <span className="text-sm font-medium">
-                        {payload.risk}/5
+                        {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                        {payload.risk ?? 0}/5
                       </span>
                     </div>
                   </TableCell>
@@ -176,7 +182,8 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
                   {/* Confidence */}
                   <TableCell className="text-center">
                     <Badge variant="outline" className="font-mono">
-                      {payload.confidence}%
+                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                      {payload.confidence ?? 0}%
                     </Badge>
                   </TableCell>
 
