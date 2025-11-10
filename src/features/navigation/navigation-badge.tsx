@@ -10,7 +10,6 @@ import {
 import { Lock, Zap, Crown } from "lucide-react";
 import type { NavLinkBadgeType } from "./navigation.type";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 type NavigationBadgeProps = {
   badge: NavLinkBadgeType;
@@ -39,16 +38,27 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
         ? "Requires Ultra plan ($99/month)"
         : "Available on Free plan";
 
+    const handleClick = (e: React.MouseEvent) => {
+      if (isPro || isUltra) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = "/pricing";
+      }
+    };
+
     const badgeContent = (
       <Badge
         variant="outline"
         className={cn(
           "ml-auto text-[10px] font-semibold",
-          isPro && "border-blue-500/50 bg-blue-500/10 text-blue-500",
-          isUltra && "border-purple-500/50 bg-purple-500/10 text-purple-500",
+          isPro &&
+            "cursor-pointer border-blue-500/50 bg-blue-500/10 text-blue-500 hover:opacity-80",
+          isUltra &&
+            "cursor-pointer border-purple-500/50 bg-purple-500/10 text-purple-500 hover:opacity-80",
           isFree && "border-gray-500/50 bg-gray-500/10 text-gray-500",
           className,
         )}
+        onClick={handleClick}
       >
         <Lock className="mr-1 h-2.5 w-2.5" />
         {badge.plan}
@@ -59,13 +69,7 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            {isPro || isUltra ? (
-              <Link href="/pricing" className="hover:opacity-80">
-                {badgeContent}
-              </Link>
-            ) : (
-              <div>{badgeContent}</div>
-            )}
+            <div>{badgeContent}</div>
           </TooltipTrigger>
           <TooltipContent side="right" className="max-w-xs">
             <p className="font-medium">{tooltipContent}</p>
