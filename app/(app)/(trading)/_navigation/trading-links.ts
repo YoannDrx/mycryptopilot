@@ -7,7 +7,7 @@ import {
   Calculator,
   TrendingUp,
   Users,
-  Home,
+  LayoutDashboard,
   LineChart,
   PlusCircle,
   Gift,
@@ -39,7 +39,7 @@ import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 const MY_FEED_LINKS: NavigationLink[] = [
   {
     href: "/dashboard",
-    Icon: Home,
+    Icon: LayoutDashboard,
     label: "Dashboard",
     description: "Your personalized trading dashboard",
   },
@@ -243,7 +243,7 @@ export function getTradingNavigationGroups(
     {
       title: "MY FEED",
       links: myFeedLinks,
-      icon: Home,
+      icon: LayoutDashboard,
       defaultOpen: true,
     },
     {
