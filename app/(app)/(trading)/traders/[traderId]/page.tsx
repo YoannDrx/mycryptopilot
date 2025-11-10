@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FollowButton } from "@/components/nowts/follow-button";
-import { TradingCard } from "@/components/nowts/trading-card";
 import { Typography } from "@/components/nowts/typography";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { isFollowingTrader } from "@/features/follow/follow-queries";
@@ -20,6 +19,8 @@ import { CheckCircle2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { LayoutContent } from "@/features/page/layout";
 import { TraderProfileStats } from "./_components/trader-profile-stats";
+import { ViewToggle } from "@/components/signals/view-toggle";
+import { TraderSignalsDisplay } from "./_components/trader-signals-display";
 
 type TraderProfilePageProps = {
   params: Promise<{
@@ -132,11 +133,15 @@ export default async function TraderProfilePage({
 
       {/* Signaux récents */}
       <div className="space-y-4">
-        <div>
-          <Typography variant="large">Recent Signals</Typography>
-          <Typography variant="muted">
-            Latest trading signals from {traderProfile.displayName}
-          </Typography>
+        <div className="flex items-center justify-between">
+          <div>
+            <Typography variant="large">Recent Signals</Typography>
+            <Typography variant="muted">
+              Latest trading signals from {traderProfile.displayName}
+            </Typography>
+          </div>
+          {/* ViewToggle - Même pattern que /signals */}
+          {signals.length > 0 && <ViewToggle />}
         </div>
 
         {signals.length === 0 ? (
@@ -150,19 +155,13 @@ export default async function TraderProfilePage({
             </CardHeader>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {signals.map((signal) => (
-              <TradingCard
-                key={signal.id}
-                symbol={signal.symbol}
-                payload={signal.payloadJson as TradingCardPayloadType}
-                traderId={signal.traderId}
-                traderName={traderProfile.displayName}
-                createdAt={signal.createdAt}
-                expiresAt={signal.expiresAt}
-              />
-            ))}
-          </div>
+          <TraderSignalsDisplay
+            signals={signals.map((signal) => ({
+              ...signal,
+              payloadJson: signal.payloadJson as TradingCardPayloadType,
+            }))}
+            traderDisplayName={traderProfile.displayName}
+          />
         )}
       </div>
     </LayoutContent>
