@@ -14,6 +14,8 @@ import {
   LayoutDescription,
   LayoutContent,
 } from "@/features/page/layout";
+import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { TaxPaywall } from "../../_components/tax-paywall";
 
 /**
  * Import Transactions Page
@@ -22,9 +24,19 @@ import {
  *
  * Upload and import transactions from exchanges
  * TODO: Implement CSV import functionality
+ *
+ * Restriction: ULTRA plan only
  */
 export default async function ImportTransactionsPage() {
-  await getRequiredUser();
+  const user = await getRequiredUser();
+
+  // Check plan limits - Tax Declaration requires ULTRA plan
+  const planName = (user.planName ?? "free") as MyCryptoPilotPlanName;
+
+  // Tax features require ULTRA plan (not available in PRO)
+  if (planName !== "ultra") {
+    return <TaxPaywall currentPlan={planName} />;
+  }
 
   return (
     <>
