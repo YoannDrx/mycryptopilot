@@ -34,6 +34,7 @@ export function SignalsFeedDisplay({ signals }: SignalsFeedDisplayProps) {
   const { viewMode } = useSignalsViewState();
 
   if (viewMode === "table") {
+    // Note: userPlan will be undefined for now - can be added later if needed for Copy Trade in dialog
     return <SignalsTableView signals={signals} />;
   }
 
