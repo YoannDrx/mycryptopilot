@@ -8,6 +8,9 @@ import {
   LayoutDescription,
   LayoutContent,
 } from "@/features/page/layout";
+import { getPlanLimits } from "@/lib/crypto/get-plan-limits";
+import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { RiskConsolePaywall } from "../_components/risk-console-paywall";
 
 export const metadata: Metadata = {
   title: "Risk Console History - MyCryptoPilot",
@@ -16,6 +19,15 @@ export const metadata: Metadata = {
 
 export default async function RiskConsoleHistoryPage() {
   const user = await getRequiredUser();
+
+  // Check plan limits (same as Risk Console main page)
+  const planName = (user.planName ?? "free") as MyCryptoPilotPlanName;
+  const planLimits = getPlanLimits(planName);
+
+  if (!planLimits.riskConsole) {
+    return <RiskConsolePaywall currentPlan={planName} />;
+  }
+
   const calculations = await getUserRiskCalculations(user.id, 50);
 
   return (
