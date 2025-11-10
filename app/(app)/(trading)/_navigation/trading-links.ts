@@ -20,6 +20,7 @@ import {
   Clock,
   Link2,
   TrendingUpDown,
+  Briefcase,
 } from "lucide-react";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 
@@ -256,7 +257,7 @@ export function getTradingNavigationGroups(
     {
       title: "MY TRADING",
       links: myTradingLinks,
-      icon: TrendingUpDown,
+      icon: Briefcase,
       defaultOpen: true,
     },
   ];
