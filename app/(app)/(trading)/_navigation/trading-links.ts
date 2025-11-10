@@ -97,7 +97,7 @@ const PUBLISH_LINKS: NavigationLink[] = [
   {
     href: "/dashboard/trader",
     Icon: BarChart3,
-    label: "Trader Dashboard",
+    label: "Trade Space",
     description: "Your trader stats and signals",
   },
   {
@@ -109,13 +109,13 @@ const PUBLISH_LINKS: NavigationLink[] = [
   {
     href: "/portfolio",
     Icon: LineChart,
-    label: "Portfolio Analytics",
+    label: "Portfolio",
     description: "Track your trading performance",
   },
   {
     href: "/trader-tools/referral",
     Icon: Gift,
-    label: "Referral Program",
+    label: "Referrals",
     description: "Earn rewards by inviting traders",
   },
 ];
