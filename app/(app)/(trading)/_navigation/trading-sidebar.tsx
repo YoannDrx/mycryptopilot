@@ -29,6 +29,8 @@ import {
 import { ChevronDown } from "lucide-react";
 import { useSidebarState } from "@/stores/sidebar-state";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 /**
  * Trading Sidebar
@@ -67,7 +69,17 @@ export function TradingSidebar({
   );
 
   // Utiliser store Zustand pour persister l'état collapsed/expanded
-  const { collapsedSections, toggleSection } = useSidebarState();
+  const collapsedSections = useSidebarState(
+    (state) => state.collapsedSections,
+  );
+  const toggleSection = useSidebarState((state) => state.toggleSection);
+  const hasHydrated = useSidebarState((state) => state.hasHydrated);
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      void useSidebarState.persist.rehydrate();
+    }
+  }, [hasHydrated]);
 
   return (
     <Sidebar variant="inset" suppressHydrationWarning>
@@ -94,7 +106,12 @@ export function TradingSidebar({
                     </span>
                     <div className="flex items-center gap-1">
                       {group.badge && <NavigationBadge badge={group.badge} />}
-                      <ChevronDown className="size-4 transition-transform duration-200" />
+                      <ChevronDown
+                        className={cn(
+                          "size-4 transition-transform duration-200",
+                          isOpen && "rotate-180",
+                        )}
+                      />
                     </div>
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
