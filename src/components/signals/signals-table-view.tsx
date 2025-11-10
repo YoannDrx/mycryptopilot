@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,6 +17,7 @@ import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SignalDetailDialog } from "./signal-detail-dialog";
 
 type SignalForTable = {
   id: string;
@@ -36,9 +38,12 @@ type SignalForTable = {
 
 type SignalsTableViewProps = {
   signals: SignalForTable[];
+  userPlan?: string | null;
 };
 
-export function SignalsTableView({ signals }: SignalsTableViewProps) {
+export function SignalsTableView({ signals, userPlan }: SignalsTableViewProps) {
+  const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
+
   if (signals.length === 0) {
     return (
       <div className="rounded-lg border p-12 text-center">
@@ -48,6 +53,7 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
   }
 
   const now = new Date();
+  const selectedSignal = signals.find((s) => s.id === selectedSignalId);
 
   return (
     <div className="rounded-lg border">
@@ -212,12 +218,11 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      asChild
                       className="size-8 p-0"
+                      onClick={() => setSelectedSignalId(signal.id)}
+                      aria-label="View signal details"
                     >
-                      <Link href={`/signals/${signal.id}`}>
-                        <Target className="size-4" />
-                      </Link>
+                      <Target className="size-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -226,6 +231,16 @@ export function SignalsTableView({ signals }: SignalsTableViewProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Signal Detail Dialog */}
+      {selectedSignal && (
+        <SignalDetailDialog
+          open={selectedSignalId !== null}
+          onOpenChange={(open) => !open && setSelectedSignalId(null)}
+          signal={selectedSignal}
+          userPlan={userPlan}
+        />
+      )}
     </div>
   );
 }
