@@ -4,7 +4,7 @@ import { TradingSidebar } from "./_navigation/trading-sidebar";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { checkUserHasTraderProfile } from "@/features/trader/trader-queries";
 import { getAllNavigationLinks } from "../_navigation/navigation-helpers";
-import { prisma } from "@/lib/prisma";
+import { countFollowedTraders } from "@/features/follow/follow-queries";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 
 /**
@@ -29,12 +29,8 @@ export default async function TradingLayout({ children }: PropsWithChildren) {
   // Get user plan for badges
   const userPlan = (user.planName ?? "free") as MyCryptoPilotPlanName;
 
-  // Count active signals followed (for badge on Dashboard)
-  const activeSignalsCount = await prisma.follow.count({
-    where: {
-      userId: user.id,
-    },
-  });
+  // Count active follows (for badge on Following)
+  const activeSignalsCount = await countFollowedTraders(user.id);
 
   // Get all links for global search (from all 4 spaces)
   const allLinks = getAllNavigationLinks(hasTraderProfile);
