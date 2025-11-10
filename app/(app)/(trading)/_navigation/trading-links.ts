@@ -166,7 +166,7 @@ const CONNECT_EXCHANGE_LINK: NavigationLink = {
  * Get trading navigation groups
  *
  * @param hasTraderProfile - Whether user has a trader profile (to show PUBLISH section)
- * @param activeSignalsCount - Number of active signals followed (for badge on Dashboard)
+ * @param activeSignalsCount - Number of active follows (for badge on Following)
  * @param userPlan - Current user plan (to show/hide plan badges)
  * @returns Array of navigation groups with dynamic badges
  */
@@ -203,10 +203,10 @@ export function getTradingNavigationGroups(
     };
   };
 
-  // MY FEED: Add count badge on Dashboard if activeSignalsCount > 0
+  // MY FEED: Add count badge on Following if activeSignalsCount > 0
   const myFeedLinks = MY_FEED_LINKS.map((link) => {
     if (
-      link.href === "/dashboard" &&
+      link.href === "/following" &&
       activeSignalsCount &&
       activeSignalsCount > 0
     ) {
