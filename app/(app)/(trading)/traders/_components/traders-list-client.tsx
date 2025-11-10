@@ -255,7 +255,7 @@ function TradersList({ traders, userId }: TradersListProps) {
       className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
     >
       {traders.map((trader) => (
-        <TraderCard key={trader.id} trader={trader} userId={userId} />
+        <TraderCard key={trader.userId} trader={trader} userId={userId} />
       ))}
     </div>
   );
