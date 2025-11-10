@@ -50,7 +50,7 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
       <Badge
         variant="outline"
         className={cn(
-          "ml-auto text-[10px] font-semibold",
+          "ml-auto h-4 px-1 text-[9px] font-semibold",
           isPro &&
             "cursor-pointer border-blue-500/50 bg-blue-500/10 text-blue-500 hover:opacity-80",
           isUltra &&
@@ -60,7 +60,7 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
         )}
         onClick={handleClick}
       >
-        <Lock className="mr-1 h-2.5 w-2.5" />
+        <Lock className="mr-0.5 h-2 w-2" />
         {badge.plan}
       </Badge>
     );
@@ -98,7 +98,7 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
     return (
       <Badge
         className={cn(
-          "ml-auto flex h-5 w-5 items-center justify-center rounded-full p-0 text-[10px] font-bold text-white",
+          "ml-auto flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold text-white",
           variantStyles[variant],
           className,
         )}
@@ -113,11 +113,11 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
     return (
       <Badge
         className={cn(
-          "ml-auto bg-gradient-to-r from-blue-500 to-purple-500 text-[10px] font-bold text-white",
+          "ml-auto h-4 bg-gradient-to-r from-blue-500 to-purple-500 px-1 text-[9px] font-bold text-white",
           className,
         )}
       >
-        <Zap className="mr-1 h-2.5 w-2.5" />
+        <Zap className="mr-0.5 h-2 w-2" />
         NEW
       </Badge>
     );
@@ -129,11 +129,11 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
       <Badge
         variant="outline"
         className={cn(
-          "ml-auto border-amber-500/50 bg-amber-500/10 text-[10px] font-semibold text-amber-500",
+          "ml-auto h-4 border-amber-500/50 bg-amber-500/10 px-1 text-[9px] font-semibold text-amber-500",
           className,
         )}
       >
-        <Crown className="mr-1 h-2.5 w-2.5" />
+        <Crown className="mr-0.5 h-2 w-2" />
         TRADER
       </Badge>
     );
@@ -141,7 +141,10 @@ export function NavigationBadge({ badge, className }: NavigationBadgeProps) {
 
   // Badge Custom
   return (
-    <Badge variant="outline" className={cn("ml-auto text-[10px]", className)}>
+    <Badge
+      variant="outline"
+      className={cn("ml-auto h-4 px-1 text-[9px]", className)}
+    >
       {badge.label}
     </Badge>
   );
