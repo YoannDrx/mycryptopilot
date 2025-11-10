@@ -16,7 +16,7 @@ import { X, Filter } from "lucide-react";
 import { useState } from "react";
 
 type SignalsFiltersProps = {
-  totalSignals: number;
+  totalSignals?: number;
 };
 
 const POPULAR_SYMBOLS = [
@@ -261,9 +261,11 @@ export function SignalsFilters({ totalSignals }: SignalsFiltersProps) {
       </div>
 
       {/* Results count */}
-      <div className="text-muted-foreground border-t pt-3 text-sm">
-        {totalSignals} signal{totalSignals !== 1 ? "s" : ""} found
-      </div>
+      {totalSignals !== undefined && (
+        <div className="text-muted-foreground border-t pt-3 text-sm">
+          {totalSignals} signal{totalSignals !== 1 ? "s" : ""} found
+        </div>
+      )}
     </div>
   );
 }
