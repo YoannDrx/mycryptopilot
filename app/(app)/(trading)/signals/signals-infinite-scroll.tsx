@@ -94,7 +94,14 @@ export function SignalsInfiniteScroll({
 
         const data = await response.json();
 
-        setSignals((prev) => [...prev, ...data.items]);
+        // Convert date strings to Date objects (JSON serialization)
+        const newSignals = data.items.map((signal: Signal) => ({
+          ...signal,
+          createdAt: new Date(signal.createdAt),
+          expiresAt: new Date(signal.expiresAt),
+        }));
+
+        setSignals((prev) => [...prev, ...newSignals]);
         setCursor(data.nextCursor);
         setHasMore(data.hasNextPage);
       } catch {
