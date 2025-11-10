@@ -101,7 +101,14 @@ export function SignalsInfiniteScroll({
           expiresAt: new Date(signal.expiresAt),
         }));
 
-        setSignals((prev) => [...prev, ...newSignals]);
+        // Deduplicate signals by id to prevent duplicate key warnings
+        setSignals((prev) => {
+          const existingIds = new Set(prev.map((s) => s.id));
+          const uniqueNewSignals = newSignals.filter(
+            (s: Signal) => !existingIds.has(s.id),
+          );
+          return [...prev, ...uniqueNewSignals];
+        });
         setCursor(data.nextCursor);
         setHasMore(data.hasNextPage);
       } catch {

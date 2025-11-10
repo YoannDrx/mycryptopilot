@@ -85,7 +85,14 @@ export function TradersInfiniteScroll({
 
         const data = await response.json();
 
-        setTraders((prev) => [...prev, ...data.items]);
+        // Deduplicate traders by userId to prevent duplicate key warnings
+        setTraders((prev) => {
+          const existingIds = new Set(prev.map((t) => t.userId));
+          const newTraders = data.items.filter(
+            (t: Trader) => !existingIds.has(t.userId),
+          );
+          return [...prev, ...newTraders];
+        });
         setCursor(data.nextCursor);
         setHasMore(data.hasNextPage);
       } catch {
