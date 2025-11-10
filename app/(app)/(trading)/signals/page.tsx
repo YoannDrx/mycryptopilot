@@ -12,6 +12,7 @@ import {
   LayoutContent,
 } from "@/features/page/layout";
 import { TrendingUp } from "lucide-react";
+import { ViewToggle } from "@/components/signals/view-toggle";
 
 export const metadata: Metadata = {
   title: "Signals Feed - MyCryptoPilot",
@@ -87,7 +88,10 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
         {/* Filters */}
         <Card>
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Filters</CardTitle>
+              <ViewToggle />
+            </div>
           </CardHeader>
           <CardContent>
             <SignalsFilters totalSignals={countSignals.length} />
