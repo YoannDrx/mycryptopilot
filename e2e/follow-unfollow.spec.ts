@@ -59,12 +59,14 @@ test.describe("Follow/Unfollow Trader Flow", () => {
         response.url().includes("/api/follow") && response.status() === 200,
       { timeout: 10000 },
     );
-    await page.waitForTimeout(500); // Allow UI update
 
     // Wait for success message
     await expect(
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
+
+    // Wait longer for database commit to complete
+    await page.waitForTimeout(2000);
 
     // 6. Verify follow relationship in database
     const followRelation = await prisma.follow.findFirst({
@@ -102,18 +104,13 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     await expect(unfollowBtn).toBeVisible({ timeout: 5000 });
     await unfollowBtn.click();
 
-    // Wait for API response to complete
-    await page.waitForResponse(
-      (response) =>
-        response.url().includes("/api/follow") && response.status() === 200,
-      { timeout: 10000 },
-    );
-    await page.waitForTimeout(500); // Allow UI update
-
-    // Wait for success message
+    // Wait for success message (Server Actions don't use API routes)
     await expect(
       page.getByText(/unfollowed this trader|no longer following/i),
     ).toBeVisible({ timeout: 10000 });
+
+    // Wait for database commit to complete
+    await page.waitForTimeout(2000);
 
     // 10. Verify follow relationship status changed to CANCELLED (soft delete)
     const followRelationAfterUnfollow = await prisma.follow.findFirst({
@@ -167,7 +164,8 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     // Wait for API response to complete
     await page.waitForResponse(
       (response) =>
-        response.url().includes("/api/follow") && response.status() === 200,
+        response.url().includes("/api/follow") &&
+        (response.status() === 200 || response.status() === 204),
       { timeout: 10000 },
     );
     await page.waitForTimeout(500); // Allow UI update
@@ -234,7 +232,8 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     // Wait for API response to complete
     await page.waitForResponse(
       (response) =>
-        response.url().includes("/api/follow") && response.status() === 200,
+        response.url().includes("/api/follow") &&
+        (response.status() === 200 || response.status() === 204),
       { timeout: 10000 },
     );
     await page.waitForTimeout(500); // Allow UI update

@@ -277,13 +277,17 @@ test.describe("Crypto Checkout Flow", () => {
     // Wait for React hydration and checkout form mount
     await page.waitForTimeout(3000);
 
+    // Close Command Palette if it's open (can interfere with tests)
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(500);
+
     // 3. Verify checkout page loaded with payment info
-    await expect(
-      page.locator("h1, h2, [data-testid='checkout-form']").first(),
-    ).toBeVisible({
+    // Use main element to avoid capturing dialog h2 elements
+    const mainContent = page.locator("main");
+    await expect(mainContent.locator("h1, h2").first()).toBeVisible({
       timeout: 30000,
     });
-    await expect(page.locator("h1, h2").first()).toContainText(
+    await expect(mainContent.locator("h1, h2").first()).toContainText(
       /complete your payment/i,
       {
         timeout: 30000,
