@@ -6,11 +6,13 @@ import { persist, createJSONStorage } from "zustand/middleware";
 type SidebarState = {
   // État des sections collapsibles
   collapsedSections: Record<string, boolean>;
+  hasHydrated: boolean;
 
   // Actions
   toggleSection: (sectionId: string) => void;
   setSectionOpen: (sectionId: string, isOpen: boolean) => void;
   resetSections: () => void;
+  markHydrated: () => void;
 };
 
 /**
@@ -19,10 +21,16 @@ type SidebarState = {
  * Persiste dans localStorage pour garder l'état des sections
  * collapsed/expanded entre les sessions
  */
+const storage =
+  typeof window === "undefined"
+    ? undefined
+    : createJSONStorage(() => window.localStorage);
+
 export const useSidebarState = create<SidebarState>()(
   persist(
     (set) => ({
       collapsedSections: {},
+      hasHydrated: false,
 
       toggleSection: (sectionId: string) =>
         set((state) => ({
@@ -41,10 +49,19 @@ export const useSidebarState = create<SidebarState>()(
         })),
 
       resetSections: () => set({ collapsedSections: {} }),
+
+      markHydrated: () => set({ hasHydrated: true }),
     }),
     {
       name: "trading-sidebar-state", // Clé localStorage
-      storage: createJSONStorage(() => localStorage),
+      storage,
+      skipHydration: true,
+      onRehydrateStorage: () => (state) => {
+        state?.markHydrated();
+      },
+      partialize: (state) => ({
+        collapsedSections: state.collapsedSections,
+      }),
     },
   ),
 );
