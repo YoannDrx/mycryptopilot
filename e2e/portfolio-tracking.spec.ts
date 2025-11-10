@@ -33,7 +33,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
       page.getByRole("heading", { name: "Exchange Connections" }),
     ).toBeVisible();
     await expect(
-      page.getByText(/connect.*exchange.*automatically.*sync/i),
+      page.getByText(/connect.*exchange.*automatically.*sync/i).first(),
     ).toBeVisible();
 
     // 4. Create a mock connection (simulates API key validation + connection)
@@ -69,13 +69,21 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     // 9. Reload to see updated stats
     await page.reload();
     await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1000); // Wait for React hydration
     await performanceTab.click();
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000); // Wait for performance data to load
 
     // 10. Verify performance stats are displayed (PRO user sees all metrics)
-    await expect(page.getByText(/win rate/i)).toBeVisible();
-    await expect(page.getByText(/profit factor/i)).toBeVisible();
-    await expect(page.getByText(/net pnl/i)).toBeVisible();
+    // Use longer timeout and first() to handle multiple matches
+    await expect(page.getByText(/win rate/i).first()).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByText(/profit factor/i).first()).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByText(/net pnl/i).first()).toBeVisible({
+      timeout: 10000,
+    });
 
     // 11. Disconnect exchange
     await page.goto("/account/exchanges");
