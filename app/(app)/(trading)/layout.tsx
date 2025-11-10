@@ -4,14 +4,17 @@ import { TradingSidebar } from "./_navigation/trading-sidebar";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { checkUserHasTraderProfile } from "@/features/trader/trader-queries";
 import { getAllNavigationLinks } from "../_navigation/navigation-helpers";
+import { prisma } from "@/lib/prisma";
+import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 
 /**
  * Trading Layout
  *
- * Big Bang (Issue #77) - Adapted for user-centric architecture:
- * - Removed org-based queries
- * - Direct user queries
- * - Simplified allLinks generation
+ * Issue #81 - Réorganisation sidebar Trading:
+ * - Nouvelle structure par intention (MY FEED, DISCOVER, MY TRADING, PUBLISH, INSIGHTS & GROWTH)
+ * - Badges dynamiques selon plan utilisateur
+ * - Compteur de signaux actifs suivis
+ * - État des sections persiste dans localStorage
  *
  * Layout pour l'espace Trading avec sidebar dédiée
  * Contient: Dashboard, Signals, Traders, Pricing, Checkout
@@ -20,8 +23,18 @@ import { getAllNavigationLinks } from "../_navigation/navigation-helpers";
 export default async function TradingLayout({ children }: PropsWithChildren) {
   const user = await getRequiredUser();
 
-  // Check if user has trader profile (for conditional TRADER TOOLS section)
+  // Check if user has trader profile (for conditional PUBLISH section)
   const hasTraderProfile = await checkUserHasTraderProfile(user.id);
+
+  // Get user plan for badges
+  const userPlan = (user.planName ?? "free") as MyCryptoPilotPlanName;
+
+  // Count active signals followed (for badge on Dashboard)
+  const activeSignalsCount = await prisma.follow.count({
+    where: {
+      userId: user.id,
+    },
+  });
 
   // Get all links for global search (from all 4 spaces)
   const allLinks = getAllNavigationLinks(hasTraderProfile);
@@ -32,6 +45,8 @@ export default async function TradingLayout({ children }: PropsWithChildren) {
         <TradingSidebar
           allLinks={allLinks}
           hasTraderProfile={hasTraderProfile}
+          activeSignalsCount={activeSignalsCount}
+          userPlan={userPlan}
         />
       }
     >
