@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Users,
   LayoutDashboard,
+  Home,
   LineChart,
   PlusCircle,
   Gift,
@@ -243,7 +244,7 @@ export function getTradingNavigationGroups(
     {
       title: "MY FEED",
       links: myFeedLinks,
-      icon: LayoutDashboard,
+      icon: Home,
       defaultOpen: true,
     },
     {
