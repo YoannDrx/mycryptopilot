@@ -1,4 +1,3 @@
-import { TradingCard } from "@/components/nowts/trading-card";
 import {
   Card,
   CardContent,
@@ -11,6 +10,7 @@ import { getSignalsFeed } from "@/features/signal/signal-queries";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { SignalsFeedDisplay } from "./signals-feed-display";
 
 type SignalsFeedProps = {
   searchParams: {
@@ -98,25 +98,13 @@ export const SignalsFeed = async ({ searchParams }: SignalsFeedProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Signals grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {signals.map((signal) => {
-          const traderName =
-            signal.trader.traderProfile?.displayName ?? signal.trader.name;
-
-          return (
-            <TradingCard
-              key={signal.id}
-              symbol={signal.symbol}
-              payload={signal.payloadJson as TradingCardPayloadType}
-              traderName={traderName}
-              expiresAt={signal.expiresAt}
-              className="h-full"
-              compact={true}
-            />
-          );
-        })}
-      </div>
+      {/* Signals display (cards or table) */}
+      <SignalsFeedDisplay
+        signals={signals.map((signal) => ({
+          ...signal,
+          payloadJson: signal.payloadJson as TradingCardPayloadType,
+        }))}
+      />
 
       {/* Load more button */}
       {hasNextPage && nextCursor && (
