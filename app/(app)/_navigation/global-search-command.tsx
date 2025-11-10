@@ -56,7 +56,10 @@ export function GlobalSearchCommand({
     setOpen((open) => !open);
   };
 
-  useHotkeys("mod+k", toggleOpen);
+  // Disable hotkeys in test environment to prevent accidental triggers
+  useHotkeys("mod+k", toggleOpen, {
+    enabled: process.env.NODE_ENV !== "test",
+  });
 
   return (
     <>

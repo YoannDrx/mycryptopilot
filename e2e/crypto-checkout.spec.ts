@@ -131,15 +131,19 @@ test.describe("Crypto Checkout Flow", () => {
     // Wait for React hydration and checkout form mount
     await page.waitForTimeout(3000);
 
+    // Close Command Palette if it's open (can interfere with tests)
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(500);
+
     // Verify Pro plan checkout page loaded correctly
     // Note: Checkout page displays plan name and price, NOT plan features
     // Features are displayed on the /pricing page, not /checkout
-    await expect(
-      page.locator("h1, h2, [data-testid='checkout-form']").first(),
-    ).toBeVisible({
+    // Use main element to avoid capturing dialog h2 elements
+    const mainContent = page.locator("main");
+    await expect(mainContent.locator("h1, h2").first()).toBeVisible({
       timeout: 30000,
     });
-    await expect(page.locator("h1, h2").first()).toContainText(
+    await expect(mainContent.locator("h1, h2").first()).toContainText(
       /complete your payment/i,
       {
         timeout: 30000,
@@ -162,13 +166,16 @@ test.describe("Crypto Checkout Flow", () => {
     // Wait for React hydration and checkout form mount
     await page.waitForTimeout(3000);
 
+    // Close Command Palette if it's open (can interfere with tests)
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(500);
+
     // Verify Ultra plan checkout page loaded correctly
-    await expect(
-      page.locator("h1, h2, [data-testid='checkout-form']").first(),
-    ).toBeVisible({
+    const mainContentUltra = page.locator("main");
+    await expect(mainContentUltra.locator("h1, h2").first()).toBeVisible({
       timeout: 30000,
     });
-    await expect(page.locator("h1, h2").first()).toContainText(
+    await expect(mainContentUltra.locator("h1, h2").first()).toContainText(
       /complete your payment/i,
       {
         timeout: 30000,
