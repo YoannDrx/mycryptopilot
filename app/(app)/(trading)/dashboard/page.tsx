@@ -18,7 +18,7 @@ import {
   TrendingUp,
   MessageCircle,
   CheckCircle2,
-  Home,
+  LayoutDashboard,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <LayoutHeader className="flex flex-row items-center gap-3">
         <div className="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2">
-          <Home className="size-5" />
+          <LayoutDashboard className="size-5" />
         </div>
         <div>
           <LayoutTitle>Dashboard</LayoutTitle>
