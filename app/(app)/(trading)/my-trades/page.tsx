@@ -1,5 +1,4 @@
 import { getRequiredUser } from "@/lib/auth/auth-user";
-import { redirect } from "next/navigation";
 import { getPlanLimits } from "@/lib/crypto/get-plan-limits";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CopyTradesList } from "@/components/copy-trading/copy-trades-list";
@@ -14,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { Clock, TrendingUp, BookOpen } from "lucide-react";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { MyTradesPaywall } from "./_components/my-trades-paywall";
 
 /**
  * My Trades Page
@@ -32,7 +32,7 @@ export default async function MyTradesPage() {
 
   // Paywall: PRO ou ULTRA only (riskConsole = PRO+)
   if (!planLimits.riskConsole) {
-    redirect("/pricing?upgrade=pro&feature=my-trades");
+    return <MyTradesPaywall currentPlan={userPlan} />;
   }
 
   // Fetch copy trades
