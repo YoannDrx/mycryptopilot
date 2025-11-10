@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SignalsFeed } from "./signals-feed";
 import { SignalsFilters } from "./signals-filters";
+import { SignalsLoadingSkeleton } from "./signals-loading-skeleton";
 import {
   LayoutHeader,
   LayoutTitle,
@@ -70,17 +70,7 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
         {/* Signals Feed */}
         <Suspense
           key={JSON.stringify(params)}
-          fallback={
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i}>
-                  <CardContent className="pt-6">
-                    <Skeleton className="h-64 w-full" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          }
+          fallback={<SignalsLoadingSkeleton />}
         >
           <SignalsFeed searchParams={params} />
         </Suspense>
