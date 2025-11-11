@@ -9,7 +9,7 @@ import {
 test.describe("Portfolio Tracking - Connection Flow", () => {
   test("complete flow: connect → view stats → disconnect", async ({ page }) => {
     // 1. Create a trader with PRO plan
-    const { user: trader } = await createTestTrader({ page });
+    const { user: trader, traderProfile } = await createTestTrader({ page });
 
     await page.waitForURL(/\/dashboard$/);
 
@@ -17,11 +17,6 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await prisma.user.update({
       where: { id: trader.id },
       data: { planName: "pro" },
-    });
-
-    // Get trader profile
-    const traderProfile = await prisma.traderProfile.findUniqueOrThrow({
-      where: { userId: trader.id },
     });
 
     // 2. Navigate to exchanges page
@@ -50,42 +45,30 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await expect(page.getByText("BINANCE")).toBeVisible();
     await expect(page.getByText(/active/i)).toBeVisible();
 
-    // 7. Navigate to Trader Dashboard > Performance tab
-    await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
-
-    // Click Performance tab
-    const performanceTab = page.getByRole("tab", { name: /performance/i });
-    await performanceTab.click();
-    await page.waitForTimeout(1000); // Wait for tab content to load
-
-    // 8. Create complete portfolio data (trades + performance snapshots)
+    // 7. Create complete portfolio data BEFORE visiting the page
     await createCompletePortfolioData({
       traderProfileId: traderProfile.id,
       tradesCount: 50,
       winrate: 65,
     });
 
-    // 9. Reload to see updated stats
-    await page.reload();
+    // 8. Navigate to trader dashboard
+    await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(1000); // Wait for React hydration
+
+    // 9. Click on Performance tab
+    const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(2000); // Wait for performance data to load
+    await page.waitForLoadState("networkidle");
 
     // 10. Verify performance stats are displayed (PRO user sees all metrics)
-    // Use longer timeout and first() to handle multiple matches
     await expect(page.getByText(/win rate/i).first()).toBeVisible({
-      timeout: 10000,
+      timeout: 15000,
     });
-    await expect(page.getByText(/profit factor/i).first()).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(page.getByText(/net pnl/i).first()).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(page.getByText(/profit factor/i).first()).toBeVisible();
+    await expect(page.getByText(/net pnl/i).first()).toBeVisible();
 
-    // 11. Disconnect exchange
+    // 10. Disconnect exchange
     await page.goto("/account/exchanges");
     await page.waitForLoadState("networkidle");
 
@@ -179,19 +162,13 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
       winrate: 70,
     });
 
-    // 3. Navigate to Trader Dashboard > Performance tab
+    // 3. Navigate to Trader Dashboard
     await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
+    // Click Performance tab
     const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure fresh data is loaded
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await performanceTab.click();
-    await page.waitForTimeout(1000);
 
     // 4. Test ALL_TIME period (default)
     await expect(page.getByText(/all time/i)).toBeVisible();
@@ -248,15 +225,9 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
     await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
+    // Click Performance tab
     const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure fresh data is loaded
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await performanceTab.click();
-    await page.waitForTimeout(1000);
 
     // 4. Verify key metrics (6 cards) - check all in parallel
     await Promise.all([
@@ -308,15 +279,9 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     await page.goto("/dashboard/trader");
     await page.waitForLoadState("networkidle");
 
+    // Click Performance tab
     const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure fresh data is loaded
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await performanceTab.click();
-    await page.waitForTimeout(1000);
 
     // 4. Verify FREE user sees ONLY winrate card
     await expect(page.getByText(/win rate/i).first()).toBeVisible();
