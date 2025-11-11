@@ -105,7 +105,13 @@ fi
 # - Start the server with NODE_ENV=test
 # - Use .env.test for environment variables
 # - Connect to mycryptopilot_test database
-if NODE_ENV=test HEADLESS=true playwright test; then
+
+# Pass all script arguments to playwright test
+# Examples:
+#   ./scripts/run-e2e-tests.sh                           # Run all tests
+#   ./scripts/run-e2e-tests.sh e2e/follow-unfollow.spec.ts:7  # Run specific test
+#   ./scripts/run-e2e-tests.sh e2e/follow-unfollow.spec.ts     # Run specific file
+if NODE_ENV=test HEADLESS=true npx playwright test "$@"; then
   echo -e "\n${GREEN}==============================================================================\n${NC}"
   echo -e "${GREEN}✅ Tests E2E terminés avec succès !\n${NC}"
   echo -e "${GREEN}==============================================================================\n${NC}"
