@@ -26,15 +26,12 @@ export const PerformanceTabContent = ({
   const { data, isLoading } = useQuery({
     queryKey: ["performance-snapshot", traderProfileId, period],
     queryFn: async () => {
-      const response = await upfetch(
+      // upfetch retourne DÉJÀ le JSON parsé et throw si erreur HTTP
+      const result = (await upfetch(
         `/api/performance/${traderProfileId}/${period}`,
-      );
+      )) as PerformanceSnapshotResponse;
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch performance snapshot");
-      }
-
-      return response.json() as Promise<PerformanceSnapshotResponse>;
+      return result;
     },
   });
 
