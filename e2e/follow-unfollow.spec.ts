@@ -28,12 +28,13 @@ test.describe("Follow/Unfollow Trader Flow", () => {
     });
 
     // 3. Navigate to traders marketplace
-    await page.goto("/traders");
-    // Wait for TanStack Query API call (hybrid architecture)
-    await page.waitForResponse(
+    // Attach listener BEFORE navigation to catch the API call during page load
+    const waitForSearch = page.waitForResponse(
       (response) => response.url().includes("/api/traders/search"),
-      { timeout: 5000 },
+      { timeout: 10000 }, // Increased timeout for safety
     );
+    await page.goto("/traders");
+    await waitForSearch;
 
     // 4. Wait for trader card to be visible and click "View Profile"
     // Since we just created this trader, they should be the first/only one in the list
@@ -65,18 +66,33 @@ test.describe("Follow/Unfollow Trader Flow", () => {
       page.getByText(/successfully followed|now following/i),
     ).toBeVisible({ timeout: 10000 });
 
-    // Wait longer for database commit to complete
-    await page.waitForTimeout(2000);
+    // 6. Verify follow relationship in database using expect.poll for robustness
+    // This will retry until the database record is found (handles async DB writes in headless mode)
+    await expect
+      .poll(
+        async () => {
+          const followRelation = await prisma.follow.findFirst({
+            where: {
+              userId: follower.id,
+              traderId: trader.id,
+            },
+          });
+          return followRelation;
+        },
+        {
+          timeout: 10000, // 10 seconds max
+          intervals: [500, 1000, 2000], // Retry intervals
+        },
+      )
+      .not.toBeNull();
 
-    // 6. Verify follow relationship in database
+    // Verify the relationship details
     const followRelation = await prisma.follow.findFirst({
       where: {
         userId: follower.id,
         traderId: trader.id,
       },
     });
-
-    expect(followRelation).not.toBeNull();
     expect(followRelation?.userId).toBe(follower.id);
     expect(followRelation?.traderId).toBe(trader.id);
 
@@ -109,19 +125,34 @@ test.describe("Follow/Unfollow Trader Flow", () => {
       page.getByText(/unfollowed this trader|no longer following/i),
     ).toBeVisible({ timeout: 10000 });
 
-    // Wait for database commit to complete
-    await page.waitForTimeout(2000);
-
     // 10. Verify follow relationship status changed to CANCELLED (soft delete)
+    // Use expect.poll to wait for database update in headless mode
+    await expect
+      .poll(
+        async () => {
+          const followRelation = await prisma.follow.findFirst({
+            where: {
+              userId: follower.id,
+              traderId: trader.id,
+            },
+          });
+          return followRelation?.status;
+        },
+        {
+          timeout: 10000,
+          intervals: [500, 1000, 2000],
+        },
+      )
+      .toBe("CANCELLED");
+
+    // Verify the record still exists (soft delete)
     const followRelationAfterUnfollow = await prisma.follow.findFirst({
       where: {
         userId: follower.id,
         traderId: trader.id,
       },
     });
-
     expect(followRelationAfterUnfollow).not.toBeNull();
-    expect(followRelationAfterUnfollow?.status).toBe("CANCELLED");
 
     // 11. Verify trader no longer appears in following list
     await page.goto("/account/following");
