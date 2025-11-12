@@ -41,7 +41,7 @@ export default async function FollowingPage() {
 
       <LayoutContent>
         {followedTraders.length === 0 ? (
-          <Card>
+          <Card data-testid="following-empty-state">
             <CardHeader>
               <CardTitle>No traders followed yet</CardTitle>
               <CardDescription>
@@ -70,7 +70,10 @@ export default async function FollowingPage() {
                 > | null) ?? {};
 
               return (
-                <Card key={follow.id}>
+                <Card
+                  key={follow.id}
+                  data-testid={`following-card-${trader.id}`}
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
@@ -89,6 +92,7 @@ export default async function FollowingPage() {
                             <Link
                               href={`/traders/${trader.id}`}
                               className="hover:underline"
+                              data-testid={`following-trader-link-${trader.id}`}
                             >
                               <Typography variant="h3">
                                 {traderProfile.displayName}

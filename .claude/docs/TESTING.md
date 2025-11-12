@@ -8,21 +8,29 @@ Cette fiche regroupe tous les moyens de validation disponibles (unitaires, e2e, 
 
 ## 🧪 Couverture automatisée
 
-| Type | Local | CI | Détails |
-|------|-------|----|---------|
-| Unitaires / intégration (Vitest) | `pnpm test` | `pnpm test:ci` | 21 fichiers dans `__tests__/`. Cible : logique métier (trading, crypto, auth). |
-| E2E (Playwright) | `pnpm test:e2e`, `pnpm test:e2e -- --headed` | `pnpm test:e2e:ci` via `scripts/run-e2e-tests.sh` | 26 scénarios couvrant signup, dashboard, marketplace, checkout crypto, administration de base. |
-| Lint + types | `pnpm lint`, `pnpm ts` | `pnpm lint:ci`, `pnpm test:ci` | Évite régressions typescript/eslint. |
+| Type                             | Local                                        | CI                                                | Détails                                                                                        |
+| -------------------------------- | -------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Unitaires / intégration (Vitest) | `pnpm test`                                  | `pnpm test:ci`                                    | 21 fichiers dans `__tests__/`. Cible : logique métier (trading, crypto, auth).                 |
+| E2E (Playwright)                 | `pnpm test:e2e`, `pnpm test:e2e -- --headed` | `pnpm test:e2e:ci` via `scripts/run-e2e-tests.sh` | 26 scénarios couvrant signup, dashboard, marketplace, checkout crypto, administration de base. |
+| Lint + types                     | `pnpm lint`, `pnpm ts`                       | `pnpm lint:ci`, `pnpm test:ci`                    | Évite régressions typescript/eslint.                                                           |
 
 ### Pré-requis communs
+
 - Base de données `mycryptopilot_test` accessible (Postgres). Utiliser `scripts/setup-test-db.sh` (crée DB + migrations + seed minimal).
 - Variables fichier `.env.test` complètes (voir `.claude/docs/ENV-VARIABLES-MAPPING.md`).
 - Pour Playwright headed, installer les navigateurs : `npx playwright install`.
 
 ### Scripts utilitaires
+
 - `scripts/run-e2e-tests.sh`: orchestre reset DB → build → tests (utilisé en CI).
 - `scripts/dev-tools/check-test-env.sh`: vérifie Postgres, Prisma CLI, Playwright, versions Node/pnpm.
 - `scripts/dev-tools/test-*`: diagnostics ciblés (checkout crypto, génération d’adresses, RPC, DB).
+
+### Modes rapides Playwright
+
+- `./scripts/run-e2e-tests.sh --reuse-db` : saute `setup-test-db` et réutilise la base `mycryptopilot_test`. À réserver aux runs locaux répétitifs.
+- `./scripts/run-e2e-tests.sh --reuse-server` : n’arrête pas les serveurs Next déjà lancés (utile avec `pnpm dev` + `PLAYWRIGHT_TEST_BASE_URL`).
+- Sharding CI : exportez `PLAYWRIGHT_SHARD_INDEX` et `PLAYWRIGHT_SHARD_TOTAL` avant `pnpm test:e2e:ci` pour paralléliser (`1/2`, `2/2`, etc.).
 
 ---
 
@@ -89,4 +97,3 @@ Cette fiche regroupe tous les moyens de validation disponibles (unitaires, e2e, 
 - `.claude/docs/PORTFOLIO-TRACKING.md` — Bybit/Binance + agrégation.
 - `.claude/docs/TRADING-SYSTEM.md` — domaine trading.
 - `.claude/docs/ENV-VARIABLES-MAPPING.md` — configuration complète env.
-

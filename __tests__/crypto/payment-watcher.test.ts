@@ -17,8 +17,13 @@ vi.mock("@/lib/subscription/subscription-manager", () => ({
   }),
 }));
 
-vi.mock("@/lib/mail/resend", () => ({
-  resendMailAdapter: vi.fn(),
+const sendEmailMock = vi.fn();
+vi.mock("@/lib/mail/send-email", () => ({
+  sendEmail: sendEmailMock,
+}));
+
+vi.mock("@email/test-payment-success", () => ({
+  TestPaymentSuccessEmail: vi.fn().mockReturnValue("<email />"),
 }));
 
 vi.mock("@/lib/discord/roles", () => ({
@@ -49,6 +54,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     user: {
       update: vi.fn(),
+      findUnique: vi.fn(),
     },
     subscription: {
       upsert: vi.fn(),
@@ -260,6 +266,56 @@ describe("payment-watcher", () => {
         plan: "pro",
         daysGranted: 30,
       });
+    });
+
+    it("should skip subscription activation for test plan but send email", async () => {
+      const { prisma } = await import("@/lib/prisma");
+      const { activateSubscription } = await import(
+        "@/lib/subscription/subscription-manager"
+      );
+
+      vi.mocked(prisma.cryptoPayment.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.cryptoAddress.findFirst).mockResolvedValue({
+        id: "addr_123",
+        userId: "user_123",
+        network: "BASE",
+        address: "0x123",
+        derivationIndex: 0,
+        isActive: true,
+        createdAt: new Date(),
+      } as never);
+      vi.mocked(prisma.cryptoPayment.create).mockResolvedValue({
+        id: "payment_test",
+      } as never);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        id: "user_123",
+        email: "user@test.dev",
+        name: "Test User",
+      } as never);
+
+      const { processPayment } = await import("@/lib/crypto/payment-watcher");
+
+      await processPayment(
+        {
+          txHash: "0xtest",
+          network: "BASE",
+          address: "0x123",
+          amountToken: 1,
+          amountUSD: 1,
+          currency: "USDC",
+          confirmations: 5,
+          timestamp: new Date(),
+        },
+        "user_123",
+      );
+
+      expect(activateSubscription).not.toHaveBeenCalled();
+      expect(sendEmailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: "user@test.dev",
+          subject: expect.stringContaining("Test Payment Confirmed"),
+        }),
+      );
     });
   });
 

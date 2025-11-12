@@ -14,6 +14,9 @@ import {
   LayoutDescription,
   LayoutContent,
 } from "@/features/page/layout";
+import { getPlanLimits } from "@/lib/crypto/get-plan-limits";
+import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
+import { SchoolPaywall } from "../../_components/school-paywall";
 
 /**
  * Courses Page
@@ -22,9 +25,20 @@ import {
  *
  * Display crypto trading courses catalog
  * TODO: Implement courses system
+ *
+ * Restriction: PRO or ULTRA plan
  */
 export default async function CoursesPage() {
-  await getRequiredUser();
+  const user = await getRequiredUser();
+
+  // Check plan limits - School requires PRO or ULTRA
+  const planName = (user.planName ?? "free") as MyCryptoPilotPlanName;
+  const planLimits = getPlanLimits(planName);
+
+  if (!planLimits.riskConsole) {
+    // riskConsole is available on PRO+, we use it as proxy for PRO/ULTRA check
+    return <SchoolPaywall currentPlan={planName} />;
+  }
 
   return (
     <>

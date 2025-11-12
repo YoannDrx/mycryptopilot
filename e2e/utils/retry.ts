@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { logger } from "@/lib/logger";
+import { testLogger } from "./test-logger";
 
 type RetryOptions = {
   maxAttempts?: number;
@@ -26,7 +26,7 @@ export async function retry<T>(
       options.onError?.(error, attempt);
 
       if (attempt === maxAttempts) {
-        logger.error("Max retry attempts reached", {
+        testLogger.error("Max retry attempts reached", {
           error,
           maxAttempts,
         });
@@ -34,7 +34,7 @@ export async function retry<T>(
       }
 
       const delay = backoff ? delayMs * Math.pow(2, attempt - 1) : delayMs;
-      logger.debug(
+      testLogger.debug(
         `Retrying in ${delay}ms (attempt ${attempt}/${maxAttempts})`,
       );
       await new Promise((resolve) => setTimeout(resolve, delay));

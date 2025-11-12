@@ -93,12 +93,14 @@ EMAIL_FROM="noreply@mycryptopilot.app"
 #### Comment Obtenir les Clés Testnet
 
 **Binance Testnet**:
+
 1. Va sur https://testnet.binance.vision/
 2. Connecte-toi avec GitHub
 3. Crée une API Key avec permissions READ-ONLY
 4. Copie la clé dans `.env.local`
 
 **Bybit Testnet**:
+
 1. Va sur https://testnet.bybit.com/
 2. Crée un compte testnet
 3. Va dans API Management
@@ -141,6 +143,7 @@ pnpm prisma:seed
 ```
 
 Cela crée:
+
 - 3 utilisateurs (free, pro, ultra)
 - 3 traders vérifiés
 - 50+ trades historiques
@@ -181,12 +184,14 @@ npx tsx scripts/verify-encryption.ts
 ```
 
 Ce script vérifie:
+
 - ✅ `ENCRYPTION_SECRET` configuré
 - ✅ Cycle encryption/decryption fonctionne
 - ✅ Connections existantes se décryptent correctement
 - ❌ Identifie les connections avec erreurs "Data integrity check failed"
 
 **Résultat attendu**:
+
 ```
 🔐 Encryption Verification Tool
 ================================
@@ -215,6 +220,7 @@ Ce script vérifie:
 ```
 
 **Si erreur de décryption**:
+
 ```
    🔓 Decryption: ❌ FAILED
       Error: Decryption failed: Data integrity check failed (possible tampering)
@@ -234,12 +240,14 @@ Ce script vérifie:
 **Objectif**: Vérifier que `takeProfit` supporte les 2 formats (simple numbers + structured).
 
 **Pré-requis**:
+
 - 1 TraderProfile créé
 - User connecté
 
 **Steps**:
 
 1. **Navigue vers le formulaire de création de trade manuel**:
+
    ```
    /orgs/[orgSlug]/dashboard/trader/trades/new
    ```
@@ -256,11 +264,13 @@ Ce script vérifie:
 3. **Soumets le formulaire**
 
 4. **Vérifie dans DB (Prisma Studio)**:
+
    ```bash
    npx prisma studio
    ```
 
    Ouvre `TraderTrade`, trouve le trade créé:
+
    ```json
    {
      "symbol": "BTC/USDT",
@@ -287,6 +297,7 @@ Ce script vérifie:
 1. Crée un trade manuel (voir Test 1)
 
 2. Navigue vers l'édition:
+
    ```
    /orgs/[orgSlug]/dashboard/trader/trades/[tradeId]/edit
    ```
@@ -319,6 +330,7 @@ Ce script vérifie:
    - Entry: `50000`, Quantity: `0.1`
 
 2. Ferme le trade via UI ou API:
+
    ```
    POST /api/trades/[tradeId]/close
    {
@@ -331,7 +343,7 @@ Ce script vérifie:
    {
      "status": "CLOSED",
      "averageExit": 52000,
-     "realizedPnl": 200,  // (52000 - 50000) * 0.1 = 200
+     "realizedPnl": 200, // (52000 - 50000) * 0.1 = 200
      "closedAt": "2025-11-01T12:00:00Z"
    }
    ```
@@ -345,25 +357,28 @@ Ce script vérifie:
 **Steps**:
 
 1. Essaie de créer un LONG trade avec TP invalide:
+
    ```json
    {
      "side": "BUY",
      "entryPrice": 50000,
-     "takeProfits": [48000]  // ❌ TP below entry for LONG
+     "takeProfits": [48000] // ❌ TP below entry for LONG
    }
    ```
 
 2. Vérifie que l'erreur est retournée:
+
    ```
    ❌ Error: Take profit levels must be above entry price for long trades
    ```
 
 3. Essaie SL invalide pour LONG:
+
    ```json
    {
      "side": "BUY",
      "entryPrice": 50000,
-     "stopLoss": 52000  // ❌ SL above entry for LONG
+     "stopLoss": 52000 // ❌ SL above entry for LONG
    }
    ```
 
@@ -383,6 +398,7 @@ Ce script vérifie:
 **Objectif**: Valider API keys + créer `ExchangeConnection` encryptée.
 
 **Pré-requis**:
+
 - `ENCRYPTION_SECRET` configuré
 - `BINANCE_USER_API_KEY` + `BINANCE_USER_SECRET_KEY` configurés
 - User avec plan PRO (1 exchange connection)
@@ -390,6 +406,7 @@ Ce script vérifie:
 **Steps**:
 
 1. Navigue vers exchanges:
+
    ```
    /orgs/[orgSlug]/account/exchanges
    ```
@@ -405,11 +422,13 @@ Ce script vérifie:
 5. **Vérifications Backend**:
 
    a. L'API route `/api/exchange/connect` appelle `validateBinanceCredentials()`:
+
    ```typescript
    // Devrait retourner { valid: true, accountInfo: {...} }
    ```
 
    b. Vérifie dans DB (ExchangeConnection):
+
    ```json
    {
      "exchange": "BINANCE",
@@ -422,6 +441,7 @@ Ce script vérifie:
    ```
 
    c. Vérifie que le TraderProfile est maintenant `verified`:
+
    ```json
    {
      "verified": true,
@@ -432,6 +452,7 @@ Ce script vérifie:
 6. **Test Decryption**:
 
    Run le script:
+
    ```bash
    npx tsx scripts/verify-encryption.ts
    ```
@@ -449,13 +470,15 @@ Ce script vérifie:
 1. Depuis `/orgs/[orgSlug]/account/exchanges`, clique **"Sync Now"**
 
 2. Le système appelle:
+
    ```typescript
-   syncExchangeTrades(connectionId)
+   syncExchangeTrades(connectionId);
    ```
 
 3. **Vérifications**:
 
    a. Check logs console:
+
    ```
    Syncing Binance trades for connection: conn_123
    Fetched 15 trades from Binance
@@ -463,6 +486,7 @@ Ce script vérifie:
    ```
 
    b. Vérifie dans DB (`ExchangeTrade` table):
+
    ```json
    {
      "connectionId": "conn_123",
@@ -478,6 +502,7 @@ Ce script vérifie:
    ```
 
    c. Vérifie que `lastSyncAt` a été mis à jour:
+
    ```json
    {
      "lastSyncAt": "2025-11-01T12:05:00Z"
@@ -491,6 +516,7 @@ Ce script vérifie:
 **Objectif**: Vérifier que le cron job sync automatiquement toutes les 5 minutes.
 
 **Pré-requis**:
+
 - `CRON_SECRET` configuré
 - Vercel cron configuré dans `vercel.json`
 
@@ -510,6 +536,7 @@ Ce script vérifie:
 **Steps (Local Testing)**:
 
 1. Appelle manuellement le cron endpoint:
+
    ```bash
    curl -X POST http://localhost:3000/api/cron/sync-exchanges \
      -H "Authorization: Bearer YOUR_CRON_SECRET"
@@ -535,6 +562,7 @@ Ce script vérifie:
 1. Connecte Binance (voir Test 5)
 
 2. **Change** `ENCRYPTION_SECRET` dans `.env.local`:
+
    ```bash
    ENCRYPTION_SECRET="$(openssl rand -hex 32)"  # Nouveau secret!
    ```
@@ -542,11 +570,13 @@ Ce script vérifie:
 3. Restart dev server
 
 4. Essaie de sync:
+
    ```
    POST /api/exchange/sync
    ```
 
 5. **Vérifie l'erreur**:
+
    ```json
    {
      "error": "Decryption failed: Data integrity check failed (possible tampering)"
@@ -559,11 +589,13 @@ Ce script vérifie:
    - Lien: `/orgs/[orgSlug]/account/exchanges`
 
 7. **Run diagnostic script**:
+
    ```bash
    npx tsx scripts/verify-encryption.ts
    ```
 
    Output attendu:
+
    ```
    🔓 Decryption: ❌ FAILED
       Error: Data integrity check failed
@@ -581,11 +613,13 @@ Ce script vérifie:
 **Objectif**: Vérifier que `aggregateTraderFills()` détecte les sessions et crée `TraderTrade`.
 
 **Pré-requis**:
+
 - Binance connecté + synced (au moins 10 trades BTCUSDT)
 
 **Steps**:
 
 1. Run aggregation pour un trader:
+
    ```bash
    npx tsx scripts/aggregate-fills.ts --traderId=trader_123
    ```
@@ -593,6 +627,7 @@ Ce script vérifie:
 2. **Vérifications**:
 
    a. Check console output:
+
    ```
    Processing 50 fills for trader: trader_123
    Detected 3 trading sessions
@@ -600,16 +635,17 @@ Ce script vérifie:
    ```
 
    b. Vérifie dans DB (`TraderTrade` table):
+
    ```json
    {
      "source": "BINANCE",
      "symbol": "BTC/USDT",
      "side": "BUY",
      "status": "CLOSED",
-     "totalQuantity": 0.5,  // ✅ max(totalBuys, totalSells) pour CLOSED
+     "totalQuantity": 0.5, // ✅ max(totalBuys, totalSells) pour CLOSED
      "averageEntry": 49800,
      "averageExit": 50200,
-     "realizedPnl": 200,  // ✅ Calculé pour CLOSED
+     "realizedPnl": 200, // ✅ Calculé pour CLOSED
      "openedAt": "2025-11-01T08:00:00Z",
      "closedAt": "2025-11-01T09:00:00Z"
    }
@@ -627,6 +663,7 @@ Ce script vérifie:
 **Objectif**: Vérifier que `totalQuantity` préserve la taille pour trades fermés.
 
 **Pré-requis**:
+
 - Au moins 1 session CLOSED dans la DB
 
 **Steps**:
@@ -634,6 +671,7 @@ Ce script vérifie:
 1. Trouve un trade CLOSED dans Prisma Studio
 
 2. Vérifie `totalQuantity`:
+
    ```sql
    SELECT id, status, totalQuantity FROM "TraderTrade"
    WHERE status = 'CLOSED' AND source = 'BINANCE'
@@ -641,15 +679,16 @@ Ce script vérifie:
    ```
 
 3. **Calcul Attendu**:
+
    ```typescript
    // Si fills:
    // - BUY 0.3 BTC
    // - BUY 0.2 BTC
    // - SELL 0.5 BTC (closes position)
 
-   totalBuys = 0.5
-   totalSells = 0.5
-   totalQuantity = max(0.5, 0.5) = 0.5  // ✅ Position size preserved
+   totalBuys = 0.5;
+   totalSells = 0.5;
+   totalQuantity = max(0.5, 0.5) = 0.5; // ✅ Position size preserved
    ```
 
 4. **Avant le fix (bug)**:
@@ -665,11 +704,13 @@ Ce script vérifie:
 **Objectif**: Vérifier que `realizedPnl` est calculé pour PARTIAL (pas seulement CLOSED).
 
 **Pré-requis**:
+
 - Crée une session PARTIAL manuellement
 
 **Steps**:
 
 1. Insert des fills qui créent un PARTIAL:
+
    ```sql
    -- Session: BUY 1 BTC @ 50000, SELL 0.5 BTC @ 52000
    INSERT INTO "ExchangeTrade" (...)
@@ -677,6 +718,7 @@ Ce script vérifie:
    ```
 
 2. Run aggregation:
+
    ```bash
    npx tsx scripts/aggregate-fills.ts --traderId=trader_123
    ```
@@ -685,8 +727,8 @@ Ce script vérifie:
    ```json
    {
      "status": "PARTIAL",
-     "totalQuantity": 0.5,  // 1 - 0.5 = 0.5 remaining
-     "realizedPnl": 1000,   // ✅ Calculated! (52000 - 50000) * 0.5
+     "totalQuantity": 0.5, // 1 - 0.5 = 0.5 remaining
+     "realizedPnl": 1000, // ✅ Calculated! (52000 - 50000) * 0.5
      "averageExit": 52000
    }
    ```
@@ -700,13 +742,14 @@ Ce script vérifie:
 **Steps**:
 
 1. Appelle aggregation pour un trader sans fills:
+
    ```typescript
    const result = await aggregateTraderFills(traderProfileId);
    ```
 
 2. Vérifie:
    ```typescript
-   expect(result.traderTrade).toBeNull();  // ✅ Clean nullable
+   expect(result.traderTrade).toBeNull(); // ✅ Clean nullable
    expect(result.fillsProcessed).toBe(0);
    expect(result.sessionsCreated).toBe(0);
    ```
@@ -722,17 +765,20 @@ Ce script vérifie:
 **Objectif**: Tester `calculateUnrealizedPnL()` avec un trade OPEN.
 
 **Pré-requis**:
+
 - Redis running (optionnel)
 - 1 TraderTrade avec `status: OPEN`
 
 **Steps**:
 
 1. **API Call**:
+
    ```bash
    curl http://localhost:3000/api/pnl/unrealized/[tradeId]
    ```
 
 2. **Vérifie la réponse**:
+
    ```json
    {
      "tradeId": "trade_123",
@@ -740,14 +786,15 @@ Ce script vérifie:
      "side": "BUY",
      "quantity": 0.1,
      "entryPrice": 50000,
-     "currentPrice": 51000,  // Fetched from market
-     "unrealizedPnl": 100,   // (51000 - 50000) * 0.1 = 100
-     "unrealizedPnlPercent": 2.0,  // ((51000 - 50000) / 50000) * 100
+     "currentPrice": 51000, // Fetched from market
+     "unrealizedPnl": 100, // (51000 - 50000) * 0.1 = 100
+     "unrealizedPnlPercent": 2.0, // ((51000 - 50000) / 50000) * 100
      "fromCache": false
    }
    ```
 
 3. **Re-call immédiatement**:
+
    ```bash
    curl http://localhost:3000/api/pnl/unrealized/[tradeId]
    ```
@@ -763,6 +810,7 @@ Ce script vérifie:
 **Steps**:
 
 1. **API Call**:
+
    ```bash
    curl http://localhost:3000/api/pnl/unrealized/batch \
      -H "Content-Type: application/json" \
@@ -770,6 +818,7 @@ Ce script vérifie:
    ```
 
 2. **Vérifie la réponse**:
+
    ```json
    [
      {
@@ -803,11 +852,13 @@ Ce script vérifie:
 **Steps**:
 
 1. **API Call**:
+
    ```bash
    curl http://localhost:3000/api/pnl/trader/[traderProfileId]
    ```
 
 2. **Vérifie la réponse**:
+
    ```json
    {
      "totalUnrealizedPnl": 350,
@@ -838,39 +889,45 @@ Ce script vérifie:
 **Objectif**: Vérifier que le cache Redis expire après 1 minute.
 
 **Pré-requis**:
+
 - Redis configuré
 - Cache TTL = 60 secondes (default)
 
 **Steps**:
 
 1. Appelle PnL:
+
    ```bash
    curl http://localhost:3000/api/pnl/unrealized/[tradeId]
    ```
 
 2. Vérifie:
+
    ```json
-   { "fromCache": false }  // Fresh calculation
+   { "fromCache": false } // Fresh calculation
    ```
 
 3. **Re-call dans 30 secondes**:
+
    ```bash
    curl http://localhost:3000/api/pnl/unrealized/[tradeId]
    ```
 
 4. Vérifie:
+
    ```json
-   { "fromCache": true }  // Cache hit
+   { "fromCache": true } // Cache hit
    ```
 
 5. **Attends 2 minutes**, puis re-call:
+
    ```bash
    curl http://localhost:3000/api/pnl/unrealized/[tradeId]
    ```
 
 6. Vérifie:
    ```json
-   { "fromCache": false }  // Cache expired, fresh calculation
+   { "fromCache": false } // Cache expired, fresh calculation
    ```
 
 ✅ **Succès**: Cache expire après 60 secondes.
@@ -890,6 +947,7 @@ pnpm test __tests__/lib/exchange/performance-calculator.test.ts
 ```
 
 **Sections testées**:
+
 - ✅ Basic Metrics (winrate, totalTrades)
 - ✅ Net PnL (totalProfits, totalLosses)
 - ✅ Profit Factor
@@ -901,6 +959,7 @@ pnpm test __tests__/lib/exchange/performance-calculator.test.ts
 - ✅ Time Period Filtering (LAST_30D, LAST_90D, LAST_365D, ALL_TIME)
 
 **Output attendu**:
+
 ```
  ✓ __tests__/lib/exchange/performance-calculator.test.ts (35 tests) 1250ms
    ✓ calculatePerformanceMetrics - Basic Metrics (4)
@@ -926,6 +985,7 @@ pnpm test __tests__/crypto/encryption-service.test.ts
 ```
 
 **Vérifie**:
+
 - ✅ AES-256-GCM encryption/decryption
 - ✅ IV generation (unique per encryption)
 - ✅ Auth tag verification
@@ -940,6 +1000,7 @@ pnpm test:e2e e2e/portfolio-tracking.spec.ts
 ```
 
 **Scénarios testés**:
+
 - ✅ Complete flow: connect → view stats → disconnect
 - ✅ Manual sync triggers trade fetching
 - ✅ Displays performance stats for all 4 periods
@@ -950,6 +1011,7 @@ pnpm test:e2e e2e/portfolio-tracking.spec.ts
 - ✅ Trader loses verified badge when disconnecting last exchange
 
 **Output attendu**:
+
 ```
 Running 8 tests using 4 workers
 
@@ -974,6 +1036,7 @@ pnpm test:e2e:ci
 ```
 
 Cela exécute tous les tests E2E (20+ fichiers):
+
 - ✅ Signup / Login / Password Reset
 - ✅ Trader Profile Creation
 - ✅ Signal Creation & Expiration
@@ -993,6 +1056,7 @@ Cela exécute tous les tests E2E (20+ fichiers):
 **Contexte**: Un trader scalpe BTCUSDT avec multiples entrées/sorties.
 
 **Fills**:
+
 ```
 10:00 - BUY 0.5 BTC @ 50000 (entry)
 10:05 - BUY 0.5 BTC @ 49800 (add to position)
@@ -1005,11 +1069,11 @@ Cela exécute tous les tests E2E (20+ fichiers):
 ```json
 {
   "status": "CLOSED",
-  "side": "BUY",  // Session is BUY-initiated
-  "totalQuantity": 1.0,  // max(totalBuys=1.0, totalSells=1.0)
-  "averageEntry": 49900,  // (50000*0.5 + 49800*0.5) / 1.0
-  "averageExit": 50560,   // (50500*0.3 + 50600*0.7) / 1.0
-  "realizedPnl": 660,     // (50560 - 49900) * 1.0
+  "side": "BUY", // Session is BUY-initiated
+  "totalQuantity": 1.0, // max(totalBuys=1.0, totalSells=1.0)
+  "averageEntry": 49900, // (50000*0.5 + 49800*0.5) / 1.0
+  "averageExit": 50560, // (50500*0.3 + 50600*0.7) / 1.0
+  "realizedPnl": 660, // (50560 - 49900) * 1.0
   "openedAt": "2025-11-01T10:00:00Z",
   "closedAt": "2025-11-01T10:15:00Z"
 }
@@ -1028,6 +1092,7 @@ Cela exécute tous les tests E2E (20+ fichiers):
 **Contexte**: Trader close un LONG puis ouvre un SHORT.
 
 **Fills**:
+
 ```
 Day 1:
 10:00 - BUY 1.0 BTC @ 50000
@@ -1047,14 +1112,14 @@ Day 2:
     "side": "BUY",
     "status": "CLOSED",
     "totalQuantity": 1.0,
-    "realizedPnl": 1000  // (51000 - 50000) * 1.0
+    "realizedPnl": 1000 // (51000 - 50000) * 1.0
   },
   {
     "id": "trade_2",
     "side": "SELL",
     "status": "CLOSED",
     "totalQuantity": 1.0,
-    "realizedPnl": 500  // (52000 - 51500) * 1.0
+    "realizedPnl": 500 // (52000 - 51500) * 1.0
   }
 ]
 ```
@@ -1081,11 +1146,13 @@ Day 2:
    - Error: "Data integrity check failed"
 
 2. **Diagnostic**:
+
    ```bash
    npx tsx scripts/verify-encryption.ts
    ```
 
    Output:
+
    ```
    🔓 Decryption: ❌ FAILED
       💡 ENCRYPTION_SECRET changed - reconnect exchange
@@ -1097,11 +1164,13 @@ Day 2:
    - Reconnecte avec les mêmes API keys (ré-encrypte avec nouveau secret)
 
 4. **Vérification**:
+
    ```bash
    npx tsx scripts/verify-encryption.ts
    ```
 
    Output:
+
    ```
    🔓 Decryption: ✅ SUCCESS (key length: 64)
    ```
@@ -1130,11 +1199,11 @@ Calcul global combine les 2 exchanges:
 
 ```typescript
 const binanceTrades = await prisma.traderTrade.findMany({
-  where: { traderProfileId, source: "BINANCE" }
+  where: { traderProfileId, source: "BINANCE" },
 });
 
 const bybitTrades = await prisma.traderTrade.findMany({
-  where: { traderProfileId, source: "BYBIT" }
+  where: { traderProfileId, source: "BYBIT" },
 });
 
 const allTrades = [...binanceTrades, ...bybitTrades];
@@ -1152,21 +1221,25 @@ const metrics = calculatePerformanceMetrics(allTrades, "ALL_TIME");
 ### Issue 1: "Data integrity check failed"
 
 **Symptôme**:
+
 ```
 Error: Decryption failed: Data integrity check failed (possible tampering)
 ```
 
 **Causes**:
+
 1. `ENCRYPTION_SECRET` a changé depuis l'encryption
 2. Encrypted data/IV/tag corrompu dans DB
 3. Wrong environment (dev secret sur prod data)
 
 **Diagnostic**:
+
 ```bash
 npx tsx scripts/verify-encryption.ts
 ```
 
 **Fix**:
+
 1. Si secret a changé: Reconnecte l'exchange (re-encrypte avec nouveau secret)
 2. Si data corrompu: Delete connection et reconnecte
 3. Si wrong env: Utilise le bon `ENCRYPTION_SECRET`
@@ -1180,6 +1253,7 @@ npx tsx scripts/verify-encryption.ts
 **Fix**: Upgrade vers version avec `calculatePositionSize()` fonction (commit: XXX).
 
 **Vérification**:
+
 ```bash
 grep -n "calculatePositionSize" src/lib/trading/fill-aggregation.service.ts
 ```
@@ -1205,6 +1279,7 @@ where: {
 ```
 
 **Vérification**:
+
 ```bash
 grep -A 5 "findMatchingTraderTrade" src/lib/trading/fill-aggregation.service.ts | grep "side:"
 ```
@@ -1214,6 +1289,7 @@ Devrait afficher: `side: session.side,`
 ### Issue 4: "takeProfits not an array"
 
 **Symptôme**:
+
 ```
 TypeError: takeProfits.map is not a function
 ```
@@ -1226,12 +1302,13 @@ TypeError: takeProfits.map is not a function
 import { parseTakeProfits } from "@/lib/trading/types";
 
 const trade = await prisma.traderTrade.findUnique({ where: { id } });
-const tps = parseTakeProfits(trade.takeProfit);  // ✅ Always returns TakeProfitLevel[] | null
+const tps = parseTakeProfits(trade.takeProfit); // ✅ Always returns TakeProfitLevel[] | null
 ```
 
 ### Issue 5: "Redis connection refused"
 
 **Symptôme**:
+
 ```
 Error: connect ECONNREFUSED 127.0.0.1:6379
 ```
@@ -1239,6 +1316,7 @@ Error: connect ECONNREFUSED 127.0.0.1:6379
 **Cause**: Redis pas running (cache UnrealizedPnL).
 
 **Fix (option 1 - Start Redis)**:
+
 ```bash
 brew services start redis
 ```
@@ -1247,11 +1325,12 @@ brew services start redis
 Remove `REDIS_URL` from `.env.local` → système fonctionne sans cache.
 
 **Vérification**:
+
 ```typescript
 // UnrealizedPnL service gracefully handles missing Redis
 if (!redisClient) {
   logger.warn("Redis not available, PnL will not be cached");
-  return calculateFresh();  // ✅ Works without cache
+  return calculateFresh(); // ✅ Works without cache
 }
 ```
 
@@ -1266,14 +1345,14 @@ if (!redisClient) {
 ```typescript
 const exchangesUrl = orgSlug
   ? `${SiteConfig.prodUrl}/orgs/${orgSlug}/account/exchanges`
-  : `${SiteConfig.prodUrl}/login`;  // Fallback
+  : `${SiteConfig.prodUrl}/login`; // Fallback
 ```
 
 **Vérification**: Vérifie que `orgSlug` est passé en prop (ligne 17):
 
 ```typescript
 type ExchangeSyncFailureEmailProps = {
-  orgSlug: string | null;  // ✅ DOIT être présent
+  orgSlug: string | null; // ✅ DOIT être présent
   // ...
 };
 ```
@@ -1372,12 +1451,14 @@ Avant de déployer en production:
 ## Support
 
 **Questions?** Check:
+
 - [`.claude/CLAUDE.md`](../CLAUDE.md) - Instructions principales
 - [`.claude/docs/TRADING-SYSTEM.md`](./TRADING-SYSTEM.md) - Détails système trading
 - [`.claude/docs/DATABASE.md`](./DATABASE.md) - Schémas DB + relations
 - [`.claude/docs/CRYPTO-PAYMENTS.md`](./CRYPTO-PAYMENTS.md) - HD wallet + encryption
 
 **Bugs?** Ouvre une issue GitHub avec:
+
 - Steps to reproduce
 - Expected vs actual behavior
 - Logs / screenshots
@@ -1392,10 +1473,12 @@ Avant de déployer en production:
 Le système de Copy Trading permet aux utilisateurs de répliquer les trades des traders qu'ils suivent, soit manuellement (journal), soit automatiquement (exécution via API).
 
 **Modes disponibles**:
+
 - **MANUAL**: User copie le signal dans son journal personnel, track entry/exit manuellement
 - **AUTO**: Exécution automatique via l'API Binance/Bybit de l'utilisateur
 
 **Tests à effectuer**:
+
 1. Copy Trading MANUAL (SPOT)
 2. Copy Trading AUTO (SPOT)
 3. Copy Trading FUTURES (avec leverage)
@@ -1414,6 +1497,7 @@ Le système de Copy Trading permet aux utilisateurs de répliquer les trades des
 #### Étape 2: Générer API Keys
 
 **Pour le Trader** (READ + WRITE):
+
 1. Dashboard → API Management
 2. Create API Key → Label: "Trader Test"
 3. Permissions:
@@ -1424,6 +1508,7 @@ Le système de Copy Trading permet aux utilisateurs de répliquer les trades des
 5. Whitelist IP (optionnel, recommandé: ton IP publique)
 
 **Pour l'User** (READ + WRITE):
+
 1. Même processus, Label: "User Test"
 2. Permissions identiques au trader
 
@@ -1471,6 +1556,7 @@ npx prisma studio
 **1. Trader crée un signal**:
 
 Navigue vers `/orgs/[orgSlug]/dashboard/trader/signals/new` et crée un signal:
+
 - Symbol: `BTC/USDT`
 - Side: `LONG`
 - Entry Price: `50000`
@@ -1483,12 +1569,14 @@ Navigue vers `/orgs/[orgSlug]/dashboard/trader/signals/new` et crée un signal:
 **2. User voit le signal dans son feed**:
 
 Navigue vers `/orgs/[orgSlug]/dashboard`:
+
 - Le signal doit apparaître dans le feed
 - Bouton "Copy" visible si user est PRO/ULTRA
 
 **3. User clique "Copy"**:
 
 Le `CopyTradeDialog` s'ouvre:
+
 - Choix du mode: MANUAL ou AUTO
 - Sélectionne **MANUAL**
 - Entry price pré-rempli: `50000`
@@ -1524,6 +1612,7 @@ AND originalTradeId = 'signal.linkedTradeId';
 **5. User ferme manuellement le trade**:
 
 User navigue vers son journal → Edit copy trade:
+
 - Set `manualExit`: `52000`
 - `manualPnl` calculé automatiquement: `(52000 - 50000) * 0.01 = 20 USD`
 - Status → `CLOSED`
@@ -1557,6 +1646,7 @@ POST /api/user-exchange/connect
 **2. Validation backend**:
 
 Le service `UserExchangeConnectionService` :
+
 - Encrypt les keys (AES-256-GCM)
 - Test credentials avec `validateApiKeys()`
 - Store dans DB avec `isActive = true`
@@ -1586,7 +1676,7 @@ Le `CopyTradeService` détecte le nouveau signal et exécute:
 
 ```typescript
 // Backend automatique
-const userConnection = await getUserConnectionForExchange(userId, 'BINANCE');
+const userConnection = await getUserConnectionForExchange(userId, "BINANCE");
 const decryptedCreds = await getDecryptedCredentials(userConnection);
 
 // Create Binance order
@@ -1595,10 +1685,7 @@ const exchange = new ccxt.binance({
   secret: decryptedCreds.secretKey,
 });
 
-const order = await exchange.createMarketBuyOrder(
-  'BTC/USDT',
-  quantity
-);
+const order = await exchange.createMarketBuyOrder("BTC/USDT", quantity);
 ```
 
 **5. Vérifications DB**:
@@ -1621,6 +1708,7 @@ SELECT * FROM "CopyTrade" WHERE mode = 'AUTO';
 **6. Vérification Binance Testnet**:
 
 Dashboard Binance Testnet → Orders History:
+
 - Devrait afficher l'ordre BUY exécuté
 - Symbol: BTC/USDT
 - Quantity: 0.01
@@ -1636,8 +1724,8 @@ await closeOriginalTradeCopies(traderTrade.id, averageExit);
 
 // Execute SELL order pour user
 const sellOrder = await exchange.createMarketSellOrder(
-  'BTC/USDT',
-  executedQuantity
+  "BTC/USDT",
+  executedQuantity,
 );
 ```
 
@@ -1701,8 +1789,8 @@ const futuresQuantity = (userCapital * leverage) / entryPrice;
 const requiredMargin = positionValue / leverage;
 const userBalance = await exchange.fetchBalance();
 
-if (userBalance.free['USDT'] < requiredMargin) {
-  throw new Error('Insufficient margin');
+if (userBalance.free["USDT"] < requiredMargin) {
+  throw new Error("Insufficient margin");
 }
 ```
 
@@ -1710,11 +1798,11 @@ if (userBalance.free['USDT'] < requiredMargin) {
 
 ```typescript
 // LONG
-const liquidationPrice = entryPrice * (1 - 1/leverage);
+const liquidationPrice = entryPrice * (1 - 1 / leverage);
 // Ex: 50000 * (1 - 1/10) = 45000
 
 // SHORT
-const liquidationPrice = entryPrice * (1 + 1/leverage);
+const liquidationPrice = entryPrice * (1 + 1 / leverage);
 // Ex: 50000 * (1 + 1/10) = 55000
 ```
 
@@ -1741,22 +1829,20 @@ const exchange = new ccxt.binance({
   apiKey: decryptedCreds.apiKey,
   secret: decryptedCreds.secretKey,
   options: {
-    defaultType: 'future',  // Important!
-  }
+    defaultType: "future", // Important!
+  },
 });
 
 // Set leverage
 await exchange.fapiPrivatePostLeverage({
-  symbol: 'BTCUSDT',
+  symbol: "BTCUSDT",
   leverage: 5,
 });
 
 // Open position
-const order = await exchange.createMarketBuyOrder(
-  'BTC/USDT',
-  quantity,
-  { reduceOnly: false }
-);
+const order = await exchange.createMarketBuyOrder("BTC/USDT", quantity, {
+  reduceOnly: false,
+});
 ```
 
 **4. Vérifier position ouverte**:
@@ -1784,9 +1870,9 @@ console.log(positions[0]);
 ```typescript
 // Trigger auto
 const closeOrder = await exchange.createMarketSellOrder(
-  'BTC/USDT',
+  "BTC/USDT",
   position.contracts,
-  { reduceOnly: true }  // Important pour Futures!
+  { reduceOnly: true }, // Important pour Futures!
 );
 ```
 
@@ -1824,12 +1910,12 @@ SELECT * FROM "CopyTrade" WHERE originalTradeId = 'trade_xxx';
 
 ```typescript
 // copy-trade.service.ts
-const MAX_COPY_VALUE_USD = 1000;  // $1000 max par copy
+const MAX_COPY_VALUE_USD = 1000; // $1000 max par copy
 
 // Si signal = $5000
 const userQuantity = Math.min(
   signalQuantity * copyRatio,
-  MAX_COPY_VALUE_USD / entryPrice
+  MAX_COPY_VALUE_USD / entryPrice,
 );
 ```
 
@@ -1866,12 +1952,12 @@ const MAX_DAILY_COPIES = 10;
 const todayCopies = await prisma.copyTrade.count({
   where: {
     userId: user.id,
-    createdAt: { gte: startOfDay(new Date()) }
-  }
+    createdAt: { gte: startOfDay(new Date()) },
+  },
 });
 
 if (todayCopies >= MAX_DAILY_COPIES) {
-  throw new Error('Daily copy limit reached (10/day)');
+  throw new Error("Daily copy limit reached (10/day)");
 }
 ```
 
@@ -1891,14 +1977,14 @@ if (todayCopies >= MAX_DAILY_COPIES) {
 
 ```typescript
 // User settings
-const userMaxLoss = 500;  // $500 max loss
+const userMaxLoss = 500; // $500 max loss
 
 // Monitorer les copies
-const totalLoss = await calculateUserLosses(userId, 'today');
+const totalLoss = await calculateUserLosses(userId, "today");
 
 if (totalLoss > userMaxLoss) {
   await disableAutoCopy(userId);
-  await sendAlert(user.email, 'Max loss reached: auto-copy disabled');
+  await sendAlert(user.email, "Max loss reached: auto-copy disabled");
 }
 ```
 
@@ -1918,12 +2004,14 @@ if (totalLoss > userMaxLoss) {
 ### Checklist Tests Copy Trading
 
 #### Setup ✅
+
 - [ ] Binance Testnet account créé
 - [ ] API keys générées (trader + user)
 - [ ] `.env.local` configuré
 - [ ] Database seed (TraderProfile + Follow)
 
 #### Test MANUAL ✅
+
 - [ ] Signal créé par trader
 - [ ] Copy button visible pour user PRO
 - [ ] CopyTrade créé en mode MANUAL
@@ -1931,6 +2019,7 @@ if (totalLoss > userMaxLoss) {
 - [ ] PnL calculé correctement
 
 #### Test AUTO SPOT ✅
+
 - [ ] User connecte API Binance
 - [ ] Credentials encryptées en DB
 - [ ] Signal → ordre BUY automatique
@@ -1940,6 +2029,7 @@ if (totalLoss > userMaxLoss) {
 - [ ] PnL final correct
 
 #### Test FUTURES ✅
+
 - [ ] Signal FUTURES avec leverage
 - [ ] Position sizing correct (× leverage)
 - [ ] Position ouverte sur Binance Futures
@@ -1948,6 +2038,7 @@ if (totalLoss > userMaxLoss) {
 - [ ] Close avec `reduceOnly: true`
 
 #### Circuit Breakers ✅
+
 - [ ] Max position size enforced ($1000)
 - [ ] Max daily copies enforced (10/day)
 - [ ] Stop loss auto-disable
@@ -1962,6 +2053,7 @@ if (totalLoss > userMaxLoss) {
 **Cause**: User balance insuffisante
 
 **Solution**:
+
 1. Ajoute des fonds Testnet: https://testnet.binance.vision/ → Faucet
 2. Vérifie balance: `exchange.fetchBalance()`
 3. Ajuste quantity du copy
@@ -1971,6 +2063,7 @@ if (totalLoss > userMaxLoss) {
 **Cause**: Keys incorrectes ou expirées
 
 **Solution**:
+
 1. Regenerate keys sur Binance Testnet
 2. Update `.env.local`
 3. Reconnecte via `/api/user-exchange/connect`
@@ -1980,6 +2073,7 @@ if (totalLoss > userMaxLoss) {
 **Cause**: Prix marché trop proche du stop loss
 
 **Solution**:
+
 1. Ajuste stop loss du signal
 2. Ou: ignore stop loss pour ce copy
 
@@ -1988,9 +2082,10 @@ if (totalLoss > userMaxLoss) {
 **Cause**: Leverage pas configuré pour Futures
 
 **Solution**:
+
 ```typescript
 await exchange.fapiPrivatePostLeverage({
-  symbol: 'BTCUSDT',
+  symbol: "BTCUSDT",
   leverage: 5,
 });
 ```
@@ -2000,15 +2095,18 @@ await exchange.fapiPrivatePostLeverage({
 ## 🔗 Ressources Additionnelles
 
 **Binance Testnet**:
+
 - Dashboard: https://testnet.binance.vision/
 - API Docs: https://binance-docs.github.io/apidocs/spot/en/
 - Futures Docs: https://binance-docs.github.io/apidocs/futures/en/
 
 **CCXT Documentation**:
+
 - Main docs: https://docs.ccxt.com/
 - Binance methods: https://docs.ccxt.com/en/latest/manual.html#binance
 
 **Encryption Reference**:
+
 - AES-256-GCM: Voir `src/lib/crypto/encryption-service.ts`
 - Key management: `.claude/docs/CRYPTO-PAYMENTS.md`
 

@@ -538,6 +538,7 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 ### ✅ Déjà Fait (99%)
 
 **6 Phases complètes**:
+
 - Phase 1: Setup & Infrastructure ✅
 - Phase 2: Database & Auth ✅
 - Phase 2.5: UI/UX Pages ✅
@@ -547,6 +548,7 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 - **Phase 6: Feed Signaux Avancé ✅** (PR #40, 13 oct 2025)
 
 **Tous les systèmes opérationnels**:
+
 - Profils traders ✅
 - Création signaux ✅
 - Follow/unfollow ✅
@@ -559,6 +561,7 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 ### 🎉 MVP 100% Complete!
 
 **Code Cleanup** - ✅ **DONE**:
+
 1. ~~Fix `webhook.ts:37`~~ - ✅ DONE (commit 41bd066)
 2. ~~Fix `follow-button.tsx:20`~~ - ✅ DONE (déjà fonctionnel)
 3. ~~Decide `payment-status` route~~ - ✅ DONE (deleted, commit 41bd066)

@@ -17,6 +17,7 @@ nano .env.sweep
 ```
 
 **Variables requises**:
+
 - `SWEEP_MNEMONIC_BASE` - Ta seed phrase Base (24 mots)
 - `SWEEP_MNEMONIC_TRON` - Ta seed phrase Tron (24 mots)
 - `BINANCE_MASTER_WALLET_BASE` - Ton adresse Binance Base (0x...)
@@ -30,6 +31,7 @@ npx tsx scripts/sweep-to-binance.ts
 ```
 
 Output attendu:
+
 ```
 🧹 Starting sweep of all crypto addresses to Binance...
 
@@ -77,6 +79,7 @@ DRY_RUN=false npx tsx scripts/sweep-to-binance.ts
 ```
 
 Le script demandera une confirmation:
+
 ```
 ⚠️  WARNING: You are about to execute REAL sweep transactions!
 ⚠️  Funds will be transferred to your Binance wallets immediately.
@@ -121,11 +124,13 @@ SWEEP_MNEMONIC_TRON="word1 word2 ..."
 ### Gas Fees
 
 **Base Network (ETH)**:
+
 - Besoin de ~0.001 ETH par adresse pour payer les gas fees
 - Coût estimé: ~$3-5 par sweep (selon gas price)
 - Si pas assez d'ETH: le sweep skip automatiquement l'adresse
 
 **Tron Network (TRX)**:
+
 - Besoin de ~5 TRX par adresse
 - Coût estimé: ~$0.50 par sweep
 - Si pas assez de TRX: le sweep skip automatiquement l'adresse
@@ -149,14 +154,17 @@ npx prisma studio
 ### Explorer Transactions
 
 **Base (mainnet)**:
+
 - Explorer: https://basescan.org/tx/[TX_HASH]
 
 **Tron (mainnet)**:
+
 - Explorer: https://tronscan.org/#/transaction/[TX_HASH]
 
 ### Logs
 
 Le script affiche:
+
 - ✅ Confirmations (block numbers)
 - 💾 Mises à jour database
 - 🔗 Liens explorateurs
@@ -232,6 +240,7 @@ SWEEP_NOTIFICATION_EMAIL="ton-email@example.com"
 ```
 
 Email envoyé après chaque sweep réussi avec:
+
 - Résumé (total swept)
 - Détails par transaction (Base + Tron)
 - Liens explorateurs

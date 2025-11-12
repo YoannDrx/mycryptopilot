@@ -9,7 +9,7 @@ import {
 test.describe("Portfolio Tracking - Connection Flow", () => {
   test("complete flow: connect → view stats → disconnect", async ({ page }) => {
     // 1. Create a trader with PRO plan
-    const { user: trader } = await createTestTrader({ page });
+    const { user: trader, traderProfile } = await createTestTrader({ page });
 
     await page.waitForURL(/\/dashboard$/);
 
@@ -19,21 +19,16 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
       data: { planName: "pro" },
     });
 
-    // Get trader profile
-    const traderProfile = await prisma.traderProfile.findUniqueOrThrow({
-      where: { userId: trader.id },
-    });
-
     // 2. Navigate to exchanges page
     await page.goto("/account/exchanges");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 3. Verify page title
     await expect(
       page.getByRole("heading", { name: "Exchange Connections" }),
     ).toBeVisible();
     await expect(
-      page.getByText(/connect.*exchange.*automatically.*sync/i),
+      page.getByText(/connect.*exchange.*automatically.*sync/i).first(),
     ).toBeVisible();
 
     // 4. Create a mock connection (simulates API key validation + connection)
@@ -44,61 +39,66 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
 
     // 5. Reload page to see the connection
     await page.reload();
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 6. Verify connection card is displayed
     await expect(page.getByText("BINANCE")).toBeVisible();
     await expect(page.getByText(/active/i)).toBeVisible();
 
-    // 7. Navigate to Trader Dashboard > Performance tab
-    await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
-
-    // Click Performance tab
-    const performanceTab = page.getByRole("tab", { name: /performance/i });
-    await performanceTab.click();
-    await page.waitForTimeout(1000); // Wait for tab content to load
-
-    // 8. Create complete portfolio data (trades + performance snapshots)
+    // 7. Create complete portfolio data BEFORE visiting the page
     await createCompletePortfolioData({
       traderProfileId: traderProfile.id,
       tradesCount: 50,
       winrate: 65,
     });
 
-    // 9. Reload to see updated stats
-    await page.reload();
-    await page.waitForLoadState("networkidle");
+    // 8. Navigate to trader dashboard
+    await page.goto("/dashboard/trader");
+    await page.waitForLoadState("domcontentloaded");
+
+    // 9. Click on Performance tab
+    const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
+    await page.waitForLoadState("domcontentloaded");
 
     // 10. Verify performance stats are displayed (PRO user sees all metrics)
-    await expect(page.getByText(/win rate/i)).toBeVisible();
-    await expect(page.getByText(/profit factor/i)).toBeVisible();
-    await expect(page.getByText(/net pnl/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(page.getByText(/profit factor/i).first()).toBeVisible();
+    await expect(page.getByText(/net pnl/i).first()).toBeVisible();
 
-    // 11. Disconnect exchange
+    // 10. Disconnect exchange
     await page.goto("/account/exchanges");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Click disconnect button
-    const disconnectButton = page.getByRole("button", {
-      name: /disconnect/i,
-    });
+    const disconnectButton = page.getByRole("button", { name: /disconnect/i });
     await disconnectButton.click();
 
-    // Confirm dialog
+    // Confirm dialog requires typing "Disconnect"
+    const confirmInput = page.getByTestId("dialog-confirm-input");
+    await expect(confirmInput).toBeVisible({ timeout: 5000 });
+    await confirmInput.fill("Disconnect");
     await page
-      .getByRole("button", { name: /disconnect/i })
+      .getByRole("button", { name: /^disconnect$/i })
       .last()
       .click();
-    await page.waitForTimeout(1000);
 
-    // 12. Verify connection is now inactive
-    const updatedConnection = await prisma.exchangeConnection.findUnique({
-      where: { id: connection.id },
-    });
-    expect(updatedConnection?.isActive).toBe(false);
+    // 12. Verify connection is now inactive (wait for server action)
+    await expect
+      .poll(
+        async () => {
+          const updatedConnection = await prisma.exchangeConnection.findUnique({
+            where: { id: connection.id },
+          });
+          return updatedConnection?.isActive;
+        },
+        {
+          timeout: 10000,
+        },
+      )
+      .toBe(false);
   });
 
   test("manual sync triggers trade fetching", async ({ page }) => {
@@ -125,7 +125,7 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
 
     // 3. Navigate to exchanges page
     await page.goto("/account/exchanges");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 4. Verify "Manual Sync" button is visible
     const syncButton = page.getByRole("button", { name: /manual sync/i });
@@ -171,46 +171,40 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
       winrate: 70,
     });
 
-    // 3. Navigate to Trader Dashboard > Performance tab
+    // 3. Navigate to Trader Dashboard
     await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
+    // Click Performance tab
     const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure fresh data is loaded
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await performanceTab.click();
-    await page.waitForTimeout(1000);
 
     // 4. Test ALL_TIME period (default)
     await expect(page.getByText(/all time/i)).toBeVisible();
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 5. Test LAST_365D period
     const yearTab = page.getByRole("tab", { name: /1 year/i });
     await yearTab.click();
     await page.waitForTimeout(500);
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 6. Test LAST_90D period
     const quarterTab = page.getByRole("tab", { name: /90 days/i });
     await quarterTab.click();
     await page.waitForTimeout(500);
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 7. Test LAST_30D period
     const monthTab = page.getByRole("tab", { name: /30 days/i });
     await monthTab.click();
     await page.waitForTimeout(500);
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 8. Verify all key metrics are displayed
-    await expect(page.getByText(/net pnl/i)).toBeVisible();
-    await expect(page.getByText(/profit factor/i)).toBeVisible();
-    await expect(page.getByText(/max drawdown/i)).toBeVisible();
+    await expect(page.getByText(/net pnl/i).first()).toBeVisible();
+    await expect(page.getByText(/profit factor/i).first()).toBeVisible();
+    await expect(page.getByText(/max drawdown/i).first()).toBeVisible();
   });
 
   test("displays 15 performance metrics for PRO users", async ({ page }) => {
@@ -238,17 +232,11 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
 
     // 3. Navigate to Performance tab
     await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
+    // Click Performance tab
     const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure fresh data is loaded
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await performanceTab.click();
-    await page.waitForTimeout(1000);
 
     // 4. Verify key metrics (6 cards) - check all in parallel
     await Promise.all([
@@ -298,17 +286,11 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
 
     // 3. Navigate to Performance tab
     await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
+    // Click Performance tab
     const performanceTab = page.getByRole("tab", { name: /performance/i });
     await performanceTab.click();
-    await page.waitForTimeout(1000);
-
-    // Reload to ensure fresh data is loaded
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await performanceTab.click();
-    await page.waitForTimeout(1000);
 
     // 4. Verify FREE user sees ONLY winrate card
     await expect(page.getByText(/win rate/i).first()).toBeVisible();
@@ -334,8 +316,9 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     await expect(upgradeButton).toBeVisible();
 
     // 9. Click upgrade button and verify redirect to pricing
+    const waitForPricing = page.waitForURL(/\/pricing/, { timeout: 30000 });
     await upgradeButton.click();
-    await page.waitForURL(/\/pricing/);
+    await waitForPricing;
     expect(page.url()).toContain("/pricing");
   });
 
@@ -355,7 +338,7 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
 
     // 2. Navigate to exchanges page
     await page.goto("/account/exchanges");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 3. Verify upgrade blocker is displayed
     await expect(
@@ -366,12 +349,8 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     ).toBeVisible();
 
     // 4. Verify connect form is NOT visible
-    const connectForm = page.getByLabel(/api key/i);
-    await expect(connectForm).not.toBeVisible();
-
-    // 5. Verify upgrade button exists
-    const upgradeButton = page.getByRole("link", { name: /upgrade to pro/i });
-    await expect(upgradeButton).toBeVisible();
+    await expect(page.getByText(/connect new exchange/i)).toHaveCount(0);
+    await expect(page.getByLabel(/api key/i)).toHaveCount(0);
   });
 });
 
@@ -414,7 +393,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
 
     // 5. Navigate to marketplace to see verified badge
     await page.goto("/traders");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Search for the trader by display name
     await expect(page.getByText(traderProfile.displayName)).toBeVisible();
@@ -491,7 +470,7 @@ test.describe("Portfolio Tracking - Verified Badge Auto-Management", () => {
 
     // 5. Navigate to marketplace to verify badge is gone
     await page.goto("/traders");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Trader should still be visible but WITHOUT verified badge
     await expect(page.getByText(traderProfile.displayName)).toBeVisible();

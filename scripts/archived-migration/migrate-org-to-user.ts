@@ -165,7 +165,6 @@ async function migrateOrganizationsToUser(
   for (const org of orgs) {
     const owner = org.members[0];
 
-     
     if (!owner) {
       stats.errors.push({
         orgId: org.id,
@@ -254,7 +253,7 @@ async function migrateOrganizationsToUser(
     }
 
     const owner = org.members[0];
-     
+
     if (!owner) continue;
 
     try {

@@ -1,7 +1,8 @@
 ---
 title: "Binance API Setup Guide"
 description: "Complete guide to creating and configuring Binance API keys for Portfolio Tracking"
-keywords: ["binance", "api keys", "setup", "portfolio tracking", "exchange connection"]
+keywords:
+  ["binance", "api keys", "setup", "portfolio tracking", "exchange connection"]
 tags: ["guide", "binance", "api"]
 order: 4
 subcategory: "Guide"
@@ -31,6 +32,7 @@ Connecting your Binance account allows MyCryptoPilot to:
 - ✅ You can revoke API keys anytime from Binance settings
 
 **We NEVER:**
+
 - ❌ Request withdrawal permissions
 - ❌ Request trading permissions
 - ❌ Store your password
@@ -76,10 +78,12 @@ Connecting your Binance account allows MyCryptoPilot to:
 For maximum security, you can restrict API key usage to specific IPs:
 
 **Option 1: Unrestricted Access (Not Recommended)**
+
 - Select **"Unrestricted"** if you want simplest setup
 - Less secure but easier for users with dynamic IPs
 
 **Option 2: IP Whitelist (Recommended)**
+
 - Select **"Restrict access to trusted IPs only"**
 - Add MyCryptoPilot server IPs:
   ```
@@ -170,6 +174,7 @@ Verification shows followers that your stats are real and backed by live trading
 4. **IP restriction mismatch**: Add MyCryptoPilot IPs to whitelist
 
 **Solution:**
+
 - Re-check both keys (no spaces before/after)
 - Verify permissions in Binance API Management
 - Try creating new API keys if issue persists
@@ -194,6 +199,7 @@ Verification shows followers that your stats are real and backed by live trading
 **Cause:** Binance API has rate limits. Too many requests in short time.
 
 **Solution:**
+
 - Wait 1 minute
 - Retry connection
 - If persists, check if other apps are using the same API keys
@@ -228,6 +234,7 @@ Verification shows followers that your stats are real and backed by live trading
 - Wait for initial sync to complete
 
 **Check:**
+
 - Go to Account → Exchanges
 - Look for "Last Synced" timestamp
 - Ensure it says "Active" status
@@ -239,6 +246,7 @@ MyCryptoPilot sends email notifications for sync failures:
 ### Notification Triggers
 
 You'll receive an email if:
+
 - Sync fails due to invalid API keys
 - IP whitelist issues detected
 - Network/API errors occur
@@ -246,6 +254,7 @@ You'll receive an email if:
 ### Rate Limiting
 
 To avoid spam:
+
 - **Maximum 1 email per 24 hours** per connection
 - Automatic retry every 5 minutes until sync succeeds
 - Email includes troubleshooting guidance
@@ -253,6 +262,7 @@ To avoid spam:
 ### Opt-out
 
 To disable sync failure emails:
+
 1. Go to **Account → Email Preferences**
 2. Uncheck "Exchange sync notifications"
 
@@ -282,12 +292,14 @@ If you need to rotate API keys:
 ### Disconnecting Exchange
 
 ⚠️ **Warning:** Disconnecting will:
+
 - Remove your Verified Badge
 - Stop automatic syncs
 - Keep historical trades (not deleted)
 - Hide performance stats from followers
 
 To disconnect:
+
 1. Go to Account → Exchanges
 2. Click **"Disconnect"**
 3. Confirm action
@@ -298,11 +310,11 @@ You can reconnect anytime without data loss (historical trades remain).
 
 Connection limits by plan:
 
-| Plan | Max Connections | Sync Frequency |
-|------|----------------|----------------|
-| **FREE** | 0 connections | N/A |
-| **PRO** | 1 connection | Every 1 minute |
-| **ULTRA** | 3 connections | Every 5 seconds |
+| Plan      | Max Connections | Sync Frequency  |
+| --------- | --------------- | --------------- |
+| **FREE**  | 0 connections   | N/A             |
+| **PRO**   | 1 connection    | Every 1 minute  |
+| **ULTRA** | 3 connections   | Every 5 seconds |
 
 ### Multiple Exchanges
 
@@ -324,6 +336,7 @@ For maximum security, rotate API keys every 3-6 months:
 ### Do you store my API keys?
 
 Yes, but **encrypted**:
+
 - Keys are encrypted using **AES-256-GCM** (military-grade)
 - Encryption key stored securely in environment variables (not in database)
 - Keys never appear in logs or error messages
@@ -332,6 +345,7 @@ Yes, but **encrypted**:
 ### Can you trade on my behalf?
 
 **No.** API keys have **read-only permissions**. We cannot:
+
 - Place trades
 - Withdraw funds
 - Transfer assets
@@ -340,11 +354,13 @@ Yes, but **encrypted**:
 ### What data do you fetch?
 
 We only fetch:
+
 - **Trade history** (spot + futures)
 - **Order details** (symbol, side, price, quantity, PnL)
 - **Account balances** (for future features)
 
 We **do not** fetch:
+
 - Withdrawal history
 - Deposit addresses
 - KYC documents
@@ -353,6 +369,7 @@ We **do not** fetch:
 ### Is my data shared with third parties?
 
 **No.** Your trading data is:
+
 - **Private by default** (only you can see raw trades)
 - **Aggregated stats** are public if you're a verified trader (Win rate, Profit Factor, etc.)
 - **Never sold** to third parties

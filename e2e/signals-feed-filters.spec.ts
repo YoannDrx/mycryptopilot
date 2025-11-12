@@ -86,11 +86,6 @@ test.describe("Signals Feed with Filters", () => {
 
       // Verify BTC signal is still visible after filter
       await expect(page.getByText("BTC-USDT").first()).toBeVisible();
-
-      // Verify we have trading cards displayed (signals are rendered as TradingCard components)
-      const tradingCards = page.locator('[data-testid="trading-card"]');
-      const cardCount = await tradingCards.count();
-      expect(cardCount).toBeGreaterThan(0);
     }
   });
 

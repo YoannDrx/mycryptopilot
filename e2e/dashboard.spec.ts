@@ -4,6 +4,7 @@ import { createTestAccount } from "./utils/auth-test";
 import {
   createTestTraderDirectly,
   createTestSignal,
+  createTestSignalsBatch,
 } from "./utils/trader-test";
 
 test.describe("User Dashboard", () => {
@@ -198,15 +199,11 @@ test.describe("User Dashboard", () => {
       },
     });
 
-    // Create 10 signals (sequentially to avoid timestamp conflicts)
-    for (let i = 0; i < 10; i++) {
-      // eslint-disable-next-line no-await-in-loop
-      await createTestSignal({
-        traderId: trader.id,
-        symbol: `ASSET${i + 1}-USDT`,
-        rationale: `Signal ${i + 1}`,
-      });
-    }
+    await createTestSignalsBatch({
+      traderId: trader.id,
+      count: 10,
+      symbolPrefix: "ASSET",
+    });
 
     // Verify 10 signals were created in database
     const dbSignals = await prisma.signal.count({
@@ -216,10 +213,11 @@ test.describe("User Dashboard", () => {
 
     // Navigate to dashboard
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
-    // Verify all 10 signal cards are rendered
+    // Verify all 10 signal cards are rendered (wait for hydration)
     const signalCards = page.locator('[data-testid="trading-card"]');
+    await expect(signalCards).toHaveCount(10, { timeout: 15000 });
     const totalCards = await signalCards.count();
     expect(totalCards).toBe(10);
 
@@ -259,14 +257,18 @@ test.describe("User Dashboard", () => {
       // Verify "Upgrade to Pro" CTA is visible in blurred card area
       // The CTA is in a sibling overlay div, not inside the card
       const container = signalCards.nth(i).locator("..").locator("..");
-      const upgradeButton = container.getByRole("link", { name: /upgrade to pro/i });
+      const upgradeButton = container.getByRole("link", {
+        name: /upgrade to pro/i,
+      });
       // eslint-disable-next-line no-await-in-loop
       await expect(upgradeButton).toBeVisible();
     }
 
     // Click first blurred signal's "Upgrade to Pro" CTA
     // Since only blurred signals (4-10) have upgrade buttons, .first() gets button from signal #4
-    const upgradeButton = page.getByRole("link", { name: /upgrade to pro/i }).first();
+    const upgradeButton = page
+      .getByRole("link", { name: /upgrade to pro/i })
+      .first();
     await upgradeButton.click();
 
     // Verify redirect to pricing page

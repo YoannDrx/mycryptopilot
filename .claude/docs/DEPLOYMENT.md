@@ -44,6 +44,7 @@ Ce guide couvre le déploiement complet de MyCryptoPilot en production.
 ```
 
 **Services**:
+
 - **Vercel**: Web app production (main branch auto-deploy)
 - **Railway**: Discord bot (24/7, manual deploy)
 - **Neon**: Database avec branch-per-preview
@@ -81,6 +82,7 @@ chmod +x scripts/deploy-railway.sh
 ```
 
 Le script:
+
 1. Installe Railway CLI si nécessaire
 2. Te connecte à Railway
 3. Crée projet (si besoin)
@@ -115,21 +117,21 @@ railway logs
 
 ### Variables Requises Railway
 
-| Variable | Source | Exemple |
-|----------|--------|---------|
-| `DISCORD_BOT_ENABLED` | Vercel / Railway | `true` |
-| `DISCORD_BOT_TOKEN` | Discord Developer Portal | `MTI3...xyz` |
-| `DISCORD_GUILD_ID` | Discord Server (right-click) | `127...890` |
-| `DATABASE_URL` | Neon Console | `postgresql://...` |
-| `DATABASE_URL_UNPOOLED` | Neon Console | `postgresql://...` |
-| `BETTER_AUTH_URL` | Vercel URL | `https://mycryptopilot.app` |
-| `BETTER_AUTH_SECRET` | Vercel Variables | `random_secret_32+` |
-| `BASE_RPC_URL` | Vercel Variables | `https://mainnet.base.org` |
-| `TRON_RPC_URL` | Vercel Variables | `https://api.trongrid.io` |
-| `CRYPTO_XPUB_BASE` | Vercel Variables | `xpub6F...` |
-| `CRYPTO_XPUB_TRON` | Vercel Variables | `xpub6D...` |
-| `RESEND_API_KEY` | Resend Dashboard | `re_...` |
-| `EMAIL_FROM` | Resend Domain | `noreply@mycryptopilot.app` |
+| Variable                | Source                       | Exemple                     |
+| ----------------------- | ---------------------------- | --------------------------- |
+| `DISCORD_BOT_ENABLED`   | Vercel / Railway             | `true`                      |
+| `DISCORD_BOT_TOKEN`     | Discord Developer Portal     | `MTI3...xyz`                |
+| `DISCORD_GUILD_ID`      | Discord Server (right-click) | `127...890`                 |
+| `DATABASE_URL`          | Neon Console                 | `postgresql://...`          |
+| `DATABASE_URL_UNPOOLED` | Neon Console                 | `postgresql://...`          |
+| `BETTER_AUTH_URL`       | Vercel URL                   | `https://mycryptopilot.app` |
+| `BETTER_AUTH_SECRET`    | Vercel Variables             | `random_secret_32+`         |
+| `BASE_RPC_URL`          | Vercel Variables             | `https://mainnet.base.org`  |
+| `TRON_RPC_URL`          | Vercel Variables             | `https://api.trongrid.io`   |
+| `CRYPTO_XPUB_BASE`      | Vercel Variables             | `xpub6F...`                 |
+| `CRYPTO_XPUB_TRON`      | Vercel Variables             | `xpub6D...`                 |
+| `RESEND_API_KEY`        | Resend Dashboard             | `re_...`                    |
+| `EMAIL_FROM`            | Resend Domain                | `noreply@mycryptopilot.app` |
 
 **Total**: 15 variables minimum
 
@@ -147,6 +149,7 @@ railway restart
 ```
 
 **Logs attendus**:
+
 ```
 ✅ Discord bot logged in as MyCryptoPilot#1234
 ✅ Guild found: MyCryptoPilot Server (ID: 127...890)
@@ -159,12 +162,14 @@ railway restart
 **Dashboard**: https://railway.app/dashboard
 
 **Métriques**:
+
 - CPU usage (should be < 5%)
 - Memory usage (should be < 200MB)
 - Network (Discord API calls)
 - Logs (errors, warnings)
 
 **Alertes à configurer**:
+
 - Memory > 500MB
 - CPU > 50%
 - Crashes repeated
@@ -173,6 +178,7 @@ railway restart
 ### Troubleshooting Railway
 
 **Problème: Bot ne démarre pas**
+
 ```bash
 # Check logs
 railway logs
@@ -187,6 +193,7 @@ railway variables
 ```
 
 **Problème: Bot se déconnecte**
+
 ```bash
 # Restart bot
 railway restart
@@ -197,6 +204,7 @@ railway restart
 ```
 
 **Problème: Commandes slash n'apparaissent pas**
+
 ```bash
 # Redeploy commands
 railway run npm run discord:deploy
@@ -219,6 +227,7 @@ npx prisma migrate status
 ```
 
 **Fonctionnalités actives**:
+
 - ✅ Profils traders
 - ✅ Système signaux
 - ✅ Follow/unfollow
@@ -227,15 +236,16 @@ npx prisma migrate status
 
 ### Branches Neon
 
-| Branch | Usage | Endpoint | Fichier .env |
-|--------|-------|----------|--------------|
-| **main** (prod) | Production | `ep-proud-term-abutee8y` | `.env.production` |
-| **dev** | Staging/Dev | `ep-falling-bar-ab0lufee` | `.env.development` |
-| **preview-\*** | PR previews | Auto-créées Vercel | Variables Vercel |
+| Branch          | Usage       | Endpoint                  | Fichier .env       |
+| --------------- | ----------- | ------------------------- | ------------------ |
+| **main** (prod) | Production  | `ep-proud-term-abutee8y`  | `.env.production`  |
+| **dev**         | Staging/Dev | `ep-falling-bar-ab0lufee` | `.env.development` |
+| **preview-\***  | PR previews | Auto-créées Vercel        | Variables Vercel   |
 
 ### Branch-Per-Preview Setup
 
 **Avantages**:
+
 - ✅ DB isolée par Pull Request
 - ✅ Pas de risque casser dev/prod
 - ✅ Tests E2E sur données isolées
@@ -253,6 +263,7 @@ npx prisma migrate status
    - Délai rétention: 7 jours
 
 3. **Test**:
+
 ```bash
 git checkout -b test-preview
 git push origin test-preview
@@ -262,6 +273,7 @@ git push origin test-preview
 ### Commandes Prisma
 
 **Local (dev branch)**:
+
 ```bash
 # Apply migrations
 pnpm prisma migrate dev
@@ -274,6 +286,7 @@ npx prisma studio
 ```
 
 **Production (via Vercel)**:
+
 ```bash
 # Deploy migrations
 pnpm prisma migrate deploy
@@ -323,6 +336,7 @@ git push origin feature/new-feature
 **Configurer dans**: Vercel → Settings → Environment Variables
 
 **Production Scope** (35+ variables):
+
 - Database (DATABASE_URL, DATABASE_URL_UNPOOLED)
 - Auth (BETTER_AUTH_URL, BETTER_AUTH_SECRET, BETTER_AUTH_TRUST_HOST)
 - Discord (DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_BOT_TOKEN, DISCORD_GUILD_ID)
@@ -342,6 +356,7 @@ Voir [ENVIRONMENT.md](ENVIRONMENT.md) pour la liste complète.
 **Install Command**: `pnpm install`
 
 **Environment Variables** injectées automatiquement:
+
 - `VERCEL_URL`
 - `VERCEL_ENV` (production/preview)
 - `VERCEL_GIT_COMMIT_SHA`
@@ -351,12 +366,14 @@ Voir [ENVIRONMENT.md](ENVIRONMENT.md) pour la liste complète.
 **Dashboard**: https://vercel.com/dashboard
 
 **Métriques**:
+
 - Build time (should be < 3min)
 - Function executions
 - Bandwidth usage
 - Edge requests
 
 **Logs**:
+
 ```bash
 # Installer Vercel CLI
 npm install -g vercel
@@ -396,6 +413,7 @@ vercel logs --all
 Voir [ENVIRONMENT.md](ENVIRONMENT.md) pour la checklist complète par service.
 
 **Vérification**:
+
 ```bash
 # Vercel
 vercel env ls
@@ -414,6 +432,7 @@ cat .env.development | grep DATABASE_URL
 ### Health Checks
 
 **Vercel (Web)**:
+
 ```bash
 # Test homepage
 curl https://mycryptopilot.app
@@ -426,6 +445,7 @@ vercel --prod
 ```
 
 **Railway (Discord)**:
+
 ```bash
 # Check bot status
 railway logs --tail
@@ -435,6 +455,7 @@ railway logs --tail
 ```
 
 **Neon (Database)**:
+
 ```bash
 # Test connection
 psql $DATABASE_URL -c "SELECT 1"
@@ -446,24 +467,29 @@ npx prisma migrate status
 ### Troubleshooting Commun
 
 **Erreur: Build Vercel timeout**
+
 - Cause: Build > 45min (limite Hobby plan)
 - Solution: Optimiser build ou upgrade plan
 
 **Erreur: Railway bot crash loop**
+
 - Cause: Variable manquante ou DB inaccessible
 - Solution: Check `railway logs` + `railway variables`
 
 **Erreur: Neon connection pool exhausted**
+
 - Cause: Trop de connexions simultanées
 - Solution: Utiliser DATABASE_URL (pooled) pas UNPOOLED
 
 **Erreur: Discord commands not showing**
+
 - Cause: Bot pas réinvité avec `applications.commands` scope
 - Solution: Générer nouvelle URL invitation (voir [DISCORD-SETUP.md](DISCORD-SETUP.md))
 
 ### Logs & Debug
 
 **Vercel**:
+
 ```bash
 vercel logs --all           # All deployments
 vercel logs --prod          # Production only
@@ -471,6 +497,7 @@ vercel logs --follow        # Tail logs
 ```
 
 **Railway**:
+
 ```bash
 railway logs                # Last 100 lines
 railway logs --tail         # Follow logs
@@ -478,6 +505,7 @@ railway logs --filter error # Errors only
 ```
 
 **Neon**:
+
 - Console: https://console.neon.tech → Monitoring tab
 - Slow queries, connection stats, CPU usage
 
@@ -486,16 +514,19 @@ railway logs --filter error # Errors only
 ## Ressources
 
 **Documentation**:
+
 - [Vercel Docs](https://vercel.com/docs)
 - [Railway Docs](https://docs.railway.app/)
 - [Neon Docs](https://neon.tech/docs)
 
 **MyCryptoPilot Docs**:
+
 - [ENVIRONMENT.md](ENVIRONMENT.md) - Variables complètes
 - [DISCORD-SETUP.md](DISCORD-SETUP.md) - Config Discord Bot
 - [DATABASE.md](DATABASE.md) - Schémas Prisma
 
 **Support**:
+
 - Vercel: support@vercel.com
 - Railway: Discord server
 - Neon: support@neon.tech

@@ -42,16 +42,16 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
         <Typography variant="muted" className="text-xs">
           Prefer password sign in?{" "}
           <Typography
-          variant="link"
-          as="button"
-          type="button"
-          onClick={() => {
-            persistPreference(true);
-          }}
-        >
-          Use password
+            variant="link"
+            as="button"
+            type="button"
+            onClick={() => {
+              persistPreference(true);
+            }}
+          >
+            Use password
+          </Typography>
         </Typography>
-      </Typography>
       </div>
     );
   }
@@ -62,16 +62,16 @@ export const SignInCredentialsAndMagicLinkForm = (props: {
       <Typography variant="muted" className="text-xs">
         Want faster sign in?{" "}
         <Typography
-        variant="link"
-        as="button"
-        type="button"
-        onClick={() => {
-          persistPreference(false);
-        }}
-      >
-        Login with OTP code
+          variant="link"
+          as="button"
+          type="button"
+          onClick={() => {
+            persistPreference(false);
+          }}
+        >
+          Login with OTP code
+        </Typography>
       </Typography>
-    </Typography>
     </div>
   );
 };

@@ -67,14 +67,10 @@ export async function createTestTrader(options: {
 
   // Get user from database (with retry to handle DB transaction timing)
   const user = await retry(
-    async () => {
-      // Force Prisma to refresh its connection to avoid cache issues
-      await prisma.$disconnect();
-      await prisma.$connect();
-      return prisma.user.findUniqueOrThrow({
+    async () =>
+      prisma.user.findUniqueOrThrow({
         where: { email: userData.email },
-      });
-    },
+      }),
     {
       maxAttempts: 5,
       delayMs: 1000,
@@ -155,4 +151,66 @@ export async function createTestSignal(options: {
   });
 
   return signal;
+}
+
+type SignalBatchOptions = {
+  traderId: string;
+  count: number;
+  symbolPrefix?: string;
+};
+
+/**
+ * Create many signals efficiently (createMany) to speed up tests that need large datasets.
+ */
+export async function createTestSignalsBatch({
+  traderId,
+  count,
+  symbolPrefix = "SIGNAL",
+}: SignalBatchOptions): Promise<void> {
+  if (count <= 0) {
+    return;
+  }
+
+  const ttlSec = 86400; // 24h by default
+  const now = Date.now();
+  const { createHash } = await import("crypto");
+
+  const payloadBase = () => ({
+    symbol: `${faker.finance.currencyCode()}USDT`,
+    bias: faker.helpers.arrayElement(["LONG", "SHORT"]),
+    entry: faker.number.float({ min: 1, max: 100 }).toString(),
+    tps: [
+      faker.number.float({ min: 1, max: 100 }).toString(),
+      faker.number.float({ min: 1, max: 100 }).toString(),
+    ],
+    sl: faker.number.float({ min: 1, max: 100 }).toString(),
+    leverage: faker.number.int({ min: 1, max: 20 }).toString(),
+    timeframe: faker.helpers.arrayElement(["1H", "4H", "1D"]),
+    instrumentType: "PERP",
+    riskLevel: faker.number.int({ min: 1, max: 5 }),
+    rationales: [faker.lorem.sentence()],
+  });
+
+  const signals = Array.from({ length: count }).map((_, index) => {
+    const createdAt = new Date(now + index * 1000);
+    const expiresAt = new Date(createdAt.getTime() + ttlSec * 1000);
+    const payload = payloadBase();
+    const symbol = `${symbolPrefix}${index + 1}-USDT`;
+    const hashSource = `${traderId}|${symbol}|${JSON.stringify(payload)}|${createdAt.toISOString()}`;
+    const hash = createHash("sha256").update(hashSource).digest("hex");
+
+    return {
+      traderId,
+      symbol,
+      payloadJson: payload,
+      ttlSec,
+      hash,
+      createdAt,
+      expiresAt,
+    };
+  });
+
+  await prisma.signal.createMany({
+    data: signals,
+  });
 }

@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -67,7 +67,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -134,7 +134,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -166,39 +166,44 @@ jobs:
 
     env:
       # Core
-      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
-      DATABASE_URL_UNPOOLED: "postgresql://postgres:postgres@localhost:5432/mycryptopilot_test"
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'test-better-auth-secret-for-ci-minimum-32-chars' }}
-      ENCRYPTION_SECRET: ${{ secrets.ENCRYPTION_SECRET || 'test-encryption-secret-32-chars-minimum-for-e2e' }}
+      DATABASE_URL: ${{ secrets.CI_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mycryptopilot_test' }}
+      DATABASE_URL_UNPOOLED: ${{ secrets.CI_DATABASE_URL_UNPOOLED || 'postgresql://postgres:postgres@localhost:5432/mycryptopilot_test' }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      ENCRYPTION_SECRET: ${{ secrets.ENCRYPTION_SECRET }}
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       # Email
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY || 'test-resend-key' }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       EMAIL_FROM: "MyCryptoPilot <contact@mycryptopilot.app>"
       NEXT_PUBLIC_EMAIL_CONTACT: "contact@mycryptopilot.app"
       # Stripe
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_ci' }}
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_dummy_key_for_ci' }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET || 'whsec_test_dummy' }}
-      STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID || 'price_test_pro' }}
-      STRIPE_PRO_YEARLY_PLAN_ID: ${{ secrets.STRIPE_PRO_YEARLY_PLAN_ID || 'price_test_pro_yearly' }}
-      STRIPE_ULTRA_PLAN_ID: ${{ secrets.STRIPE_ULTRA_PLAN_ID || 'price_test_ultra' }}
-      STRIPE_ULTRA_YEARLY_PLAN_ID: ${{ secrets.STRIPE_ULTRA_YEARLY_PLAN_ID || 'price_test_ultra_yearly' }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID }}
+      STRIPE_PRO_YEARLY_PLAN_ID: ${{ secrets.STRIPE_PRO_YEARLY_PLAN_ID }}
+      STRIPE_ULTRA_PLAN_ID: ${{ secrets.STRIPE_ULTRA_PLAN_ID }}
+      STRIPE_ULTRA_YEARLY_PLAN_ID: ${{ secrets.STRIPE_ULTRA_YEARLY_PLAN_ID }}
       # OAuth
-      GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID || 'test_github_client_id' }}
-      GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET || 'test_github_client_secret' }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID || 'test_google_client_id.apps.googleusercontent.com' }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET || 'test_google_client_secret' }}
+      GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+      GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       # Analytics
-      NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY || 'phc_test_key' }}
-      NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com' }}
+      NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+      NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
       # Crypto payments (required for E2E checkout tests)
+      CRYPTO_NETWORK: "testnet"
       BASE_RPC_URL: "https://mainnet.base.org"
       TRON_RPC_URL: "https://api.trongrid.io"
-      CRYPTO_XPUB_BASE: ${{ secrets.CRYPTO_XPUB_BASE || 'xpub_test_base' }}
-      CRYPTO_XPUB_TRON: ${{ secrets.CRYPTO_XPUB_TRON || 'xpub_test_tron' }}
-      BINANCE_MASTER_WALLET_BASE: ${{ secrets.BINANCE_MASTER_WALLET_BASE || '0x0000000000000000000000000000000000000000' }}
-      BINANCE_MASTER_WALLET_TRON: ${{ secrets.BINANCE_MASTER_WALLET_TRON || 'T000000000000000000000000000000000' }}
+      BASE_RPC_URL_TESTNET: "https://sepolia.base.org"
+      TRON_RPC_URL_TESTNET: "https://api.shasta.trongrid.io"
+      CRYPTO_XPUB_BASE: ${{ secrets.CRYPTO_XPUB_BASE }}
+      CRYPTO_XPUB_TRON: ${{ secrets.CRYPTO_XPUB_TRON }}
+      CRYPTO_XPUB_BASE_TESTNET: ${{ secrets.CRYPTO_XPUB_BASE_TESTNET }}
+      CRYPTO_XPUB_TRON_TESTNET: ${{ secrets.CRYPTO_XPUB_TRON_TESTNET }}
+      BINANCE_MASTER_WALLET_BASE: ${{ secrets.BINANCE_MASTER_WALLET_BASE }}
+      BINANCE_MASTER_WALLET_TRON: ${{ secrets.BINANCE_MASTER_WALLET_TRON }}
       # Playwright specific
       PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000"
       HEADLESS: "true"
@@ -235,7 +240,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Cache Next.js build
         uses: actions/cache@v4

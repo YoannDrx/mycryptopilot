@@ -1,7 +1,8 @@
 ---
 title: "Bybit API Setup Guide"
 description: "Complete guide to creating and configuring Bybit API keys for Portfolio Tracking"
-keywords: ["bybit", "api keys", "setup", "portfolio tracking", "exchange connection"]
+keywords:
+  ["bybit", "api keys", "setup", "portfolio tracking", "exchange connection"]
 tags: ["guide", "bybit", "api"]
 order: 5
 subcategory: "Guide"
@@ -31,6 +32,7 @@ Connecting your Bybit account allows MyCryptoPilot to:
 - ✅ You can revoke API keys anytime from Bybit settings
 
 **We NEVER:**
+
 - ❌ Request withdrawal permissions
 - ❌ Request trading permissions
 - ❌ Store your password
@@ -78,10 +80,12 @@ Connecting your Bybit account allows MyCryptoPilot to:
 For maximum security, you can restrict API key usage to specific IPs:
 
 **Option 1: No IP Restriction (Not Recommended)**
+
 - Leave IP whitelist empty
 - Less secure but easier for users with dynamic IPs
 
 **Option 2: IP Whitelist (Recommended)**
+
 - Add MyCryptoPilot server IPs:
   ```
   [IP addresses will be provided based on deployment]
@@ -121,6 +125,7 @@ Store them temporarily in a secure location (password manager, encrypted note).
 ### 2.4 Validation
 
 MyCryptoPilot will:
+
 1. Validate your API keys
 2. Check that keys are **read-only**
 3. Start syncing your trading history
@@ -133,6 +138,7 @@ MyCryptoPilot will:
 ### 3.1 Check Connection Status
 
 After connecting, you'll see:
+
 - ✅ **Connection status**: Active
 - 📊 **Last synced**: Timestamp of last sync
 - 🔄 **Next sync**: Scheduled time for next sync
@@ -141,6 +147,7 @@ After connecting, you'll see:
 ### 3.2 Review Your Stats
 
 Navigate to your **Trader Dashboard** to see:
+
 - Win rate (percentage of profitable trades)
 - Total P&L (profit and loss)
 - Profit Factor (ratio of wins to losses)
@@ -153,6 +160,7 @@ Navigate to your **Trader Dashboard** to see:
 **Cause:** API key or secret key is incorrect
 
 **Solutions:**
+
 1. Check you copied the **full key** (no spaces or line breaks)
 2. Ensure API key is **enabled** in Bybit settings
 3. Try generating a new API key
@@ -162,6 +170,7 @@ Navigate to your **Trader Dashboard** to see:
 **Cause:** API key has trading or withdrawal permissions enabled
 
 **Solutions:**
+
 1. Go back to Bybit API Management
 2. Edit your API key
 3. **Disable all Write permissions** (Trade, Withdraw, Transfer)
@@ -173,6 +182,7 @@ Navigate to your **Trader Dashboard** to see:
 **Cause:** Your API key has IP restrictions and MyCryptoPilot's IP is not whitelisted
 
 **Solutions:**
+
 1. Remove IP whitelist restrictions (Option 1)
 2. Or add MyCryptoPilot server IPs to whitelist (Option 2)
 
@@ -181,6 +191,7 @@ Navigate to your **Trader Dashboard** to see:
 **Cause:** Various (API rate limits, Bybit downtime, etc.)
 
 **Solutions:**
+
 1. Wait 5-10 minutes and check again
 2. Click **"Manual Sync"** button
 3. Check **Last Sync Error** message if any

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { logger } from "@/lib/logger";
+import { testLogger } from "./test-logger";
 
 /**
  * Cleanup orphaned data from database
@@ -11,7 +11,7 @@ import { logger } from "@/lib/logger";
  * Run this before each test suite to ensure data integrity.
  */
 export async function cleanupOrphanedData() {
-  logger.info("Starting cleanup of orphaned data...");
+  testLogger.info("Starting cleanup of orphaned data...");
 
   let deletedCount = 0;
 
@@ -33,7 +33,7 @@ export async function cleanupOrphanedData() {
         where: { id: { in: profileIds } },
       });
       deletedCount += orphanedProfiles.length;
-      logger.info(
+      testLogger.info(
         `Deleted ${orphanedProfiles.length} orphaned TraderProfiles`,
       );
     }
@@ -52,7 +52,7 @@ export async function cleanupOrphanedData() {
         where: { id: { in: signalIds } },
       });
       deletedCount += orphanedSignals.length;
-      logger.info(`Deleted ${orphanedSignals.length} orphaned Signals`);
+      testLogger.info(`Deleted ${orphanedSignals.length} orphaned Signals`);
     }
 
     // 3. Delete orphaned Follows (userId or traderId -> non-existent User)
@@ -70,7 +70,7 @@ export async function cleanupOrphanedData() {
         where: { id: { in: followIds } },
       });
       deletedCount += orphanedFollows.length;
-      logger.info(`Deleted ${orphanedFollows.length} orphaned Follows`);
+      testLogger.info(`Deleted ${orphanedFollows.length} orphaned Follows`);
     }
 
     // 4. Delete orphaned CryptoAddresses (userId -> non-existent User)
@@ -87,7 +87,7 @@ export async function cleanupOrphanedData() {
         where: { id: { in: addressIds } },
       });
       deletedCount += orphanedAddresses.length;
-      logger.info(
+      testLogger.info(
         `Deleted ${orphanedAddresses.length} orphaned CryptoAddresses`,
       );
     }
@@ -106,21 +106,25 @@ export async function cleanupOrphanedData() {
         where: { id: { in: paymentIds } },
       });
       deletedCount += orphanedPayments.length;
-      logger.info(`Deleted ${orphanedPayments.length} orphaned CryptoPayments`);
+      testLogger.info(
+        `Deleted ${orphanedPayments.length} orphaned CryptoPayments`,
+      );
     }
 
     // Note: Organization table doesn't have ownerId, so no cleanup needed
     // Member, Invitation, Subscription all have onDelete: Cascade configured
 
     if (deletedCount === 0) {
-      logger.info("✓ No orphaned data found - database is clean");
+      testLogger.info("✓ No orphaned data found - database is clean");
     } else {
-      logger.info(`✓ Cleanup complete - deleted ${deletedCount} orphaned records`);
+      testLogger.info(
+        `✓ Cleanup complete - deleted ${deletedCount} orphaned records`,
+      );
     }
 
     return deletedCount;
   } catch (error) {
-    logger.error("Failed to cleanup orphaned data", error);
+    testLogger.error("Failed to cleanup orphaned data", error);
     throw error;
   }
 }
@@ -130,7 +134,7 @@ export async function cleanupOrphanedData() {
  * More aggressive than cleanupOrphanedData - deletes ALL test users
  */
 export async function cleanupAllTestData() {
-  logger.info("Starting cleanup of all test data...");
+  testLogger.info("Starting cleanup of all test data...");
 
   try {
     // Delete all users with playwright-test email prefix
@@ -142,14 +146,16 @@ export async function cleanupAllTestData() {
       },
     });
 
-    logger.info(`✓ Deleted ${deletedUsers.count} test users (cascade will clean related data)`);
+    testLogger.info(
+      `✓ Deleted ${deletedUsers.count} test users (cascade will clean related data)`,
+    );
 
     // Run orphaned cleanup as well to be safe
     await cleanupOrphanedData();
 
     return deletedUsers.count;
   } catch (error) {
-    logger.error("Failed to cleanup test data", error);
+    testLogger.error("Failed to cleanup test data", error);
     throw error;
   }
 }

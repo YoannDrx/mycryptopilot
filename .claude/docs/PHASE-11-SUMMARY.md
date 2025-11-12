@@ -23,6 +23,7 @@
 **Après**: 0 erreurs (dans fichiers actifs)
 
 **Détail**:
+
 - 13 erreurs admin pages → ✅ Fixed
 - 10 erreurs e2e tests → ✅ Fixed (3) + Archived (7)
 - 21 erreurs scripts migration → ✅ Archived
@@ -44,12 +45,15 @@
 **File**: `app/admin/users/[userId]/page.tsx`
 
 **Avant**:
+
 ```typescript
 include: {
   members: {
     include: {
       organization: {
-        include: { subscription: true }
+        include: {
+          subscription: true;
+        }
       }
     }
   }
@@ -57,6 +61,7 @@ include: {
 ```
 
 **Après**:
+
 ```typescript
 include: {
   userSubscription: true,
@@ -71,6 +76,7 @@ include: {
 ### 2. API Routes Cleanup
 
 **Supprimé**:
+
 - ❌ `app/api/orgs/[orgId]/route.ts` (legacy orgRoute)
 - ❌ `app/api/admin/organizations/[orgId]/crypto-payments/route.ts` (org-based admin)
 
@@ -83,6 +89,7 @@ include: {
 #### E2E Tests Archived
 
 **Déplacés** vers `e2e/archived-org-tests/`:
+
 - `org-details-update.spec.ts` (48 lignes)
 - `org-slug-update.spec.ts` (93 lignes)
 - `organization-members.spec.ts` (103 lignes)
@@ -94,16 +101,16 @@ include: {
 **File**: `e2e/signup.spec.ts`
 
 **Avant**:
+
 ```typescript
-callbackURL: "/orgs",
-await page.waitForURL(/\/orgs\/.*/);
+callbackURL: ("/orgs", await page.waitForURL(/\/orgs\/.*/));
 expect(user?.members.length).toBeGreaterThan(0);
 ```
 
 **Après**:
+
 ```typescript
-callbackURL: "/dashboard",
-await page.waitForURL(/\/dashboard/);
+callbackURL: ("/dashboard", await page.waitForURL(/\/dashboard/));
 expect(user?.planName).toBe("free");
 ```
 
@@ -116,26 +123,29 @@ expect(user?.planName).toBe("free");
 #### payment-test.ts
 
 **Avant**:
+
 ```typescript
 const subscription = await prisma.subscription.findFirst({
   where: {
     organization: {
-      members: { some: { userId } }
-    }
-  }
+      members: { some: { userId } },
+    },
+  },
 });
 ```
 
 **Après**:
+
 ```typescript
 const subscription = await prisma.userSubscription.findUnique({
-  where: { userId }
+  where: { userId },
 });
 ```
 
 #### trader-test.ts
 
 **Supprimé**:
+
 - Organization creation (30 lignes)
 - Member creation (10 lignes)
 
@@ -146,6 +156,7 @@ const subscription = await prisma.userSubscription.findUnique({
 ### 5. Migration Scripts Archived
 
 **Déplacés** vers `scripts/archived-migration/`:
+
 - `migrate-org-to-user.ts` (309 lignes)
 - `pre-migration-validation.ts` (262 lignes)
 - `rollback-migration.ts` (237 lignes)
@@ -159,10 +170,12 @@ const subscription = await prisma.userSubscription.findUnique({
 ### 6. Dialog System Cleanup
 
 **Supprimé**:
+
 - ❌ `src/features/global-dialog/org-plan-dialog.tsx` (34 lignes)
 - ❌ `src/features/plans/pricing-card.tsx` (207 lignes)
 
 **Modifié**:
+
 - `global-dialog.store.ts`: `DialogType = never` (no active dialogs)
 - `global-dialog.tsx`: Return `null` (kept for future use)
 
@@ -173,18 +186,21 @@ const subscription = await prisma.userSubscription.findUnique({
 ### 7. URL Fixes
 
 **Files modifiés**:
+
 - `src/lib/discord/commands/pricing.ts`
 - `src/lib/exchange/email-notifications.ts`
 - `src/lib/mail/send-signal-notification.ts`
 
 **Avant**:
+
 ```typescript
-await getAppUrl("/pricing", userId, true)
+await getAppUrl("/pricing", userId, true);
 ```
 
 **Après**:
+
 ```typescript
-getAppUrl("/pricing", true)
+getAppUrl("/pricing", true);
 ```
 
 **Raison**: `getAppUrl()` est maintenant synchrone et ne prend plus userId.
@@ -196,6 +212,7 @@ getAppUrl("/pricing", true)
 **File**: `tsconfig.json`
 
 **Ajouté** à `exclude`:
+
 ```json
 "exclude": [
   "scripts/archived-migration",
@@ -212,12 +229,14 @@ getAppUrl("/pricing", true)
 **File**: `src/lib/auth/stripe/auth-plans.ts`
 
 **Avant**:
+
 ```typescript
 import type { Subscription } from "@/generated/prisma";
 onTrialStart?: (subscription: Subscription, ctx: HookCtx) => Promise<void>;
 ```
 
 **Après**:
+
 ```typescript
 // No import needed (legacy Stripe, not used)
 onTrialStart?: (subscription: unknown, ctx: HookCtx) => Promise<void>;
@@ -232,10 +251,11 @@ onTrialStart?: (subscription: unknown, ctx: HookCtx) => Promise<void>;
 **File**: `src/features/invitation/invitation.action.ts`
 
 **Supprimé**:
+
 ```typescript
 const userMember = await prisma.member.findFirst({
   where: { userId: user.id },
-  include: { organization: { select: { slug: true } } }
+  include: { organization: { select: { slug: true } } },
 });
 const orgSlug = userMember?.organization.slug ?? "org-slug-default";
 return { orgSlug };
@@ -249,24 +269,24 @@ return { orgSlug };
 
 ### Lignes de Code
 
-| Action | Fichiers | Lignes |
-|--------|----------|--------|
-| **Supprimés** | 5 | -782 |
-| **Archivés** | 6 | -1,052 |
-| **Modifiés** | 11 | -541 / +110 |
-| **Total Net** | 22 | **-1,834 lignes** |
+| Action        | Fichiers | Lignes            |
+| ------------- | -------- | ----------------- |
+| **Supprimés** | 5        | -782              |
+| **Archivés**  | 6        | -1,052            |
+| **Modifiés**  | 11       | -541 / +110       |
+| **Total Net** | 22       | **-1,834 lignes** |
 
 ### Erreurs TypeScript
 
-| Catégorie | Avant | Après | Résolution |
-|-----------|-------|-------|------------|
-| Admin pages | 5 | 0 | ✅ Fixed |
-| API routes | 2 | 0 | ✅ Deleted |
-| E2E active | 3 | 0 | ✅ Fixed |
-| E2E archived | 7 | 7 | 📦 Archived |
-| Scripts archived | 21 | 21 | 📦 Archived |
-| Features | 6 | 0 | ✅ Fixed |
-| **Total actif** | **16** | **0** | ✅ **100%** |
+| Catégorie        | Avant  | Après | Résolution  |
+| ---------------- | ------ | ----- | ----------- |
+| Admin pages      | 5      | 0     | ✅ Fixed    |
+| API routes       | 2      | 0     | ✅ Deleted  |
+| E2E active       | 3      | 0     | ✅ Fixed    |
+| E2E archived     | 7      | 7     | 📦 Archived |
+| Scripts archived | 21     | 21    | 📦 Archived |
+| Features         | 6      | 0     | ✅ Fixed    |
+| **Total actif**  | **16** | **0** | ✅ **100%** |
 
 ---
 
@@ -315,11 +335,13 @@ return { orgSlug };
 ### Archived Files
 
 Les fichiers archivés sont conservés pour:
+
 1. **Historique**: Comprendre l'évolution du codebase
 2. **Référence**: Récupérer de la logique si besoin
 3. **Documentation**: Montrer ce qui a été supprimé
 
 Ils sont **exclus** de:
+
 - TypeScript check (`tsconfig.json`)
 - Linter
 - Tests
@@ -328,6 +350,7 @@ Ils sont **exclus** de:
 ### TypeScript Errors Remaining
 
 27 erreurs restent dans fichiers archivés:
+
 - **Non bloquant**: Exclus du build
 - **Non prioritaire**: Code legacy
 - **Action**: Aucune (archived)

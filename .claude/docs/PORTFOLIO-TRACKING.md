@@ -25,6 +25,7 @@
 ### 📌 Important: Deux Systèmes de Connexion Exchange
 
 **1. ExchangeConnection (TRADERS - READ ONLY)**:
+
 - **Usage**: Traders connectent leurs exchanges pour **sync automatique** des trades
 - **Permissions**: **READ-ONLY** uniquement (pas de trading, pas de withdrawals)
 - **Objectif**: Vérification des stats publiques + badge "Verified"
@@ -32,6 +33,7 @@
 - **Modèle DB**: `ExchangeConnection` (ce document)
 
 **2. UserExchangeConnection (USERS - WRITE/COPY)**:
+
 - **Usage**: Users connectent leurs exchanges pour **copy trading automatique**
 - **Permissions**: **WRITE** (exécution d'ordres automatique en mode AUTO)
 - **Modes**:
@@ -43,14 +45,14 @@
 
 **Différences clés**:
 
-| Feature | ExchangeConnection (Traders) | UserExchangeConnection (Users) |
-|---------|------------------------------|--------------------------------|
-| **Permissions** | READ-ONLY ✅ | READ + WRITE ⚠️ |
-| **Objectif** | Vérification stats | Copy trading |
-| **Sync** | Auto (cron 5min) | Manuel + Auto execution |
-| **Badge** | Verified badge | N/A |
-| **Circuit Breakers** | N/A | Max size, daily limits |
-| **Plan Gating** | FREE=0, PRO=1, ULTRA=3 | TBD |
+| Feature              | ExchangeConnection (Traders) | UserExchangeConnection (Users) |
+| -------------------- | ---------------------------- | ------------------------------ |
+| **Permissions**      | READ-ONLY ✅                 | READ + WRITE ⚠️                |
+| **Objectif**         | Vérification stats           | Copy trading                   |
+| **Sync**             | Auto (cron 5min)             | Manuel + Auto execution        |
+| **Badge**            | Verified badge               | N/A                            |
+| **Circuit Breakers** | N/A                          | Max size, daily limits         |
+| **Plan Gating**      | FREE=0, PRO=1, ULTRA=3       | TBD                            |
 
 ---
 
@@ -112,6 +114,7 @@ model ExchangeConnection {
 ```
 
 **Contraintes**:
+
 - 1 connexion par exchange par trader
 - API keys TOUJOURS encryptées (AES-256-GCM)
 - Throttling via `nextSyncAt` (gating par plan)
@@ -146,6 +149,7 @@ model ExchangeTrade {
 ```
 
 **Features**:
+
 - **Idempotence**: `externalOrderId` unique (pas de doublons)
 - **Spot + Futures**: `realizedPnl` nullable (futures only)
 - **Indexes optimisés**: Queries par connexion + date
@@ -196,6 +200,7 @@ model TraderPerformanceSnapshot {
 ```
 
 **Pourquoi un cache ?**
+
 - Calculs expensive (Sharpe, Sortino, MDD) = lents
 - Recalculés après chaque sync (async background job)
 - Queries ultra-rapides (1 row = toutes les stats)
@@ -323,7 +328,7 @@ class BinanceService {
     this.exchange = new ccxt.binance({
       apiKey,
       secret: secretKey,
-      enableRateLimit: true,  // Automatic rate limiting
+      enableRateLimit: true, // Automatic rate limiting
       options: {
         defaultType: "spot",
       },
@@ -351,12 +356,14 @@ async validateApiKeys(): Promise<ValidationResult>
 ```
 
 **Checks**:
+
 1. Keys valides (authentication test via `fetchBalance`)
 2. Read-only enforcement (call `sapiGetAccountApiRestrictions`)
 3. Spot enabled (toujours true si keys valides)
 4. Futures enabled (optionnel)
 
 **Error handling**:
+
 - Invalid API keys → `errorMessage: "Invalid API keys"`
 - IP not whitelisted → `errorMessage: "IP address not whitelisted"`
 
@@ -386,6 +393,7 @@ async fetchRecentTrades(
 ```
 
 **Algorithme**:
+
 1. Load all markets (spot + futures)
 2. For each market, call `fetchMyTrades(symbol, sinceTimestamp)`
 3. Map ccxt format → internal `BinanceTrade`
@@ -422,14 +430,14 @@ await binance.close();
 
 ### Threat Model
 
-| Threat | Impact | Mitigation |
-|--------|--------|------------|
-| **API keys leak** | CRITIQUE | AES-256-GCM encryption + never log |
-| **Write permissions abuse** | CRITIQUE | Strict read-only validation |
-| **Data tampering** | HIGH | Auth tag verification (GCM mode) |
-| **Binance API changes** | HIGH | ccxt abstraction + version pinning |
-| **Sync failures** | MEDIUM | Retry logic + email notifications |
-| **DB performance** | MEDIUM | Indexes + caching snapshots |
+| Threat                      | Impact   | Mitigation                         |
+| --------------------------- | -------- | ---------------------------------- |
+| **API keys leak**           | CRITIQUE | AES-256-GCM encryption + never log |
+| **Write permissions abuse** | CRITIQUE | Strict read-only validation        |
+| **Data tampering**          | HIGH     | Auth tag verification (GCM mode)   |
+| **Binance API changes**     | HIGH     | ccxt abstraction + version pinning |
+| **Sync failures**           | MEDIUM   | Retry logic + email notifications  |
+| **DB performance**          | MEDIUM   | Indexes + caching snapshots        |
 
 ### Best Practices
 
@@ -506,11 +514,13 @@ env: {
 ```
 
 **Erreur si non configuré**:
+
 ```
 ENCRYPTION_SECRET not configured in environment variables
 ```
 
 **Erreur si trop court**:
+
 ```
 ENCRYPTION_SECRET must be at least 32 characters (got {length})
 ```
@@ -526,6 +536,7 @@ ENCRYPTION_SECRET must be at least 32 characters (got {length})
 #### Coverage: 20 tests
 
 **Categories**:
+
 1. **encryptApiKey** (5 tests)
    - Encrypt plaintext
    - Different IVs for same plaintext
@@ -585,6 +596,7 @@ pnpm test:ci
 ### 🚀 Semaine 2: API Routes + Sync Engine (NEXT)
 
 **Jour 1-2: API Routes**
+
 - `POST /api/exchange/connect` - Validate + encrypt + store
 - `GET /api/exchange/status/:id` - Connection status
 - `POST /api/exchange/disconnect` - Soft delete
@@ -592,6 +604,7 @@ pnpm test:ci
 - Gating par plan (FREE bloqué, PRO 1 connexion, ULTRA 3)
 
 **Jour 3-4: Sync Service + Performance Calculator**
+
 - `syncConnectionTrades()` - Decrypt + fetch + upsert
 - `recalculatePerformanceSnapshots()` - 4 périodes
 - Performance metrics algorithms:
@@ -602,6 +615,7 @@ pnpm test:ci
 - Error handling + email notifications
 
 **Jour 5: Cron Job**
+
 - Route `/api/cron/sync-exchanges`
 - Batch processing (max 10 concurrent)
 - Throttling PRO (5min) vs ULTRA (1min)
@@ -610,18 +624,21 @@ pnpm test:ci
 ### 📅 Semaine 3: UI Components + Public Stats
 
 **Jour 1-2: Dashboard Trader - Onglet Portfolio**
+
 - `ExchangeConnectionCard` (status, last sync, total trades)
 - `ConnectExchangeModal` (form + validation)
 - `PerformanceOverview` (6 metric cards)
 - Error states (sync failures, API keys invalides)
 
 **Jour 3-4: Charts + Tables**
+
 - `EquityCurveChart` (Recharts line chart)
 - `TradesTable` (pagination, filtres, export CSV)
 - Period selector (ALL_TIME, 30D, 90D, 365D)
 - Responsive design
 
 **Jour 5: Public Profile - Verified Stats Tab**
+
 - `VerifiedBadge` component
 - `VerifiedStatsTab` (gating Free users)
 - Preview winrate only pour Free
@@ -632,15 +649,16 @@ pnpm test:ci
 
 ## Gating par Plan
 
-| Feature | FREE | PRO ($49) | ULTRA ($99) |
-|---------|------|-----------|-------------|
-| **Connexions** | ❌ 0 | ✅ 1 | ✅ 3 |
-| **Sync interval** | - | 5 min | 1 min |
-| **Historique** | - | 30 jours | 30 jours |
-| **Voir stats verified** | ⚠️ Winrate only | ✅ Full | ✅ Full |
-| **Export CSV** | ❌ | ✅ | ✅ |
+| Feature                 | FREE            | PRO ($49) | ULTRA ($99) |
+| ----------------------- | --------------- | --------- | ----------- |
+| **Connexions**          | ❌ 0            | ✅ 1      | ✅ 3        |
+| **Sync interval**       | -               | 5 min     | 1 min       |
+| **Historique**          | -               | 30 jours  | 30 jours    |
+| **Voir stats verified** | ⚠️ Winrate only | ✅ Full   | ✅ Full     |
+| **Export CSV**          | ❌              | ✅        | ✅          |
 
 **Upsell flows**:
+
 1. Free user try connect → modal "Upgrade to Pro ($49/mo)"
 2. Free user view verified stats → blur + modal
 3. Pro user try 2nd connection → modal "Upgrade to Ultra ($99/mo)"
@@ -687,7 +705,7 @@ mycryptopilot/
 ```json
 {
   "dependencies": {
-    "ccxt": "^4.5.12"  // ✅ Installé
+    "ccxt": "^4.5.12" // ✅ Installé
   }
 }
 ```
@@ -708,6 +726,7 @@ mycryptopilot/
 #### Tests fail: ENCRYPTION_SECRET not configured
 
 **Solution**: Ajouter dans `.env.local`:
+
 ```bash
 ENCRYPTION_SECRET="your-32-char-key-here-min-32chars"
 ```
@@ -715,11 +734,13 @@ ENCRYPTION_SECRET="your-32-char-key-here-min-32chars"
 #### Binance API errors: Invalid API-key
 
 **Causes**:
+
 1. Keys incorrectes
 2. IP non whitelistée (si restriction IP activée)
 3. Keys expirées
 
 **Solution**:
+
 ```typescript
 const validation = await binance.validateApiKeys();
 console.log(validation.errorMessage); // Debug
@@ -805,6 +826,7 @@ SyncExchangeSchema = z.object({
 **POST /api/exchange/connect** (`app/api/exchange/connect/route.ts` - 215 lignes)
 
 Flow complet:
+
 1. Validate request body (Zod)
 2. Check trader profile exists
 3. Check plan limits (FREE=0, PRO=1, ULTRA=3)
@@ -817,6 +839,7 @@ Flow complet:
 **GET /api/exchange/[id]/status** (`app/api/exchange/[id]/status/route.ts` - 73 lignes)
 
 Retourne:
+
 - Connection status (active, sync times, errors)
 - Trade statistics (total, first/last trade dates)
 - Ownership verification
@@ -824,6 +847,7 @@ Retourne:
 **POST /api/exchange/[id]/disconnect** (`app/api/exchange/[id]/disconnect/route.ts` - 86 lignes)
 
 Soft delete:
+
 - Set isActive=false
 - Keep historical trades in DB
 - Stop auto-sync (nextSyncAt removed)
@@ -831,6 +855,7 @@ Soft delete:
 **POST /api/exchange/[id]/sync** (`app/api/exchange/[id]/sync/route.ts` - 138 lignes)
 
 Force manual sync:
+
 - Rate limiting check (based on plan)
 - Schedule immediate sync (nextSyncAt=now)
 - Cron job picks it up in next run
@@ -840,6 +865,7 @@ Force manual sync:
 Core synchronization engine:
 
 **syncConnectionTrades(connection)**: Sync single connection
+
 1. Decrypt API keys (AES-256-GCM)
 2. Create BinanceService instance
 3. Determine sync period (30 days first time, incremental after)
@@ -850,12 +876,14 @@ Core synchronization engine:
 8. Cleanup (close Binance connection)
 
 **syncMultipleConnections(connections)**: Batch processing
+
 - Sequential processing (avoid rate limiting)
 - 2s delay between syncs
 - Used by cron job
 - Summary stats (success/fail counts, trades imported)
 
 **Features**:
+
 - Parallel upserts (Promise.all) pour performance
 - Error handling graceful (log + continue)
 - Auto-update performance metrics si nouveaux trades
@@ -866,6 +894,7 @@ Core synchronization engine:
 Calcul de 15 métriques de trading:
 
 **Métriques de base**:
+
 - Total trades (winning/losing counts)
 - Winrate (%)
 - Total Profits/Losses
@@ -875,6 +904,7 @@ Calcul de 15 métriques de trading:
 - Largest Win/Loss
 
 **Métriques avancées**:
+
 - **Sharpe Ratio**: Risk-adjusted returns
   - Formula: (Mean Return - Risk-Free Rate) / Std Deviation
   - Mesure rendement par unité de risque total
@@ -888,12 +918,14 @@ Calcul de 15 métriques de trading:
   - Détection du plus gros drawdown historique
 
 **4 périodes de calcul**:
+
 - ALL_TIME: Tous les trades historiques
 - LAST_30D: 30 derniers jours
 - LAST_90D: 90 derniers jours
 - LAST_365D: 365 derniers jours
 
 **updatePerformanceSnapshots(traderProfileId, trades)**:
+
 - Calcule métriques pour les 4 périodes
 - Upsert snapshots en DB (via unique constraint)
 - Appelé automatiquement après chaque sync réussi
@@ -903,11 +935,13 @@ Calcul de 15 métriques de trading:
 **GET /api/cron/sync-exchanges**
 
 Configuration:
+
 - Protection: Authorization Bearer ${CRON_SECRET}
 - Runtime: nodejs
 - Max duration: 60s (Vercel Hobby limit)
 
 Flow:
+
 1. Verify CRON_SECRET
 2. Fetch connections ready for sync (via getConnectionsToSync)
 3. Batch process up to 50 connections
@@ -915,6 +949,7 @@ Flow:
 5. Return detailed results
 
 **Vercel Cron Setup** (à configurer):
+
 ```json
 {
   "crons": [
@@ -931,18 +966,21 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 📊 Statistiques Semaine 2
 
 **Code écrit**:
+
 - 7 nouveaux fichiers
 - 994 lignes de code total
 - 100% TypeScript strict
 - 0 erreurs ESLint/TypeScript
 
 **Fichiers par catégorie**:
+
 - Queries & Helpers: 147 lignes
 - API Routes: 512 lignes
 - Services: 662 lignes (SyncService + PerformanceCalculator)
 - Cron: 132 lignes
 
 **Features complètes**:
+
 - ✅ CRUD complet pour exchange connections
 - ✅ Sync automatique avec rate limiting
 - ✅ Calcul performance metrics (15 métriques)
@@ -953,18 +991,21 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 🔐 Sécurité
 
 **API Keys**:
+
 - Toujours encryptées (AES-256-GCM)
 - Jamais exposées en API responses
 - Décryptées uniquement pendant sync (en mémoire)
 - Cleanup automatique après usage
 
 **Validation**:
+
 - Zod schemas sur tous les endpoints
 - Ownership check sur toutes les routes
 - Read-only enforcement (Binance API)
 - CRON_SECRET pour cron job
 
 **Rate Limiting**:
+
 - Plan-based throttling (PRO=5min, ULTRA=1min)
 - Cooldown check pour manual sync
 - 2s delay entre syncs (batch processing)
@@ -973,6 +1014,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 🚀 Prochaines Étapes (Semaine 3)
 
 **UI Components** (environ 8h):
+
 1. Connection Management UI
    - Connect form (API key inputs)
    - Connection list (active/inactive)
@@ -991,11 +1033,13 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
    - Free user gating (preview winrate only)
 
 **Configuration Vercel**:
+
 - Ajouter ENCRYPTION_SECRET en env vars
 - Configurer cron job (vercel.json)
 - Tester en staging
 
 **Documentation finale**:
+
 - Guide utilisateur (comment connecter Binance)
 - Guide admin (troubleshooting sync errors)
 - Architecture diagram
@@ -1051,6 +1095,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
    - Conditional rendering: form vs connections list vs upgrade CTA
 
 **Features implémentées**:
+
 - ✅ Plan limits enforcement (FREE bloqué avec upgrade CTA)
 - ✅ API key encryption automatique (invisible pour user)
 - ✅ Security warnings (read-only keys only)
@@ -1059,6 +1104,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 - ✅ Error handling robuste (API errors, validation)
 
 **Patterns suivis**:
+
 - upfetch au lieu de fetch (projet convention)
 - dialogManager pour confirmations
 - Date serialization (ISO strings pour client components)
@@ -1074,12 +1120,13 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 
 1. **performance-queries.ts** (`src/features/exchange/performance-queries.ts` - 95 lignes)
    - 5 helper functions pour DB queries:
+
    ```typescript
-   getPerformanceSnapshot(traderProfileId, period)
-   getAllPerformanceSnapshots(traderProfileId)
-   hasPerformanceData(traderProfileId)
-   getBestPerformingPeriod(traderProfileId)
-   hasVerifiedStats(traderProfileId)  // Check si au moins 1 connexion active
+   getPerformanceSnapshot(traderProfileId, period);
+   getAllPerformanceSnapshots(traderProfileId);
+   hasPerformanceData(traderProfileId);
+   getBestPerformingPeriod(traderProfileId);
+   hasVerifiedStats(traderProfileId); // Check si au moins 1 connexion active
    ```
 
 2. **PeriodSelector** (`src/components/nowts/period-selector.tsx` - 44 lignes)
@@ -1107,6 +1154,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
      - Loading: Skeleton cards (animate-pulse)
 
 **Design patterns**:
+
 - Color-coded metrics (green=profit, red=loss, amber=risk)
 - Responsive grid (1/2/3 columns)
 - Loading skeletons (UX smooth)
@@ -1167,6 +1215,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
      - Trader garde verified si autres connexions actives
 
 **Verified Badge**:
+
 - ✅ Already displayed in 2 places:
   - Trader profile page (`/traders/[traderId]`)
   - Traders marketplace cards
@@ -1179,23 +1228,27 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 📊 Statistiques Semaine 3
 
 **Code écrit**:
+
 - 8 nouveaux fichiers
 - 1,122 lignes de code (new + modifications)
 - 100% TypeScript strict
 - 0 erreurs ESLint/TypeScript
 
 **Breakdown par commit**:
+
 1. **Day 1 - Connection UI**: 4 fichiers, 715 lignes
 2. **Day 2 - Performance Components**: 3 fichiers, 407 lignes
 3. **Day 3 - Integration Finale**: 2 nouveaux + 6 modifiés, ~350 lignes
 
 **Components créés**:
+
 - 5 nouveaux React components
 - 1 nouveau API route
 - 5 nouvelles query helpers
 - 2 auto-verification hooks (connect/disconnect)
 
 **Features complètes**:
+
 - ✅ Exchange connection management UI (CRUD complet)
 - ✅ Performance stats display (15 métriques)
 - ✅ Period selection (4 périodes)
@@ -1210,12 +1263,14 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 🎨 UI/UX Highlights
 
 **Design System**:
+
 - Shadcn/UI components (Card, Badge, Button, Tabs)
 - Color coding: green (profit), red (loss), amber (risk)
 - Responsive grid layouts (mobile-first)
 - Dark mode support complet
 
 **User Experience**:
+
 - Skeleton loaders (pas de flashes blancs)
 - Toast notifications (success/error)
 - Confirmation dialogs (actions destructives)
@@ -1224,6 +1279,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 - User guides inline (Binance API setup)
 
 **Performance**:
+
 - React Query caching (moins de requêtes DB)
 - Lazy loading per component
 - Optimized DB queries (indexes)
@@ -1232,16 +1288,19 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 🔐 Sécurité UI
 
 **Data Exposure**:
+
 - ✅ API keys JAMAIS affichées en UI
 - ✅ Stats publiques uniquement (pas de secrets)
 - ✅ Ownership checks sur toutes les routes
 
 **Plan Enforcement**:
+
 - ✅ FREE users: bloqués côté UI + backend
 - ✅ Plan limits: validés server-side
 - ✅ Gating prévisible (pas de confusion)
 
 **Error Messages**:
+
 - User-friendly (pas de stack traces)
 - Actionnable (étapes pour résoudre)
 - Secure (pas de détails sensibles)
@@ -1249,11 +1308,13 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 🚀 Déploiement Ready
 
 **Vercel Configuration**:
+
 - [x] ENCRYPTION_SECRET configuré en env vars
 - [ ] Cron job à configurer (vercel.json)
 - [ ] Tester en staging
 
 **User Documentation**:
+
 - [x] Guide inline (connect form)
 - [ ] FAQ page (troubleshooting)
 - [ ] Video tutorial (optionnel)
@@ -1261,12 +1322,14 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### 📱 Espaces UI Impactés
 
 **Account Space**:
+
 - ✅ New page: `/account/exchanges`
   - Connection management
   - Manual sync
   - Disconnect
 
 **Trading Space - Dashboard Trader**:
+
 - ✅ New tab: "Performance"
   - Period selector
   - 15 métriques display
@@ -1274,16 +1337,19 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
   - Trade history table (future phase 4)
 
 **Trading Space - Public Profile**:
+
 - ✅ Verified badge (existing)
   - Auto-managed (connect/disconnect hooks)
 
 **Trading Space - Marketplace**:
+
 - ✅ Verified badge on cards (existing)
   - Filter by verified (future enhancement)
 
 ### 🎯 Success Criteria - Semaine 3
 
 **UI Components**:
+
 - [x] Connection form fonctionnel
 - [x] Connection list with actions
 - [x] Performance stats display (15 metrics)
@@ -1292,12 +1358,14 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 - [x] Verified badge auto-management
 
 **Integration**:
+
 - [x] Dashboard Trader → Performance tab
 - [x] Account Settings → Exchanges page
 - [x] Public Profile → Verified badge
 - [x] Marketplace → Verified badge
 
 **User Flows**:
+
 - [x] Trader connect Binance → verified badge appears
 - [x] Trader disconnect last exchange → verified removed
 - [x] FREE user view stats → see winrate + upgrade CTA
@@ -1311,17 +1379,20 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### Charts & Visualizations (optionnel)
 
 **Equity Curve Chart** (Recharts):
+
 - Line chart du PnL cumulatif over time
 - Période sélectionnable
 - Zoom/pan interactions
 - Responsive
 
 **Drawdown Chart**:
+
 - Visualize peak-to-trough declines
 - Highlight max drawdown period
 - Color gradient (green→red)
 
 **Trade Distribution**:
+
 - Histogram wins vs losses
 - Pie chart par symbol
 - Bar chart par stratégie (future)
@@ -1329,6 +1400,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### Trade History Table
 
 **Features**:
+
 - Pagination (500 trades max par page)
 - Filters: symbol, side, date range
 - Sort: date, PnL, size
@@ -1336,6 +1408,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 - Detail modal (click pour voir détails)
 
 **Columns**:
+
 - Date/Time
 - Symbol
 - Side (BUY/SELL)
@@ -1348,12 +1421,14 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 ### Admin Dashboard
 
 **Monitoring**:
+
 - Total connections actives
 - Sync success rate (last 24h)
 - Average sync duration
 - Failed syncs table (troubleshooting)
 
 **Actions Admin**:
+
 - Force re-sync connection
 - Invalidate connection (security)
 - View trader stats (debug)
@@ -1373,6 +1448,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 #### 1. Tests (Priorité 1) - 4-6h
 
 **Tests E2E (Playwright)** - 2-3h :
+
 - [ ] **E2E complet**: Connect Binance → Auto-sync → View stats → Disconnect
   - Fichier: `e2e/portfolio-tracking.spec.ts`
   - Scénarios:
@@ -1386,6 +1462,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 - [ ] **Verified Badge Auto-management**: Connect/disconnect hooks
 
 **Tests Unitaires (Vitest)** - 2-3h :
+
 - [ ] **PerformanceCalculator** (CRITIQUE - 15 métriques):
   - Fichier: `__tests__/lib/exchange/performance-calculator.test.ts`
   - Tests: winrate, profit factor, Sharpe, Sortino, MDD, avg win/loss
@@ -1400,6 +1477,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
   - Test idempotence (externalOrderId unique)
 
 **Tests API Routes** - 1h :
+
 - [ ] **POST /api/exchange/connect**:
   - Validation + encryption
   - Plan limits enforcement
@@ -1410,6 +1488,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
   - Soft delete + verified badge removal
 
 **Tests Components** - 1h :
+
 - [ ] **ConnectExchangeForm** (validation + submit)
 - [ ] **PerformanceStatsDisplay** (Free vs PRO rendering)
 
@@ -1420,6 +1499,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 **Status**: ❌ Non implémenté
 
 **Fichiers à créer**:
+
 - `emails/sync-failure.tsx` (React Email template)
 - `emails/weekly-stats-summary.tsx` (optionnel mais nice)
 - `src/lib/exchange/email-notifications.ts` (helper functions)
@@ -1427,6 +1507,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 **Templates requis**:
 
 1. **Sync Failure Email** (CRITIQUE):
+
    ```tsx
    Subject: "⚠️ Binance Sync Failed - Action Required"
 
@@ -1440,6 +1521,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
    ```
 
 2. **Weekly Summary Email** (Nice-to-have):
+
    ```tsx
    Subject: "📊 Your Trading Stats This Week"
 
@@ -1451,6 +1533,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
    ```
 
 **Intégration**:
+
 - Hook dans `SyncService.syncConnectionTrades()` catch block
 - Utiliser Resend API (déjà configuré)
 - Rate limiting (max 1 email/jour par erreur)
@@ -1509,6 +1592,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 **Objectif**: Admin dashboard pour monitoring en temps réel
 
 **Metrics à tracker**:
+
 - Total connections actives (gauge)
 - Sync success rate last 24h (%)
 - Average sync duration (ms)
@@ -1517,12 +1601,14 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 - Top 5 traders by trade volume
 
 **Implémentation**:
+
 - Page: `app/admin/portfolio/page.tsx`
 - Queries: `src/features/exchange/admin-queries.ts`
 - Charts: Recharts (line chart sync rate, bar chart errors)
 - Auto-refresh: React Query (30s interval)
 
 **Vercel Integration**:
+
 - Analytics API (optional, coût extra)
 - Custom endpoint: `/api/admin/portfolio-stats`
 
@@ -1562,6 +1648,7 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 **Fichier**: `scripts/rotate-encryption-key.ts`
 
 **Algorithme**:
+
 1. Prendre nouveau `ENCRYPTION_SECRET_NEW` en input
 2. Fetch toutes les `ExchangeConnection` actives
 3. Pour chaque connection:
@@ -1573,11 +1660,13 @@ Fréquence recommandée: **5 minutes** (balance entre freshness et quotas API)
 6. Instructions pour update env vars (Vercel + local)
 
 **Usage**:
+
 ```bash
 ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
 ```
 
 **Safety**:
+
 - Dry-run mode (preview sans modifier DB)
 - Backup DB avant rotation
 - Rollback automatique si erreur
@@ -1610,6 +1699,7 @@ ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
    - Check: idempotence (externalOrderId unique constraint)
 
 **Tools**:
+
 - k6 (load testing)
 - Prisma `EXPLAIN ANALYZE` (DB queries)
 - Vercel Analytics (production metrics)
@@ -1623,6 +1713,7 @@ ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
 **Checklist**:
 
 1. **EXPLAIN ANALYZE Top Queries** - 1h:
+
    ```sql
    -- Query 1: Get all snapshots for trader
    EXPLAIN ANALYZE
@@ -1660,26 +1751,26 @@ ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
 
 ### Phase 0 (P0) - BLOQUEURS
 
-| Tâche | Temps | Status | ETA |
-|-------|-------|--------|-----|
-| Tests E2E (4 scénarios) | 2-3h | ⬜ TODO | - |
-| Tests Unitaires (Services) | 2-3h | ⬜ TODO | - |
-| Email Notifications | 2-3h | ⬜ TODO | - |
-| Guide Binance Setup | 1h | ⬜ TODO | - |
-| Update FAQ | 15min | ⬜ TODO | - |
-| FAQ Portfolio Tracking | 30min | ⬜ TODO | - |
-| **TOTAL P0** | **8-10h** | **0%** | - |
+| Tâche                      | Temps     | Status  | ETA |
+| -------------------------- | --------- | ------- | --- |
+| Tests E2E (4 scénarios)    | 2-3h      | ⬜ TODO | -   |
+| Tests Unitaires (Services) | 2-3h      | ⬜ TODO | -   |
+| Email Notifications        | 2-3h      | ⬜ TODO | -   |
+| Guide Binance Setup        | 1h        | ⬜ TODO | -   |
+| Update FAQ                 | 15min     | ⬜ TODO | -   |
+| FAQ Portfolio Tracking     | 30min     | ⬜ TODO | -   |
+| **TOTAL P0**               | **8-10h** | **0%**  | -   |
 
 ### Phase 1 (P1) - POST-LAUNCH
 
-| Tâche | Temps | Status | ETA |
-|-------|-------|--------|-----|
-| Monitoring Dashboard | 3-4h | ⬜ TODO | - |
-| Audit Sécurité | 2h | ⬜ TODO | - |
-| Key Rotation Script | 2h | ⬜ TODO | - |
-| Load Testing | 2-3h | ⬜ TODO | - |
-| DB Optimization | 1-2h | ⬜ TODO | - |
-| **TOTAL P1** | **10-13h** | **0%** | - |
+| Tâche                | Temps      | Status  | ETA |
+| -------------------- | ---------- | ------- | --- |
+| Monitoring Dashboard | 3-4h       | ⬜ TODO | -   |
+| Audit Sécurité       | 2h         | ⬜ TODO | -   |
+| Key Rotation Script  | 2h         | ⬜ TODO | -   |
+| Load Testing         | 2-3h       | ⬜ TODO | -   |
+| DB Optimization      | 1-2h       | ⬜ TODO | -   |
+| **TOTAL P1**         | **10-13h** | **0%**  | -   |
 
 ### GRAND TOTAL: 18-23h
 
@@ -1690,41 +1781,50 @@ ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
 ### Week 1: Phase 0 (P0)
 
 **Jour 1-2** (4-6h):
+
 - ✅ Tests E2E (Playwright)
 - ✅ Tests Unitaires (Vitest)
 
 **Jour 3** (2-3h):
+
 - ✅ Email Notifications
 
 **Jour 4** (2h):
+
 - ✅ Documentation Utilisateur
 - ✅ Update FAQ
 
 ### Week 2: Phase 1 (P1)
 
 **Jour 1-2** (5-6h):
+
 - ✅ Monitoring Dashboard
 - ✅ Audit Sécurité
 
 **Jour 3** (2h):
+
 - ✅ Key Rotation Script
 
 **Jour 4-5** (4-5h):
+
 - ✅ Load Testing
 - ✅ DB Optimization
 
 ### Week 3: Polish & Deploy
 
 **Jour 1-2**:
+
 - ✅ Fix issues trouvés en testing
 - ✅ Code review
 - ✅ Update documentation finale
 
 **Jour 3**:
+
 - ✅ Deploy staging
 - ✅ Beta testing avec 2-3 traders
 
 **Jour 4-5**:
+
 - ✅ Production deploy
 - ✅ Monitoring 48h post-launch
 - ✅ Quick fixes si needed
@@ -1736,30 +1836,35 @@ ENCRYPTION_SECRET_NEW="new-key-here" node scripts/rotate-encryption-key.ts
 **Avant déploiement, tout doit être ✅** :
 
 ### Tests
+
 - [ ] E2E complet (connect → sync → stats → disconnect)
 - [ ] 80%+ code coverage (Services + Calculator)
 - [ ] Tous les tests passent en CI/CD
 - [ ] Zero flaky tests
 
 ### Sécurité
+
 - [ ] Aucun log de sensitive data (audit complet)
 - [ ] Tampering tests passent (auth tag verification)
 - [ ] Key rotation script testé (dry-run)
 - [ ] Security review externe (optionnel, recommandé)
 
 ### Performance
+
 - [ ] Load test 100 traders → P95 < 500ms
 - [ ] Cron sync 100 connections < 5min
 - [ ] DB queries optimisées (EXPLAIN ANALYZE)
 - [ ] Zero timeout Vercel
 
 ### Documentation
+
 - [ ] Guide Binance Setup complet (screenshots)
 - [ ] FAQ à jour (no contradictions)
 - [ ] Troubleshooting guide
 - [ ] Admin runbook (monitoring, incidents)
 
 ### Monitoring
+
 - [ ] Dashboard admin fonctionnel
 - [ ] Alertes configurées (error rate > 10%)
 - [ ] Metrics trackées (sync rate, latency, errors)

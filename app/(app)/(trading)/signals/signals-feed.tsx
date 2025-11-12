@@ -1,4 +1,3 @@
-import { TradingCard } from "@/components/nowts/trading-card";
 import {
   Card,
   CardContent,
@@ -6,11 +5,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { getSignalsFeed } from "@/features/signal/signal-queries";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import { AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { SignalsInfiniteScroll } from "./signals-infinite-scroll";
 
 type SignalsFeedProps = {
   searchParams: {
@@ -97,35 +95,21 @@ export const SignalsFeed = async ({ searchParams }: SignalsFeedProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Signals grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {signals.map((signal) => {
-          const traderName =
-            signal.trader.traderProfile?.displayName ?? signal.trader.name;
-
-          return (
-            <TradingCard
-              key={signal.id}
-              symbol={signal.symbol}
-              payload={signal.payloadJson as TradingCardPayloadType}
-              traderName={traderName}
-              expiresAt={signal.expiresAt}
-              className="h-full"
-              compact={true}
-            />
-          );
-        })}
-      </div>
-
-      {/* Load more button */}
-      {hasNextPage && nextCursor && (
-        <div className="flex justify-center">
-          <Button asChild variant="outline">
-            <Link href={`?cursor=${nextCursor}`}>Load more signals</Link>
-          </Button>
-        </div>
-      )}
-    </div>
+    <SignalsInfiniteScroll
+      initialSignals={signals.map((signal) => ({
+        ...signal,
+        payloadJson: signal.payloadJson as TradingCardPayloadType,
+      }))}
+      initialCursor={nextCursor ?? null}
+      hasMore={hasNextPage}
+      filters={{
+        symbols,
+        bias,
+        status,
+        instrumentType,
+        traderName: searchParams.traderName,
+        verifiedOnly,
+      }}
+    />
   );
 };

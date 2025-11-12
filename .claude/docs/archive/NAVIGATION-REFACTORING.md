@@ -81,11 +81,13 @@ app/orgs/[orgSlug]/(navigation)/
 ### Phase 1 : Composants Partagés ✅
 
 **1.1. `global-search-command.tsx`** (30min)
+
 - Composant de search global (cmd+k)
 - Affiche tous les liens des 4 espaces groupés par section
 - Réutilisé dans les 4 sidebars
 
 **1.2. `base-sidebar-layout.tsx`** (15min)
+
 - Layout wrapper partagé
 - Contient : SidebarProvider + SidebarInset + Header + Breadcrumb
 - Évite la duplication de code entre les 4 layouts
@@ -95,6 +97,7 @@ app/orgs/[orgSlug]/(navigation)/
 ### Phase 2 : Trading Space ✅
 
 **2.1. `trading-links.ts`** (10min)
+
 - 6 liens Trading :
   - Dashboard (home)
   - My Trading Dashboard
@@ -104,11 +107,13 @@ app/orgs/[orgSlug]/(navigation)/
   - Trader Dashboard
 
 **2.2. `trading-sidebar.tsx`** (20min)
+
 - Sidebar dédiée Trading
 - Affiche uniquement les 6 liens Trading
 - Contient : OrgsSelect + GlobalSearch + Links + Footer
 
 **2.3. `trading/layout.tsx`** (10min)
+
 - Layout Trading avec TradingSidebar
 - Récupère org + userOrgs + allLinks pour le search
 
@@ -117,15 +122,18 @@ app/orgs/[orgSlug]/(navigation)/
 ### Phase 3 : School Space ✅
 
 **3.1. `school-links.ts`** (10min)
+
 - 2 liens School :
   - Courses
   - My Progress
 
 **3.2. `school-sidebar.tsx`** (20min)
+
 - Sidebar dédiée School
 - Affiche uniquement les 2 liens School
 
 **3.3. `school/layout.tsx`** (10min)
+
 - Layout School avec SchoolSidebar
 
 ---
@@ -133,15 +141,18 @@ app/orgs/[orgSlug]/(navigation)/
 ### Phase 4 : Tax Space ✅
 
 **4.1. `tax-links.ts`** (10min)
+
 - 2 liens Tax :
   - Import Transactions (FileUp icon)
   - Tax Reports (FileText icon)
 
 **4.2. `tax-sidebar.tsx`** (20min)
+
 - Sidebar dédiée Tax
 - Affiche uniquement les 2 liens Tax
 
 **4.3. `tax/layout.tsx`** (10min)
+
 - Layout Tax avec TaxSidebar
 
 ---
@@ -149,6 +160,7 @@ app/orgs/[orgSlug]/(navigation)/
 ### Phase 5 : Account Space ✅
 
 **5.1. Déplacement pages Account** (1h)
+
 - Copié `/app/(logged-in)/(account-layout)/account/` vers `/app/orgs/[orgSlug]/(navigation)/(account)/`
 - 11 pages déplacées :
   - page.tsx (settings principal)
@@ -162,6 +174,7 @@ app/orgs/[orgSlug]/(navigation)/
   - danger/
 
 **5.2. `account-links.ts`** (10min)
+
 - 5 liens Account :
   - Profile
   - Discord Integration
@@ -170,10 +183,12 @@ app/orgs/[orgSlug]/(navigation)/
   - Danger Zone
 
 **5.3. `account-sidebar.tsx`** (20min)
+
 - Sidebar dédiée Account
 - Affiche uniquement les 5 liens Account
 
 **5.4. `account/layout.tsx`** (10min)
+
 - Layout Account avec AccountSidebar
 - Remplace l'ancien layout Settings
 
@@ -182,11 +197,13 @@ app/orgs/[orgSlug]/(navigation)/
 ### Phase 6 : Mise à Jour Navigation Links ✅
 
 **6.1. Correction routes School/Tax** (15min)
+
 - ❌ Avant : `/school/courses`, `/school/progress`, `/tax/import`, `/tax/reports`
 - ✅ Après : `/courses`, `/progress`, `/import`, `/reports`
 - Ajout icône FileUp pour Import Transactions
 
 **6.2. Ajout liens Account** (10min)
+
 - Ajouté groupe "Account" dans `org-navigation.links.ts`
 - 5 liens Account avec icônes appropriées
 
@@ -211,12 +228,14 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
 **Fichier** : `src/features/auth/user-dropdown.tsx`
 
 **Avant** :
+
 ```tsx
 <DropdownMenuItem href="/orgs">Dashboard</DropdownMenuItem>
 <DropdownMenuItem href="/account">Account Settings</DropdownMenuItem>
 ```
 
 **Après** (à implémenter) :
+
 ```tsx
 <DropdownMenuItem href="/orgs/{slug}/dashboard">Trading</DropdownMenuItem>
 <DropdownMenuItem href="/orgs/{slug}/courses">Crypto School</DropdownMenuItem>
@@ -227,6 +246,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
 **Solution** : Utilisation du hook `useCurrentOrg()` pour récupérer dynamiquement le slug.
 
 **Changements**:
+
 - Ajout import `useCurrentOrg` depuis `@app/orgs/[orgSlug]/use-current-org`
 - Construction dynamique du `basePath` basé sur `currentOrg?.slug`
 - Remplacement des 4 liens avec les bonnes routes
@@ -245,6 +265,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
 ## ✅ Phase 9 : Nettoyer Fichiers Obsolètes - Complétée
 
 **Fichiers supprimés**:
+
 - ✅ Supprimé `/app/(logged-in)/(account-layout)/` (tout le dossier - 25 fichiers)
 - ✅ Supprimé `_navigation/org-navigation.tsx` (remplacé par layouts individuels)
 - ✅ Supprimé `_navigation/org-sidebar.tsx` (remplacé par sidebars individuelles)
@@ -253,6 +274,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
 ## ✅ Phase 10 : Mettre à Jour Routes Account - Complétée
 
 **Fichiers corrigés**:
+
 - ✅ `edit-profile-form.tsx` - Liens vers change-email/change-password mis à jour
 - ✅ `trader-mode-toggle.tsx` - Liens vers become-trader mis à jour
 - ✅ `discord/page.tsx` - Redirect vers `/orgs/${slug}/account/discord` mis à jour
@@ -261,6 +283,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
 ## ✅ Phase 11 : Tests - Complétés
 
 **Tests exécutés**:
+
 - ✅ `pnpm ts` - TypeScript compilation **PASSED** ✓
 - ✅ `pnpm build` - Next.js build **PASSED** ✓
 - ✅ Warnings ESLint corrigés (orgSlug, Settings imports non utilisés)
@@ -271,6 +294,7 @@ export const ORGANIZATION_LINKS: NavigationGroup[] = [
 **Problème détecté** : La page `/orgs/[orgSlug]` n'affichait plus de sidebar
 
 **Solution** : Déplacé les fichiers du dashboard principal dans `(trading)/`:
+
 - ✅ Déplacé `page.tsx` vers `(trading)/page.tsx`
 - ✅ Déplacé `information-cards.tsx` vers `(trading)/`
 - ✅ Déplacé `subscribers-charts.tsx` vers `(trading)/`
@@ -281,21 +305,21 @@ La page est maintenant accessible avec la TradingSidebar comme prévu.
 
 ## 📊 Progression Globale
 
-| Phase | Tâches | Complétées | Status |
-|-------|--------|------------|--------|
-| Phase 1: Composants partagés | 2 | 2 | 🟢 100% |
-| Phase 2: Trading space | 3 | 3 | 🟢 100% |
-| Phase 3: School space | 3 | 3 | 🟢 100% |
-| Phase 4: Tax space | 3 | 3 | 🟢 100% |
-| Phase 5: Account space | 4 | 4 | 🟢 100% |
-| Phase 6: Navigation links | 2 | 2 | 🟢 100% |
-| Phase 7: User dropdown | 1 | 1 | 🟢 100% |
-| Phase 8: Simplifier layout | 1 | 1 | 🟢 100% |
-| Phase 9: Nettoyer fichiers | 1 | 1 | 🟢 100% |
-| Phase 10: Mettre à jour routes | 1 | 1 | 🟢 100% |
-| Phase 11: Tests | 4 | 4 | 🟢 100% |
-| Phase 12: Fix dashboard | 1 | 1 | 🟢 100% |
-| **TOTAL** | **26** | **26** | **🟢 100%** |
+| Phase                          | Tâches | Complétées | Status      |
+| ------------------------------ | ------ | ---------- | ----------- |
+| Phase 1: Composants partagés   | 2      | 2          | 🟢 100%     |
+| Phase 2: Trading space         | 3      | 3          | 🟢 100%     |
+| Phase 3: School space          | 3      | 3          | 🟢 100%     |
+| Phase 4: Tax space             | 3      | 3          | 🟢 100%     |
+| Phase 5: Account space         | 4      | 4          | 🟢 100%     |
+| Phase 6: Navigation links      | 2      | 2          | 🟢 100%     |
+| Phase 7: User dropdown         | 1      | 1          | 🟢 100%     |
+| Phase 8: Simplifier layout     | 1      | 1          | 🟢 100%     |
+| Phase 9: Nettoyer fichiers     | 1      | 1          | 🟢 100%     |
+| Phase 10: Mettre à jour routes | 1      | 1          | 🟢 100%     |
+| Phase 11: Tests                | 4      | 4          | 🟢 100%     |
+| Phase 12: Fix dashboard        | 1      | 1          | 🟢 100%     |
+| **TOTAL**                      | **26** | **26**     | **🟢 100%** |
 
 ---
 
@@ -374,24 +398,30 @@ Account
 ## 🔍 Points d'Attention
 
 ### 1. orgSlug dans user-dropdown
+
 **Problème** : Le user-dropdown est un client component, il faut récupérer le slug de l'org courante.
 
 **Solutions possibles** :
+
 - Via `useSession()` si le slug est stocké dans la session
 - Via un custom hook `useCurrentOrg()`
 - Via context React
 
 ### 2. Imports circulaires
+
 **Attention** : `global-search-command.tsx` importe les links de chaque espace.
 Vérifier qu'il n'y a pas de cycles d'imports.
 
 ### 3. Account routes
+
 **Important** : Mettre à jour tous les liens `/account` vers `/orgs/{slug}/account` dans :
+
 - Components (Link href)
 - Server actions (redirect)
 - Forms (action)
 
 ### 4. Tests e2e
+
 Si des tests Playwright existent pour `/account`, les mettre à jour vers la nouvelle route.
 
 ---
@@ -403,12 +433,14 @@ Si des tests Playwright existent pour `/account`, les mettre à jour vers la nou
 **Option choisie** : 4 layouts indépendants (Trading, School, Tax, Account)
 
 **Avantages** :
+
 - ✅ Isolation complète des espaces
 - ✅ Chaque layout gère sa propre sidebar
 - ✅ Facile à maintenir et étendre
 - ✅ Pas de logique conditionnelle
 
 **Alternative rejetée** : 1 layout parent avec sidebar conditionnelle (basée sur pathname)
+
 - ❌ Logique fragile
 - ❌ Difficile à maintenir
 
@@ -417,6 +449,7 @@ Si des tests Playwright existent pour `/account`, les mettre à jour vers la nou
 **Décision** : Le search (cmd+k) affiche tous les liens des 4 espaces
 
 **Raison** :
+
 - Pattern moderne (Notion, Linear, VS Code)
 - Navigation rapide entre espaces
 - Découverte des features
@@ -426,6 +459,7 @@ Si des tests Playwright existent pour `/account`, les mettre à jour vers la nou
 **Décision** : Toutes les pages restent sous `/orgs/[orgSlug]/...`
 
 **Raisons** :
+
 - Cohérence totale
 - Compatible avec Better Auth orgs
 - Moins de refactoring

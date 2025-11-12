@@ -18,18 +18,18 @@ test.describe("Navigation System", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify Trading sidebar is displayed
-    // Should see links like: Dashboard, Signals, Traders, Pricing
+    // Should see links like: Dashboard, Signals Feed, Traders Marketplace, Upgrade Plan
     await expect(
       page.getByRole("link", { name: /dashboard/i }).first(),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /signals/i }).first(),
+      page.getByRole("link", { name: /signals feed/i }).first(),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: /traders/i }).first(),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /pricing/i }).first(),
+      page.getByRole("link", { name: /upgrade plan/i }).first(),
     ).toBeVisible();
 
     // 3. Navigate to Account space (hub with cards)
@@ -68,19 +68,20 @@ test.describe("Navigation System", () => {
       page.getByRole("link", { name: /dashboard/i }).first(),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /signals/i }).first(),
+      page.getByRole("link", { name: /signals feed/i }).first(),
     ).toBeVisible();
   });
 
   /**
-   * ✅ TEST FIXED - Made navigation labels unique across all spaces
+   * ✅ TEST UPDATED - Navigation reorganization (Issue #81)
    *
-   * Previous issue: Duplicate labels ("Following" appeared in Trading + Account)
-   * Fix applied:
-   * - Trading: "Following" → "My Signals" (trading-links.ts:40)
-   * - Account: "Following" → "Manage Following" (account-links.ts:35)
+   * After sidebar reorganization:
+   * - Trading: "Dashboard" in MY FEED section
+   * - Trading: "Signals Feed" in DISCOVER section
+   * - Note: "Following" appears in both Trading (MY FEED) and Account
+   * - Using "Dashboard" for search to avoid ambiguity
    *
-   * This ensures GlobalSearchCommand results are unambiguous.
+   * This ensures GlobalSearchCommand results work with new structure.
    */
   test("global search works across all spaces", async ({ page }) => {
     // 1. Create a user account
@@ -137,18 +138,18 @@ test.describe("Navigation System", () => {
     const dialogInput2 = page.getByPlaceholder(/type to search/i);
     await expect(dialogInput2).toBeVisible();
 
-    // Search for another navigation link
-    await dialogInput2.fill("My Signals");
+    // Search for Dashboard link (unique in Trading MY FEED section)
+    await dialogInput2.fill("Dashboard");
     await page.waitForTimeout(500);
 
-    // Should find "My Signals" link in results (points to /dashboard)
-    const mySignalsLink = page.getByRole("option", { name: /my signals/i });
-    await expect(mySignalsLink).toBeVisible();
+    // Should find "Dashboard" link in results (points to /dashboard)
+    const dashboardLink = page.getByRole("option", { name: /dashboard/i });
+    await expect(dashboardLink).toBeVisible();
 
     // Click on the result to navigate
-    await mySignalsLink.click();
+    await dashboardLink.click();
 
-    // Verify navigation happened (My Signals points to /dashboard)
+    // Verify navigation happened (Dashboard points to /dashboard)
     await expect(page).toHaveURL(/\/dashboard$/);
   });
 });
