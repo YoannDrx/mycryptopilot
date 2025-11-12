@@ -14,7 +14,7 @@
 
 // Load environment variables BEFORE importing any modules
 // IMPORTANT: Only load .env files in development
-// In production (Railway/Vercel), variables are injected via platform
+// In production (Fly/Vercel), variables sont injectées via la plateforme
 import fs from "node:fs";
 import path from "node:path";
 import dotenv from "dotenv";
@@ -42,9 +42,7 @@ if (process.env.NODE_ENV !== "production") {
   }
 } else {
   // eslint-disable-next-line no-console
-  console.log(
-    "Production mode: Using environment variables from Railway/platform",
-  );
+  console.log("Production mode: Using environment variables from the platform");
 }
 
 import { discordBot } from "../src/lib/discord/bot-client";
