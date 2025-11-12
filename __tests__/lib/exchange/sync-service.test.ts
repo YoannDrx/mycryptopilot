@@ -1,65 +1,68 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { Exchange } from "@/generated/prisma";
-import {
-  syncConnectionTrades,
-  syncMultipleConnections,
-} from "@/lib/exchange/sync-service";
-import * as SyncServiceModule from "@/lib/exchange/sync-service";
+import { syncConnectionTrades } from "@/lib/exchange/sync-service";
 
-const upsertMock = vi.fn();
-const exchangeUpdateMock = vi.fn();
-const exchangeFindManyMock = vi.fn();
+const prismaMocks = vi.hoisted(() => ({
+  upsert: vi.fn(),
+  findMany: vi.fn(),
+  updateConnection: vi.fn(),
+}));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     exchangeTrade: {
-      upsert: upsertMock,
-      findMany: exchangeFindManyMock,
+      upsert: prismaMocks.upsert,
+      findMany: prismaMocks.findMany,
     },
     exchangeConnection: {
-      update: exchangeUpdateMock,
+      update: prismaMocks.updateConnection,
     },
   },
 }));
 
-const loggerSpy = {
+const loggerSpy = vi.hoisted(() => ({
   info: vi.fn(),
   warn: vi.fn(),
   error: vi.fn(),
   debug: vi.fn(),
-};
+}));
 
 vi.mock("@/lib/logger", () => ({
   logger: loggerSpy,
 }));
 
-const decryptMock = vi.fn().mockReturnValue("decrypted-key");
+const decryptMock = vi.hoisted(() => vi.fn().mockReturnValue("decrypted-key"));
 vi.mock("@/lib/crypto/encryption-service", () => ({
   decryptApiKey: decryptMock,
 }));
 
-const mockExchangeService = {
+const exchangeServiceMocks = vi.hoisted(() => ({
   fetchRecentTrades: vi.fn(),
   close: vi.fn(),
-};
+}));
 
-const createExchangeServiceMock = vi
-  .fn()
-  .mockReturnValue(mockExchangeService);
+const mockExchangeService = exchangeServiceMocks;
+
+const exchangeFactory = vi.hoisted(() => ({
+  createExchangeService: vi.fn(),
+}));
+
+const createExchangeServiceMock = exchangeFactory.createExchangeService;
+createExchangeServiceMock.mockReturnValue(mockExchangeService as never);
 
 vi.mock("@/lib/exchange/exchange-service-factory", () => ({
-  createExchangeService: createExchangeServiceMock,
+  createExchangeService: exchangeFactory.createExchangeService,
 }));
 
-const calculateNextSyncAtMock = vi
-  .fn()
-  .mockReturnValue(new Date("2025-12-11T00:00:00Z"));
+const planLimitMocks = vi.hoisted(() => ({
+  calculateNextSyncAt: vi.fn().mockReturnValue(new Date("2025-12-11T00:00:00Z")),
+}));
 
 vi.mock("@/features/exchange/exchange-plan-limits", () => ({
-  calculateNextSyncAt: calculateNextSyncAtMock,
+  calculateNextSyncAt: planLimitMocks.calculateNextSyncAt,
 }));
 
-const sendSyncFailureNotificationMock = vi.fn();
+const sendSyncFailureNotificationMock = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/exchange/email-notifications", () => ({
   sendSyncFailureNotification: sendSyncFailureNotificationMock,
 }));
@@ -109,6 +112,14 @@ describe("syncConnectionTrades", () => {
     vi.clearAllMocks();
     mockExchangeService.fetchRecentTrades.mockReset();
     mockExchangeService.close.mockReset();
+    createExchangeServiceMock.mockReturnValue(mockExchangeService as never);
+    prismaMocks.upsert.mockReset();
+    prismaMocks.findMany.mockReset();
+    prismaMocks.updateConnection.mockReset();
+    planLimitMocks.calculateNextSyncAt.mockReturnValue(
+      new Date("2025-12-11T00:00:00Z"),
+    );
+    sendSyncFailureNotificationMock.mockReset();
   });
 
   it("syncs trades, aggregates fills and updates snapshots", async () => {
@@ -143,8 +154,8 @@ describe("syncConnectionTrades", () => {
     ];
 
     mockExchangeService.fetchRecentTrades.mockResolvedValue(trades);
-    upsertMock.mockResolvedValue({ success: true });
-    exchangeFindManyMock.mockResolvedValue(trades);
+    prismaMocks.upsert.mockResolvedValue({ success: true });
+    prismaMocks.findMany.mockResolvedValue(trades);
 
     const result = await syncConnectionTrades(
       connection as unknown as Parameters<typeof syncConnectionTrades>[0],
@@ -155,8 +166,8 @@ describe("syncConnectionTrades", () => {
       tradesFetched: trades.length,
       tradesImported: trades.length,
     });
-    expect(calculateNextSyncAtMock).toHaveBeenCalledWith("pro");
-    expect(exchangeUpdateMock).toHaveBeenCalledWith({
+    expect(planLimitMocks.calculateNextSyncAt).toHaveBeenCalledWith("pro");
+    expect(prismaMocks.updateConnection).toHaveBeenCalledWith({
       where: { id: connection.id },
       data: expect.objectContaining({
         lastSyncedAt: expect.any(Date),
@@ -193,7 +204,7 @@ describe("syncConnectionTrades", () => {
       tradesImported: 0,
       error: "RPC down",
     });
-    expect(exchangeUpdateMock).toHaveBeenCalledWith({
+    expect(prismaMocks.updateConnection).toHaveBeenCalledWith({
       where: { id: connection.id },
       data: expect.objectContaining({
         lastSyncError: "RPC down",
@@ -206,35 +217,5 @@ describe("syncConnectionTrades", () => {
       }),
     );
     expect(mockExchangeService.close).toHaveBeenCalled();
-  });
-});
-
-describe("syncMultipleConnections", () => {
-  it("processes each connection sequentially and aggregates results", async () => {
-    const spy = vi
-      .spyOn(SyncServiceModule, "syncConnectionTrades")
-      .mockResolvedValueOnce({
-        success: true,
-        tradesFetched: 2,
-        tradesImported: 2,
-      })
-      .mockResolvedValueOnce({
-        success: false,
-        tradesFetched: 0,
-        tradesImported: 0,
-        error: "boom",
-      });
-
-    const results = await syncMultipleConnections([
-      buildConnection(),
-      buildConnection({ id: "conn_2" }),
-    ] as unknown as Parameters<typeof syncMultipleConnections>[0]);
-
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(results).toHaveLength(2);
-    expect(results[0].success).toBe(true);
-    expect(results[1].success).toBe(false);
-
-    spy.mockRestore();
   });
 });

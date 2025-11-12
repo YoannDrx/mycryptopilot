@@ -6,31 +6,42 @@ import {
 import * as RolesModule from "@/lib/discord/roles";
 import { DISCORD_CONFIG } from "@/lib/discord/config";
 
-const loggerMock = {
-  info: vi.fn(),
-  warn: vi.fn(),
-  error: vi.fn(),
-};
+const hoisted = vi.hoisted(() => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+  getClient: vi.fn(),
+}));
 
 vi.mock("@/lib/logger", () => ({
-  logger: loggerMock,
+  logger: hoisted.logger,
 }));
 
-const mockGetClient = vi.fn();
 vi.mock("@/lib/discord/bot-client", () => ({
   discordBot: {
-    getClient: mockGetClient,
+    getClient: hoisted.getClient,
   },
 }));
+
+const loggerMock = hoisted.logger;
+const mockGetClient = hoisted.getClient;
 
 const ensureRolesExistSpy = vi
   .spyOn(RolesModule, "ensureRolesExist")
   .mockResolvedValue();
 
 const buildGuild = () => {
-  const freeRole = { id: "role-free", name: DISCORD_CONFIG.roles.FREE };
-  const proRole = { id: "role-pro", name: DISCORD_CONFIG.roles.PRO };
-  const ultraRole = { id: "role-ultra", name: DISCORD_CONFIG.roles.ULTRA };
+  const makeRole = (id: string, name: string) => ({
+    id,
+    name,
+    setPosition: vi.fn().mockResolvedValue(undefined),
+  });
+
+  const freeRole = makeRole("role-free", DISCORD_CONFIG.roles.FREE);
+  const proRole = makeRole("role-pro", DISCORD_CONFIG.roles.PRO);
+  const ultraRole = makeRole("role-ultra", DISCORD_CONFIG.roles.ULTRA);
 
   const roles = [freeRole, proRole, ultraRole];
   const roleCache = {
@@ -61,8 +72,12 @@ const buildGuild = () => {
 
 describe("Discord roles helpers", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockGetClient.mockReset();
+    loggerMock.error.mockReset();
+    loggerMock.info.mockReset();
+    loggerMock.warn.mockReset();
     ensureRolesExistSpy.mockClear();
+    ensureRolesExistSpy.mockResolvedValue(undefined);
   });
 
   it("returns false when bot client is not initialized", async () => {
@@ -83,6 +98,7 @@ describe("Discord roles helpers", () => {
     const success = await assignRoleToUser("discord-1", "pro");
 
     expect(success).toBe(true);
+    expect(loggerMock.error).not.toHaveBeenCalled();
     expect(guild.members.fetch).toHaveBeenCalledWith("discord-1");
     expect(member.roles.remove).toHaveBeenCalledWith(freeRole);
     expect(member.roles.add).toHaveBeenCalledWith(proRole);
