@@ -21,11 +21,11 @@
 
 ### Progression
 
-| Métrique | Avant | Après | Amélioration |
-|----------|-------|-------|--------------|
-| Tests passants | 15 (17%) | 52 (62%) | **+37 tests (+45%)** |
+| Métrique        | Avant    | Après    | Amélioration         |
+| --------------- | -------- | -------- | -------------------- |
+| Tests passants  | 15 (17%) | 52 (62%) | **+37 tests (+45%)** |
 | Tests échouants | 71 (81%) | 21 (25%) | **-50 tests (-56%)** |
-| Tests total | 88 | 84 | -4 (obsolètes) |
+| Tests total     | 88       | 84       | -4 (obsolètes)       |
 
 **🎉 Amélioration majeure : 17% → 62% de succès (+45 points)**
 
@@ -34,9 +34,11 @@
 ## ✅ Fixes Appliqués (4 Commits)
 
 ### Commit 1: `ab6da3c` - B2C Migration Core Fixes
+
 **Impact** : +42 tests (17% → 59%)
 
 **Changements** :
+
 1. `src/lib/subscription/subscription-manager.ts:132-141`
    - Wrapped `revalidatePath()` in try-catch
    - **Problème** : Error "Invariant: static generation store missing in revalidatePath"
@@ -53,9 +55,11 @@
    - **Impact** : Fixed trader-referral, follow-unfollow tests
 
 ### Commit 2: `81b2b7b` - Route Restructuring
+
 **Impact** : +6 tests
 
 **Changements** :
+
 1. Renamed directory: `account/(settings)` → `account/settings`
    - **Problème** : Route group `(settings)` créait conflit URL avec `account/page.tsx`
    - **Root cause** : Next.js App Router - route groups ne créent pas de segments URL
@@ -70,9 +74,11 @@
    - `e2e/navigation.spec.ts` (2 assertions)
 
 ### Commit 3: `cbd2e06` - UI Assertions + Portfolio
+
 **Impact** : +2 tests
 
 **Changements** :
+
 1. `e2e/admin.spec.ts` - Removed "Organizations" link assertions (2 locations)
    - B2C n'a plus de section Organizations dans admin panel
 
@@ -86,9 +92,11 @@
    - nuqs replaceState vs waitForURL issue à investiguer
 
 ### Commit 4: `37eada5` - Removed Obsolete Tests
+
 **Impact** : -4 tests obsolètes
 
 **Files Deleted** :
+
 - `e2e/archived-org-tests/` (entire directory)
   - org-details-update.spec.ts
   - org-slug-update.spec.ts
@@ -98,9 +106,11 @@
 **Rationale** : B2B → B2C migration removed organization management features
 
 ### Non-committable Fix: `.env.test` XPUB Configuration
+
 **Impact** : +5 crypto-checkout tests (estimé)
 
 **Changement** :
+
 ```bash
 # Added to .env.test (gitignored file)
 CRYPTO_XPUB_BASE_TESTNET="xpub6MKMoQW1C8iRsJ1d8kDLm6HVEGfXVXR1ZMxhCTQuo8sZFSPnorhBKF6h6wNLzSzhQ9PL8gosifFfx4KTQaPh7bPhAiuZd5WEknY9TGE5EGE"
@@ -131,6 +141,7 @@ CRYPTO_XPUB_TRON_TESTNET="xpub6CpdKXsPQ2dA9LMTgmquYHKuWHEoo71pSv9m8nhhHiUJy7Ziq4
    - Assertions obsolètes cherchant les anciens textes
 
 **Tests Échouants** :
+
 ```
 ❌ e2e/portfolio-tracking.spec.ts:10   - complete flow: connect → view stats
 ❌ e2e/portfolio-tracking.spec.ts:102  - manual sync triggers trade fetching
@@ -155,12 +166,13 @@ export async function createMockExchangeConnection(userId: string) {
   // ✅ ADD: Update traderProfile.verified
   await prisma.traderProfile.updateMany({
     where: { userId },
-    data: { verified: true }
+    data: { verified: true },
   });
 
   return connection;
 }
 ```
+
 </details>
 
 <details>
@@ -174,41 +186,42 @@ export async function createCompletePortfolioData() {
     where: {
       userId_exchange: {
         userId: trader.id,
-        exchange: 'BINANCE'
-      }
+        exchange: "BINANCE",
+      },
     },
     update: {
       apiKey: encryptedApiKey,
       apiSecret: encryptedApiSecret,
       isActive: true,
-      lastSyncAt: new Date()
+      lastSyncAt: new Date(),
     },
     create: {
       userId: trader.id,
-      exchange: 'BINANCE',
+      exchange: "BINANCE",
       apiKey: encryptedApiKey,
       apiSecret: encryptedApiSecret,
       isActive: true,
-      lastSyncAt: new Date()
-    }
+      lastSyncAt: new Date(),
+    },
   });
 
   // ✅ ADD: Create TraderTrade for portfolio tests
   const trade = await prisma.traderTrade.create({
     data: {
       traderId: trader.id,
-      symbol: 'BTCUSDT',
-      side: 'BUY',
-      type: 'LIMIT',
+      symbol: "BTCUSDT",
+      side: "BUY",
+      type: "LIMIT",
       quantity: 0.01,
       price: 50000,
-      status: 'FILLED',
+      status: "FILLED",
       executedAt: new Date(),
-      exchange: 'BINANCE'
-    }
+      exchange: "BINANCE",
+    },
   });
 }
 ```
+
 </details>
 
 <details>
@@ -220,16 +233,19 @@ export async function createCompletePortfolioData() {
 // AFTER: Use more flexible matcher
 await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 ```
+
 </details>
 
 <details>
 <summary>4. Investigate API 401 errors</summary>
 
 **Files to check**:
+
 - `app/api/performance/[period]/route.ts`
 - `src/lib/auth/api-auth.ts` (si existe)
 
 **Investigation**:
+
 - Vérifier que l'auth context est bien propagé aux API routes
 - Tester manuellement avec curl/Postman en simulant session E2E
 </details>
@@ -243,6 +259,7 @@ await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 **Root Cause** : Assertions obsolètes après UI changes
 
 **Tests Échouants** :
+
 ```
 ❌ e2e/settings.spec.ts:6   - user can edit profile settings
 ❌ e2e/settings.spec.ts:64  - user can view billing settings
@@ -251,6 +268,7 @@ await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 **Fixes Recommandés** :
 
 **Investigation nécessaire** (30min-1h) :
+
 1. Lancer test en mode UI : `pnpm test:e2e:ui e2e/settings.spec.ts`
 2. Observer visuellement quelle assertion échoue
 3. Vérifier les sélecteurs CSS dans `app/(app)/(account)/account/settings/page.tsx`
@@ -265,6 +283,7 @@ await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 **Root Cause** : Global search + space switching cassés après removal organizations
 
 **Tests Échouants** :
+
 ```
 ❌ e2e/navigation.spec.ts:5   - navigation sidebars switch correctly between spaces
 ❌ e2e/navigation.spec.ts:86  - global search works across all spaces
@@ -281,6 +300,7 @@ await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 // Espaces en B2C : Trading, Account, Admin (pas de "Orgs" space)
 // Ajuster les assertions pour ces 3 espaces uniquement
 ```
+
 </details>
 
 <details>
@@ -293,6 +313,7 @@ await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 // - Vérifier qu'aucun résultat "Organization" n'apparaît
 // - Tester avec "Dashboard", "Traders", "Settings" (valides en B2C)
 ```
+
 </details>
 
 **Temps Estimé** : 1h
@@ -304,6 +325,7 @@ await expect(page.getByText(/unlock.*metrics|upgrade.*plan/i)).toBeVisible();
 **Root Cause** : Timeouts 60s insuffisants + assertions UI
 
 **Tests Échouants** :
+
 ```
 ❌ e2e/crypto-checkout.spec.ts:6    - user can view checkout page and get payment address
 ❌ e2e/crypto-checkout.spec.ts:114  - checkout page shows plan features correctly
@@ -324,8 +346,9 @@ await page.waitForTimeout(5000); // Checkout form React hydration prend 3-5s
 
 // Line 30: timeout: 30000
 // CHANGE TO:
-timeout: 45000 // Checkout components lourds (QR code, crypto libs)
+timeout: 45000; // Checkout components lourds (QR code, crypto libs)
 ```
+
 </details>
 
 <details>
@@ -335,9 +358,10 @@ timeout: 45000 // Checkout components lourds (QR code, crypto libs)
 // e2e/crypto-checkout.spec.ts:114
 // Line 143: await expect(page.getByText(/\$49/i).first()).toBeVisible();
 // CHANGE TO: Plus flexible avec toContainText
-const priceElement = page.locator('text=/\\$49/i').first();
+const priceElement = page.locator("text=/\\$49/i").first();
 await expect(priceElement).toBeVisible({ timeout: 10000 });
 ```
+
 </details>
 
 <details>
@@ -349,6 +373,7 @@ await expect(priceElement).toBeVisible({ timeout: 10000 });
 // Vérifier comment le pro-rata est affiché dans la nouvelle UI
 // Ajuster l'assertion selon le format exact (peut être dans un tooltip, badge, etc.)
 ```
+
 </details>
 
 **Temps Estimé** : 1-2h
@@ -360,6 +385,7 @@ await expect(priceElement).toBeVisible({ timeout: 10000 });
 **Root Cause** : Redirection checkout + nuqs URL persistence
 
 **Tests Échouants** :
+
 ```
 ❌ e2e/pricing.spec.ts:70                - pricing page subscribe button redirects to checkout
 ❌ e2e/signals-feed-filters.spec.ts:34   - user can filter signals by asset
@@ -377,9 +403,10 @@ await expect(priceElement).toBeVisible({ timeout: 10000 });
 // CHANGE TO:
 await page.waitForURL(/\/checkout\/pro/, {
   timeout: 15000, // Checkout page has React hydration + crypto libs loading
-  waitUntil: 'domcontentloaded' // Don't wait for full networkidle (plus rapide)
+  waitUntil: "domcontentloaded", // Don't wait for full networkidle (plus rapide)
 });
 ```
+
 </details>
 
 <details>
@@ -394,9 +421,10 @@ await page.waitForURL(/\/checkout\/pro/, {
 await page.waitForURL(/asset=BTC/, { timeout: 2000 }).catch(() => {});
 await page.waitForResponse(
   (response) => response.url().includes("/api/signals/feed"),
-  { timeout: 2000 }
+  { timeout: 2000 },
 );
 ```
+
 </details>
 
 **Temps Estimé** : 1h
@@ -446,11 +474,13 @@ await page.waitForResponse(
 ## 🎯 Recommandation Finale
 
 **Option A - Quick Wins Only** (3-4h) :
+
 - Passer de 62% → 75%
 - Fixes faciles sans refactor majeur
 - **État acceptable pour production Beta** ✅
 
 **Option B - Full Fix** (7-10h) :
+
 - Passer de 62% → 95%+
 - Requires portfolio helpers refactor + nuqs investigation
 - **État idéal pour production stable** 🌟
@@ -473,6 +503,7 @@ cbd2e06 - test: update UI assertions (admin + portfolio + skip 2 tests)
 ### Environment Configuration
 
 **CRITIQUE** : `.env.test` doit contenir les XPUBs TESTNET :
+
 ```bash
 CRYPTO_XPUB_BASE_TESTNET="xpub6MKMoQW1C8iRsJ1d8kDLm6HVEGfXVXR1ZMxhCTQuo8sZFSPnorhBKF6h6wNLzSzhQ9PL8gosifFfx4KTQaPh7bPhAiuZd5WEknY9TGE5EGE"
 CRYPTO_XPUB_TRON_TESTNET="xpub6CpdKXsPQ2dA9LMTgmquYHKuWHEoo71pSv9m8nhhHiUJy7Ziq4bZZ3MNo3VpGwzt2XuNqCc67SNay6h4knQdZ5EqukbpQAYRSMQNamBQv8h"
@@ -483,12 +514,14 @@ CRYPTO_XPUB_TRON_TESTNET="xpub6CpdKXsPQ2dA9LMTgmquYHKuWHEoo71pSv9m8nhhHiUJy7Ziq4
 ### Playwright Reports
 
 **Lancer les tests avec HTML report** :
+
 ```bash
 pnpm test:e2e:ci
 # Report disponible dans: playwright-report/index.html
 ```
 
 **Ouvrir le rapport** :
+
 ```bash
 npx playwright show-report
 ```

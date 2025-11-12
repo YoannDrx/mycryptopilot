@@ -1,8 +1,4 @@
-import {
-  ChannelType,
-  PermissionFlagsBits,
-  type TextChannel,
-} from "discord.js";
+import { ChannelType, PermissionFlagsBits, type TextChannel } from "discord.js";
 import { discordBot } from "./bot-client";
 import { DISCORD_CONFIG } from "./config";
 import { logger } from "../logger";
@@ -261,9 +257,7 @@ export async function removeFollowerFromTraderChannel(
  * @param traderId - User ID du trader
  * @returns true si succès
  */
-export async function archiveTraderChannel(
-  traderId: string,
-): Promise<boolean> {
+export async function archiveTraderChannel(traderId: string): Promise<boolean> {
   const client = discordBot.getClient();
 
   if (!client) {

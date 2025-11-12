@@ -17,7 +17,7 @@ type MetricCardProps = {
   trend?: "positive" | "negative" | "neutral";
   className?: string;
   icon?: React.ReactNode;
-}
+};
 
 export function MetricCard({
   label,
@@ -123,7 +123,7 @@ type MetricCardGridProps = {
   children: React.ReactNode;
   columns?: 1 | 2 | 3 | 4;
   className?: string;
-}
+};
 
 export function MetricCardGrid({
   children,

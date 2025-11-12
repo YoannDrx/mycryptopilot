@@ -12,25 +12,25 @@
 
 ### Phases Complètes ✅ (4/11 = 36%)
 
-| Phase | Durée estimée | Status | Fichiers modifiés | Lignes supprimées |
-|-------|--------------|--------|-------------------|-------------------|
-| **Phase 1** | 2h | ✅ COMPLETE | 3 fichiers | ~200 lignes |
-| **Phase 2** | 3h | ✅ COMPLETE | 1 fichier | ~70 lignes |
-| **Phase 3** | 1h | ✅ COMPLETE | 6 fichiers | ~350 lignes |
-| **Phase 4** | 2h | ✅ COMPLETE | 5 fichiers | ~170 lignes |
+| Phase       | Durée estimée | Status      | Fichiers modifiés | Lignes supprimées |
+| ----------- | ------------- | ----------- | ----------------- | ----------------- |
+| **Phase 1** | 2h            | ✅ COMPLETE | 3 fichiers        | ~200 lignes       |
+| **Phase 2** | 3h            | ✅ COMPLETE | 1 fichier         | ~70 lignes        |
+| **Phase 3** | 1h            | ✅ COMPLETE | 6 fichiers        | ~350 lignes       |
+| **Phase 4** | 2h            | ✅ COMPLETE | 5 fichiers        | ~170 lignes       |
 
 **Total Phases 1-4**: ~790 lignes supprimées, 15 fichiers modifiés
 
 ### Phase En Cours 🔄 (Phase 5: 4/6 routes = 67%)
 
-| Route | Status | Changements | Fichiers |
-|-------|--------|-------------|----------|
-| `/dashboard` | ✅ COMPLETE | org → user.userSubscription, URLs directes | 1 fichier |
-| `/traders` | ✅ COMPLETE | Déjà user-centric (aucun changement) | 0 fichier |
-| `/signals` | ✅ COMPLETE | Supprimé orgSlug de tous les composants | 3 fichiers |
-| `/pricing` | ✅ COMPLETE | URLs /checkout/* directes | 1 fichier |
-| `/checkout/[plan]` | ⏳ PENDING | Doit être copié depuis app/orgs/ | - |
-| `/risk-console` | ⏳ PENDING | Doit être copié depuis app/orgs/ | - |
+| Route              | Status      | Changements                                | Fichiers   |
+| ------------------ | ----------- | ------------------------------------------ | ---------- |
+| `/dashboard`       | ✅ COMPLETE | org → user.userSubscription, URLs directes | 1 fichier  |
+| `/traders`         | ✅ COMPLETE | Déjà user-centric (aucun changement)       | 0 fichier  |
+| `/signals`         | ✅ COMPLETE | Supprimé orgSlug de tous les composants    | 3 fichiers |
+| `/pricing`         | ✅ COMPLETE | URLs /checkout/\* directes                 | 1 fichier  |
+| `/checkout/[plan]` | ⏳ PENDING  | Doit être copié depuis app/orgs/           | -          |
+| `/risk-console`    | ⏳ PENDING  | Doit être copié depuis app/orgs/           | -          |
 
 **Phase 5 Progress**: 5 fichiers modifiés, ~60 lignes changées
 
@@ -50,14 +50,17 @@
 ## Phase 1: Database Schema (2h) ✅
 
 ### Objectif
+
 Supprimer les models Organization, Member, Invitation, Subscription (legacy) de Prisma.
 
 ### Fichiers Modifiés
 
 #### 1. `prisma/better-auth.prisma`
+
 **Lignes supprimées**: 97-153 (57 lignes)
 
 **BEFORE**:
+
 ```prisma
 model User {
   // ...
@@ -108,6 +111,7 @@ model Subscription {
 ```
 
 **AFTER**:
+
 ```prisma
 model User {
   // ...
@@ -127,9 +131,11 @@ model Session {
 ```
 
 #### 2. `prisma/schema.prisma`
+
 **Lignes supprimées**: 640-652 (13 lignes)
 
 **BEFORE**:
+
 ```prisma
 model LegacyOrgSlug {
   id        String   @id @default(cuid())
@@ -143,15 +149,18 @@ model LegacyOrgSlug {
 ```
 
 **AFTER**:
+
 ```prisma
 // ✂️ LegacyOrgSlug model REMOVED
 // UserSubscription KEPT (user-centric architecture)
 ```
 
 #### 3. `prisma/seed.ts`
+
 **Lignes supprimées**: 174-257 (84 lignes)
 
 **BEFORE**:
+
 ```typescript
 // Create organizations
 const orgData = [
@@ -169,12 +178,13 @@ const organizations = await Promise.all(
         slug: orgSlug,
         // ... members creation
       },
-    })
-  )
+    }),
+  ),
 );
 ```
 
 **AFTER**:
+
 ```typescript
 // ✂️ Organization creation logic REMOVED
 // Comment: "Organizations removed - Phase 1 Big Bang (Issue #77)"
@@ -188,22 +198,26 @@ const traders = await Promise.all(traderProfiles);
 ### Database Migration
 
 **Commande exécutée**:
+
 ```bash
 PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
   npx prisma migrate reset --force --skip-seed
 ```
 
 **Résultat**:
+
 - ✅ 25 migrations ré-appliquées
 - ✅ Prisma Client régénéré
 - ✅ Seed réussi: 15 users, 6 traders, 24 signals, 18 follows
 
 **Erreur Prisma gérée**:
+
 - Prisma a détecté un agent AI et a bloqué l'opération dangereuse
 - Solution: Variable d'environnement avec consentement explicite de l'utilisateur
 - Sécurité: Important pour éviter la destruction accidentelle de données en production
 
 ### TypeScript Errors
+
 **Avant**: 75 erreurs
 **Après**: 74 erreurs (stable - erreurs dans fichiers à supprimer plus tard)
 
@@ -212,14 +226,17 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 ## Phase 2: Auth Core (3h) ✅
 
 ### Objectif
+
 Supprimer le plugin `organization` de Better Auth, simplifier la création d'utilisateur.
 
 ### Fichier Modifié
 
 #### `src/lib/auth.ts`
+
 **Lignes**: 500 → 430 (-70 lignes)
 
 **BEFORE**:
+
 ```typescript
 import { organization } from "better-auth/plugins";
 import { ac, roles } from "./auth/auth-permissions";
@@ -237,7 +254,9 @@ export const auth = betterAuth({
           // ❌ DUAL-MODE LOGIC (63 lignes)
           if (FEATURES.USER_ACCOUNT_MODE) {
             // Mode nouveau: UserSubscription
-            await prisma.userSubscription.create({ /* ... */ });
+            await prisma.userSubscription.create({
+              /* ... */
+            });
           } else {
             // Mode legacy: Organization avec retry logic
             let retries = 0;
@@ -276,7 +295,9 @@ export const auth = betterAuth({
       createdRedirectPath: (orgId) => `/orgs/${orgId}`,
       /* ... 40+ lignes de config ... */
     }),
-    emailOTP({ /* ... */ }),
+    emailOTP({
+      /* ... */
+    }),
     admin({}),
     multiSession({ maximumSessions: 5 }),
     nextCookies(),
@@ -285,6 +306,7 @@ export const auth = betterAuth({
 ```
 
 **AFTER**:
+
 ```typescript
 // ✂️ Imports supprimés: organization, ac, roles, createOrganizationApi, FEATURES, generateSlug, stripe
 
@@ -305,7 +327,10 @@ export const auth = betterAuth({
             });
             logger.info(`User ${user.id} initialized with FREE plan`);
           } catch (err) {
-            logger.error("Failed to initialize user plan", { err, userId: user.id });
+            logger.error("Failed to initialize user plan", {
+              err,
+              userId: user.id,
+            });
           }
 
           // ============================================
@@ -322,7 +347,10 @@ export const auth = betterAuth({
             });
             logger.info(`UserSubscription created for user ${user.id}`);
           } catch (err) {
-            logger.error("Failed to create UserSubscription", { err, userId: user.id });
+            logger.error("Failed to create UserSubscription", {
+              err,
+              userId: user.id,
+            });
             // Don't throw - user creation should not fail
           }
 
@@ -334,7 +362,9 @@ export const auth = betterAuth({
   },
   plugins: [
     // ✂️ Organization plugin REMOVED - Big Bang (Issue #77 Phase 2)
-    emailOTP({ /* ... */ }),
+    emailOTP({
+      /* ... */
+    }),
     admin({}),
     lastLoginMethod({}),
     multiSession({ maximumSessions: 5 }),
@@ -362,6 +392,7 @@ export const auth = betterAuth({
    - Plus de gestion de rôles org (ac, roles)
 
 ### TypeScript Errors
+
 **Avant**: 75 erreurs
 **Après**: 74 erreurs (-1, fichier auth.ts clean)
 
@@ -370,14 +401,17 @@ export const auth = betterAuth({
 ## Phase 3: Feature Flags (1h) ✅
 
 ### Objectif
+
 Supprimer complètement le système de feature flags dual-mode.
 
 ### Fichiers Modifiés
 
 #### 1. `middleware.ts`
+
 **Lignes**: 86 → 45 (-41 lignes, -48%)
 
 **BEFORE**:
+
 ```typescript
 import {
   extractOrgSlug,
@@ -420,7 +454,10 @@ export async function middleware(request: NextRequest) {
       return redirectToRoot(request);
     }
 
-    const userOrg = await findUserOrganization(orgSlug, validated.session.session.userId);
+    const userOrg = await findUserOrganization(
+      orgSlug,
+      validated.session.session.userId,
+    );
     if (!userOrg) {
       return redirectToOrgList(request);
     }
@@ -440,6 +477,7 @@ export async function middleware(request: NextRequest) {
 ```
 
 **AFTER**:
+
 ```typescript
 import {
   handleRootRedirect,
@@ -479,6 +517,7 @@ export async function middleware(request: NextRequest) {
 ```
 
 **Fonctions supprimées**:
+
 - `extractOrgSlug()` - extraction du slug depuis pathname
 - `findUserOrganization()` - query Prisma pour trouver l'org
 - `switchActiveOrganization()` - changement d'org active
@@ -488,9 +527,11 @@ export async function middleware(request: NextRequest) {
 - `validateSession()` - validation session + org active
 
 #### 2. `src/lib/auth/middleware-utils.ts`
+
 **Lignes**: 200 → 71 (-129 lignes, -65%)
 
 **BEFORE**:
+
 ```typescript
 import {
   getFullOrganizationApiWithHeaders,
@@ -556,6 +597,7 @@ export const handleLegacyOrgRedirect = (request: NextRequest) => {
 ```
 
 **AFTER**:
+
 ```typescript
 import { getSessionApi } from "@/lib/auth/auth-api-helper";
 import { SiteConfig } from "@/site-config";
@@ -609,9 +651,11 @@ export const isAdminRoute = (pathname: string) => {
 ```
 
 #### 3. `src/lib/subscription/subscription-manager.ts`
+
 **Lignes**: 690 → 420 (-270 lignes, -39%)
 
 **Changements**:
+
 - Supprimé `activateSubscriptionLegacyMode()` (170 lignes)
 - Renommé `activateSubscriptionUserMode()` → `activateSubscription()`
 - Supprimé dual-mode `if (FEATURES.USER_ACCOUNT_MODE)`
@@ -619,6 +663,7 @@ export const isAdminRoute = (pathname: string) => {
 - Gardé uniquement logique `UserSubscription` directe
 
 **BEFORE**:
+
 ```typescript
 import { FEATURES } from "@/lib/feature-flags";
 
@@ -649,8 +694,12 @@ async function activateSubscriptionLegacyMode(params) {
 
   await prisma.subscription.upsert({
     where: { referenceId: org.id },
-    create: { /* ... */ },
-    update: { /* ... */ },
+    create: {
+      /* ... */
+    },
+    update: {
+      /* ... */
+    },
   });
 }
 
@@ -660,6 +709,7 @@ async function activateSubscriptionUserMode(params) {
 ```
 
 **AFTER**:
+
 ```typescript
 // ✂️ FEATURES import removed
 
@@ -693,7 +743,9 @@ export async function activateSubscription(params) {
 
     // Calculate periodEnd
     let periodEnd: Date;
-    const isExtension = !!(user.planExpiresAt && user.planExpiresAt > currentDate);
+    const isExtension = !!(
+      user.planExpiresAt && user.planExpiresAt > currentDate
+    );
 
     if (isExtension && user.planExpiresAt) {
       periodEnd = new Date(user.planExpiresAt);
@@ -742,9 +794,11 @@ export async function activateSubscription(params) {
 ```
 
 #### 4. `src/lib/subscription/get-user-subscription.ts`
+
 **Lignes**: 122 → 76 (-46 lignes, -38%)
 
 **BEFORE**:
+
 ```typescript
 import { FEATURES } from "@/lib/feature-flags";
 
@@ -772,6 +826,7 @@ export async function getUserSubscription(userId: string) {
 ```
 
 **AFTER**:
+
 ```typescript
 // ✂️ FEATURES import removed
 
@@ -806,9 +861,11 @@ export async function getUserSubscription(userId: string) {
 ```
 
 #### 5. `src/lib/urls/app-urls.ts`
+
 **Lignes**: 156 → 57 (-99 lignes, -63%)
 
 **BEFORE**:
+
 ```typescript
 import { FEATURES } from "@/lib/feature-flags";
 import { prisma } from "@/lib/prisma";
@@ -864,6 +921,7 @@ export async function getCommonAppUrls(userId: string) {
 ```
 
 **AFTER**:
+
 ```typescript
 import { SiteConfig } from "@/site-config";
 
@@ -895,9 +953,11 @@ export function getCommonAppUrls() {
 ```
 
 #### 6. `src/lib/feature-flags.ts`
+
 **Status**: ✂️ DELETED (90 lignes)
 
 **BEFORE**:
+
 ```typescript
 /**
  * Feature Flags for Organization → User Refactoring
@@ -926,9 +986,11 @@ export type FeatureFlags = typeof FEATURES;
 **AFTER**: ✂️ File deleted entirely
 
 #### 7. `.env.example`
+
 **Lignes supprimées**: 201-218 (18 lignes)
 
 **BEFORE**:
+
 ```bash
 # ==============================================================================
 # 🚩 FEATURE FLAGS (Refactoring Issue #77)
@@ -953,12 +1015,14 @@ NEXT_PUBLIC_LEGACY_REDIRECTS="true"
 ```
 
 **AFTER**:
+
 ```bash
 # ✂️ Feature Flags section removed entirely
 # No longer needed in Big Bang approach
 ```
 
 ### TypeScript Errors
+
 **Avant**: 74 erreurs
 **Après**: 97 erreurs (+23 - attendu, imports cassés dans app/orgs/ à supprimer)
 
@@ -967,11 +1031,13 @@ NEXT_PUBLIC_LEGACY_REDIRECTS="true"
 ## Phase 4: Helpers (2h) ✅
 
 ### Objectif
+
 Supprimer les helpers organization, améliorer les helpers user existants.
 
 ### Analyse Initiale
 
 **Fichiers dans `src/lib/organizations/`**:
+
 1. `get-org.ts` (91 lignes) - `getCurrentOrg()`, `getRequiredCurrentOrg()`
 2. `is-in-roles.ts` (18 lignes) - `isInRoles()` - vérification rôles
 3. `get-org-subscription.ts` (62 lignes) - `getOrgActiveSubscription()` - Stripe subscription
@@ -982,9 +1048,11 @@ Supprimer les helpers organization, améliorer les helpers user existants.
 ### Fichiers Modifiés
 
 #### 1. `src/lib/auth/auth-user.ts`
+
 **Changement**: Enhanced `getUser()` to include `userSubscription`
 
 **BEFORE**:
+
 ```typescript
 export const getUser = async () => {
   const session = await getSession();
@@ -1016,6 +1084,7 @@ export const getUser = async () => {
 ```
 
 **AFTER**:
+
 ```typescript
 export const getUser = async () => {
   const session = await getSession();
@@ -1052,6 +1121,7 @@ export const getUser = async () => {
 ```
 
 #### 2. DELETE `src/lib/organizations/`
+
 **Status**: ✂️ Directory deleted (4 files, 171 lignes)
 
 **Équivalents user-centric**:
@@ -1063,6 +1133,7 @@ export const getUser = async () => {
 | `isInRoles()` | ❌ Not needed | User-centric = pas de rôles org |
 
 ### TypeScript Errors
+
 **Avant**: 97 erreurs
 **Après**: 97 erreurs (stable - erreurs dans fichiers à supprimer)
 
@@ -1071,6 +1142,7 @@ export const getUser = async () => {
 ## Phase 5: Routes Principales (6h) 🔄 67% Complete
 
 ### Objectif
+
 Migrer les 6 routes critiques de `app/orgs/[orgSlug]/(navigation)/(trading)/` vers `app/(app)/`.
 
 ### Routes Migrées ✅ (4/6)
@@ -1080,6 +1152,7 @@ Migrer les 6 routes critiques de `app/orgs/[orgSlug]/(navigation)/(trading)/` ve
 **Fichier**: `app/(app)/dashboard/page.tsx`
 
 **Changements**:
+
 ```typescript
 // BEFORE
 import { getOrgOrStub } from "@/lib/react/org-cache-dual";
@@ -1112,6 +1185,7 @@ export default async function DashboardPage() {
 ```
 
 **Remplacements**:
+
 - `getOrgOrStub()` → supprimé
 - `org` variable → supprimé
 - `fullUser` query → supprimé (user.discordId déjà disponible)
@@ -1148,11 +1222,13 @@ export default async function TradersMarketplacePage() {
 #### 3. `/signals` ✅
 
 **Fichiers modifiés**: 3 fichiers
+
 - `app/(app)/signals/page.tsx`
 - `app/(app)/signals/signals-filters.tsx`
 - `app/(app)/signals/signals-feed.tsx`
 
 **page.tsx**:
+
 ```typescript
 // BEFORE
 import { getOrgOrStub } from "@/lib/react/org-cache-dual";
@@ -1178,6 +1254,7 @@ export default async function SignalsPage({ searchParams }) {
 ```
 
 **signals-filters.tsx**:
+
 ```typescript
 // BEFORE
 type SignalsFiltersProps = {
@@ -1200,6 +1277,7 @@ export function SignalsFilters({ totalSignals }) {
 ```
 
 **signals-feed.tsx**:
+
 ```typescript
 // BEFORE
 type SignalsFeedProps = {
@@ -1228,6 +1306,7 @@ export const SignalsFeed = async ({ searchParams }) {
 **Fichier**: `app/(app)/pricing/page.tsx`
 
 **Changements**:
+
 ```typescript
 // BEFORE
 import { getOrgOrStub } from "@/lib/react/org-cache-dual";
@@ -1265,6 +1344,7 @@ export default async function PricingPage() {
 ```
 
 **Remplacements**:
+
 - URLs: `/orgs/${org.slug}/checkout/${plan}` → `/checkout/${plan}`
 - URLs: `/orgs/${org.slug}/checkout/test` → `/checkout/test`
 
@@ -1277,6 +1357,7 @@ export default async function PricingPage() {
 **Status**: Existe uniquement dans `app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/`
 
 **Localisation**:
+
 ```
 app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/page.tsx
 ```
@@ -1284,6 +1365,7 @@ app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/page.tsx
 **Prochaine étape**: Copier vers `app/(app)/checkout/[plan]/page.tsx` et adapter
 
 **Changements attendus**:
+
 - Supprimer `getRequiredCurrentOrgCache()`
 - Remplacer `org.subscription` par `user.userSubscription`
 - URLs de retour: `/orgs/${org.slug}/dashboard` → `/dashboard`
@@ -1293,6 +1375,7 @@ app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/page.tsx
 **Status**: Existe uniquement dans `app/orgs/[orgSlug]/(navigation)/(trading)/risk-console/`
 
 **Localisation**:
+
 ```
 app/orgs/[orgSlug]/(navigation)/(trading)/risk-console/page.tsx
 ```
@@ -1300,6 +1383,7 @@ app/orgs/[orgSlug]/(navigation)/(trading)/risk-console/page.tsx
 **Prochaine étape**: Copier vers `app/(app)/risk-console/page.tsx` et adapter
 
 **Changements attendus**:
+
 - Supprimer logique organization
 - Utiliser `user` directement
 
@@ -1310,6 +1394,7 @@ app/orgs/[orgSlug]/(navigation)/(trading)/risk-console/page.tsx
 ### Pattern 1: Suppression getOrgOrStub()
 
 **AVANT**:
+
 ```typescript
 import { getOrgOrStub } from "@/lib/react/org-cache-dual";
 
@@ -1322,6 +1407,7 @@ export default async function Page() {
 ```
 
 **APRÈS**:
+
 ```typescript
 export default async function Page() {
   const user = await getRequiredUser();
@@ -1330,19 +1416,20 @@ export default async function Page() {
 }
 ```
 
-### Pattern 2: Remplacements org.* → user.*
+### Pattern 2: Remplacements org._ → user._
 
-| AVANT | APRÈS |
-|-------|-------|
-| `org.subscription?.plan` | `user.userSubscription?.plan` |
+| AVANT                         | APRÈS                              |
+| ----------------------------- | ---------------------------------- |
+| `org.subscription?.plan`      | `user.userSubscription?.plan`      |
 | `org.subscription?.periodEnd` | `user.userSubscription?.periodEnd` |
-| `org.subscription?.status` | `user.userSubscription?.status` |
-| `org.slug` | ❌ Not needed (direct URLs) |
-| `org.members` | ❌ Removed (no org members) |
+| `org.subscription?.status`    | `user.userSubscription?.status`    |
+| `org.slug`                    | ❌ Not needed (direct URLs)        |
+| `org.members`                 | ❌ Removed (no org members)        |
 
 ### Pattern 3: URLs avec org slug
 
 **AVANT**:
+
 ```typescript
 <Link href={`/orgs/${org.slug}/dashboard`}>Dashboard</Link>
 <Link href={`/orgs/${org.slug}/traders`}>Traders</Link>
@@ -1350,6 +1437,7 @@ export default async function Page() {
 ```
 
 **APRÈS**:
+
 ```typescript
 <Link href="/dashboard">Dashboard</Link>
 <Link href="/traders">Traders</Link>
@@ -1359,6 +1447,7 @@ export default async function Page() {
 ### Pattern 4: Props orgSlug inutilisées
 
 **AVANT**:
+
 ```typescript
 type Props = {
   orgSlug: string;
@@ -1371,6 +1460,7 @@ function Component({ orgSlug: _orgSlug, otherProp }: Props) {
 ```
 
 **APRÈS**:
+
 ```typescript
 type Props = {
   otherProp: number;
@@ -1384,6 +1474,7 @@ function Component({ otherProp }: Props) {
 ### Pattern 5: Query user supplémentaire inutile
 
 **AVANT**:
+
 ```typescript
 const user = await getRequiredUser();
 
@@ -1392,10 +1483,13 @@ const fullUser = await prisma.user.findUnique({
   select: { discordId: true },
 });
 
-const hasJoinedDiscord = await hasUserJoinedDiscord(fullUser?.discordId ?? null);
+const hasJoinedDiscord = await hasUserJoinedDiscord(
+  fullUser?.discordId ?? null,
+);
 ```
 
 **APRÈS**:
+
 ```typescript
 const user = await getRequiredUser(); // ✅ discordId already included
 
@@ -1409,6 +1503,7 @@ const hasJoinedDiscord = await hasUserJoinedDiscord(user.discordId);
 ### État: 97 erreurs
 
 **Distribution**:
+
 - `__tests__/` (12 erreurs) - Tests feature-flags supprimés → Phase 9
 - `app/orgs/` (45+ erreurs) - Directory entier à supprimer → Phase 10
 - `app/admin/organizations/` (25+ erreurs) - Admin org routes → Phase 10
@@ -1416,12 +1511,14 @@ const hasJoinedDiscord = await hasUserJoinedDiscord(user.discordId);
 - `app/(app)/` (5 erreurs) - Fichiers non encore migrés
 
 **Pourquoi ces erreurs sont OK**:
+
 1. Les fichiers dans `app/orgs/` seront complètement supprimés (Phase 10)
 2. Les tests seront réécrits (Phase 9)
 3. Les admin routes seront nettoyées (Phase 10)
 4. Les webhooks Stripe sont legacy (non utilisés)
 
 **Erreurs à résoudre dans Phase 5**:
+
 - ✅ `app/(app)/dashboard/page.tsx` - RESOLVED
 - ✅ `app/(app)/signals/page.tsx` - RESOLVED
 - ✅ `app/(app)/pricing/page.tsx` - RESOLVED
@@ -1437,12 +1534,14 @@ const hasJoinedDiscord = await hasUserJoinedDiscord(user.discordId);
 **Contexte**: Codex (reviewer) a recommandé Big Bang car pas de prod.
 
 **Choix**: ✅ Big Bang
+
 - Supprimer tout en une seule fois
 - Pas de dual-mode (complexe et superficiel)
 - Plus rapide et plus propre
 - Pas de backward compatibility nécessaire
 
 **Alternative rejetée**: Dual-mode progressif
+
 - Trop complexe pour 0 bénéfice
 - Aurait nécessité 2x le code
 - Tests des 2 modes
@@ -1453,12 +1552,14 @@ const hasJoinedDiscord = await hasUserJoinedDiscord(user.discordId);
 **Contexte**: MyCryptoPilot est B2C (1 User = 1 Account), pas B2B multi-tenant.
 
 **Choix**: ✅ UserSubscription directe
+
 - Relation directe `User → UserSubscription`
 - Plus simple, plus performant
 - Pas de Member, pas d'Invitation
 - Aligné avec le modèle business
 
 **Architecture**:
+
 ```
 User {
   id
@@ -1477,11 +1578,12 @@ UserSubscription {
 }
 ```
 
-### Décision 3: Routes directes vs /orgs/*
+### Décision 3: Routes directes vs /orgs/\*
 
 **Contexte**: Plus besoin de namespace par organization.
 
 **Choix**: ✅ Routes directes
+
 - `/dashboard` au lieu de `/orgs/abc/dashboard`
 - `/traders` au lieu de `/orgs/abc/traders`
 - Plus simple pour les users
@@ -1489,6 +1591,7 @@ UserSubscription {
 - Pas de confusion
 
 **Migration**:
+
 - Phase 5: Migrer routes principales
 - Phase 10: Supprimer `/orgs/` complètement
 - Pas de redirections 307 (pas de prod)
@@ -1498,12 +1601,14 @@ UserSubscription {
 **Contexte**: Plus besoin de récupérer l'organization.
 
 **Choix**: ✅ `getUser()` enrichi
+
 - Inclut `userSubscription`
 - Inclut `discordId`
 - Une seule query Prisma
 - Type-safe
 
 **Code**:
+
 ```typescript
 const user = await getRequiredUser();
 // user.userSubscription déjà disponible
@@ -1516,6 +1621,7 @@ const user = await getRequiredUser();
 **Contexte**: Plus besoin de switch d'organization active.
 
 **Choix**: ✅ Middleware minimal
+
 - Root redirect vers `/dashboard`
 - Admin route protection
 - **Supprimé**: org slug extraction, org switching, redirections legacy
@@ -1529,32 +1635,32 @@ const user = await getRequiredUser();
 
 ### Taille du Code
 
-| Métrique | AVANT | APRÈS | Delta |
-|----------|-------|-------|-------|
-| **Fichiers totaux** | ~450 | ~435 | -15 files |
-| **Lignes de code** | ~85,000 | ~84,210 | -790 lines |
-| **src/lib/** | 12,500 | 11,900 | -600 lines |
-| **app/(app)/** | 8,200 | 8,140 | -60 lines |
-| **Middleware** | 86 | 45 | -48% |
+| Métrique            | AVANT   | APRÈS   | Delta      |
+| ------------------- | ------- | ------- | ---------- |
+| **Fichiers totaux** | ~450    | ~435    | -15 files  |
+| **Lignes de code**  | ~85,000 | ~84,210 | -790 lines |
+| **src/lib/**        | 12,500  | 11,900  | -600 lines |
+| **app/(app)/**      | 8,200   | 8,140   | -60 lines  |
+| **Middleware**      | 86      | 45      | -48%       |
 
 ### Complexité
 
-| Métrique | AVANT | APRÈS | Amélioration |
-|----------|-------|-------|--------------|
-| **Dual-mode conditionals** | 45+ | 0 | -100% |
-| **Organization queries** | 25+ | 0 | -100% |
-| **Feature flags** | 2 | 0 | -100% |
-| **User queries per page** | 2-3 | 1 | -50% |
+| Métrique                   | AVANT | APRÈS | Amélioration |
+| -------------------------- | ----- | ----- | ------------ |
+| **Dual-mode conditionals** | 45+   | 0     | -100%        |
+| **Organization queries**   | 25+   | 0     | -100%        |
+| **Feature flags**          | 2     | 0     | -100%        |
+| **User queries per page**  | 2-3   | 1     | -50%         |
 
 ### TypeScript Errors
 
-| Phase | Erreurs | Delta | Raison |
-|-------|---------|-------|--------|
-| Start | 75 | - | Baseline |
-| Phase 1 | 74 | -1 | auth.ts clean |
-| Phase 2 | 74 | 0 | Stable |
-| Phase 3 | 97 | +23 | Imports cassés (attendu) |
-| Phase 4 | 97 | 0 | Stable |
+| Phase   | Erreurs | Delta | Raison                   |
+| ------- | ------- | ----- | ------------------------ |
+| Start   | 75      | -     | Baseline                 |
+| Phase 1 | 74      | -1    | auth.ts clean            |
+| Phase 2 | 74      | 0     | Stable                   |
+| Phase 3 | 97      | +23   | Imports cassés (attendu) |
+| Phase 4 | 97      | 0     | Stable                   |
 
 **Note**: Les +23 erreurs en Phase 3 sont attendues et OK - ce sont des imports vers des fichiers supprimés dans `app/orgs/` qui sera supprimé en Phase 10.
 
@@ -1565,6 +1671,7 @@ const user = await getRequiredUser();
 ### Problème 1: Prisma AI Detection
 
 **Erreur**:
+
 ```
 Error: Prisma Migrate detected that it was invoked by Claude Code.
 You are attempting a highly dangerous action that can lead to devastating
@@ -1574,10 +1681,12 @@ consequences if it is incorrectly executed against a production database.
 **Contexte**: Phase 1, tentative de `prisma migrate reset`
 
 **Solution**:
+
 1. Expliquer à l'utilisateur la dangerosité de l'action
 2. Confirmer que c'est une DB de dev (Neon PostgreSQL)
 3. Demander consentement explicite de l'utilisateur
 4. Utiliser la variable d'environnement:
+
 ```bash
 PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
   npx prisma migrate reset --force --skip-seed
@@ -1590,11 +1699,13 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 **Erreur**: `generateSlug(user.id)` avec `customAlphabet()` générait des slugs différents à chaque appel.
 
 **Impact**:
+
 - Navigation instability
 - Hydration errors React
 - Liens cassés
 
 **Solution** (Big Bang):
+
 - Suppression complète du système de slug
 - Plus de generation aléatoire
 - URLs directes `/dashboard` au lieu de `/orgs/abc/dashboard`
@@ -1606,11 +1717,13 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 **Erreur**: Phase 5 progressive créait un dual-mode qui ne fonctionnait pas réellement.
 
 **Impact**:
+
 - Code dupliqué
 - Tests impossibles
 - Maintenance cauchemar
 
 **Solution** (Big Bang):
+
 - Supprimer tout le code legacy d'un coup
 - Une seule logique: user-centric
 - Pas de feature flags
@@ -1626,10 +1739,12 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 **Restant**: 2 routes
 
 #### `/checkout/[plan]`
+
 **Source**: `app/orgs/[orgSlug]/(navigation)/(trading)/checkout/[plan]/page.tsx`
 **Destination**: `app/(app)/checkout/[plan]/page.tsx`
 
 **Actions**:
+
 1. Copier le fichier depuis orgs/
 2. Supprimer `getRequiredCurrentOrgCache()`
 3. Remplacer `org.subscription` par `user.userSubscription`
@@ -1639,10 +1754,12 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 **Estimation**: 30 min
 
 #### `/risk-console`
+
 **Source**: `app/orgs/[orgSlug]/(navigation)/(trading)/risk-console/page.tsx`
 **Destination**: `app/(app)/risk-console/page.tsx`
 
 **Actions**:
+
 1. Copier le fichier depuis orgs/
 2. Supprimer logique organization
 3. Utiliser `user` directement
@@ -1664,6 +1781,7 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 6. `app/(app)/layout.tsx` - Layout avec org context
 
 **Pattern**:
+
 - Supprimer `getOrgOrStub()`
 - Remplacer `org.*` par `user.*`
 - URLs directes
@@ -1675,6 +1793,7 @@ PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="ok pour reset" \
 **Composants à supprimer/réécrire**:
 
 Dans `src/components/nowts/`:
+
 - `organization-card.tsx`
 - `organization-switcher.tsx`
 - `member-list.tsx`
@@ -1682,6 +1801,7 @@ Dans `src/components/nowts/`:
 - Autres composants org-specific
 
 **Actions**:
+
 1. Identifier tous les composants org dans `src/components/`
 2. Pour chaque composant:
    - Si utilisé uniquement dans `/orgs/`: rien faire (sera supprimé Phase 10)
@@ -1695,6 +1815,7 @@ Dans `src/components/nowts/`:
 **Fichier principal**: `src/lib/actions/safe-actions.ts`
 
 **Actions**:
+
 - Supprimer `orgAction()` (action avec org context)
 - Garder `authAction()` (action avec user context)
 - Adapter les actions existantes qui utilisent `orgAction()`
@@ -1706,6 +1827,7 @@ Dans `src/components/nowts/`:
 **Tests à réécrire** (18 tests e2e):
 
 Dans `e2e/`:
+
 - `organization.spec.ts` - DELETE (tests d'org)
 - `member.spec.ts` - DELETE (tests de membres)
 - `invitation.spec.ts` - DELETE (tests d'invitations)
@@ -1717,6 +1839,7 @@ Dans `e2e/`:
 - Autres tests e2e
 
 **Actions**:
+
 1. Lister tous les tests e2e
 2. Catégoriser: DELETE vs REWRITE vs UPDATE
 3. Pour chaque test REWRITE:
@@ -1732,11 +1855,13 @@ Dans `e2e/`:
 **Suppressions massives**:
 
 1. **DELETE `app/orgs/`** (100+ fichiers)
+
    ```bash
    rm -rf app/orgs/
    ```
 
 2. **DELETE admin org routes**:
+
    ```bash
    rm -rf app/admin/organizations/
    ```
@@ -1761,30 +1886,38 @@ Dans `e2e/`:
 **Tests complets**:
 
 1. **Build TypeScript** (1h)
+
    ```bash
    pnpm ts
    ```
+
    - Objectif: 0 erreurs
    - Fixer toutes les erreurs TypeScript restantes
 
 2. **Tests unitaires** (30 min)
+
    ```bash
    pnpm test:ci
    ```
+
    - Vérifier que tous les tests passent
    - Adapter les tests cassés
 
 3. **Tests e2e** (30 min)
+
    ```bash
    pnpm test:e2e:ci
    ```
+
    - Vérifier les flows principaux
    - Dashboard, Traders, Signals, Checkout
 
 4. **Build Next.js** (30 min)
+
    ```bash
    pnpm build
    ```
+
    - Vérifier que le build passe
    - Pas d'erreurs de runtime
 
@@ -1806,31 +1939,32 @@ Dans `e2e/`:
 
 ### Temps Consommé (Phases 1-4 + 67% Phase 5)
 
-| Phase | Estimé | Réel | Delta |
-|-------|--------|------|-------|
-| Phase 1 | 2h | 1.5h | -30 min ✅ |
-| Phase 2 | 3h | 2h | -1h ✅ |
-| Phase 3 | 1h | 1.5h | +30 min |
-| Phase 4 | 2h | 1h | -1h ✅ |
-| Phase 5 (67%) | 4h | 2h | -2h ✅ |
-| **TOTAL** | **12h** | **8h** | **-4h** ✅ |
+| Phase         | Estimé  | Réel   | Delta      |
+| ------------- | ------- | ------ | ---------- |
+| Phase 1       | 2h      | 1.5h   | -30 min ✅ |
+| Phase 2       | 3h      | 2h     | -1h ✅     |
+| Phase 3       | 1h      | 1.5h   | +30 min    |
+| Phase 4       | 2h      | 1h     | -1h ✅     |
+| Phase 5 (67%) | 4h      | 2h     | -2h ✅     |
+| **TOTAL**     | **12h** | **8h** | **-4h** ✅ |
 
 **Observation**: Nous sommes 33% plus rapides que prévu!
 
 ### Temps Restant (33% Phase 5 + Phases 6-11)
 
-| Phase | Estimé | Ajusté | Note |
-|-------|--------|--------|------|
-| Phase 5 (33%) | 2h | 1h | Checkout + Risk console |
-| Phase 6 | 5h | 4h | Account pages |
-| Phase 7 | 4h | 3h | Components |
-| Phase 8 | 2h | 1.5h | Actions |
-| Phase 9 | 5h | 4h | Tests e2e |
-| Phase 10 | 2h | 1.5h | Cleanup |
-| Phase 11 | 3h | 2h | Validation |
-| **TOTAL** | **23h** | **17h** | -26% |
+| Phase         | Estimé  | Ajusté  | Note                    |
+| ------------- | ------- | ------- | ----------------------- |
+| Phase 5 (33%) | 2h      | 1h      | Checkout + Risk console |
+| Phase 6       | 5h      | 4h      | Account pages           |
+| Phase 7       | 4h      | 3h      | Components              |
+| Phase 8       | 2h      | 1.5h    | Actions                 |
+| Phase 9       | 5h      | 4h      | Tests e2e               |
+| Phase 10      | 2h      | 1.5h    | Cleanup                 |
+| Phase 11      | 3h      | 2h      | Validation              |
+| **TOTAL**     | **23h** | **17h** | -26%                    |
 
 **Estimation totale Big Bang**:
+
 - **Estimé initial**: 35h (12h fait + 23h restant)
 - **Ajusté**: 25h (8h fait + 17h restant)
 - **Économie**: -10h (-29%)
@@ -1842,11 +1976,13 @@ Dans `e2e/`:
 ### Recommandation 1: Continuer Phases 6-9 avant Phase 10
 
 **Pourquoi**:
+
 - Phase 10 supprime `/orgs/` (source de vérité pour checkout/risk-console)
 - Phases 6-9 peuvent avoir besoin de référencer l'ancien code
 - Plus sûr de migrer avant de supprimer
 
 **Ordre suggéré**:
+
 1. ✅ Phases 1-4 (FAIT)
 2. 🔄 Phase 5 - Finir les 2 routes restantes (1h)
 3. ⏳ Phase 6 - Account pages (4h)
@@ -1859,6 +1995,7 @@ Dans `e2e/`:
 ### Recommandation 2: Créer des commits fréquents
 
 **Actuel**: 5 commits créés
+
 - `feat(refactor): Phase 1 complete`
 - `feat(refactor): Phase 2 complete`
 - `feat(refactor): Phase 3 complete`
@@ -1868,6 +2005,7 @@ Dans `e2e/`:
 **Suggéré**: Continuer avec 1 commit par phase complète
 
 **Bénéfices**:
+
 - Historique Git propre
 - Facilité de rollback si problème
 - Revue de code plus facile
@@ -1875,15 +2013,18 @@ Dans `e2e/`:
 ### Recommandation 3: Option de pause stratégique
 
 **Option A**: Continuer jusqu'à Phase 11 (17h restantes)
+
 - Avantage: Big Bang complet en une seule session
 - Risque: Fatigue, erreurs
 
 **Option B**: Pause après Phase 6 (Account Pages)
+
 - Avantage: Checkpoint naturel
 - État: App fonctionnelle avec routes critiques migrées
 - PR intermédiaire possible
 
 **Option C**: Pause maintenant, continuer plus tard
+
 - Avantage: Fraîcheur mentale
 - État actuel: 4 phases complètes, 67% Phase 5
 
@@ -1894,6 +2035,7 @@ Dans `e2e/`:
 ## 📝 Commits Git Créés
 
 ### Commit 1: Phase 1 Complete
+
 ```
 feat(refactor): Phase 1 complete - Database schema cleanup
 
@@ -1917,6 +2059,7 @@ Next: Phase 2 - Auth Core
 ```
 
 ### Commit 2: Phase 2 Complete
+
 ```
 feat(refactor): Phase 2 complete - Auth core simplification
 
@@ -1936,6 +2079,7 @@ Next: Phase 3 - Feature Flags
 ```
 
 ### Commit 3: Phase 3 Complete
+
 ```
 feat(refactor): Phase 3 complete - Remove feature flags system
 
@@ -1958,6 +2102,7 @@ Next: Phase 4 - Helpers
 ```
 
 ### Commit 4: Phase 4 Complete
+
 ```
 feat(refactor): Phase 4 complete - Replace org helpers with user helpers
 
@@ -1982,6 +2127,7 @@ Next: Phase 5 - Migrate critical routes
 ```
 
 ### Commit 5: Phase 5 Progress (4/6 routes)
+
 ```
 feat(refactor): Phase 5 progress - Migrate /dashboard, /traders, /signals, /pricing
 
@@ -2029,6 +2175,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 **Impact**: Les liens dans `/pricing` pointent vers des routes qui n'existent pas encore
 
 **Solution**:
+
 - Option A: Copier et adapter maintenant (1h)
 - Option B: Laisser pour Phase 10 (marchera depuis `/orgs/` en attendant)
 
@@ -2065,6 +2212,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 **Impact**: Webhooks Stripe vont échouer
 
 **Solution**:
+
 - Option A: Adapter pour `UserSubscription`
 - Option B: Supprimer complètement (MyCryptoPilot utilise crypto)
 
@@ -2118,18 +2266,21 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 **Contexte**: Pas de production, codebase sous contrôle
 
 **Avantages Big Bang**:
+
 - Plus rapide (8h vs 12h estimé progressif)
 - Code plus propre (pas de dual-mode)
 - Moins de bugs (une seule logique)
 - Maintenance simplifiée
 
 **Quand utiliser Big Bang**:
+
 - ✅ Pas de production
 - ✅ Peut tout casser
 - ✅ Équipe petite
 - ✅ Refactor bien défini
 
 **Quand éviter Big Bang**:
+
 - ❌ Production active
 - ❌ Downtime inacceptable
 - ❌ Équipe grande
@@ -2140,11 +2291,13 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 **Règle**: Lire 3+ fichiers similaires avant d'éditer
 
 **Bénéfices observés**:
+
 - Patterns identifiés (ex: `orgSlug` inutilisé dans signals)
 - Évite réinventer la roue (ex: `getUser()` existe déjà)
 - Code cohérent avec le reste de la codebase
 
 **Exemple**:
+
 - Lu `dashboard/page.tsx` dans `/orgs/` avant d'adapter dans `/(app)/`
 - Découvert que `traders/page.tsx` était déjà user-centric
 - Économisé 30 min de travail inutile
@@ -2154,6 +2307,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 **Pratique**: 1 commit par phase complète
 
 **Bénéfices**:
+
 - Rollback facile si problème
 - Historique Git propre
 - Revue de code simplifiée
@@ -2164,6 +2318,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 ### 4. TypeScript errors comme indicateurs
 
 **Observation**:
+
 - Phase 1-2: Erreurs diminuent (code nettoyé)
 - Phase 3: Erreurs augmentent (imports cassés - OK)
 - Phase 5+: Erreurs diminuent (migrations)
@@ -2174,6 +2329,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 
 **Temps investi**: ~2h de documentation
 **Temps économisé**:
+
 - Pas de répétition d'erreurs
 - Patterns clairement identifiés
 - Roadmap précise pour les phases restantes
@@ -2187,12 +2343,14 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 ### État Actuel ✅
 
 **Phases complètes**: 4/11 (36%)
+
 - ✅ Phase 1: Database
 - ✅ Phase 2: Auth Core
 - ✅ Phase 3: Feature Flags
 - ✅ Phase 4: Helpers
 
 **Phase en cours**: Phase 5 (67% complète)
+
 - ✅ 4 routes migrées (dashboard, traders, signals, pricing)
 - ⏳ 2 routes restantes (checkout, risk-console)
 
@@ -2206,6 +2364,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 **Option recommandée**: Continuer Phase 5 (1h)
 
 **Actions**:
+
 1. Copier `checkout/[plan]/page.tsx` depuis `/orgs/` vers `/(app)/`
 2. Adapter pour user-centric (supprimer org logic)
 3. Copier `risk-console/page.tsx` depuis `/orgs/` vers `/(app)/`
@@ -2213,6 +2372,7 @@ Next: Complete Phase 5, then Phase 6 (Account Pages)
 5. Commit: "feat(refactor): Phase 5 complete"
 
 **Après Phase 5**:
+
 - Phase 6: Account Pages (4h)
 - Pause possible pour créer PR intermédiaire
 

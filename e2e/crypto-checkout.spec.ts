@@ -66,12 +66,12 @@ test.describe("Crypto Checkout Flow", () => {
     });
 
     expect(addresses).toHaveLength(2);
-    expect(
-      addresses.find((addr) => addr.network === "BASE")?.address,
-    ).toMatch(/^0x[a-fA-F0-9]{40}$/);
-    expect(
-      addresses.find((addr) => addr.network === "TRON")?.address,
-    ).toMatch(/^T[a-zA-Z0-9]{30,}$/);
+    expect(addresses.find((addr) => addr.network === "BASE")?.address).toMatch(
+      /^0x[a-fA-F0-9]{40}$/,
+    );
+    expect(addresses.find((addr) => addr.network === "TRON")?.address).toMatch(
+      /^T[a-zA-Z0-9]{30,}$/,
+    );
     addresses.forEach((addr) => expect(addr.isActive).toBe(true));
   });
 
@@ -204,10 +204,7 @@ test.describe("Crypto Checkout Flow", () => {
     }
   });
 
-  test.skip("free user sees upgrade prompt in dashboard", async ({ page }) => {
-    // TODO: Update test for new dashboard UI (B2C migration)
-    // Old: Link to /settings/billing
-    // New: Dashboard cards invite to follow traders (app/(app)/(trading)/dashboard/page.tsx:130-210)
+  test("free user sees upgrade prompt in dashboard", async ({ page }) => {
     // 1. Create a user account
     const userData = await createTestAccount({
       page,
@@ -223,25 +220,17 @@ test.describe("Crypto Checkout Flow", () => {
     // Verify user is on Free plan
     expect(user.planName).toBe("free");
 
-    // 2. Navigate to dashboard
+    // 2. Navigate to dashboard (already there after signup, but ensure fresh load)
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
-    // 3. Verify upgrade CTA visible
-    // Use .first() to avoid strict mode violation (title + description both match)
-    await expect(
-      page.getByText(/upgrade.*unlock|upgrade.*pro/i).first(),
-    ).toBeVisible({
-      timeout: 5000,
-    });
-
-    // 4. Verify upgrade link is present and clickable
-    const upgradeLink = page.getByRole("link", { name: /upgrade/i }).first();
-    await expect(upgradeLink).toBeVisible();
-
-    // Verify upgrade link points to billing settings (where users can upgrade)
-    const upgradeLinkHref = await upgradeLink.getAttribute("href");
-    expect(upgradeLinkHref).toMatch(/settings\/billing/);
+    // 3. Verify plan card indicates Free plan with upgrade hint
+    const planCard = page.getByTestId("plan-card");
+    await expect(planCard).toBeVisible();
+    await expect(planCard.getByTestId("plan-name")).toHaveText(/free/i);
+    await expect(planCard.getByTestId("plan-status")).toContainText(
+      /upgrade to pro/i,
+    );
   });
 
   test("checkout validates payment amount for pro-rata", async ({ page }) => {

@@ -32,7 +32,8 @@ export async function handleRiskCommand(
 
   if (rewardDistance === 0) {
     await interaction.reply({
-      content: "❌ La différence entre take profit et entry ne peut pas être 0.",
+      content:
+        "❌ La différence entre take profit et entry ne peut pas être 0.",
       ephemeral: true,
     });
     return;

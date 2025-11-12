@@ -45,7 +45,7 @@ export const GET = route.handler(async (req) => {
 
   if (token !== expectedSecret) {
     logger.warn("Unauthorized cron job attempt", {
-      receivedToken: `${token?.slice(0, 10)  }...`,
+      receivedToken: `${token?.slice(0, 10)}...`,
       ip: req.headers.get("x-forwarded-for") ?? "unknown",
     });
     throw new ZodRouteError("Unauthorized", 401);

@@ -27,7 +27,8 @@ export async function handleSupportCommand(
       },
       {
         name: "💬 Discord",
-        value: "Utilise ce serveur pour discuter avec l'équipe ou ouvrir un ticket.",
+        value:
+          "Utilise ce serveur pour discuter avec l'équipe ou ouvrir un ticket.",
         inline: false,
       },
     )

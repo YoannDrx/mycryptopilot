@@ -88,21 +88,10 @@ test.describe("Traders Marketplace", () => {
   });
 
   /**
-   * ✅ FIXED - Marketplace search filter now working with hybrid architecture!
-   *
-   * Root cause: Hard redirects were causing full page reloads (bad UX)
-   * Solution: Hybrid architecture with SSR initial + TanStack Query for client-side filtering
-   *
-   * Architecture:
-   * - Initial load: SSR with searchTraders()
-   * - Filtering: Client-side fetch via /api/traders/search
-   * - URL state: nuqs with shallow: true (no navigation)
-   * - Result: No full page reload, fast filtering, SEO preserved
+   * Hybrid marketplace architecture combines SSR (SEO) with client-side filters.
+   * This test ensures the search input and filter dropdown update results without reloads.
    */
-  test.skip("marketplace search and filters work", async ({ page }) => {
-    // TODO: Investigate nuqs replaceState vs waitForURL issue
-    // Test already uses waitForResponse fallback but still failing
-    // 1. Create 3 traders directly in DB with UNIQUE names (using timestamp to avoid duplicates from previous test runs)
+  test("marketplace search and filters work", async ({ page }) => {
     const timestamp = Date.now();
     const trader1Data = await createTestTraderDirectly();
     await prisma.traderProfile.update({
@@ -134,7 +123,6 @@ test.describe("Traders Marketplace", () => {
       },
     });
 
-    // 2. Create a follower account
     await createTestAccount({
       page,
       callbackURL: "/dashboard",
@@ -142,88 +130,64 @@ test.describe("Traders Marketplace", () => {
 
     await page.waitForURL(/\/dashboard$/);
 
-    // 3. Navigate to marketplace
     await page.goto("/traders");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
-    // 4. Verify all 3 traders are visible initially
-    await expect(
-      page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByText(`Bitcoin Expert ${timestamp}`).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByText(`Altcoin Master ${timestamp}`).first(),
-    ).toBeVisible();
+    const grid = page.locator('[data-testid="traders-grid"]');
+    const waitForFetch = async () =>
+      page.waitForResponse(
+        (response) =>
+          response.url().includes("/api/traders/search") &&
+          response.request().method() === "GET",
+        { timeout: 15000 },
+      );
 
-    // 5. Test search functionality - search for "Whale"
     const searchInput = page.getByPlaceholder(/search traders/i);
     await expect(searchInput).toBeVisible();
-    await searchInput.fill("Whale");
 
-    // Wait for URL update (nuqs throttle: 300ms) + API call
-    await page.waitForURL(/search=Whale/, { timeout: 2000 });
-    // Wait for API response
-    await page.waitForResponse(
-      (response) => response.url().includes("/api/traders/search"),
-      { timeout: 2000 },
-    );
-
-    // Verify only Crypto Whale Trader is visible (search filters out others)
     await expect(
-      page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+      grid.getByText(`Crypto Whale Trader ${timestamp}`).first(),
     ).toBeVisible();
-    // Bitcoin Expert and Altcoin Master should NOT exist in DOM (count = 0)
-    expect(await page.getByText(`Bitcoin Expert ${timestamp}`).count()).toBe(0);
-    expect(await page.getByText(`Altcoin Master ${timestamp}`).count()).toBe(0);
-
-    // 6. Clear search and test "Verified Only" filter
-    await searchInput.clear();
-    // Wait for URL to clear search param
-    await page.waitForFunction(
-      () => !window.location.search.includes("search="),
-      { timeout: 2000 },
-    );
-    // Wait for API response
-    await page.waitForResponse(
-      (response) => response.url().includes("/api/traders/search"),
-      { timeout: 2000 },
-    );
-
-    // Apply verified filter
-    const filterSelect = page.getByLabel(/filter/i);
-    if ((await filterSelect.count()) > 0) {
-      await filterSelect.click();
-      await page.getByRole("option", { name: /verified/i }).click();
-      await page.waitForLoadState("networkidle");
-
-      // Should show only verified traders (Crypto Whale Trader, Altcoin Master)
-      await expect(
-        page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
-      ).toBeVisible();
-      await expect(
-        page.getByText(`Altcoin Master ${timestamp}`).first(),
-      ).toBeVisible();
-      // Bitcoin Expert is NOT verified, should not exist in DOM (count = 0)
-      expect(await page.getByText(`Bitcoin Expert ${timestamp}`).count()).toBe(
-        0,
-      );
-    }
-
-    // 7. Test combined search + filter
-    await searchInput.fill("Trader");
-    // Wait for API response
-    await page.waitForResponse(
-      (response) => response.url().includes("/api/traders/search"),
-      { timeout: 2000 },
-    );
-
-    // Should show only "Crypto Whale Trader" (verified + contains "Trader")
     await expect(
-      page.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+      grid.getByText(`Bitcoin Expert ${timestamp}`).first(),
     ).toBeVisible();
-    // Altcoin Master doesn't contain "Trader", should not be visible
-    expect(await page.getByText(`Altcoin Master ${timestamp}`).count()).toBe(0);
+    await expect(
+      grid.getByText(`Altcoin Master ${timestamp}`).first(),
+    ).toBeVisible();
+
+    const searchFetch = waitForFetch();
+    await searchInput.fill(`Whale Trader ${timestamp}`);
+    await searchFetch;
+
+    await expect(
+      grid.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+    ).toBeVisible();
+    await expect(grid.getByText(`Bitcoin Expert ${timestamp}`)).toHaveCount(0);
+    await expect(grid.getByText(`Altcoin Master ${timestamp}`)).toHaveCount(0);
+
+    const clearFetch = waitForFetch();
+    await searchInput.fill("");
+    await clearFetch;
+
+    const filterTrigger = page.locator('button[role="combobox"]').first();
+    await filterTrigger.click();
+    await page.getByRole("option", { name: /verified only/i }).click();
+    await waitForFetch();
+
+    await expect(
+      grid.getByText(`Crypto Whale Trader ${timestamp}`).first(),
+    ).toBeVisible();
+    await expect(
+      grid.getByText(`Altcoin Master ${timestamp}`).first(),
+    ).toBeVisible();
+    await expect(grid.getByText(`Bitcoin Expert ${timestamp}`)).toHaveCount(0);
+
+    await filterTrigger.click();
+    await page.getByRole("option", { name: /all traders/i }).click();
+    await waitForFetch();
+
+    await expect(
+      grid.getByText(`Bitcoin Expert ${timestamp}`).first(),
+    ).toBeVisible();
   });
 });

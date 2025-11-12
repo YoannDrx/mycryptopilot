@@ -40,7 +40,7 @@ test.describe("Trader Dashboard", () => {
 
     // 3. Navigate to trader dashboard
     await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 4. Verify "My Signals" tab is active by default
     const mySignalsTab = page.getByRole("tab", { name: /my signals/i });
@@ -131,7 +131,7 @@ test.describe("Trader Dashboard", () => {
 
     // 4. Navigate to trader dashboard
     await page.goto("/dashboard/trader");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 5. Verify Followers stat card shows 3
     const followersCard = page

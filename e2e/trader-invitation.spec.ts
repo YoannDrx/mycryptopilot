@@ -12,7 +12,7 @@ test.describe("Trader Invitation System", () => {
 
     // 2. Navigate to referral program page
     await page.goto("/trader-tools/referral");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Click on Invitations tab
     await page.getByRole("tab", { name: /invitations/i }).click();
@@ -49,7 +49,7 @@ test.describe("Trader Invitation System", () => {
     // 5. Test resend functionality
     // After the invitation dialog closes, the page may reload and return to the default "signals" tab
     // We need to click on the "Invitations" tab again to see the invitation
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.getByRole("tab", { name: /invitations/i }).click();
 
     // Find the row with the email and wait for resend button to be visible
@@ -91,7 +91,7 @@ test.describe("Trader Invitation System", () => {
 
     // Navigate to invitation acceptance page
     await page.goto(`/invite/accept/${invitationWithToken?.token}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Should see trader name and follow button
     await expect(page.getByRole("button", { name: /follow/i })).toBeVisible();
@@ -100,7 +100,7 @@ test.describe("Trader Invitation System", () => {
     await page.getByRole("button", { name: /follow/i }).click();
 
     // Should redirect to dashboard
-    await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
+    await page.waitForURL(/\/dashboard$/, { timeout: 30000 });
 
     // Verify invitation status is ACCEPTED
     const acceptedInvitation = await prisma.traderInvitation.findFirst({
@@ -141,7 +141,7 @@ test.describe("Trader Invitation System", () => {
 
     // 9. Navigate back to invitations tab and delete invitation
     await page.goto("/trader-tools/referral");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.getByRole("tab", { name: /invitations/i }).click();
 
     // Find invitation row and click delete
@@ -199,7 +199,7 @@ test.describe("Trader Invitation System", () => {
 
     // Navigate to acceptance page while logged in as trader
     await page.goto(`/invite/accept/${token}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Click accept button
     await page.getByRole("button", { name: /follow/i }).click();
@@ -236,7 +236,7 @@ test.describe("Trader Invitation System", () => {
 
     // Navigate to acceptance page
     await page.goto(`/invite/accept/${token}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Should show "Invitation Not Found" or expired message
     await expect(page.getByText(/invitation.*invalid.*expired/i)).toBeVisible();

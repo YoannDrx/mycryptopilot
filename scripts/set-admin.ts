@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+/* eslint-disable no-console */
 
 /**
  * Script pour passer un utilisateur en admin
