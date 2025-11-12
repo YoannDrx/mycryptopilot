@@ -1,6 +1,6 @@
 # 🎮 Discord Bot - Guide de Configuration Complète
 
-**Dernière mise à jour**: 2 novembre 2025 — ajout de `DISCORD_BOT_ENABLED` et retours Railway
+**Dernière mise à jour**: 12 novembre 2025 — ajout de `DISCORD_BOT_ENABLED` et migration vers Fly worker
 
 Ce guide détaille la configuration complète du bot Discord MyCryptoPilot, incluant:
 
@@ -22,7 +22,7 @@ Ce guide détaille la configuration complète du bot Discord MyCryptoPilot, incl
 6. [Phase 6: Obtenir les IDs Discord](#phase-6-obtenir-les-ids-discord)
 7. [Phase 7: Variables d'Environnement](#phase-7-variables-denvironnement)
    - [7.1 - Fichier .env (Local Development)](#71---fichier-env-local-development)
-   - [7.2 - Railway (Production Bot)](#72---railway-production-bot)
+   - [7.2 - Fly Worker (Production Bot)](#72---fly-worker-production-bot)
    - [7.3 - Vercel (Production Next.js)](#73---vercel-production-nextjs)
    - [7.4 - Développement Local (Testing)](#74---développement-local-testing)
 8. [Vérification Finale](#vérification-finale)
@@ -114,7 +114,7 @@ Dans Developer Portal → Bot → Bot Permissions:
 - `SERVER MEMBERS INTENT`: Pour récupérer les membres Discord et lier `discordId` (utilisé dans `bot-client.ts`)
 - `MESSAGE CONTENT INTENT`: Pour lire le contenu des messages (modération, teasers, Phase 4)
 
-**⚠️ Important**: Après activation, **redémarrer le bot** (Railway/Fly.io) pour prendre effet!
+**⚠️ Important**: Après activation, **redémarrer le bot** (worker Fly) pour prendre effet!
 
 ---
 
@@ -343,19 +343,20 @@ DISCORD_LOG_CHANNEL_ID="123456789012345678"           # ID de #bot-logs
 DISCORD_ROLE_ADMIN_ID="123456789012345678"            # ID du rôle Admin
 ```
 
-### 7.2 - Railway (Production Bot)
+### 7.2 - Fly Worker (Production Bot)
 
-Le bot Discord tourne sur **Railway** (pas Vercel, car serverless).
+Le bot Discord (ainsi que les cron jobs) tourne sur le worker Fly `mycryptopilot-worker`.
 
-Ajouter les 3 nouvelles variables sur Railway:
+Ajouter/mettre à jour les secrets:
 
-1. Aller sur Railway Dashboard → Votre projet MyCryptoPilot Bot
-2. Onglet **"Variables"**
-3. Ajouter:
-   - `DISCORD_FREE_SIGNALS_CHANNEL_ID` = `123...` (ID récupéré en Phase 6.2)
-   - `DISCORD_LOG_CHANNEL_ID` = `123...`
-   - `DISCORD_ROLE_ADMIN_ID` = `123...`
-4. **Redeploy** le bot
+```bash
+fly secrets set -a mycryptopilot-worker \
+  DISCORD_FREE_SIGNALS_CHANNEL_ID="123..." \
+  DISCORD_LOG_CHANNEL_ID="123..." \
+  DISCORD_ROLE_ADMIN_ID="123..."
+```
+
+Après mise à jour, surveiller `fly logs -a mycryptopilot-worker --no-tail` pour vérifier le redémarrage du bot (message `Discord bot logged in as ...`).
 
 ### 7.3 - Vercel (Production Next.js)
 
@@ -410,7 +411,7 @@ Loaded environment from .env.local
 - Si erreur `Missing DISCORD_BOT_TOKEN` → Vérifier les variables Phase 7.1
 - Si erreur `Invalid token` → Regénérer le token sur Discord Developer Portal
 
-**Note**: En production (Railway), le script utilise directement les variables d'environnement injectées par la plateforme (pas de .env.local).
+**Note**: En production (Fly worker), le script utilise directement les variables d'environnement injectées par la plateforme (pas de .env.local).
 
 ---
 
@@ -442,13 +443,13 @@ Avant de passer aux Phases 2-5 (code), vérifier:
 **Variables Env**:
 
 - ✅ `.env.local` rempli (dev)
-- ✅ Railway variables ajoutées (bot production)
+- ✅ Secrets Fly ajoutés (bot production)
 - ✅ Vercel variables ajoutées (site production)
 
 **Bot Redéployé**:
 
-- ✅ Railway bot redéployé après ajout variables env
-- ✅ Logs Railway affichent:
+- ✅ Worker Fly redéployé après ajout des secrets
+- ✅ `fly logs -a mycryptopilot-worker --no-tail` affiche:
   - `Discord bot logged in as MyCryptoPilot#1234` ✅
   - `🔍 Checking bot permissions...` ✅
   - `✅ All permissions verified successfully!` ✅
@@ -460,7 +461,7 @@ Avant de passer aux Phases 2-5 (code), vérifier:
 1. Sur Discord, faire `/status`
 2. Le bot doit répondre avec votre plan actuel
 
-Si erreur → Vérifier logs Railway pour voir permissions manquantes
+Si erreur → Vérifier `fly logs -a mycryptopilot-worker --no-tail` pour voir les permissions manquantes
 
 #### Test 2: Vérifier Hiérarchie Rôles
 
@@ -470,7 +471,7 @@ Si erreur → Vérifier logs Railway pour voir permissions manquantes
 
 #### Test 3: Vérifier Gateway Intents
 
-1. Sur Railway, voir les logs bot au démarrage
+1. Sur Fly, voir les logs bot au démarrage (`fly logs -a mycryptopilot-worker --no-tail`)
 2. Chercher `Discord bot logged in as` → Si absent, intent SERVER MEMBERS pas activé
 3. Si le bot ne répond pas aux commandes → Vérifier intent MESSAGE CONTENT
 
@@ -664,14 +665,14 @@ Les rôles sont assignés automatiquement dans 3 cas:
 2. Drag & drop le rôle `BotMyCryptoPilot` **en première position** (juste après owner)
 3. Retester
 
-### Problème: Bot ne démarre pas (Railway)
+### Problème: Bot ne démarre pas (Fly worker)
 
 **Cause**: Variables env manquantes ou Gateway Intents pas activés.
 
 **Solution**:
 
-1. Vérifier logs Railway: `railway logs --tail`
-2. Si `Missing DISCORD_BOT_TOKEN` → Ajouter variable sur Railway
+1. Vérifier logs Fly: `fly logs -a mycryptopilot-worker --no-tail`
+2. Si `Missing DISCORD_BOT_TOKEN` → Ajouter le secret via `fly secrets set -a mycryptopilot-worker DISCORD_BOT_TOKEN="..."`
 3. Si `PrivilegedIntentsRequired` → Activer intents dans Developer Portal, puis redéployer
 
 ### Problème: Commandes slash n'apparaissent pas
@@ -697,7 +698,7 @@ Les rôles sont assignés automatiquement dans 3 cas:
 
 - **Discord Developer Portal**: https://discord.com/developers/applications
 - **Documentation Discord.js**: https://discord.js.org/docs/packages/discord.js/main
-- **Railway Dashboard**: https://railway.app/dashboard
+- **Fly Dashboard**: https://fly.io/apps
 - **Vercel Dashboard**: https://vercel.com/dashboard
 
 ---

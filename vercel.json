@@ -1,12 +1,3 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/expiration-reminders",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/sync-exchanges",
-      "schedule": "0 2 * * *"
-    }
-  ]
+  "crons": []
 }

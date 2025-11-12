@@ -29,8 +29,7 @@ import { route } from "@/lib/zod-route";
 import { logger } from "@/lib/logger";
 import { env } from "@/lib/env";
 import { ZodRouteError } from "@/lib/errors/zod-route-error";
-import { getConnectionsToSync } from "@/features/exchange/exchange-queries";
-import { syncMultipleConnections } from "@/lib/exchange/sync-service";
+import { runExchangeSyncCronJob } from "@/lib/cron/exchange-sync-job";
 
 export const GET = route.handler(async (req) => {
   // Protection: Verify CRON_SECRET
@@ -53,72 +52,13 @@ export const GET = route.handler(async (req) => {
     throw new ZodRouteError("Unauthorized", 401);
   }
 
-  logger.info("=== Starting exchange sync cron job ===");
-
-  const startTime = Date.now();
-
   try {
-    // 1. Fetch connections ready for sync
-    const connections = await getConnectionsToSync();
+    const result = await runExchangeSyncCronJob();
 
-    if (connections.length === 0) {
-      logger.info("No connections to sync", {
-        timestamp: new Date().toISOString(),
-      });
-      return {
-        success: true,
-        message: "No connections to sync",
-        connectionsProcessed: 0,
-        timestamp: new Date().toISOString(),
-      };
-    }
-
-    logger.info("Found connections to sync", {
-      count: connections.length,
-    });
-
-    // 2. Sync all connections
-    const results = await syncMultipleConnections(connections);
-
-    // 3. Calculate summary stats
-    const successCount = results.filter((r) => r.success).length;
-    const failureCount = results.length - successCount;
-    const totalTradesImported = results.reduce(
-      (sum, r) => sum + r.tradesImported,
-      0,
-    );
-    const totalTradesFetched = results.reduce(
-      (sum, r) => sum + r.tradesFetched,
-      0,
-    );
-
-    const duration = Date.now() - startTime;
-
-    logger.info("=== Exchange sync cron job completed ===", {
-      connectionsProcessed: connections.length,
-      successful: successCount,
-      failed: failureCount,
-      totalTradesImported,
-      totalTradesFetched,
-      durationMs: duration,
-    });
-
-    return {
-      success: true,
-      connectionsProcessed: connections.length,
-      successful: successCount,
-      failed: failureCount,
-      totalTradesImported,
-      totalTradesFetched,
-      durationMs: duration,
-      timestamp: new Date().toISOString(),
-    };
+    return { ...result, timestamp: new Date().toISOString() };
   } catch (error) {
-    const duration = Date.now() - startTime;
-
     logger.error("=== Exchange sync cron job failed ===", {
       error,
-      durationMs: duration,
     });
 
     throw new ZodRouteError(

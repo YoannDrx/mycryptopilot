@@ -9,7 +9,7 @@ Plateforme de trading crypto « risk-first » permettant aux utilisateurs de s
 - **Trading social complet** : profils traders, publication de signaux (TradingCard JSON), feed avec filtres, marketplace et dashboards.
 - **Paiements crypto natifs** : génération d’adresses HD (Base/Tron), watcher on-chain, activation d’abonnement automatique, script de sweep vers Binance.
 - **Portfolio tracking vérifié** : intégration API read-only Binance & Bybit, calcul de KPI (winrate, profit factor, drawdown) et snapshots par période.
-- **Automations Discord** : bot 24/7 (Railway), slash commands (user + admin), rôles dynamiques, notifications de signaux et DM plan.
+- **Automations Discord** : bot 24/7 (Fly worker), slash commands (user + admin), rôles dynamiques, notifications de signaux et DM plan.
 - **Tooling dev** : scripts `scripts/` + `scripts/dev-tools/`, workflows GitHub Actions (lint/tests), commandes `.claude/commands/*.md` pour audit, env sync, TDD.
 
 ---
@@ -94,7 +94,7 @@ Plus de détails dans `.claude/docs/TESTING.md`.
 | `scripts/generate-mainnet-xpubs.ts` / `generate-testnet-xpubs.ts` | Génère les XPUB HD wallet.                                                     |
 | `scripts/upgrade-to-pro.ts <email> [days]`                        | Upgrade manuel utilisateur (plan PRO).                                         |
 | `scripts/upgrade-to-ultra.ts <email> [days]`                      | Upgrade manuel utilisateur (plan ULTRA).                                       |
-| `scripts/deploy-railway.sh`                                       | Déploiement bot Discord sur Railway.                                           |
+| `scripts/start-fly-worker.ts`                                     | Entrypoint du worker Fly (cron + payment watcher + bot Discord).               |
 | `scripts/run-e2e-tests.sh`                                        | Reset DB + Playwright pour CI.                                                 |
 | `scripts/setup-test-db.sh`                                        | Prépare la base de tests locale.                                               |
 
@@ -110,14 +110,13 @@ Le dossier `scripts/dev-tools/` contient les scripts de debug ciblés (checkout,
 2. Configurer les variables via le dashboard Vercel (prod & preview). Référence : `.claude/docs/ENV-VARIABLES-MAPPING.md`.
 3. `vercel --prod` (Vercel exécute `prisma generate`, `prisma migrate deploy`, `pnpm build`).
 
-### Bot Discord (Railway)
+### Worker Fly.io (Cron + Discord bot)
 
-1. Installer Railway CLI : `npm install -g @railway/cli`.
-2. `railway login` puis `railway init` (ou utiliser le projet existant).
-3. Vérifier les variables (`DISCORD_BOT_ENABLED=true`, `DISCORD_BOT_TOKEN`, `DATABASE_URL`, etc.).
-4. `./scripts/deploy-railway.sh` ou `railway up`.
+1. Installer Fly CLI : `brew install flyctl` puis `fly auth login`.
+2. Déployer via `fly deploy --config fly.worker.toml --ha=false` (pense à charger les secrets avant).
+3. Surveiller avec `fly logs -a mycryptopilot-worker --no-tail`.
 
-Les instructions détaillées (permissions, intents, hiérarchie de rôles) sont dans `.claude/docs/DISCORD-SETUP.md`.
+Tous les détails (secrets requis, commandes, monitoring) sont décrits dans `.claude/docs/FLY-WORKER.md` et la section Discord de `.claude/docs/DISCORD-SETUP.md`.
 
 ---
 

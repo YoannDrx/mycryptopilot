@@ -9,7 +9,7 @@ Ce guide couvre le déploiement complet de MyCryptoPilot en production.
 ## 📋 Table des Matières
 
 1. [Architecture Production](#architecture-production)
-2. [Railway - Discord Bot](#railway---discord-bot)
+2. [Fly.io Worker - Cron & Discord Bot](#flyio-worker---cron--discord-bot)
 3. [Neon - Database Branching](#neon---database-branching)
 4. [Vercel - Web App](#vercel---web-app)
 5. [Variables d'Environnement](#variables-denvironnement)
@@ -29,10 +29,11 @@ Ce guide couvre le déploiement complet de MyCryptoPilot en production.
 └─────────────────────────────────────────┘
               ↕ (Partage DB Neon)
 ┌─────────────────────────────────────────┐
-│  RAILWAY (Discord Bot)                  │
+│  FLY.IO WORKER                          │
+│  - Cron jobs (sync exchanges, tiers…)   │
+│  - Payment watcher (Base/Tron)          │
 │  - Bot Discord 24/7                     │
-│  - Commandes slash                      │
-│  - Accès même DB que Vercel             │
+│  - Connexion directe à Neon             │
 └─────────────────────────────────────────┘
               ↕ (PostgreSQL)
 ┌─────────────────────────────────────────┐
@@ -46,172 +47,58 @@ Ce guide couvre le déploiement complet de MyCryptoPilot en production.
 **Services**:
 
 - **Vercel**: Web app production (main branch auto-deploy)
-- **Railway**: Discord bot (24/7, manual deploy)
+- **Fly.io**: Worker unique (cron jobs + payment watcher + bot Discord)
 - **Neon**: Database avec branch-per-preview
 
 ---
 
-## Railway - Discord Bot
+## Fly.io Worker - Cron & Discord Bot
+
+Le worker Fly exécute toutes les tâches longues et l’automatisation Discord. Détails exhaustifs dans [`./.claude/docs/FLY-WORKER.md`](./FLY-WORKER.md). Résumé rapide :
 
 ### Prérequis
 
-- ✅ Compte Railway ([créer](https://railway.app/))
-- ✅ Bot Discord configuré (voir [DISCORD-SETUP.md](DISCORD-SETUP.md))
-- ✅ Variables env production
-- ✅ Node.js 22+ installé
+- ✅ `flyctl` installé (`brew install flyctl`)
+- ✅ `fly auth login`
+- ✅ Secrets copiés depuis `.env` (utiliser `fly secrets set -a mycryptopilot-worker ...`)
+- ✅ Docker disponible (build pendant `fly deploy`)
 
-### Fichiers Configuration
+### Fichiers concernés
 
 ```
 mycryptopilot/
-├── nixpacks.toml        # Railway build config
-├── railway.json         # Service Railway
-├── .railwayignore      # Fichiers exclus
-└── scripts/
-    └── deploy-railway.sh  # Script auto-deploy
+├── Dockerfile.fly          # Image pour le worker
+├── fly.worker.toml         # Configuration Machines
+├── scripts/start-fly-worker.ts
+└── .dockerignore
 ```
 
-### Méthode 1: Déploiement Automatisé (Recommandé)
+### Déploiement
 
 ```bash
-# Rendre exécutable
-chmod +x scripts/deploy-railway.sh
-
-# Lancer déploiement
-./scripts/deploy-railway.sh
+# Depuis la racine du repo
+fly deploy --config fly.worker.toml --ha=false
 ```
 
-Le script:
+- `--ha=false` évite la création d’un standby VM (1 seule machine shared-cpu-1x).
+- Le build lance `pnpm install`, `prisma generate`, puis démarre `pnpm worker`.
+- Après déploiement, vérifier les machines via `fly machines list -a mycryptopilot-worker`.
 
-1. Installe Railway CLI si nécessaire
-2. Te connecte à Railway
-3. Crée projet (si besoin)
-4. Configure variables env
-5. Déploie le bot
-6. Affiche logs
+### Surveillance & opérations
 
-### Méthode 2: Déploiement Manuel
+- Logs : `fly logs -a mycryptopilot-worker --no-tail`
+- Statut : `fly status -a mycryptopilot-worker`
+- Suppression d’une machine standby indésirable : `fly machines remove <id> -a mycryptopilot-worker --force`
+- Redéploiement après mise à jour du code : relancer `fly deploy --config fly.worker.toml --ha=false`
 
-```bash
-# 1. Installer Railway CLI
-npm install -g @railway/cli
+### Contenu du worker
 
-# 2. Login
-railway login
+- `startPaymentWatcher` ➜ scrute Base/Tron toutes les 60 s (configurable via `PAYMENT_WATCHER_INTERVAL_MS`)
+- `runExchangeSyncCronJob` ➜ toutes les 5 min
+- Jobs quotidiens : active invitees (02:00 UTC), tier check (03:00 UTC), expiration reminders (09:00 UTC)
+- `discordBot.initialize()` ➜ bot Discord avec slash commands, rôles dynamiques, DM
 
-# 3. Créer projet
-railway init
-
-# 4. Configurer variables
-railway variables set DISCORD_BOT_TOKEN="..."
-railway variables set DISCORD_GUILD_ID="..."
-railway variables set DATABASE_URL="..."
-# ... (voir section Variables)
-
-# 5. Déployer
-railway up
-
-# 6. Vérifier logs
-railway logs
-```
-
-### Variables Requises Railway
-
-| Variable                | Source                       | Exemple                     |
-| ----------------------- | ---------------------------- | --------------------------- |
-| `DISCORD_BOT_ENABLED`   | Vercel / Railway             | `true`                      |
-| `DISCORD_BOT_TOKEN`     | Discord Developer Portal     | `MTI3...xyz`                |
-| `DISCORD_GUILD_ID`      | Discord Server (right-click) | `127...890`                 |
-| `DATABASE_URL`          | Neon Console                 | `postgresql://...`          |
-| `DATABASE_URL_UNPOOLED` | Neon Console                 | `postgresql://...`          |
-| `BETTER_AUTH_URL`       | Vercel URL                   | `https://mycryptopilot.app` |
-| `BETTER_AUTH_SECRET`    | Vercel Variables             | `random_secret_32+`         |
-| `BASE_RPC_URL`          | Vercel Variables             | `https://mainnet.base.org`  |
-| `TRON_RPC_URL`          | Vercel Variables             | `https://api.trongrid.io`   |
-| `CRYPTO_XPUB_BASE`      | Vercel Variables             | `xpub6F...`                 |
-| `CRYPTO_XPUB_TRON`      | Vercel Variables             | `xpub6D...`                 |
-| `RESEND_API_KEY`        | Resend Dashboard             | `re_...`                    |
-| `EMAIL_FROM`            | Resend Domain                | `noreply@mycryptopilot.app` |
-
-**Total**: 15 variables minimum
-
-### Vérification Déploiement
-
-```bash
-# Check logs
-railway logs --tail
-
-# Vérifier status
-railway status
-
-# Restart si besoin
-railway restart
-```
-
-**Logs attendus**:
-
-```
-✅ Discord bot logged in as MyCryptoPilot#1234
-✅ Guild found: MyCryptoPilot Server (ID: 127...890)
-✅ Registered 11 commands (5 user + 6 admin)
-✅ Bot ready!
-```
-
-### Monitoring Railway
-
-**Dashboard**: https://railway.app/dashboard
-
-**Métriques**:
-
-- CPU usage (should be < 5%)
-- Memory usage (should be < 200MB)
-- Network (Discord API calls)
-- Logs (errors, warnings)
-
-**Alertes à configurer**:
-
-- Memory > 500MB
-- CPU > 50%
-- Crashes repeated
-- API rate limits
-
-### Troubleshooting Railway
-
-**Problème: Bot ne démarre pas**
-
-```bash
-# Check logs
-railway logs
-
-# Vérifier variables
-railway variables
-
-# Common errors:
-# - Missing DISCORD_BOT_TOKEN → Add variable
-# - Invalid GUILD_ID → Check Discord server
-# - Database unreachable → Check DATABASE_URL
-```
-
-**Problème: Bot se déconnecte**
-
-```bash
-# Restart bot
-railway restart
-
-# Si erreur persiste, check Discord Developer Portal
-# - Gateway Intents activés?
-# - Bot token révoqué?
-```
-
-**Problème: Commandes slash n'apparaissent pas**
-
-```bash
-# Redeploy commands
-railway run npm run discord:deploy
-
-# Ou depuis le bot Discord:
-# /deploy-commands (admin only)
-```
+Si le bot ne démarre pas, vérifier les logs Fly (souvent token manquant ou `DISCORD_BOT_ENABLED=false`). Pour recharger les secrets, re-exécuter `fly secrets set ...` puis `fly deploy`.
 
 ---
 
@@ -403,10 +290,10 @@ vercel logs --all
    - BETTER_AUTH_URL = `https://mycryptopilot.app`
    - Mainnet crypto
 
-4. **Railway** (Discord Bot):
-   - DB Neon branch `main` (même que prod)
-   - Variables copiées depuis Vercel
-   - 15 variables minimum
+4. **Fly.io Worker**:
+   - DB Neon branch `main` (mêmes credentials que prod)
+   - Variables copiées depuis Vercel (voir `.claude/docs/FLY-WORKER.md`)
+   - Secrets gérés via `fly secrets set`
 
 ### Checklist Variables
 
@@ -418,8 +305,8 @@ Voir [ENVIRONMENT.md](ENVIRONMENT.md) pour la checklist complète par service.
 # Vercel
 vercel env ls
 
-# Railway
-railway variables
+# Fly (secrets)
+fly secrets list -a mycryptopilot-worker
 
 # Local
 cat .env.development | grep DATABASE_URL
@@ -444,14 +331,14 @@ curl https://mycryptopilot.app/api/health
 vercel --prod
 ```
 
-**Railway (Discord)**:
+**Fly worker (Cron + Discord)**:
 
 ```bash
-# Check bot status
-railway logs --tail
+# Logs
+fly logs -a mycryptopilot-worker --no-tail
 
-# Test command Discord
-/status (dans le serveur Discord)
+# Machines
+fly machines list -a mycryptopilot-worker
 ```
 
 **Neon (Database)**:
@@ -471,10 +358,10 @@ npx prisma migrate status
 - Cause: Build > 45min (limite Hobby plan)
 - Solution: Optimiser build ou upgrade plan
 
-**Erreur: Railway bot crash loop**
+**Erreur: Fly worker crash loop / bot Discord down**
 
-- Cause: Variable manquante ou DB inaccessible
-- Solution: Check `railway logs` + `railway variables`
+- Cause: Secret manquant, token Discord révoqué, ou DB inaccessible
+- Solution: `fly logs -a mycryptopilot-worker --no-tail` + `fly secrets list -a mycryptopilot-worker`
 
 **Erreur: Neon connection pool exhausted**
 
@@ -496,12 +383,11 @@ vercel logs --prod          # Production only
 vercel logs --follow        # Tail logs
 ```
 
-**Railway**:
+**Fly worker**:
 
 ```bash
-railway logs                # Last 100 lines
-railway logs --tail         # Follow logs
-railway logs --filter error # Errors only
+fly logs -a mycryptopilot-worker --no-tail
+fly machines status <id> -a mycryptopilot-worker
 ```
 
 **Neon**:
@@ -516,17 +402,17 @@ railway logs --filter error # Errors only
 **Documentation**:
 
 - [Vercel Docs](https://vercel.com/docs)
-- [Railway Docs](https://docs.railway.app/)
+- [Fly Docs](https://fly.io/docs/)
 - [Neon Docs](https://neon.tech/docs)
 
 **MyCryptoPilot Docs**:
 
 - [ENVIRONMENT.md](ENVIRONMENT.md) - Variables complètes
-- [DISCORD-SETUP.md](DISCORD-SETUP.md) - Config Discord Bot
+- [DISCORD-SETUP.md](DISCORD-SETUP.md) - Config Discord Bot + worker
 - [DATABASE.md](DATABASE.md) - Schémas Prisma
 
 **Support**:
 
 - Vercel: support@vercel.com
-- Railway: Discord server
+- Fly: support@fly.io
 - Neon: support@neon.tech
