@@ -1,10 +1,10 @@
 ---
-description: Synchronise automatiquement les variables d'environnement entre local (.env) et distant (Vercel + GitHub Actions + Railway)
+description: Synchronise automatiquement les variables d'environnement entre local (.env) et distant (Vercel + GitHub Actions + secrets Fly)
 ---
 
 # 🔄 Sync Environment Variables
 
-Cette commande **synchronise automatiquement** les variables d'environnement locales vers les plateformes distantes (Vercel, GitHub Actions, Railway).
+Cette commande **synchronise automatiquement** les variables d'environnement locales vers les plateformes distantes (Vercel, GitHub Actions) et fournit les instructions manuelles pour Fly.
 
 **Durée estimée**: 3-5 minutes (incluant l'exécution automatique)
 
@@ -19,7 +19,7 @@ Tu vas analyser les variables d'environnement locales et distantes, identifier l
 ### 🎯 Objectifs
 
 1. **Parser les fichiers .env locaux** (avec valeurs pour synchronisation)
-2. **Lister les variables distantes** (Vercel PROD + PREVIEW + GitHub Actions + Railway)
+2. **Lister les variables distantes** (Vercel PROD + PREVIEW + GitHub Actions + Fly secrets)
 3. **Mapper intelligemment** les variables selon leur destination
 4. **Identifier les différences** et générer le plan de synchronisation
 5. **Demander confirmation** à l'utilisateur avant de procéder
@@ -79,22 +79,17 @@ gh secret list -R YoannDrx/mycryptopilot
 
 **Parser la sortie** pour extraire les noms de secrets.
 
-### Railway
+### Fly worker (cron + Discord)
 
 ```bash
-# Vérifier que le service Railway est linké
-railway status 2>&1 | grep -q "No Railway project linked" && echo "⚠️ Railway not linked - skipping" || {
-  # Lister toutes les variables Railway (production environment)
-  railway variables --kv
-}
+# Vérifier que l'app Fly est accessible
+fly status -a mycryptopilot-worker >/dev/null
+
+# Lister les secrets (nom uniquement)
+fly secrets list -a mycryptopilot-worker
 ```
 
-**Parser la sortie** pour extraire:
-
-- Nom de variable
-- Valeur (pour comparaison - NE PAS logger les valeurs sensibles!)
-
-**Note importante**: Railway variables sont listées en format `KEY=value`. Si Railway n'est pas linké au projet, cette étape sera sautée avec un warning.
+**Parser la sortie** pour extraire les noms de secrets présents sur Fly (valeurs masquées). Toute modification se fait ensuite via `fly secrets set ...`.
 
 ---
 
@@ -230,11 +225,11 @@ DISCORD_BOT_TOKEN (si tests Discord)
 # ... autres selon besoins CI
 ```
 
-#### **E. Variables Railway (Discord Bot uniquement - 15 vars)**
+#### **E. Secrets Fly worker (cron + Discord)**
 
-Railway héberge le **Discord Bot standalone** qui nécessite seulement un sous-ensemble de variables.
+Le worker Fly exécute les cron jobs, le payment watcher et le bot Discord. Il doit partager les mêmes secrets critiques que Vercel (DB, auth, crypto) + la configuration Discord.
 
-**Variables REQUISES (15 vars)**:
+**Secrets REQUIS**:
 
 ```
 # Core Database & Auth (4 vars)
@@ -257,24 +252,13 @@ DISCORD_FREE_ROLE_ID              # Role plan FREE
 DISCORD_PRO_ROLE_ID               # Role plan PRO
 DISCORD_ULTRA_ROLE_ID             # Role plan ULTRA
 DISCORD_WEBHOOK_SIGNALS_URL       # Webhook pour signaux
+
+# Notifications / Emails
+RESEND_API_KEY
+EMAIL_FROM
 ```
 
-**Variables INTERDITES sur Railway (6 vars)**:
-
-⚠️ Ces variables sont utilisées **UNIQUEMENT par l'app web (Vercel)**, **PAS par le Discord Bot**:
-
-```
-❌ BASE_RPC_URL           # RPC calls paiements Base (Vercel only)
-❌ CRON_SECRET            # Authentification cron jobs (Vercel only)
-❌ CRYPTO_NETWORK         # Configuration réseau crypto (Vercel only)
-❌ CRYPTO_XPUB_BASE       # HD wallet XPUB Base (Vercel only)
-❌ CRYPTO_XPUB_TRON       # HD wallet XPUB Tron (Vercel only)
-❌ TRON_RPC_URL           # RPC calls paiements Tron (Vercel only)
-```
-
-**🎯 Objectif Railway**: Garder exactement **15 variables** (pas plus, pas moins).
-
-**Source**: Ces variables sont définies dans `.env` (production) et doivent être identiques à Vercel PROD pour DATABASE_URL et BETTER_AUTH_SECRET.
+⚠️ Secrets Fly = **copie stricte** des valeurs Vercel Production (pas de variantes). Toute mise à jour doit être répercutée via `fly secrets set -a mycryptopilot-worker KEY="value"`.
 
 ---
 
@@ -316,7 +300,7 @@ Pour chaque variable distante, vérifier:
 | **Vercel Production** | 45              | 40      | 5          | 0        | 0         |
 | **Vercel Preview**    | 42              | 38      | 4          | 0        | 0         |
 | **GitHub Actions**    | 15              | 10      | 5          | 0        | 0         |
-| **Railway (Bot)**     | 15 (optimal)    | 13      | 2          | 0        | 0         |
+| **Fly worker**        | 18              | 16      | 2          | 0        | 0         |
 
 **Fichiers Locaux**:
 
@@ -324,11 +308,11 @@ Pour chaque variable distante, vérifier:
 - `.env.local` (development): <N> variables
 - `.env.test` (tests): <N> variables
 
-**⚠️ Railway Status**:
+**⚠️ Fly worker secrets**:
 
-- **Objectif**: 15 variables (Discord Bot uniquement)
-- **Actuel**: <N> variables
-- **Variables interdites détectées**: <N> (à supprimer!)
+- **Objectif**: refléter 100 % des variables critiques de Vercel PROD (DB, auth, crypto, Discord)
+- **Actuel**: <N> secrets (`fly secrets list -a mycryptopilot-worker`)
+- **Secrets manquants**: <N> (ajouter via `fly secrets set ...`)
 
 ---
 
@@ -418,36 +402,23 @@ gh secret set BETTER_AUTH_SECRET_TEST -R YoannDrx/mycryptopilot
 # ... etc
 ```
 
-### Railway (Discord Bot)
+### Fly worker (cron + Discord)
 
-Variables nécessaires pour le Discord Bot mais absentes de Railway:
+Secrets nécessaires pour le worker mais absents de Fly:
 
-| Variable                | Source Locale  | Valeur (premiers chars) | Action            |
-| ----------------------- | -------------- | ----------------------- | ----------------- |
-| `DISCORD_PRO_ROLE_ID`   | `.env` line 85 | 142699...               | Ajouter à Railway |
-| `DATABASE_URL_UNPOOLED` | `.env` line 27 | postgresql://...        | Ajouter à Railway |
-| ...                     | ...            | ...                     | ...               |
+| Secret                   | Source Locale  | Valeur (premiers chars) | Action                                                  |
+| ------------------------ | -------------- | ----------------------- | ------------------------------------------------------- |
+| `DISCORD_PRO_ROLE_ID`    | `.env` line 85 | 142699...               | `fly secrets set -a mycryptopilot-worker DISCORD_PRO_ROLE_ID=...` |
+| `DATABASE_URL_UNPOOLED`  | `.env` line 27 | postgresql://...        | `fly secrets set -a mycryptopilot-worker DATABASE_URL_UNPOOLED=...` |
+| ...                      | ...            | ...                     | ...                                                     |
 
-**Commandes pour corriger**:
+Chaque secret se met à jour ainsi :
 
-⚠️ **Note**: Railway CLI ne permet pas d'ajouter des variables via CLI. Tu dois utiliser le dashboard.
-
-**Via Dashboard Railway**:
-
-1. Va sur https://railway.app/dashboard
-2. Sélectionne le projet **MyCryptoPilot**
-3. Sélectionne le service **mycryptopilot**
-4. Va dans l'onglet **Variables**
-5. Clique sur **+ New Variable** pour chaque variable manquante
-6. Copie-colle les valeurs depuis `.env`
-
-**Liste des variables à ajouter**:
-
+```bash
+fly secrets set -a mycryptopilot-worker KEY="value"
 ```
-DISCORD_PRO_ROLE_ID = <valeur depuis .env ligne 85>
-DATABASE_URL_UNPOOLED = <valeur depuis .env ligne 27>
-... (etc pour chaque variable)
-```
+
+> ⚠️ Le worker redémarre automatiquement après ajout/modification d’un secret. Vérifier `fly logs -a mycryptopilot-worker --no-tail`.
 
 ---
 
@@ -473,47 +444,17 @@ gh secret delete DEPRECATED_KEY -R YoannDrx/mycryptopilot
 
 ---
 
-## 🚨 Variables INTERDITES sur Railway (Critique!)
+## 🚨 Secrets superflus sur Fly (Critique!)
 
-⚠️ **Variables présentes sur Railway mais qui NE DOIVENT PAS y être**:
+⚠️ **Secrets présents sur Fly mais inutiles pour le worker**:
 
-Railway héberge uniquement le **Discord Bot**, qui n'utilise **AUCUNE variable crypto/payment**.
+Le worker a besoin uniquement des secrets listés plus haut. Ne laissez pas de secrets supplémentaires inutilisés (ex : anciennes clés Stripe, secrets temporaires, etc.), pour éviter les divergences avec Vercel.
 
-| Variable           | Environnement | Raison                        | Action Urgente |
-| ------------------ | ------------- | ----------------------------- | -------------- |
-| `BASE_RPC_URL`     | Railway       | Crypto payments (Vercel only) | 🔴 SUPPRIMER   |
-| `CRON_SECRET`      | Railway       | Cron jobs (Vercel only)       | 🔴 SUPPRIMER   |
-| `CRYPTO_NETWORK`   | Railway       | Crypto config (Vercel only)   | 🔴 SUPPRIMER   |
-| `CRYPTO_XPUB_BASE` | Railway       | HD wallet (Vercel only)       | 🔴 SUPPRIMER   |
-| `CRYPTO_XPUB_TRON` | Railway       | HD wallet (Vercel only)       | 🔴 SUPPRIMER   |
-| `TRON_RPC_URL`     | Railway       | Crypto payments (Vercel only) | 🔴 SUPPRIMER   |
+Suppression :
 
-**Impact**: Ces variables ne sont **PAS utilisées** par le Discord Bot et polluent l'environnement Railway.
-
-**Commandes pour nettoyer**:
-
-⚠️ **Railway CLI ne permet pas de supprimer des variables**. Tu dois utiliser le dashboard:
-
-1. Va sur https://railway.app/dashboard
-2. Sélectionne le projet **MyCryptoPilot**
-3. Sélectionne le service **mycryptopilot**
-4. Va dans l'onglet **Variables**
-5. Clique sur les 3 points (...) à côté de chaque variable interdite
-6. Clique sur **Delete**
-7. Confirme la suppression
-
-**Variables à supprimer** (6 au total):
-
+```bash
+fly secrets unset -a mycryptopilot-worker SECRET_NAME
 ```
-❌ BASE_RPC_URL
-❌ CRON_SECRET
-❌ CRYPTO_NETWORK
-❌ CRYPTO_XPUB_BASE
-❌ CRYPTO_XPUB_TRON
-❌ TRON_RPC_URL
-```
-
-**Objectif**: Railway doit avoir exactement **15 variables** (pas plus!).
 
 ---
 
@@ -587,28 +528,28 @@ Suivre les commandes dans les sections "Commandes pour corriger" ci-dessus, une 
 - ⚠️ Vérifier que `CRYPTO_NETWORK` est bien "mainnet" en PROD et "testnet" en PREVIEW
 - ✅ Les secrets GitHub Actions sont chiffrés - OK
 - ✅ Les variables Vercel sont chiffrées - OK
-- ✅ Les variables Railway sont chiffrées - OK
+- ✅ Les secrets Fly sont chiffrés - OK
 
-### Railway (Discord Bot)
+### Fly worker (cron + Discord)
 
-- 🚨 **CRITIQUE**: Railway doit avoir **EXACTEMENT 15 variables** (pas plus!)
-- ⛔ **Ne JAMAIS ajouter** de variables crypto (XPUB, RPC_URL, CRYPTO_NETWORK, CRON_SECRET) sur Railway
-- ✅ **Partager** DATABASE_URL et BETTER_AUTH_SECRET avec Vercel PROD (mêmes valeurs!)
-- 🔍 **Vérifier** que toutes les 11 variables Discord sont présentes
-- 💡 **Astuce**: Railway variables sont automatiquement injectées - pas besoin de fichier .env
+- 🚨 **CRITIQUE**: Fly doit contenir exactement la liste de secrets documentée (pas plus)
+- ⛔ **Ne JAMAIS ajouter** de variables aléatoires (XPUB/testnet) si le worker ne les consomme pas
+- ✅ **Partager** DATABASE_URL et BETTER_AUTH_SECRET avec Vercel PROD (mêmes valeurs)
+- 🔍 **Vérifier** que toutes les variables Discord sont présentes
+- 💡 **Astuce**: secrets injectés automatiquement, pas besoin de `.env`
 
 ### Performance
 
 - 💡 GitHub Actions: Ajouter uniquement les variables nécessaires pour CI (pas toutes)
 - 💡 Vercel: Utiliser les mêmes valeurs pour PROD/PREVIEW quand possible (OAuth keys, Discord config, etc.)
-- 💡 Railway: Garder le strict minimum (15 vars) pour réduire l'overhead
+- 💡 Fly: Garder uniquement les secrets nécessaires sur le worker
 
 ### Maintenance
 
 - 🔄 Lancer cette commande `/sync-env` après chaque ajout de variable locale
 - 🔄 Vérifier la synchronisation avant chaque déploiement production
 - 📝 Documenter les nouvelles variables dans `ENV_CHECKLIST.md` (si existant)
-- 🚀 Après modification variables Railway: Redéployer le bot (`railway up` ou via dashboard)
+- 🚀 Après modification des secrets Fly: surveiller `fly logs` pour confirmer le redémarrage
 
 ---
 
@@ -627,13 +568,13 @@ Suivre les commandes dans les sections "Commandes pour corriger" ci-dessus, une 
 - **Repo**: mycryptopilot
 - **Secrets Scope**: Repository-level
 
-### Railway Project
+### Fly Worker
 
-- **Name**: MyCryptoPilot
-- **Service**: mycryptopilot (Discord Bot)
-- **Environment**: production
-- **Status**: <linked/not-linked> (détecté via `railway status`)
-- **Variables Attendues**: 15 (Discord Bot uniquement)
+- **App**: mycryptopilot-worker
+- **Process**: worker (cron + Discord)
+- **Region**: cdg (peut varier)
+- **Status**: `fly status -a mycryptopilot-worker`
+- **Secrets attendus**: alignés sur Vercel PROD (voir section E)
 
 ---
 
@@ -723,11 +664,11 @@ echo "postgresql://..." | gh secret set DATABASE_URL -R YoannDrx/mycryptopilot
 - Variables de `.env.test` nécessaires pour CI
 - Voir mapping section E3-D
 
-#### Railway (limitation CLI)
+#### Fly (secrets manuels)
 
-⚠️ **Railway CLI ne permet PAS d'ajouter des variables automatiquement**.
+⚠️ Fly ne propose pas d'API CLI pour lire/écrire des valeurs en clair (uniquement `set/unset`).
 
-Pour Railway, générer uniquement des **instructions manuelles** avec:
+Pour Fly, générer uniquement des **instructions manuelles** avec:
 
 - Nom de la variable
 - Valeur à copier-coller
@@ -745,13 +686,13 @@ Avant d'exécuter les commandes, afficher:
 - Vercel Production: <N> variables
 - Vercel Preview: <N> variables
 - GitHub Actions: <N> secrets
-- Railway: <N> variables (manuel)
+- Fly worker: <N> secrets (manuel)
 
 **⚠️ ATTENTION**:
 
 - Les valeurs seront ajoutées automatiquement depuis les fichiers .env locaux
 - Vercel et GitHub Actions seront mis à jour via CLI
-- Railway nécessite une configuration manuelle (limitation CLI)
+- Fly nécessite une confirmation manuelle (commande `fly secrets set ...`)
 
 **Voulez-vous procéder à la synchronisation automatique?**
 ```
@@ -784,7 +725,7 @@ Si l'utilisateur confirme:
      - Exécuter: `echo "value" | gh secret set VAR_NAME -R YoannDrx/mycryptopilot`
      - Logger: "✅ Ajouté VAR_NAME à GitHub Actions" ou "❌ Erreur: ..."
 
-4. **Railway** (manuel):
+4. **Fly worker** (manuel):
    - Générer instructions détaillées avec valeurs à copier-coller
    - Afficher le lien direct: https://railway.app/project/<id>/service/<id>/variables
 
@@ -808,7 +749,7 @@ Après synchronisation, afficher:
 - Vercel Production: <N> variables ajoutées (✅ <success> / ❌ <failed>)
 - Vercel Preview: <N> variables ajoutées (✅ <success> / ❌ <failed>)
 - GitHub Actions: <N> secrets ajoutés (✅ <success> / ❌ <failed>)
-- Railway: <N> variables à ajouter manuellement (instructions ci-dessous)
+- Fly: <N> secrets à ajouter manuellement (instructions ci-dessous)
 
 **Variables ajoutées avec succès**:
 
@@ -824,7 +765,7 @@ Après synchronisation, afficher:
 
 **Actions manuelles requises**:
 
-- Railway: Ajouter 2 variables via dashboard (voir instructions ci-dessous)
+- Fly: Ajouter 2 secrets via CLI (voir instructions ci-dessous)
 ```
 
 ---
@@ -837,12 +778,12 @@ Lorsque l'utilisateur lance `/sync-env`:
 2. **Parser fichiers locaux avec VALEURS** (pour synchronisation)
 3. Lister variables Vercel (afficher compteur)
 4. Lister secrets GitHub Actions (afficher compteur)
-5. Lister variables Railway (afficher compteur + status)
+- 5. Lister secrets Fly (afficher compteur + status)
 6. **Analyser et identifier différences**
 7. **Générer plan de synchronisation**
 8. **Afficher plan + demander confirmation**
 9. Si confirmé:
-   - **Exécuter synchronisation automatique** (Vercel, GitHub, Railway manuel)
+   - **Exécuter synchronisation automatique** (Vercel, GitHub, instructions Fly manuelles)
    - **Afficher progress en temps réel** (✅/❌ pour chaque variable)
 10. **Générer rapport final** avec résultats
 11. Résumé final: "✅ Synchronisation terminée! <N> variables ajoutées, <N> erreurs"

@@ -1,0 +1,17 @@
+# Rename `app` once the Fly application is created (e.g., `mycryptopilot-worker`).
+app = "mycryptopilot-worker"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile.fly"
+
+[env]
+  NODE_ENV = "production"
+
+[processes]
+  worker = "pnpm worker"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

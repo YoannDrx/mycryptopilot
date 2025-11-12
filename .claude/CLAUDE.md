@@ -94,7 +94,7 @@ NOW.TS = multi-tenant B2B SaaS, MyCryptoPilot = B2C single-tenant:
 - **Trading System** – `src/lib/trading/*`, `app/orgs/[orgSlug]/(trading)` et `src/features/trader/*` confirment profils traders, signaux, copy-trades et agrégations de fills.
 - **Crypto Payments** – `src/lib/crypto/address-generator.ts`, `payment-watcher.ts` et `checkout` montrent un flux complet Base/Tron avec HD wallet et suivi pro-rata.
 - **Portfolio Tracking** – `src/lib/exchange/*`, `TraderPerformanceSnapshot` et `UserExchangeConnection` gèrent Binance + Bybit en lecture seule et calculs de KPI.
-- **Discord** – `src/lib/discord` couvre commandes, rôles, DM, webhooks; la synchro automatique dépend de la configuration Railway décrite dans `.claude/docs/DEPLOYMENT.md`.
+- **Discord** – `src/lib/discord` couvre commandes, rôles, DM, webhooks; la synchro automatique dépend du worker Fly décrit dans `.claude/docs/DEPLOYMENT.md`.
 - **Env Management & Tooling** – scripts sous `scripts/` et `.claude/commands/*.md` donnent des workflows automatisés (worktrees, audit, sync env, tests).
 
 ### ⚠️ Points de vigilance / TODO connus
@@ -355,11 +355,11 @@ mycryptopilot/
 - `app/orgs/[orgSlug]/(navigation)/traders/page.tsx` - Traders marketplace
 - `app/orgs/[orgSlug]/(navigation)/pricing/page.tsx` - Pricing page
 
-**Discord** (✅ Déployé Railway):
+**Discord** (✅ Déployé via Fly worker):
 
 - `src/lib/discord/webhook.ts` - Signal notifications
 - `src/lib/discord/roles.ts` - Role assignment
-- `discord-bot/` - Discord bot source code (Railway deployment)
+- `discord-bot/` - Discord bot source code (déployé via Fly worker)
 
 **Portfolio Tracking / Exchange Integration** (✅ Binance + Bybit):
 
@@ -465,9 +465,9 @@ Les détails techniques sont organisés en modules spécialisés:
 
 #### [`RAILWAY_SETUP.md`](../RAILWAY_SETUP.md)
 
-**Déploiement Discord Bot sur Railway**
+**Déploiement Discord Bot (Fly worker)**
 
-- Setup Railway project
+- Configure Fly app + secrets (voir `.claude/docs/FLY-WORKER.md`)
 - Configuration build settings
 - Environment variables Discord Bot
 - Deployment et monitoring
@@ -478,7 +478,7 @@ Les détails techniques sont organisés en modules spécialisés:
 **Checklist Complète des Variables d'Environnement**
 
 - Vercel: 35+ variables (web app production)
-- Railway: 15+ variables (Discord bot production)
+- Fly: secrets équivalents à Vercel (Discord + DB + mails)
 - Local Dev: `.env.local` (development)
 - Comment obtenir les Discord IDs
 - Common issues et solutions
@@ -491,7 +491,7 @@ Les détails techniques sont organisés en modules spécialisés:
 **Ajouter features trading?** → Lire `TRADING-SYSTEM.md`
 **Voir état du projet?** → Lire `DEVELOPMENT.md`
 **Utiliser Context7 MCP?** → Lire `CONTEXT7-GUIDE.md`
-**Déployer sur Railway?** → Lire `RAILWAY_SETUP.md`
+**Déployer le worker?** → Lire `.claude/docs/FLY-WORKER.md`
 **Configurer env vars?** → Lire `ENV_CHECKLIST.md`
 
 ---
@@ -554,7 +554,7 @@ NEVER proactively create documentation files (\*.md) or README files. Only creat
 - Follow/unfollow ✅
 - Crypto payments (HD wallet + RPC) ✅
 - Subscriptions (activateSubscription) ✅
-- Discord Bot 24/7 Railway ✅
+- Discord Bot 24/7 via Fly worker ✅
 - Dashboards 100% connectés ✅
 - **Feed signaux avec filtres avancés ✅**
 
