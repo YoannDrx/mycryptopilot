@@ -22,21 +22,21 @@ Ce document décrit **où chaque variable d'environnement doit être configurée
 
 ### Fichiers Locaux
 
-| Fichier | Environnement | Usage | Gitignore |
-|---------|---------------|-------|-----------|
-| `.env` | Production backup | Référence locale des valeurs PROD (mainnet) | ✅ Oui |
-| `.env.local` | Development | Variables pour `pnpm dev` (testnet) | ✅ Oui |
-| `.env.test` | E2E Tests | Variables pour tests Playwright (testnet local) | ✅ Oui |
-| `.env.example` | Template | Template pour nouveaux devs | ❌ Non (tracké) |
-| `.env.sweep` | Sweep Binance | Secrets sweep locaux (seed, wallets) | ✅ Oui |
+| Fichier        | Environnement     | Usage                                           | Gitignore       |
+| -------------- | ----------------- | ----------------------------------------------- | --------------- |
+| `.env`         | Production backup | Référence locale des valeurs PROD (mainnet)     | ✅ Oui          |
+| `.env.local`   | Development       | Variables pour `pnpm dev` (testnet)             | ✅ Oui          |
+| `.env.test`    | E2E Tests         | Variables pour tests Playwright (testnet local) | ✅ Oui          |
+| `.env.example` | Template          | Template pour nouveaux devs                     | ❌ Non (tracké) |
+| `.env.sweep`   | Sweep Binance     | Secrets sweep locaux (seed, wallets)            | ✅ Oui          |
 
 ### Environnements Distants
 
-| Environnement | Description | Configuration | Branches |
-|---------------|-------------|---------------|----------|
-| **Vercel Production** | App en production | Vercel Dashboard | `main` |
-| **Vercel Preview** | Déploiements preview PR | Vercel Dashboard | Toutes sauf `main` |
-| **GitHub Actions** | CI/CD (tests, builds) | GitHub Secrets | Toutes |
+| Environnement         | Description             | Configuration    | Branches           |
+| --------------------- | ----------------------- | ---------------- | ------------------ |
+| **Vercel Production** | App en production       | Vercel Dashboard | `main`             |
+| **Vercel Preview**    | Déploiements preview PR | Vercel Dashboard | Toutes sauf `main` |
+| **GitHub Actions**    | CI/CD (tests, builds)   | GitHub Secrets   | Toutes             |
 
 ---
 
@@ -86,18 +86,18 @@ Ce document décrit **où chaque variable d'environnement doit être configurée
 
 Ces variables sont **spécifiques à la production** (mainnet, DB prod, OAuth prod).
 
-| Variable | Source Locale | Vercel PROD | Vercel PREVIEW | GitHub Actions | Notes |
-|----------|---------------|-------------|----------------|----------------|-------|
-| `DATABASE_URL` | `.env` | ✅ Oui | ❌ Non | ❌ Non | Neon production branch (pooled) |
-| `DATABASE_URL_UNPOOLED` | `.env` | ✅ Oui | ❌ Non | ❌ Non | Neon production branch (direct) |
-| `BETTER_AUTH_URL` | `.env` | ✅ Oui | ❌ Non | ❌ Non | `https://www.mycryptopilot.app` |
-| `CRYPTO_NETWORK` | `.env` | ✅ `mainnet` | ❌ Non | ❌ Non | Mode réseau crypto |
-| `CRYPTO_XPUB_BASE` | `.env` | ✅ Oui (mainnet) | ❌ Non | ❌ Non | XPUB Base mainnet |
-| `CRYPTO_XPUB_TRON` | `.env` | ✅ Oui (mainnet) | ❌ Non | ❌ Non | XPUB Tron mainnet |
-| `BASE_RPC_URL` | `.env` | ✅ Oui | ❌ Non | ❌ Non | `https://mainnet.base.org` |
-| `TRON_RPC_URL` | `.env` | ✅ Oui | ❌ Non | ❌ Non | `https://api.trongrid.io` |
-| `GITHUB_CLIENT_ID` | `.env` | ✅ Oui | ❌ Non | ❌ Non | OAuth GitHub prod |
-| `GITHUB_CLIENT_SECRET` | `.env` | ✅ Oui | ❌ Non | ❌ Non | OAuth GitHub prod |
+| Variable                | Source Locale | Vercel PROD      | Vercel PREVIEW | GitHub Actions | Notes                           |
+| ----------------------- | ------------- | ---------------- | -------------- | -------------- | ------------------------------- |
+| `DATABASE_URL`          | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | Neon production branch (pooled) |
+| `DATABASE_URL_UNPOOLED` | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | Neon production branch (direct) |
+| `BETTER_AUTH_URL`       | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | `https://www.mycryptopilot.app` |
+| `CRYPTO_NETWORK`        | `.env`        | ✅ `mainnet`     | ❌ Non         | ❌ Non         | Mode réseau crypto              |
+| `CRYPTO_XPUB_BASE`      | `.env`        | ✅ Oui (mainnet) | ❌ Non         | ❌ Non         | XPUB Base mainnet               |
+| `CRYPTO_XPUB_TRON`      | `.env`        | ✅ Oui (mainnet) | ❌ Non         | ❌ Non         | XPUB Tron mainnet               |
+| `BASE_RPC_URL`          | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | `https://mainnet.base.org`      |
+| `TRON_RPC_URL`          | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | `https://api.trongrid.io`       |
+| `GITHUB_CLIENT_ID`      | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | OAuth GitHub prod               |
+| `GITHUB_CLIENT_SECRET`  | `.env`        | ✅ Oui           | ❌ Non         | ❌ Non         | OAuth GitHub prod               |
 
 **⚠️ CRITIQUE**: Ces variables utilisent de **l'argent réel** (mainnet). Ne JAMAIS les mélanger avec testnet!
 
@@ -107,13 +107,13 @@ Ces variables sont **spécifiques à la production** (mainnet, DB prod, OAuth pr
 
 Ces variables sont **spécifiques aux previews** (testnet, DB dev).
 
-| Variable | Source Locale | Vercel PROD | Vercel PREVIEW | GitHub Actions | Notes |
-|----------|---------------|-------------|----------------|----------------|-------|
-| `CRYPTO_NETWORK` | `.env.local` | ❌ Non | ✅ `testnet` | ❌ Non | Mode réseau crypto |
-| `CRYPTO_XPUB_BASE` | `.env.local` | ❌ Non | ✅ Oui (testnet) | ❌ Non | XPUB Base testnet |
-| `CRYPTO_XPUB_TRON` | `.env.local` | ❌ Non | ✅ Oui (testnet) | ❌ Non | XPUB Tron testnet |
-| `BASE_RPC_URL_TESTNET` | `.env.local` | ❌ Non | ✅ Oui | ❌ Non | `https://sepolia.base.org` |
-| `TRON_RPC_URL_TESTNET` | `.env.local` | ❌ Non | ✅ Oui | ❌ Non | `https://api.shasta.trongrid.io` |
+| Variable               | Source Locale | Vercel PROD | Vercel PREVIEW   | GitHub Actions | Notes                            |
+| ---------------------- | ------------- | ----------- | ---------------- | -------------- | -------------------------------- |
+| `CRYPTO_NETWORK`       | `.env.local`  | ❌ Non      | ✅ `testnet`     | ❌ Non         | Mode réseau crypto               |
+| `CRYPTO_XPUB_BASE`     | `.env.local`  | ❌ Non      | ✅ Oui (testnet) | ❌ Non         | XPUB Base testnet                |
+| `CRYPTO_XPUB_TRON`     | `.env.local`  | ❌ Non      | ✅ Oui (testnet) | ❌ Non         | XPUB Tron testnet                |
+| `BASE_RPC_URL_TESTNET` | `.env.local`  | ❌ Non      | ✅ Oui           | ❌ Non         | `https://sepolia.base.org`       |
+| `TRON_RPC_URL_TESTNET` | `.env.local`  | ❌ Non      | ✅ Oui           | ❌ Non         | `https://api.shasta.trongrid.io` |
 
 **Note**: Les `DATABASE_URL` pour preview sont gérées **automatiquement** par l'intégration Vercel + Neon (une DB branch par PR).
 
@@ -123,64 +123,64 @@ Ces variables sont **spécifiques aux previews** (testnet, DB dev).
 
 Ces variables sont **partagées** entre tous les environnements Vercel.
 
-| Variable | Source | Vercel PROD | Vercel PREVIEW | GitHub Actions | Notes |
-|----------|--------|-------------|----------------|----------------|-------|
-| `BETTER_AUTH_SECRET` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Secret pour JWT/sessions |
-| `GOOGLE_CLIENT_ID` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Google (multi-redirect) |
-| `GOOGLE_CLIENT_SECRET` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Google |
-| `DISCORD_CLIENT_ID` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Discord (multi-redirect) |
-| `DISCORD_CLIENT_SECRET` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | OAuth Discord |
-| `DISCORD_BOT_ENABLED` | `.env` | ✅ Oui (`true`) | ✅ Oui (`true` pour tests preview) | ✅ Oui (`true`) | Active le bot dans `scripts/start-discord-bot.ts` |
-| `DISCORD_BOT_TOKEN` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Discord bot (même bot dev/prod) |
-| `DISCORD_GUILD_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | ID du serveur Discord |
-| `DISCORD_FREE_SIGNALS_CHANNEL_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Channel teasers gratuits |
-| `DISCORD_LOG_CHANNEL_ID` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Channel logs bot |
-| `DISCORD_ROLE_ADMIN_ID` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Rôle admin |
-| `DISCORD_FREE_ROLE_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Rôle Free |
-| `DISCORD_PRO_ROLE_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Rôle Pro |
-| `DISCORD_ULTRA_ROLE_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Rôle Ultra |
-| `DISCORD_WEBHOOK_SIGNALS_URL` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Webhook pour signaux |
-| `RESEND_API_KEY` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Email service |
-| `RESEND_AUDIENCE_ID` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Newsletter |
-| `EMAIL_FROM` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Email expéditeur |
-| `NEXT_PUBLIC_EMAIL_CONTACT` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Email contact public |
-| `CRON_SECRET` | `.env` | ✅ Oui | ✅ Oui | ❌ Non | Secret pour cron jobs |
-| `ENCRYPTION_SECRET` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Chiffrement API keys (AES-256) |
-| `BINANCE_MASTER_WALLET_BASE` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Wallet Binance Base |
-| `BINANCE_MASTER_WALLET_TRON` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Wallet Binance Tron |
-| `TRON_API_KEY` | `.env` | ✅ Oui (optionnel) | ✅ Oui (optionnel) | ✅ Oui (optionnel) | Clé API TronGrid (https://www.trongrid.io) - Améliore les quotas pour le payment watcher. Optionnel mais recommandé en prod. |
-| `BINANCE_USER_API_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
-| `BINANCE_USER_SECRET_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
-| `BYBIT_USER_API_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
-| `BYBIT_USER_SECRET_KEY` | `.env.local` | ❌ Non | ❌ Non | ❌ Non | Test uniquement (readonly) |
-| `SWEEP_MIN_THRESHOLD_USD` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Seuil USD pour sweep (default 10) |
-| `DRY_RUN` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Active le mode dry-run pour sweep (default: true). Passer à `false` pour envoyer de vraies transactions. |
-| `SWEEP_MNEMONIC_BASE` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Mnemonic Base (sweep) |
-| `SWEEP_MNEMONIC_TRON` | `.env.sweep` | ❌ Non | ❌ Non | ❌ Non | Mnemonic Tron (sweep) |
+| Variable                          | Source       | Vercel PROD        | Vercel PREVIEW                     | GitHub Actions     | Notes                                                                                                                        |
+| --------------------------------- | ------------ | ------------------ | ---------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `BETTER_AUTH_SECRET`              | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Secret pour JWT/sessions                                                                                                     |
+| `GOOGLE_CLIENT_ID`                | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | OAuth Google (multi-redirect)                                                                                                |
+| `GOOGLE_CLIENT_SECRET`            | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | OAuth Google                                                                                                                 |
+| `DISCORD_CLIENT_ID`               | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | OAuth Discord (multi-redirect)                                                                                               |
+| `DISCORD_CLIENT_SECRET`           | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | OAuth Discord                                                                                                                |
+| `DISCORD_BOT_ENABLED`             | `.env`       | ✅ Oui (`true`)    | ✅ Oui (`true` pour tests preview) | ✅ Oui (`true`)    | Active le bot dans `scripts/start-discord-bot.ts`                                                                            |
+| `DISCORD_BOT_TOKEN`               | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Discord bot (même bot dev/prod)                                                                                              |
+| `DISCORD_GUILD_ID`                | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | ID du serveur Discord                                                                                                        |
+| `DISCORD_FREE_SIGNALS_CHANNEL_ID` | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Channel teasers gratuits                                                                                                     |
+| `DISCORD_LOG_CHANNEL_ID`          | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Channel logs bot                                                                                                             |
+| `DISCORD_ROLE_ADMIN_ID`           | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Rôle admin                                                                                                                   |
+| `DISCORD_FREE_ROLE_ID`            | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Rôle Free                                                                                                                    |
+| `DISCORD_PRO_ROLE_ID`             | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Rôle Pro                                                                                                                     |
+| `DISCORD_ULTRA_ROLE_ID`           | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Rôle Ultra                                                                                                                   |
+| `DISCORD_WEBHOOK_SIGNALS_URL`     | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Webhook pour signaux                                                                                                         |
+| `RESEND_API_KEY`                  | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Email service                                                                                                                |
+| `RESEND_AUDIENCE_ID`              | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Newsletter                                                                                                                   |
+| `EMAIL_FROM`                      | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Email expéditeur                                                                                                             |
+| `NEXT_PUBLIC_EMAIL_CONTACT`       | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Email contact public                                                                                                         |
+| `CRON_SECRET`                     | `.env`       | ✅ Oui             | ✅ Oui                             | ❌ Non             | Secret pour cron jobs                                                                                                        |
+| `ENCRYPTION_SECRET`               | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Chiffrement API keys (AES-256)                                                                                               |
+| `BINANCE_MASTER_WALLET_BASE`      | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Wallet Binance Base                                                                                                          |
+| `BINANCE_MASTER_WALLET_TRON`      | `.env`       | ✅ Oui             | ✅ Oui                             | ✅ Oui             | Wallet Binance Tron                                                                                                          |
+| `TRON_API_KEY`                    | `.env`       | ✅ Oui (optionnel) | ✅ Oui (optionnel)                 | ✅ Oui (optionnel) | Clé API TronGrid (https://www.trongrid.io) - Améliore les quotas pour le payment watcher. Optionnel mais recommandé en prod. |
+| `BINANCE_USER_API_KEY`            | `.env.local` | ❌ Non             | ❌ Non                             | ❌ Non             | Test uniquement (readonly)                                                                                                   |
+| `BINANCE_USER_SECRET_KEY`         | `.env.local` | ❌ Non             | ❌ Non                             | ❌ Non             | Test uniquement (readonly)                                                                                                   |
+| `BYBIT_USER_API_KEY`              | `.env.local` | ❌ Non             | ❌ Non                             | ❌ Non             | Test uniquement (readonly)                                                                                                   |
+| `BYBIT_USER_SECRET_KEY`           | `.env.local` | ❌ Non             | ❌ Non                             | ❌ Non             | Test uniquement (readonly)                                                                                                   |
+| `SWEEP_MIN_THRESHOLD_USD`         | `.env.sweep` | ❌ Non             | ❌ Non                             | ❌ Non             | Seuil USD pour sweep (default 10)                                                                                            |
+| `DRY_RUN`                         | `.env.sweep` | ❌ Non             | ❌ Non                             | ❌ Non             | Active le mode dry-run pour sweep (default: true). Passer à `false` pour envoyer de vraies transactions.                     |
+| `SWEEP_MNEMONIC_BASE`             | `.env.sweep` | ❌ Non             | ❌ Non                             | ❌ Non             | Mnemonic Base (sweep)                                                                                                        |
+| `SWEEP_MNEMONIC_TRON`             | `.env.sweep` | ❌ Non             | ❌ Non                             | ❌ Non             | Mnemonic Tron (sweep)                                                                                                        |
 
 #### Stripe (Legacy - conservé pour compatibilité NOW.TS)
 
-| Variable | Source | Vercel PROD | Vercel PREVIEW | GitHub Actions | Notes |
-|----------|--------|-------------|----------------|----------------|-------|
-| `STRIPE_SECRET_KEY` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
-| `STRIPE_WEBHOOK_SECRET` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
-| `STRIPE_PRO_PLAN_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
-| `STRIPE_PRO_YEARLY_PLAN_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
-| `STRIPE_ULTRA_PLAN_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
-| `STRIPE_ULTRA_YEARLY_PLAN_ID` | `.env` | ✅ Oui | ✅ Oui | ✅ Oui | Non utilisé mais gardé |
+| Variable                             | Source | Vercel PROD | Vercel PREVIEW | GitHub Actions | Notes                  |
+| ------------------------------------ | ------ | ----------- | -------------- | -------------- | ---------------------- |
+| `STRIPE_SECRET_KEY`                  | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
+| `STRIPE_WEBHOOK_SECRET`              | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
+| `STRIPE_PRO_PLAN_ID`                 | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
+| `STRIPE_PRO_YEARLY_PLAN_ID`          | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
+| `STRIPE_ULTRA_PLAN_ID`               | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
+| `STRIPE_ULTRA_YEARLY_PLAN_ID`        | `.env` | ✅ Oui      | ✅ Oui         | ✅ Oui         | Non utilisé mais gardé |
 
 **Note**: MyCryptoPilot utilise des **paiements crypto uniquement**. Stripe est conservé pour compatibilité avec le template NOW.TS.
 
 #### Variables sweep locales (`.env.sweep` uniquement)
 
-| Variable | Usage | Notes |
-|----------|-------|-------|
-| `DRY_RUN` | `true` par défaut | Passe à `false` pour envoyer de vraies transactions (confirmation requise). |
-| `SWEEP_MIN_THRESHOLD_USD` | Seuil minimum | Supérieur à 0 pour éviter le dust. |
-| `SWEEP_MNEMONIC_BASE` | Seed Base | Stocker chiffré (1Password). Jamais committer. |
-| `SWEEP_MNEMONIC_TRON` | Seed Tron | Idem. |
-| `BINANCE_MASTER_WALLET_BASE` / `TRON` | Peut être dupliqué ici | Surcharge locale possible si différent de `.env`. |
+| Variable                              | Usage                  | Notes                                                                       |
+| ------------------------------------- | ---------------------- | --------------------------------------------------------------------------- |
+| `DRY_RUN`                             | `true` par défaut      | Passe à `false` pour envoyer de vraies transactions (confirmation requise). |
+| `SWEEP_MIN_THRESHOLD_USD`             | Seuil minimum          | Supérieur à 0 pour éviter le dust.                                          |
+| `SWEEP_MNEMONIC_BASE`                 | Seed Base              | Stocker chiffré (1Password). Jamais committer.                              |
+| `SWEEP_MNEMONIC_TRON`                 | Seed Tron              | Idem.                                                                       |
+| `BINANCE_MASTER_WALLET_BASE` / `TRON` | Peut être dupliqué ici | Surcharge locale possible si différent de `.env`.                           |
 
 Ces variables ne doivent **jamais** être ajoutées à Vercel/GitHub Actions. Elles sont destinées à l’opérateur qui exécute `scripts/sweep-to-binance.ts`.
 
@@ -190,20 +190,21 @@ Ces variables ne doivent **jamais** être ajoutées à Vercel/GitHub Actions. El
 
 Variables nécessaires pour **CI/CD** (tests E2E, type checking, lint).
 
-| Variable | Source | GitHub Actions | Notes |
-|----------|--------|----------------|-------|
-| `DATABASE_URL` | `.env.test` | ✅ Oui | PostgreSQL local (pas Neon) |
-| `BETTER_AUTH_SECRET_TEST` | `.env.test` | ✅ Oui | Peut être différent de prod |
-| `CRYPTO_NETWORK` | `.env.test` | ✅ Oui | `testnet` |
-| `CRYPTO_XPUB_BASE` | `.env.test` | ✅ Oui | XPUB testnet |
-| `CRYPTO_XPUB_TRON` | `.env.test` | ✅ Oui | XPUB testnet |
-| `BASE_RPC_URL_TESTNET` | `.env.test` | ✅ Oui | RPC testnet |
-| `TRON_RPC_URL_TESTNET` | `.env.test` | ✅ Oui | RPC testnet |
-| `DISCORD_BOT_ENABLED` | `.env.test` | ✅ Oui (`true`) | Active le bot durant les tests fin de flux |
-| `RESEND_API_KEY` | `.env.test` | ✅ Oui | Pour tests email |
-| `ENCRYPTION_SECRET` | `.env.test` | ✅ Oui | Même que prod pour cohérence |
+| Variable                  | Source      | GitHub Actions  | Notes                                      |
+| ------------------------- | ----------- | --------------- | ------------------------------------------ |
+| `DATABASE_URL`            | `.env.test` | ✅ Oui          | PostgreSQL local (pas Neon)                |
+| `BETTER_AUTH_SECRET_TEST` | `.env.test` | ✅ Oui          | Peut être différent de prod                |
+| `CRYPTO_NETWORK`          | `.env.test` | ✅ Oui          | `testnet`                                  |
+| `CRYPTO_XPUB_BASE`        | `.env.test` | ✅ Oui          | XPUB testnet                               |
+| `CRYPTO_XPUB_TRON`        | `.env.test` | ✅ Oui          | XPUB testnet                               |
+| `BASE_RPC_URL_TESTNET`    | `.env.test` | ✅ Oui          | RPC testnet                                |
+| `TRON_RPC_URL_TESTNET`    | `.env.test` | ✅ Oui          | RPC testnet                                |
+| `DISCORD_BOT_ENABLED`     | `.env.test` | ✅ Oui (`true`) | Active le bot durant les tests fin de flux |
+| `RESEND_API_KEY`          | `.env.test` | ✅ Oui          | Pour tests email                           |
+| `ENCRYPTION_SECRET`       | `.env.test` | ✅ Oui          | Même que prod pour cohérence               |
 
 **Variables partagées avec Vercel** (voir section précédente):
+
 - Discord (bot, channels, roles, webhook)
 - Stripe (legacy)
 - Binance wallets
@@ -289,6 +290,7 @@ Utiliser la commande custom `/sync-env`:
 ```
 
 Cette commande va:
+
 1. Parser les fichiers `.env*` locaux
 2. Lister variables Vercel (PROD + PREVIEW)
 3. Lister secrets GitHub Actions
@@ -314,6 +316,7 @@ gh api repos/YoannDrx/mycryptopilot --jq '.delete_branch_on_merge'
 ```
 
 **Workflow normal**:
+
 1. Merge PR → GitHub supprime branche auto
 2. Vercel détecte → supprime preview
 3. Neon détecte → supprime DB branch
@@ -359,6 +362,7 @@ vercel env ls
 **Cause**: `BETTER_AUTH_URL` incorrect
 
 **Solution**:
+
 - **Production**: `BETTER_AUTH_URL="https://www.mycryptopilot.app"`
 - **Preview**: Géré automatiquement par Vercel (pas besoin de set)
 - **Local**: `BETTER_AUTH_URL="http://localhost:3000"`
@@ -368,6 +372,7 @@ vercel env ls
 **Symptôme**: Tests passent en local mais échouent dans GitHub Actions
 
 **Causes possibles**:
+
 1. DATABASE_URL manquant ou incorrect
 2. Secrets GitHub Actions manquants
 3. PostgreSQL pas configuré dans CI
@@ -407,14 +412,15 @@ Vérifier `.gitignore`:
 
 #### 2. Séparer Mainnet et Testnet
 
-| Environnement | Crypto Network | XPUBs | Risque |
-|---------------|----------------|-------|--------|
-| **Production** | `mainnet` | XPUBs mainnet | 🔴 Argent réel |
-| **Preview** | `testnet` | XPUBs testnet | ✅ Aucun risque |
-| **Local Dev** | `testnet` | XPUBs testnet | ✅ Aucun risque |
-| **CI Tests** | `testnet` | XPUBs testnet | ✅ Aucun risque |
+| Environnement  | Crypto Network | XPUBs         | Risque          |
+| -------------- | -------------- | ------------- | --------------- |
+| **Production** | `mainnet`      | XPUBs mainnet | 🔴 Argent réel  |
+| **Preview**    | `testnet`      | XPUBs testnet | ✅ Aucun risque |
+| **Local Dev**  | `testnet`      | XPUBs testnet | ✅ Aucun risque |
+| **CI Tests**   | `testnet`      | XPUBs testnet | ✅ Aucun risque |
 
 **⚠️ NE JAMAIS**:
+
 - Utiliser XPUBs mainnet en dev/test
 - Utiliser XPUBs testnet en production
 - Mélanger les deux environnements
@@ -432,11 +438,11 @@ Les **seed phrases** (12-24 mots) contrôlent les fonds:
 
 #### 4. XPUBs vs Seed Phrases
 
-| Type | Sécurité | Commit Git? | Vercel? | Usage |
-|------|----------|-------------|---------|-------|
-| **Seed Phrase** | 🔴 CRITIQUE | ❌ JAMAIS | ❌ JAMAIS | Récupération fonds uniquement |
-| **XPRV** (extended private) | 🔴 CRITIQUE | ❌ JAMAIS | ❌ JAMAIS | Génération adresses (dangereux) |
-| **XPUB** (extended public) | ✅ Safe | ❌ Non | ✅ Oui | Génération adresses (safe) |
+| Type                        | Sécurité    | Commit Git? | Vercel?   | Usage                           |
+| --------------------------- | ----------- | ----------- | --------- | ------------------------------- |
+| **Seed Phrase**             | 🔴 CRITIQUE | ❌ JAMAIS   | ❌ JAMAIS | Récupération fonds uniquement   |
+| **XPRV** (extended private) | 🔴 CRITIQUE | ❌ JAMAIS   | ❌ JAMAIS | Génération adresses (dangereux) |
+| **XPUB** (extended public)  | ✅ Safe     | ❌ Non      | ✅ Oui    | Génération adresses (safe)      |
 
 **⚠️ CRITIQUE**: Les scripts doivent générer des **XPUB** (`.neuter()`), jamais XPRV!
 
@@ -458,13 +464,14 @@ Les secrets GitHub Actions sont **chiffrés** mais:
 
 #### 7. OAuth Secrets
 
-| Provider | Multi-redirect? | Config |
-|----------|-----------------|--------|
-| **GitHub** | ❌ Non | Apps séparées dev/prod |
-| **Google** | ✅ Oui | 1 app, multiples redirect URIs |
-| **Discord** | ✅ Oui | 1 app, multiples redirect URIs |
+| Provider    | Multi-redirect? | Config                         |
+| ----------- | --------------- | ------------------------------ |
+| **GitHub**  | ❌ Non          | Apps séparées dev/prod         |
+| **Google**  | ✅ Oui          | 1 app, multiples redirect URIs |
+| **Discord** | ✅ Oui          | 1 app, multiples redirect URIs |
 
 **Redirect URIs à configurer**:
+
 - Local: `http://localhost:3000/api/auth/callback/PROVIDER`
 - Production: `https://www.mycryptopilot.app/api/auth/callback/PROVIDER`
 
@@ -531,6 +538,7 @@ pnpm dev
 ```
 
 Vérifier:
+
 - Variables orphelines
 - Branches Neon orphelines
 - Secrets GitHub Actions inutilisés
@@ -539,11 +547,11 @@ Vérifier:
 
 **Secrets à renouveler périodiquement**:
 
-| Secret | Fréquence | Impact |
-|--------|-----------|--------|
-| `BETTER_AUTH_SECRET` | 6-12 mois | Force reconnexion users |
-| `CRON_SECRET` | 6-12 mois | Régénérer et mettre à jour partout |
-| `ENCRYPTION_SECRET` | ❌ JAMAIS | Invaliderait toutes les API keys chiffrées |
+| Secret               | Fréquence | Impact                                     |
+| -------------------- | --------- | ------------------------------------------ |
+| `BETTER_AUTH_SECRET` | 6-12 mois | Force reconnexion users                    |
+| `CRON_SECRET`        | 6-12 mois | Régénérer et mettre à jour partout         |
+| `ENCRYPTION_SECRET`  | ❌ JAMAIS | Invaliderait toutes les API keys chiffrées |
 
 **Secrets OAuth**: Pas besoin de rotation (gérés par providers)
 
@@ -552,6 +560,7 @@ Vérifier:
 **📝 Fin du Guide de Mapping**
 
 Pour toute question, consulter:
+
 - `.claude/CLAUDE.md` - Instructions générales
 - `.claude/commands/sync-env.md` - Commande de vérification
 - `ENV_CHECKLIST.md` - Checklist complète (si existant)

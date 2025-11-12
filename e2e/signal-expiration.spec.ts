@@ -26,7 +26,7 @@ test.describe("Signal Expiration", () => {
 
     // 3. Navigate to trader profile to see the signal
     await page.goto(`/traders/${trader.id}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 4. Verify signal is visible
     await expect(page.getByText("BTC-USDT").first()).toBeVisible();
@@ -79,7 +79,7 @@ test.describe("Signal Expiration", () => {
 
     // 3. Navigate to signals feed (includes expired if explicitly enabled)
     await page.goto("/signals");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Note: By default, trader profile shows only ACTIVE signals (includeExpired: false)
     // So expired signals won't appear on /traders/[id]
@@ -121,7 +121,7 @@ test.describe("Signal Expiration", () => {
 
     // Sign back in as the trader
     await page.goto("/auth/signin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Since we're using test trader, let's just verify the logic by checking database
     // The expired signal exists in DB with expiresAt in the past

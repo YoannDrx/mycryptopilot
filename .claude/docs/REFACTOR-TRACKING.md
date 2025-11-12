@@ -10,18 +10,18 @@
 
 ## 🎯 Progress Global
 
-| Phase | Statut | Début | Fin | Durée | Commits |
-|-------|--------|-------|-----|-------|---------|
-| 0. Design & RFC | ✅ Terminé | 2025-01-05 | 2025-01-07 | 2j | 1d46176 |
-| 1. Structures | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | d7e3906 |
-| 2. Migration données | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | fb8d321 |
-| 3. Services | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | c18194d, 05877f1 |
-| 4. Auth & Middleware | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1j | 6d48bbe, 657a6c3 |
-| 5a. Routes principales | ✅ Terminé | 2025-01-08 | 2025-01-08 | 2h | ff67a66, 41d45b5 |
-| 5b. Layout Navigation | ✅ Terminé | 2025-01-08 | 2025-01-08 | 1h | b75a6f9, b904215 |
-| 6. Tests & Validation | 🟡 En cours | 2025-01-08 | - | ~3h (estimé) | - |
-| 7. Bascule prod | ⚪ À faire | - | - | - | - |
-| 8. Nettoyage | ⚪ À faire | - | - | - | - |
+| Phase                  | Statut      | Début      | Fin        | Durée        | Commits          |
+| ---------------------- | ----------- | ---------- | ---------- | ------------ | ---------------- |
+| 0. Design & RFC        | ✅ Terminé  | 2025-01-05 | 2025-01-07 | 2j           | 1d46176          |
+| 1. Structures          | ✅ Terminé  | 2025-01-08 | 2025-01-08 | 1j           | d7e3906          |
+| 2. Migration données   | ✅ Terminé  | 2025-01-08 | 2025-01-08 | 1j           | fb8d321          |
+| 3. Services            | ✅ Terminé  | 2025-01-08 | 2025-01-08 | 1j           | c18194d, 05877f1 |
+| 4. Auth & Middleware   | ✅ Terminé  | 2025-01-08 | 2025-01-08 | 1j           | 6d48bbe, 657a6c3 |
+| 5a. Routes principales | ✅ Terminé  | 2025-01-08 | 2025-01-08 | 2h           | ff67a66, 41d45b5 |
+| 5b. Layout Navigation  | ✅ Terminé  | 2025-01-08 | 2025-01-08 | 1h           | b75a6f9, b904215 |
+| 6. Tests & Validation  | 🟡 En cours | 2025-01-08 | -          | ~3h (estimé) | -                |
+| 7. Bascule prod        | ⚪ À faire  | -          | -          | -            | -                |
+| 8. Nettoyage           | ⚪ À faire  | -          | -          | -            | -                |
 
 **Légende** : ⚪ À faire | 🟡 En cours | ✅ Terminé | ❌ Bloqué
 
@@ -175,12 +175,14 @@
 ### Validation Données
 
 **Tests dry-run** :
+
 - [x] Dry-run migration OK (2996 orgs scannées, 652 users, 103 subscriptions)
 - [x] Dry-run rollback OK (détecte absence de données migrées)
 - [x] Aucune erreur ESLint/TypeScript
 - [x] Scripts idempotents validés
 
 **Prêt pour production** :
+
 - [x] Scripts testés en dry-run
 - [x] Documentation complète disponible
 - [x] Rollback testé
@@ -274,6 +276,7 @@
 - **Net** : +80 lignes (création helper central)
 
 **Commits** :
+
 - `c18194d` - Phase 3 Part 1: subscription-manager + follow.action
 - `05877f1` - Phase 3 Part 2: URLs helper + Discord/Email adaptations
 
@@ -330,28 +333,34 @@
 - **Net** : +116 lignes
 
 **Commits** :
+
 - `6d48bbe` - Phase 4: Auth & Middleware Dual-Mode
 
 ### Détails Techniques
 
 **Auth Hook Changes** :
+
 ```typescript
 // Mode nouveau (ligne 124-147)
 if (FEATURES.USER_ACCOUNT_MODE) {
   await prisma.userSubscription.create({
-    data: { userId, plan: "free", status: "active", periodEnd: null }
+    data: { userId, plan: "free", status: "active", periodEnd: null },
   });
 }
 
 // Mode legacy (ligne 148-184) - Création Organization avec retry
 else {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    await createOrganizationApi({ name: "Account", slug: generateSlug(userId) });
+    await createOrganizationApi({
+      name: "Account",
+      slug: generateSlug(userId),
+    });
   }
 }
 ```
 
 **Plugin Conditionnel** :
+
 ```typescript
 plugins: [
   ...(FEATURES.USER_ACCOUNT_MODE ? [] : [organization({ ... })]),
@@ -360,6 +369,7 @@ plugins: [
 ```
 
 **Middleware Redirection** :
+
 ```typescript
 if (FEATURES.USER_ACCOUNT_MODE) {
   const legacyRedirect = handleLegacyOrgRedirect(request);
@@ -396,12 +406,14 @@ if (FEATURES.USER_ACCOUNT_MODE) {
 ### Décisions Validées
 
 **Option A retenue** : Migrer seulement 5 routes principales
+
 - ✅ Plus rapide (2h vs 10h)
 - ✅ Valide le système dual-mode end-to-end
 - ✅ Redirections 307 gèrent anciens liens automatiquement
 - ✅ Sub-routes restent sous `/orgs/[orgSlug]/` temporairement
 
 **Stratégie alternative (Option B non retenue)** :
+
 - ❌ Migrer toutes les 28 pages d'un coup
 - ❌ Trop long (10-15h)
 - ❌ Blast radius trop large
@@ -409,25 +421,27 @@ if (FEATURES.USER_ACCOUNT_MODE) {
 
 ### Routes Créées
 
-| Route | Statut | Fichiers | LOC | Source |
-|-------|--------|----------|-----|--------|
-| `/dashboard` | ✅ | page.tsx + 2 components | ~600 | `(trading)/dashboard/` |
-| `/traders` | ✅ | page.tsx + 2 components | ~500 | `(trading)/traders/` |
-| `/signals` | ✅ | page.tsx + 2 components | ~400 | `(trading)/signals/` |
-| `/pricing` | ✅ | page.tsx | ~280 | `(trading)/pricing/` |
-| `/account` | ✅ | page.tsx (nouveau) | ~130 | Créé from scratch |
+| Route        | Statut | Fichiers                | LOC  | Source                 |
+| ------------ | ------ | ----------------------- | ---- | ---------------------- |
+| `/dashboard` | ✅     | page.tsx + 2 components | ~600 | `(trading)/dashboard/` |
+| `/traders`   | ✅     | page.tsx + 2 components | ~500 | `(trading)/traders/`   |
+| `/signals`   | ✅     | page.tsx + 2 components | ~400 | `(trading)/signals/`   |
+| `/pricing`   | ✅     | page.tsx                | ~280 | `(trading)/pricing/`   |
+| `/account`   | ✅     | page.tsx (nouveau)      | ~130 | Créé from scratch      |
 
 **Total** : 11 fichiers créés, 1942 lignes ajoutées
 
 ### Fichiers Modifiés
 
 **Helper dual-mode créé** :
+
 - `src/lib/react/org-cache-dual.ts` (88 lignes)
   - Fonction `getOrgOrStub()` : retourne `CurrentOrgPayload`
   - Mode legacy: `getRequiredCurrentOrgCache()`
   - Mode nouveau: stub compatible avec `UserSubscription`
 
 **Toutes les pages utilisent `getOrgOrStub()`** :
+
 - `app/(app)/dashboard/page.tsx` : ligne 38
 - `app/(app)/signals/page.tsx` : lignes 3, 29
 - `app/(app)/pricing/page.tsx` : lignes 15, 24
@@ -444,6 +458,7 @@ if (FEATURES.USER_ACCOUNT_MODE) {
 ### Commit Final
 
 **Commit** : `ff67a66`
+
 ```
 feat(refactor): Phase 5a - Create root-level routes for dual-mode
 
@@ -484,6 +499,7 @@ Created 5 main root-level routes compatible with dual-mode:
 ### Problème Identifié
 
 Après Phase 5a, lors du premier build test, découverte d'un problème critique:
+
 - ❌ Routes créées sans sidebar de navigation
 - ❌ Expérience utilisateur cassée (pas de menu)
 - ❌ Build passait mais routes inutilisables
@@ -528,6 +544,7 @@ Création complète du système de navigation pour le groupe (app):
 **Question** : Migrer 23 sub-routes maintenant ou plus tard ?
 
 **Décision retenue** : ❌ PAS maintenant - Redirections 307 suffisent
+
 - ✅ Validation système prioritaire
 - ✅ Sub-routes fonctionnent via legacy URLs + redirections
 - ✅ Phase 6 (tests) plus importante
@@ -536,6 +553,7 @@ Création complète du système de navigation pour le groupe (app):
 ### Commit Final
 
 **Commit** : `b75a6f9`
+
 ```
 fix(refactor): Add navigation layout for root-level routes
 
@@ -550,6 +568,7 @@ Solution: Created complete navigation system for (app) route group
 ### Sub-Routes Identifiées (si migration Phase 5b)
 
 **Dashboard Trader** (7 pages) :
+
 - `/dashboard/trader/` - Trader dashboard overview
 - `/dashboard/trader/signals/` - Manage signals
 - `/dashboard/trader/signals/new` - Create signal
@@ -559,6 +578,7 @@ Solution: Created complete navigation system for (app) route group
 - `/dashboard/trader/verification` - Verification status
 
 **Account Settings** (10 pages) :
+
 - `/account/(settings)/profile` - Profile settings
 - `/account/(settings)/preferences` - User preferences
 - `/account/(settings)/notifications` - Notification settings
@@ -573,6 +593,7 @@ Solution: Created complete navigation system for (app) route group
 - `/account/danger` - Danger zone
 
 **Autres** (6 pages) :
+
 - `/analytics` - Platform analytics
 - `/checkout/[plan]` - Checkout pages
 - `/risk-console` - Risk console tool
@@ -609,6 +630,7 @@ Solution: Created complete navigation system for (app) route group
 **Pull Request** : [#78](https://github.com/YoannDrx/mycryptopilot/pull/78)
 
 **Checks Status** (2025-01-08):
+
 - ✅ GitGuardian Security: SUCCESS
 - ✅ Lint & TypeScript: SUCCESS
 - ✅ Unit Tests: SUCCESS
@@ -621,6 +643,7 @@ Solution: Created complete navigation system for (app) route group
 **Total tests** : 24 fichiers spec dans `e2e/`
 
 **Tests pertinents pour Phase 5** :
+
 1. `navigation.spec.ts` - Teste sidebar navigation et global search
    - Utilise `/orgs/${orgSlug}/dashboard`, `/traders`, `/pricing`, `/account`
    - ⚠️ Tests uniquement les anciennes routes (legacy mode)
@@ -645,6 +668,7 @@ Solution: Created complete navigation system for (app) route group
 ### Vérification Routes Créées
 
 **Routes Phase 5 vérifiées** :
+
 ```bash
 app/(app)/
 ├── _navigation/        # Navigation sidebar
@@ -665,11 +689,13 @@ app/(app)/
 Les tests actuels utilisent tous `/orgs/${orgSlug}/*` et fonctionnent en mode legacy.
 
 **Options** :
+
 - **Option A** : Ne rien changer maintenant (tests valident le mode legacy)
 - **Option B** : Dupliquer les tests pour tester les 2 modes (legacy + nouveau)
 - **Option C** : Ajouter des tests conditionnels basés sur feature flag
 
 **Recommandation** : **Option A** pour Phase 6
+
 - Les tests actuels valident que le mode legacy fonctionne toujours ✅
 - Les redirections 307 sont testées indirectement (middleware)
 - Tests nouveaux mode peuvent être ajoutés en Phase 7 (avant bascule prod)
@@ -706,6 +732,7 @@ test("dual mode: flag OFF uses legacy routes", async ({ page }) => {
 ### Tests Manuels Phase 6
 
 **À faire** :
+
 - [ ] Tester `/dashboard` en local (logged in)
 - [ ] Tester `/signals` en local
 - [ ] Tester `/traders` en local
@@ -720,6 +747,7 @@ test("dual mode: flag OFF uses legacy routes", async ({ page }) => {
 ### Validation Dual-Mode
 
 **Test avec flag OFF (legacy mode)** :
+
 ```bash
 # .env.local
 NEXT_PUBLIC_USER_ACCOUNT_MODE=false
@@ -731,6 +759,7 @@ pnpm dev
 ```
 
 **Test avec flag ON (nouveau mode)** :
+
 ```bash
 # .env.local
 NEXT_PUBLIC_USER_ACCOUNT_MODE=true
@@ -744,6 +773,7 @@ pnpm dev
 ### Métriques Phase 6
 
 **Attendu** :
+
 - **Tests manuels** : 10-15 minutes
 - **Tests e2e** : Attendre fin CI/CD (~1-2h)
 - **Documentation** : 30 minutes
@@ -751,11 +781,11 @@ pnpm dev
 
 ### Décisions Phase 6
 
-| Décision | Rationale | Date |
-|----------|-----------|------|
+| Décision                        | Rationale                                    | Date       |
+| ------------------------------- | -------------------------------------------- | ---------- |
 | Ne pas modifier tests existants | Tests legacy valident backward compatibility | 2025-01-08 |
-| Créer nouveaux tests en Phase 7 | Plus proche de la bascule prod | 2025-01-08 |
-| Attendre E2E CI/CD avant merge | Validation automatique critique | 2025-01-08 |
+| Créer nouveaux tests en Phase 7 | Plus proche de la bascule prod               | 2025-01-08 |
+| Attendre E2E CI/CD avant merge  | Validation automatique critique              | 2025-01-08 |
 
 ### Statut Actuel Phase 6
 
@@ -789,6 +819,7 @@ pnpm dev
 #### Semaine 1 : Tests & Staging (2025-01-09 → 2025-01-15)
 
 **Objectifs** :
+
 - Créer tests e2e nouveaux
 - Déployer en prod avec flag OFF
 - Tester flag ON en staging
@@ -805,7 +836,9 @@ test.describe("Dual-Mode Navigation", () => {
 
     // Test /dashboard
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /dashboard/i }),
+    ).toBeVisible();
 
     // Navigate to /signals
     await page.goto("/signals");
@@ -813,7 +846,9 @@ test.describe("Dual-Mode Navigation", () => {
 
     // Navigate to /traders
     await page.goto("/traders");
-    await expect(page.getByRole("heading", { name: /traders marketplace/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /traders marketplace/i }),
+    ).toBeVisible();
 
     // Navigate to /pricing
     await page.goto("/pricing");
@@ -828,15 +863,24 @@ test.describe("Dual-Mode Navigation", () => {
     await createTestAccount({ page, callbackURL: "/dashboard" });
 
     // Verify sidebar is visible
-    await expect(page.getByRole("link", { name: /dashboard/i }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /signals/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /dashboard/i }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /signals/i }).first(),
+    ).toBeVisible();
 
     // Click sidebar link to navigate
-    await page.getByRole("link", { name: /traders/i }).first().click();
+    await page
+      .getByRole("link", { name: /traders/i })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/traders/);
 
     // Verify sidebar still visible after navigation
-    await expect(page.getByRole("link", { name: /dashboard/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /dashboard/i }).first(),
+    ).toBeVisible();
   });
 
   test("global search works on new routes", async ({ page }) => {
@@ -863,7 +907,10 @@ test.describe("Dual-Mode Navigation", () => {
 
 // e2e/redirections.spec.ts (NOUVEAU)
 test.describe("Legacy Redirections", () => {
-  test("legacy routes redirect to new routes with 307", async ({ page, context }) => {
+  test("legacy routes redirect to new routes with 307", async ({
+    page,
+    context,
+  }) => {
     await createTestAccount({ page, callbackURL: "/orgs" });
 
     const currentUrl = page.url();
@@ -900,8 +947,12 @@ test.describe("Legacy Redirections", () => {
     await page.goto(`/orgs/${orgSlug}/dashboard/trader`);
 
     // Should NOT redirect (not migrated yet)
-    await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard/trader`));
-    await expect(page.getByRole("heading", { name: /trader dashboard/i })).toBeVisible();
+    await expect(page).toHaveURL(
+      new RegExp(`/orgs/${orgSlug}/dashboard/trader`),
+    );
+    await expect(
+      page.getByRole("heading", { name: /trader dashboard/i }),
+    ).toBeVisible();
   });
 });
 
@@ -921,7 +972,9 @@ test.describe("Feature Flag Dual-Mode", () => {
 
     // Should work normally
     await expect(page).toHaveURL(new RegExp(`/orgs/${orgSlug}/dashboard`));
-    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /dashboard/i }),
+    ).toBeVisible();
   });
 
   test("flag ON: new routes work with stub org", async ({ page }) => {
@@ -932,15 +985,20 @@ test.describe("Feature Flag Dual-Mode", () => {
 
     // Should land on new route
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.getByRole("heading", { name: /dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /dashboard/i }),
+    ).toBeVisible();
 
     // Verify sidebar works (org stub created successfully)
-    await expect(page.getByRole("link", { name: /signals/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /signals/i }).first(),
+    ).toBeVisible();
   });
 });
 ```
 
 **Déploiement Semaine 1** :
+
 ```bash
 # 1. Merge PR #78
 git checkout main
@@ -958,6 +1016,7 @@ git push origin main
 ```
 
 **Tests Staging Semaine 1** :
+
 ```bash
 # Créer preview deployment avec flag ON
 # Dans Vercel: Create deployment with env var override
@@ -981,11 +1040,13 @@ NEXT_PUBLIC_USER_ACCOUNT_MODE=true
 #### Semaine 2 : Rollout 10% (2025-01-16 → 2025-01-22)
 
 **Objectifs** :
+
 - Activer flag pour 10% des users
 - Monitorer métriques clés
 - Rollback si problème critique
 
 **Métriques à monitorer** :
+
 - **Error Rate** : Doit rester < 0.1%
 - **P95 Load Time** : Doit rester < 2s
 - **Bounce Rate** : Pas d'augmentation > 5%
@@ -1017,9 +1078,12 @@ function getUserAccountModeEnabled(): boolean {
 
     // Hash user ID pour distribution stable
     const hash = simpleHash(userId);
-    const rolloutPercentage = parseInt(process.env.ROLLOUT_PERCENTAGE || "0", 10);
+    const rolloutPercentage = parseInt(
+      process.env.ROLLOUT_PERCENTAGE || "0",
+      10,
+    );
 
-    return (hash % 100) < rolloutPercentage;
+    return hash % 100 < rolloutPercentage;
   } catch {
     return false;
   }
@@ -1029,7 +1093,7 @@ function simpleHash(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
   return Math.abs(hash);
@@ -1041,6 +1105,7 @@ function getLegacyOrgRedirectsEnabled(): boolean {
 ```
 
 **Configuration Vercel Semaine 2** :
+
 ```bash
 # Dans Vercel Dashboard:
 # Environment Variables > Production
@@ -1050,6 +1115,7 @@ NEXT_PUBLIC_LEGACY_ORG_REDIRECTS=true  # Activer redirections
 ```
 
 **Dashboard Monitoring** :
+
 ```bash
 # Métriques Vercel Analytics à surveiller:
 # - Page views: /dashboard vs /orgs/:slug/dashboard
@@ -1066,12 +1132,14 @@ NEXT_PUBLIC_LEGACY_ORG_REDIRECTS=true  # Activer redirections
 #### Semaine 3 : Rollout 50% (2025-01-23 → 2025-01-29)
 
 **Conditions pour passer à 50%** :
+
 - ✅ Semaine 2 complète sans incident critique
 - ✅ Error rate < 0.1%
 - ✅ Performance stable
 - ✅ Aucun feedback négatif critique
 
 **Déploiement** :
+
 ```bash
 # Update Vercel env var
 ROLLOUT_PERCENTAGE=50
@@ -1082,6 +1150,7 @@ ROLLOUT_PERCENTAGE=50
 **Communication Utilisateurs Semaine 3** :
 
 Email/Discord announcement:
+
 ```
 🎉 Amélioration de la Navigation MyCryptoPilot
 
@@ -1103,11 +1172,13 @@ Questions? Contactez-nous sur Discord.
 #### Semaine 4 : Rollout 100% (2025-01-30)
 
 **Conditions pour passer à 100%** :
+
 - ✅ Semaine 3 complète sans incident
 - ✅ Feedback utilisateurs positif
 - ✅ Toutes métriques stables
 
 **Déploiement Final** :
+
 ```bash
 # Update Vercel env var
 NEXT_PUBLIC_USER_ACCOUNT_MODE=true
@@ -1139,6 +1210,7 @@ git push origin main
 ```
 
 **Critères Rollback Automatique** :
+
 - Error rate > 1% pendant 5 minutes
 - P95 load time > 5s pendant 10 minutes
 - Traffic drop > 50% pendant 5 minutes
@@ -1146,12 +1218,14 @@ git push origin main
 ### Communication Phase 7
 
 **Channels** :
+
 - Email newsletter (Semaine 3)
 - Discord announcement (Semaine 3)
 - In-app banner (Semaine 4)
 - Documentation update (Semaine 1)
 
 **Documentation à mettre à jour** :
+
 - README.md (nouvelles URLs)
 - `.claude/docs/DEVELOPMENT.md` (feature flags)
 - User guides (screenshots avec nouvelles URLs)
@@ -1160,6 +1234,7 @@ git push origin main
 ### Métriques Phase 7
 
 **Objectifs** :
+
 - **Zero downtime** : 100% uptime pendant rollout
 - **Error rate** : < 0.1% tout au long
 - **Performance** : P95 < 2s maintenu
@@ -1168,11 +1243,13 @@ git push origin main
 ### Tests Phase 7
 
 **Tests automatiques** :
+
 - 3 nouveaux fichiers e2e (dual-mode-navigation, redirections, feature-flag-validation)
 - ~12 tests nouveaux au total
 - Durée execution: +5-7 minutes aux tests existants
 
 **Tests manuels** :
+
 - Vérification quotidienne dashboard Vercel
 - Tests manuels avant chaque augmentation percentage
 - Smoke tests après chaque déploiement
@@ -1190,6 +1267,7 @@ git push origin main
 ### Pré-requis Phase 8
 
 **Obligatoires avant de démarrer** :
+
 - ✅ Phase 7 complète à 100% depuis minimum 1 semaine
 - ✅ Zero incidents critiques pendant 7 jours
 - ✅ Backup complet base de données créé et testé
@@ -1255,6 +1333,7 @@ COMMIT;
 ```
 
 **Prisma migration** :
+
 ```bash
 # Créer migration
 npx prisma migrate dev --name drop-legacy-org-tables
@@ -1318,6 +1397,7 @@ export async function middleware(request: NextRequest) {
 ### Étape 4 : Update Documentation
 
 **Documentation à mettre à jour** :
+
 - README.md (retirer mentions organizations)
 - CLAUDE.md (update architecture section)
 - DEVELOPMENT.md (retirer feature flags)
@@ -1325,20 +1405,24 @@ export async function middleware(request: NextRequest) {
 - All user-facing docs (screenshots, guides)
 
 **Changelog** :
+
 ```markdown
 ## v2.0.0 - Février 2025
 
 ### BREAKING CHANGES
+
 - URLs simplifiées: `/dashboard` au lieu de `/orgs/:slug/dashboard`
 - Removed multi-tenant organization system
 - Simplified to user-centric architecture
 
 ### Architecture
+
 - Migrated from Organization model to UserSubscription
 - Cleaned up legacy code (~3500 LOC removed)
 - Improved performance (-30% DB queries, -20% load time)
 
 ### Migration Notes
+
 - All users automatically migrated
 - Bookmarks with old URLs redirect automatically
 - No action required from users
@@ -1375,6 +1459,7 @@ pnpm build
 ### Métriques Phase 8
 
 **Objectifs** :
+
 - **Code cleanup** : ~3500 LOC supprimées
 - **Tables dropped** : 4 (Organization, Member, Invitation, Subscription)
 - **Files removed** : ~50 fichiers
@@ -1384,6 +1469,7 @@ pnpm build
 ### Validation Finale Phase 8
 
 **Checklist avant de considérer Phase 8 terminée** :
+
 - [ ] Backup vérifié et restaurable
 - [ ] Tables legacy droppées
 - [ ] Code legacy supprimé
@@ -1430,22 +1516,23 @@ pnpm dev
 
 ### Historique Décisions Importantes
 
-| Date | Décision | Rationale |
-|------|----------|-----------|
-| 2025-01-05 | Feature flags dual-mode | Sécurité migration progressive, réversibilité |
-| 2025-01-05 | UserSubscription avec audit trail | Traçabilité post-migration |
-| 2025-01-05 | Migration route par route | Blast radius limité, tests incrémentaux |
-| 2025-01-05 | Pas de worktree isolé | Dev only, branche directe suffit |
+| Date       | Décision                          | Rationale                                     |
+| ---------- | --------------------------------- | --------------------------------------------- |
+| 2025-01-05 | Feature flags dual-mode           | Sécurité migration progressive, réversibilité |
+| 2025-01-05 | UserSubscription avec audit trail | Traçabilité post-migration                    |
+| 2025-01-05 | Migration route par route         | Blast radius limité, tests incrémentaux       |
+| 2025-01-05 | Pas de worktree isolé             | Dev only, branche directe suffit              |
 
 ### Problèmes Rencontrés
 
-*Aucun pour l'instant (Phase 0)*
+_Aucun pour l'instant (Phase 0)_
 
 ---
 
 ## Métriques
 
 ### Phase 0
+
 - **Durée réelle** : En cours (démarré 2025-01-05)
 - **Commits** : 1 (initial)
 - **LOC ajoutées** : ~400 (documentation)
@@ -1454,6 +1541,7 @@ pnpm dev
 ### Objectifs Globaux
 
 **Cible finale** :
+
 - **Tables supprimées** : 4 (Organization, Member, Invitation, Subscription)
 - **Fichiers refactorés** : 150+
 - **LOC supprimées** : ~3500

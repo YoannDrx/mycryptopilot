@@ -16,9 +16,11 @@ Instead of fixing tests one-by-one (32 x 3min = 96min), apply fixes in batches b
 ## Pattern A: Timeout Issues (8 tests)
 
 ### Root Cause
+
 Heavy React components (crypto libs, QR code, charts) + slow CI environment
 
 ### Tests Affected
+
 1. `crypto-checkout.spec.ts:6` - user can view checkout page (34.6s timeout)
 2. `crypto-checkout.spec.ts:114` - checkout page shows plan features (37.7s timeout)
 3. `crypto-checkout.spec.ts:232` - checkout validates payment (39.0s timeout)
@@ -29,6 +31,7 @@ Heavy React components (crypto libs, QR code, charts) + slow CI environment
 8. `trader-dashboard.spec.ts` - trader dashboard shows followers (23.8s timeout)
 
 ### Batch Fix
+
 ```typescript
 // playwright.config.ts
 export default defineConfig({
@@ -43,6 +46,7 @@ export default defineConfig({
 ```
 
 **Alternative**: Add timeout overrides to specific tests:
+
 ```typescript
 // e2e/crypto-checkout.spec.ts
 test.setTimeout(90000); // Add at top of describe block
@@ -57,9 +61,11 @@ await expect(element).toBeVisible({ timeout: 20000 }); // was 10000
 ## Pattern B: UI Selector Changes (6 tests)
 
 ### Root Cause
+
 B2C migration changed UI text, button labels, navigation structure
 
 ### Tests Affected
+
 1. `account.spec.ts:78` - update name flow
 2. `account.spec.ts:100` - change password flow
 3. `settings.spec.ts:6` - edit profile settings
@@ -70,6 +76,7 @@ B2C migration changed UI text, button labels, navigation structure
 ### Batch Fix
 
 #### 1. Account Tests (account.spec.ts)
+
 **Issue**: Sélecteurs probablement corrects, mais peut-être timeout
 
 ```typescript
@@ -87,9 +94,11 @@ await page.waitForTimeout(1000); // React hydration
 ```
 
 #### 2. Admin Test (admin.spec.ts)
+
 **Already Fixed**: Organizations links removed in commit `cbd2e06`
 
 **Potential Issue**: Timing - add waits
+
 ```typescript
 // Line 13: After goto /admin
 await page.goto("/admin");
@@ -98,6 +107,7 @@ await page.waitForTimeout(1000); // Sidebar mount
 ```
 
 #### 3. Navigation Tests (navigation.spec.ts)
+
 **Issue**: Spaces changed (no more "Orgs" space)
 
 ```typescript
@@ -115,11 +125,13 @@ await page.waitForTimeout(1000); // Sidebar mount
 ## Pattern C: Portfolio DB Helpers (11 tests)
 
 ### Root Cause
+
 - `createMockExchangeConnection` doesn't update `traderProfile.verified`
 - `createCompletePortfolioData` causes unique constraint violations
 - Missing `TraderTrade` records for test data
 
 ### Tests Affected
+
 1. `portfolio-tracking.spec.ts:10` - complete flow connect → view stats
 2. `portfolio-tracking.spec.ts:102` - manual sync triggers trade fetching
 3. `portfolio-tracking.spec.ts:149` - displays performance stats for 4 periods
@@ -140,7 +152,7 @@ await page.waitForTimeout(1000); // Sidebar mount
 // FIX 1: createMockExchangeConnection
 export async function createMockExchangeConnection(
   userId: string,
-  options?: Partial<CreateMockExchangeConnectionOptions>
+  options?: Partial<CreateMockExchangeConnectionOptions>,
 ) {
   // ... existing code ...
 
@@ -162,7 +174,7 @@ export async function createCompletePortfolioData() {
     where: {
       userId_exchange: {
         userId: trader.id,
-        exchange: 'BINANCE',
+        exchange: "BINANCE",
       },
     },
     update: {
@@ -173,7 +185,7 @@ export async function createCompletePortfolioData() {
     },
     create: {
       userId: trader.id,
-      exchange: 'BINANCE',
+      exchange: "BINANCE",
       apiKey: encryptedApiKey,
       apiSecret: encryptedApiSecret,
       isActive: true,
@@ -186,25 +198,25 @@ export async function createCompletePortfolioData() {
     data: [
       {
         traderId: trader.id,
-        symbol: 'BTCUSDT',
-        side: 'BUY',
-        type: 'LIMIT',
+        symbol: "BTCUSDT",
+        side: "BUY",
+        type: "LIMIT",
         quantity: 0.01,
         price: 50000,
-        status: 'FILLED',
+        status: "FILLED",
         executedAt: new Date(),
-        exchange: 'BINANCE',
+        exchange: "BINANCE",
       },
       {
         traderId: trader.id,
-        symbol: 'ETHUSDT',
-        side: 'SELL',
-        type: 'MARKET',
+        symbol: "ETHUSDT",
+        side: "SELL",
+        type: "MARKET",
         quantity: 0.5,
         price: 3000,
-        status: 'FILLED',
+        status: "FILLED",
         executedAt: new Date(),
-        exchange: 'BINANCE',
+        exchange: "BINANCE",
       },
     ],
   });
@@ -218,9 +230,11 @@ export async function createCompletePortfolioData() {
 ## Pattern D: nuqs URL State (2 tests)
 
 ### Root Cause
+
 `nuqs` uses `replaceState` which doesn't trigger `waitForURL`. Need `waitForResponse` fallback.
 
 ### Tests Affected
+
 1. `signals-feed-filters.spec.ts:26` - user can filter signals by asset
 2. `signals-feed-filters.spec.ts:27` - user can filter signals by bias
 
@@ -240,7 +254,7 @@ test("user can filter signals by asset", async ({ page }) => {
   await page.waitForURL(/asset=BTC/, { timeout: 2000 }).catch(() => {});
   await page.waitForResponse(
     (response) => response.url().includes("/api/signals/feed"),
-    { timeout: 3000 }
+    { timeout: 3000 },
   );
 
   // Verify filtered results
@@ -258,7 +272,7 @@ test("user can filter signals by bias (LONG/SHORT)", async ({ page }) => {
   await page.waitForURL(/bias=LONG/, { timeout: 2000 }).catch(() => {});
   await page.waitForResponse(
     (response) => response.url().includes("/api/signals/feed"),
-    { timeout: 3000 }
+    { timeout: 3000 },
   );
 
   // Verify filtered results
@@ -271,9 +285,11 @@ test("user can filter signals by bias (LONG/SHORT)", async ({ page }) => {
 ## Pattern E: Follow/Unfollow Test (1 test)
 
 ### Root Cause
+
 Timing issue - follow button click not waiting for network response
 
 ### Test Affected
+
 `follow-unfollow.spec.ts:7` - user can follow and unfollow a trader
 
 ### Batch Fix
@@ -287,7 +303,7 @@ test("user can follow and unfollow a trader", async ({ page }) => {
   await followButton.click();
   await page.waitForResponse(
     (response) => response.url().includes("/api/follow"),
-    { timeout: 5000 }
+    { timeout: 5000 },
   );
   await page.waitForTimeout(1000); // UI update
 
@@ -300,7 +316,7 @@ test("user can follow and unfollow a trader", async ({ page }) => {
   await unfollowButton.click();
   await page.waitForResponse(
     (response) => response.url().includes("/api/follow"),
-    { timeout: 5000 }
+    { timeout: 5000 },
   );
   await page.waitForTimeout(1000); // UI update
 
@@ -316,9 +332,11 @@ test("user can follow and unfollow a trader", async ({ page }) => {
 ## Pattern F: Signals Expiration + Filters (3 tests)
 
 ### Root Cause
+
 Timing issues with signal creation + expiration checks
 
 ### Tests Affected
+
 1. `signal-expiration.spec.ts:58` - expired signal shows EXPIRED status
 2. `signals-feed-filters.spec.ts:10` - filters persist in URL
 
@@ -350,6 +368,7 @@ test("expired signal shows EXPIRED status", async ({ page }) => {
 ## Execution Plan
 
 ### Step 1: Global Timeout Increase (1min)
+
 ```bash
 # Edit playwright.config.ts
 - actionTimeout: 10000 → 15000
@@ -358,6 +377,7 @@ test("expired signal shows EXPIRED status", async ({ page }) => {
 ```
 
 ### Step 2: Portfolio Helpers Fix (30min)
+
 ```bash
 # Edit e2e/utils/portfolio-test.ts
 - Add traderProfile.verified update
@@ -366,18 +386,21 @@ test("expired signal shows EXPIRED status", async ({ page }) => {
 ```
 
 ### Step 3: nuqs Fixes (15min)
+
 ```bash
 # Edit e2e/signals-feed-filters.spec.ts
 - Add waitForResponse fallbacks
 ```
 
 ### Step 4: Follow Test Fix (10min)
+
 ```bash
 # Edit e2e/follow-unfollow.spec.ts
 - Add waitForResponse for follow/unfollow actions
 ```
 
 ### Step 5: Account/Settings Fixes (20min)
+
 ```bash
 # Edit e2e/account.spec.ts
 # Edit e2e/settings.spec.ts
@@ -386,6 +409,7 @@ test("expired signal shows EXPIRED status", async ({ page }) => {
 ```
 
 ### Step 6: Navigation Fixes (15min)
+
 ```bash
 # Edit e2e/navigation.spec.ts
 - Remove "Organizations" space references
@@ -393,6 +417,7 @@ test("expired signal shows EXPIRED status", async ({ page }) => {
 ```
 
 ### Step 7: Signal Expiration Fix (10min)
+
 ```bash
 # Edit e2e/signal-expiration.spec.ts
 - Increase wait for expiration
@@ -403,15 +428,15 @@ test("expired signal shows EXPIRED status", async ({ page }) => {
 
 ## Total Estimated Time
 
-| Pattern | Tests Fixed | Time |
-|---------|-------------|------|
-| A. Timeouts | 8 | 1min |
-| B. UI Selectors | 6 | 45min |
-| C. Portfolio Helpers | 11 | 30min |
-| D. nuqs | 2 | 15min |
-| E. Follow/Unfollow | 1 | 10min |
-| F. Signal Expiration | 3 | 10min |
-| **TOTAL** | **31 tests** | **2h 01min** |
+| Pattern              | Tests Fixed  | Time         |
+| -------------------- | ------------ | ------------ |
+| A. Timeouts          | 8            | 1min         |
+| B. UI Selectors      | 6            | 45min        |
+| C. Portfolio Helpers | 11           | 30min        |
+| D. nuqs              | 2            | 15min        |
+| E. Follow/Unfollow   | 1            | 10min        |
+| F. Signal Expiration | 3            | 10min        |
+| **TOTAL**            | **31 tests** | **2h 01min** |
 
 ---
 

@@ -29,6 +29,7 @@
 ### Problème à Résoudre
 
 **Actuellement sur MyCryptoPilot:**
+
 - ❌ Traders ont peu d'incentives pour recruter followers
 - ❌ Système d'invitation existe mais sous-utilisé
 - ❌ Pas de reward pour les 2 parties (trader + invité)
@@ -38,6 +39,7 @@
 ### Objectifs Business
 
 **Croissance Virale:**
+
 - 🎯 +40-60% nouveaux users via referral (vs acquisition payante)
 - 🎯 Viral coefficient K > 1.0 (chaque user amène 1+ nouveau user)
 - 🎯 Réduire CAC (Cost Acquisition Client) de 50%
@@ -47,15 +49,18 @@
 ### Principes Clés
 
 **1. Double-Sided Incentive** (les 2 parties gagnent)
+
 - ✅ Trader gagne credits/rewards pour chaque invité actif
 - ✅ Invité gagne trial extended + bonus de bienvenue
 
 **2. Align Incentives avec Quality**
+
 - ✅ Rewards seulement si invité devient actif (pas juste signup)
 - ✅ Bonus si invité upgrade vers plan payant
 - ✅ Long-term thinking (recurring rewards vs one-time)
 
 **3. Make it Easy & Fun**
+
 - ✅ 1-click referral link
 - ✅ Progress tracking visible
 - ✅ Gamification (badges, leaderboards)
@@ -69,13 +74,13 @@
 
 **Benchmarks industrie:**
 
-| Plateforme | Incentive Trader | Incentive Invité | Viral Coeff (K) |
-|------------|------------------|------------------|-----------------|
-| **Dropbox** | +500MB storage | +500MB storage | 1.2-1.5 |
-| **Uber** | 10€ credit | 10€ credit | 0.8-1.1 |
-| **Airbnb** | 25€ credit | 25€ credit | 1.0-1.3 |
-| **Robinhood** | 1 free stock | 1 free stock | 1.5-2.0 |
-| **Crypto.com** | $25 crypto | $25 crypto | 1.2-1.8 |
+| Plateforme     | Incentive Trader | Incentive Invité | Viral Coeff (K) |
+| -------------- | ---------------- | ---------------- | --------------- |
+| **Dropbox**    | +500MB storage   | +500MB storage   | 1.2-1.5         |
+| **Uber**       | 10€ credit       | 10€ credit       | 0.8-1.1         |
+| **Airbnb**     | 25€ credit       | 25€ credit       | 1.0-1.3         |
+| **Robinhood**  | 1 free stock     | 1 free stock     | 1.5-2.0         |
+| **Crypto.com** | $25 crypto       | $25 crypto       | 1.2-1.8         |
 
 **Pattern dominant**: **Symmetric rewards** (même valeur pour les 2 parties)
 
@@ -86,17 +91,20 @@
 **Pour le Trader (Inviter):**
 
 **Motivations Intrinsèques:**
+
 - 🏆 Prestige (plus de followers = statut social)
 - 📈 Crédibilité (trader populaire = plus trustable)
 - 🎓 Teaching (partager expertise)
 
 **Motivations Extrinsèques:**
+
 - 💰 Rewards financiers (credits, discounts)
 - 🎁 Plan upgrades gratuits
 - ⭐ Badges & recognition
 - 📊 Leaderboard ranking
 
 **Triggers efficaces:**
+
 - Progress bars ("You're 3 invites away from Silver badge!")
 - Scarcity ("Limited time: Double credits this week!")
 - Social proof ("Top traders have 50+ followers")
@@ -105,23 +113,27 @@
 **Pour l'Invité (Accepter):**
 
 **Motivations Intrinsèques:**
+
 - 🎯 FOMO (Fear Of Missing Out)
 - 🤝 Trust (ami/contact recommande)
 - 📚 Apprentissage (signaux de qualité)
 
 **Motivations Extrinsèques:**
+
 - 🎁 Free trial extended (30-60 jours vs 7 jours)
 - 💸 Discount sur upgrade
 - 🆓 Credits de bienvenue
 - 🚀 Early access features
 
 **Barrières à lever:**
+
 - ⏱️ Friction signup (simplifier au max)
 - 🤔 Doute valeur ("Pourquoi m'inscrire?")
 - 💳 Peur engagement financier ("Je vais payer?")
 - 🔒 Confidentialité data
 
 **Solutions:**
+
 - Signup 1-click (social auth)
 - Landing page claire value prop
 - "No credit card required" bien visible
@@ -176,12 +188,14 @@ enum FollowSource {
 ```
 
 **Components existants:**
+
 - ✅ `ReferralLinkCard` (affiche lien de partage)
 - ✅ `InviteFollowerDialog` (formulaire email invitation)
 - ✅ `InvitationsTable` (liste invitations envoyées)
 - ✅ `ConversionStatsCard` (stats conversions)
 
 **Ce qui manque:**
+
 - ❌ Système de rewards/credits
 - ❌ Gamification (badges, tiers, leaderboard)
 - ❌ Incentives pour invités (trial extended, discounts)
@@ -203,28 +217,29 @@ enum FollowSource {
 
 **Earning Credits:**
 
-| Action | Credits Gagnés | Condition |
-|--------|----------------|-----------|
-| Invitation envoyée | 0 | - |
-| Invitation acceptée (signup) | 5 credits | Email validé |
-| Invité devient actif | 10 credits | 3+ logins, 30+ jours |
-| Invité upgrade Pro | 50 credits | Premier paiement |
-| Invité upgrade Ultra | 100 credits | Premier paiement |
-| Invité reste 3 mois | 25 credits | Retention bonus |
-| Invité reste 6 mois | 50 credits | Loyalty bonus |
+| Action                       | Credits Gagnés | Condition            |
+| ---------------------------- | -------------- | -------------------- |
+| Invitation envoyée           | 0              | -                    |
+| Invitation acceptée (signup) | 5 credits      | Email validé         |
+| Invité devient actif         | 10 credits     | 3+ logins, 30+ jours |
+| Invité upgrade Pro           | 50 credits     | Premier paiement     |
+| Invité upgrade Ultra         | 100 credits    | Premier paiement     |
+| Invité reste 3 mois          | 25 credits     | Retention bonus      |
+| Invité reste 6 mois          | 50 credits     | Loyalty bonus        |
 
 **Spending Credits:**
 
-| Reward | Coût Credits | Valeur Réelle |
-|--------|--------------|---------------|
-| 1 mois Pro gratuit | 100 credits | 49$ |
-| 1 mois Ultra gratuit | 200 credits | 99$ |
-| Featured placement (1 semaine) | 50 credits | 20$ |
-| Analytics premium unlock | 30 credits | 15$ |
-| Custom badge | 150 credits | Unique |
-| Profile boost (2x visibility) | 75 credits | 30$ |
+| Reward                         | Coût Credits | Valeur Réelle |
+| ------------------------------ | ------------ | ------------- |
+| 1 mois Pro gratuit             | 100 credits  | 49$           |
+| 1 mois Ultra gratuit           | 200 credits  | 99$           |
+| Featured placement (1 semaine) | 50 credits   | 20$           |
+| Analytics premium unlock       | 30 credits   | 15$           |
+| Custom badge                   | 150 credits  | Unique        |
+| Profile boost (2x visibility)  | 75 credits   | 30$           |
 
 **Exemple Calcul:**
+
 ```
 Trader invite 10 amis:
 - 10 acceptent (signup): 10 × 5 = 50 credits
@@ -237,21 +252,24 @@ TOTAL: 270 credits → 2 mois Pro gratuit + Featured placement!
 
 **Welcome Bonus:**
 
-| Source Invitation | Bonus Reçu |
-|-------------------|------------|
-| Referral link public | 30 jours Pro trial (vs 7 jours normal) |
-| Email invitation personnalisée | 60 jours Pro trial + 25 credits |
-| Via influencer/partner | 90 jours Pro trial + 50 credits |
+| Source Invitation              | Bonus Reçu                             |
+| ------------------------------ | -------------------------------------- |
+| Referral link public           | 30 jours Pro trial (vs 7 jours normal) |
+| Email invitation personnalisée | 60 jours Pro trial + 25 credits        |
+| Via influencer/partner         | 90 jours Pro trial + 50 credits        |
 
 **Credits de Bienvenue:**
+
 - 25 credits offerts à l'inscription via invitation
 - Utilisables pour: unlock analytics, extend trial, buy custom alerts
 
 **Discount Premier Upgrade:**
+
 - 50% off premier mois (si upgrade dans 30 jours)
 - 25% off 3 premiers mois (si upgrade dans 60 jours)
 
 **Auto-Follow:**
+
 - Invité auto-follow le trader qui l'a invité
 - Peut unfollow mais perd bonus credits
 
@@ -260,11 +278,13 @@ TOTAL: 270 credits → 2 mois Pro gratuit + Featured placement!
 **Concept**: Trader gagne % recurring sur les paiements de ses invités.
 
 **Taux Proposé:**
+
 - 10% recurring tant que invité reste actif payant
 - Cap à 12 mois maximum
 - Payout mensuel via crypto ou credit plateforme
 
 **Exemple:**
+
 ```
 Trader invite 5 users:
 - 3 upgrade Pro (49$/mois): 3 × 49$ × 10% = 14.70$/mois
@@ -273,11 +293,13 @@ Revenue recurring: 24.60$/mois × 12 mois = 295$/an
 ```
 
 **Avantages:**
+
 - ✅ Motivation long-terme (pas juste signup)
 - ✅ Align incentives avec qualité invités
 - ✅ Revenus passifs pour traders
 
 **Inconvénients:**
+
 - ⚠️ Complexité accounting
 - ⚠️ Coûts marginaux élevés (10% du revenue)
 - ⚠️ Risque gaming (fake accounts)
@@ -288,20 +310,22 @@ Revenue recurring: 24.60$/mois × 12 mois = 295$/an
 
 **Tiers:**
 
-| Tier | Invités Actifs Requis | Reward |
-|------|----------------------|--------|
-| 🥉 **Bronze** | 10 invités | Badge Bronze + 10% discount lifetime |
-| 🥈 **Silver** | 50 invités | Badge Silver + 3 mois Pro gratuit |
-| 🥇 **Gold** | 100 invités | Badge Gold + 3 mois Ultra gratuit + Featured |
-| 💎 **Diamond** | 250 invités | Badge Diamond + Ultra lifetime + Top placement |
+| Tier           | Invités Actifs Requis | Reward                                         |
+| -------------- | --------------------- | ---------------------------------------------- |
+| 🥉 **Bronze**  | 10 invités            | Badge Bronze + 10% discount lifetime           |
+| 🥈 **Silver**  | 50 invités            | Badge Silver + 3 mois Pro gratuit              |
+| 🥇 **Gold**    | 100 invités           | Badge Gold + 3 mois Ultra gratuit + Featured   |
+| 💎 **Diamond** | 250 invités           | Badge Diamond + Ultra lifetime + Top placement |
 
 **Définition "Invité Actif":**
+
 - Signup completé (email validé)
 - 3+ logins dans les 30 premiers jours
 - Au moins 1 signal consulté
 - Reste inscrit 30+ jours
 
 **Progress Tracking:**
+
 - Dashboard avec progress bar
 - Notifications milestones ("You're 2 invites away from Silver!")
 - Visual badges sur profil public
@@ -453,12 +477,12 @@ export class ReferralService {
    * Award credits to trader for action
    */
   async awardCredits(params: {
-    traderId: string
-    inviteeId: string
-    action: RewardAction
-    amount: number
+    traderId: string;
+    inviteeId: string;
+    action: RewardAction;
+    amount: number;
   }) {
-    const { traderId, inviteeId, action, amount } = params
+    const { traderId, inviteeId, action, amount } = params;
 
     // Create credit transaction
     await prisma.referralCredit.create({
@@ -468,9 +492,9 @@ export class ReferralService {
         amount,
         source: action,
         sourceId: inviteeId,
-        description: `Earned ${amount} credits: ${action}`
-      }
-    })
+        description: `Earned ${amount} credits: ${action}`,
+      },
+    });
 
     // Log reward history
     await prisma.referralReward.create({
@@ -479,14 +503,14 @@ export class ReferralService {
         inviteeId,
         action,
         creditsEarned: amount,
-        description: `${action} for user ${inviteeId}`
-      }
-    })
+        description: `${action} for user ${inviteeId}`,
+      },
+    });
 
     // Check tier progression
-    await this.checkTierProgression(traderId)
+    await this.checkTierProgression(traderId);
 
-    logger.info(`Awarded ${amount} credits to ${traderId} for ${action}`)
+    logger.info(`Awarded ${amount} credits to ${traderId} for ${action}`);
   }
 
   /**
@@ -497,23 +521,23 @@ export class ReferralService {
     const activeCount = await prisma.traderInvitation.count({
       where: {
         traderId: userId,
-        inviteeActive: true
-      }
-    })
+        inviteeActive: true,
+      },
+    });
 
     // Get current tier
     let tier = await prisma.referralTier.findUnique({
-      where: { userId }
-    })
+      where: { userId },
+    });
 
     if (!tier) {
       tier = await prisma.referralTier.create({
-        data: { userId, activeInvitesCount: activeCount }
-      })
+        data: { userId, activeInvitesCount: activeCount },
+      });
     }
 
     // Determine new tier
-    const newTier = calculateTier(activeCount)
+    const newTier = calculateTier(activeCount);
 
     // Upgrade if needed
     if (newTier > tier.currentTier) {
@@ -522,14 +546,14 @@ export class ReferralService {
         data: {
           currentTier: newTier,
           activeInvitesCount: activeCount,
-          lastTierUpgrade: new Date()
-        }
-      })
+          lastTierUpgrade: new Date(),
+        },
+      });
 
       // Grant tier rewards
-      await this.grantTierRewards(userId, newTier)
+      await this.grantTierRewards(userId, newTier);
 
-      logger.info(`User ${userId} upgraded to tier ${newTier}`)
+      logger.info(`User ${userId} upgraded to tier ${newTier}`);
     }
   }
 
@@ -538,50 +562,50 @@ export class ReferralService {
    */
   async grantTierRewards(userId: string, tier: TierLevel) {
     switch (tier) {
-      case 'BRONZE':
+      case "BRONZE":
         // 10% discount lifetime (implement via user.discountPercent field)
         await prisma.user.update({
           where: { id: userId },
-          data: { discountPercent: 10 }
-        })
-        break
+          data: { discountPercent: 10 },
+        });
+        break;
 
-      case 'SILVER':
+      case "SILVER":
         // 3 mois Pro gratuit
-        const silverExpiry = addMonths(new Date(), 3)
+        const silverExpiry = addMonths(new Date(), 3);
         await prisma.user.update({
           where: { id: userId },
           data: {
-            planName: 'pro',
-            planExpiresAt: silverExpiry
-          }
-        })
-        break
+            planName: "pro",
+            planExpiresAt: silverExpiry,
+          },
+        });
+        break;
 
-      case 'GOLD':
+      case "GOLD":
         // 3 mois Ultra gratuit + Featured
-        const goldExpiry = addMonths(new Date(), 3)
+        const goldExpiry = addMonths(new Date(), 3);
         await prisma.user.update({
           where: { id: userId },
           data: {
-            planName: 'ultra',
+            planName: "ultra",
             planExpiresAt: goldExpiry,
-            featuredUntil: addWeeks(new Date(), 2) // Featured 2 weeks
-          }
-        })
-        break
+            featuredUntil: addWeeks(new Date(), 2), // Featured 2 weeks
+          },
+        });
+        break;
 
-      case 'DIAMOND':
+      case "DIAMOND":
         // Ultra lifetime
         await prisma.user.update({
           where: { id: userId },
           data: {
-            planName: 'ultra',
-            planExpiresAt: new Date('2099-12-31'), // Lifetime
-            featuredUntil: new Date('2099-12-31')
-          }
-        })
-        break
+            planName: "ultra",
+            planExpiresAt: new Date("2099-12-31"), // Lifetime
+            featuredUntil: new Date("2099-12-31"),
+          },
+        });
+        break;
     }
   }
 
@@ -591,28 +615,30 @@ export class ReferralService {
   async getCreditBalance(userId: string): Promise<number> {
     const result = await prisma.referralCredit.aggregate({
       where: { userId },
-      _sum: { amount: true }
-    })
+      _sum: { amount: true },
+    });
 
-    return result._sum.amount ?? 0
+    return result._sum.amount ?? 0;
   }
 
   /**
    * Spend credits for reward
    */
   async spendCredits(params: {
-    userId: string
-    amount: number
-    type: ReferralCreditType
-    description: string
+    userId: string;
+    amount: number;
+    type: ReferralCreditType;
+    description: string;
   }) {
-    const { userId, amount, type, description } = params
+    const { userId, amount, type, description } = params;
 
     // Check balance
-    const balance = await this.getCreditBalance(userId)
+    const balance = await this.getCreditBalance(userId);
 
     if (balance < amount) {
-      throw new Error(`Insufficient credits. Balance: ${balance}, Required: ${amount}`)
+      throw new Error(
+        `Insufficient credits. Balance: ${balance}, Required: ${amount}`,
+      );
     }
 
     // Deduct credits
@@ -621,20 +647,20 @@ export class ReferralService {
         userId,
         type,
         amount: -amount, // Negative = spent
-        description
-      }
-    })
+        description,
+      },
+    });
 
-    logger.info(`User ${userId} spent ${amount} credits for ${type}`)
+    logger.info(`User ${userId} spent ${amount} credits for ${type}`);
   }
 }
 
 function calculateTier(activeCount: number): TierLevel {
-  if (activeCount >= 250) return 'DIAMOND'
-  if (activeCount >= 100) return 'GOLD'
-  if (activeCount >= 50) return 'SILVER'
-  if (activeCount >= 10) return 'BRONZE'
-  return 'NONE'
+  if (activeCount >= 250) return "DIAMOND";
+  if (activeCount >= 100) return "GOLD";
+  if (activeCount >= 50) return "SILVER";
+  if (activeCount >= 10) return "BRONZE";
+  return "NONE";
 }
 ```
 
@@ -654,45 +680,45 @@ export class InvitationTrackingService {
       where: { token: invitationToken },
       data: {
         landingViews: { increment: 1 },
-        clickedAt: { set: new Date() } // First click timestamp
-      }
-    })
+        clickedAt: { set: new Date() }, // First click timestamp
+      },
+    });
   }
 
   /**
    * Track invitation acceptance (signup completed)
    */
   async trackAcceptance(params: {
-    invitationToken: string
-    newUserId: string
+    invitationToken: string;
+    newUserId: string;
   }) {
-    const { invitationToken, newUserId } = params
+    const { invitationToken, newUserId } = params;
 
     // Update invitation
     await prisma.traderInvitation.update({
       where: { token: invitationToken },
       data: {
-        status: 'ACCEPTED',
+        status: "ACCEPTED",
         acceptedAt: new Date(),
-        inviteeUserId: newUserId
-      }
-    })
+        inviteeUserId: newUserId,
+      },
+    });
 
     // Award credits to trader (signup bonus)
     const invitation = await prisma.traderInvitation.findUnique({
-      where: { token: invitationToken }
-    })
+      where: { token: invitationToken },
+    });
 
     if (invitation) {
       await referralService.awardCredits({
         traderId: invitation.traderId,
         inviteeId: newUserId,
-        action: 'INVITATION_ACCEPTED',
-        amount: 5 // 5 credits for signup
-      })
+        action: "INVITATION_ACCEPTED",
+        amount: 5, // 5 credits for signup
+      });
 
       // Grant welcome bonus to invitee
-      await this.grantWelcomeBonus(newUserId, invitation.source)
+      await this.grantWelcomeBonus(newUserId, invitation.source);
     }
   }
 
@@ -701,43 +727,45 @@ export class InvitationTrackingService {
    */
   async grantWelcomeBonus(userId: string, source: InvitationSource) {
     // Determine trial duration based on source
-    let trialDays = 30 // Default
-    let welcomeCredits = 25
+    let trialDays = 30; // Default
+    let welcomeCredits = 25;
 
-    if (source === 'MANUAL') {
+    if (source === "MANUAL") {
       // Email invitation personnalisée
-      trialDays = 60
-      welcomeCredits = 25
-    } else if (source === 'REFERRAL_LINK') {
+      trialDays = 60;
+      welcomeCredits = 25;
+    } else if (source === "REFERRAL_LINK") {
       // Referral link public
-      trialDays = 30
-      welcomeCredits = 0
+      trialDays = 30;
+      welcomeCredits = 0;
     }
 
     // Grant Pro trial
-    const trialExpiry = addDays(new Date(), trialDays)
+    const trialExpiry = addDays(new Date(), trialDays);
     await prisma.user.update({
       where: { id: userId },
       data: {
-        planName: 'pro',
+        planName: "pro",
         planExpiresAt: trialExpiry,
-        planTrialEndsAt: trialExpiry
-      }
-    })
+        planTrialEndsAt: trialExpiry,
+      },
+    });
 
     // Grant welcome credits
     if (welcomeCredits > 0) {
       await prisma.referralCredit.create({
         data: {
           userId,
-          type: 'EARNED_SIGNUP',
+          type: "EARNED_SIGNUP",
           amount: welcomeCredits,
-          description: 'Welcome bonus credits'
-        }
-      })
+          description: "Welcome bonus credits",
+        },
+      });
     }
 
-    logger.info(`Granted ${trialDays}d trial + ${welcomeCredits} credits to ${userId}`)
+    logger.info(
+      `Granted ${trialDays}d trial + ${welcomeCredits} credits to ${userId}`,
+    );
   }
 
   /**
@@ -748,46 +776,46 @@ export class InvitationTrackingService {
       where: { id: userId },
       select: {
         createdAt: true,
-        lastLoginAt: true
-      }
-    })
+        lastLoginAt: true,
+      },
+    });
 
-    if (!user) return false
+    if (!user) return false;
 
     // Check criteria
-    const accountAge = differenceInDays(new Date(), user.createdAt)
-    const hasEnoughLogins = true // TODO: track login count
+    const accountAge = differenceInDays(new Date(), user.createdAt);
+    const hasEnoughLogins = true; // TODO: track login count
 
-    const isActive = accountAge >= 30 && hasEnoughLogins
+    const isActive = accountAge >= 30 && hasEnoughLogins;
 
     if (isActive) {
       // Mark invitation as "active invitee"
       await prisma.traderInvitation.updateMany({
         where: {
           inviteeUserId: userId,
-          inviteeActive: false
+          inviteeActive: false,
         },
         data: {
-          inviteeActive: true
-        }
-      })
+          inviteeActive: true,
+        },
+      });
 
       // Award credits to trader
       const invitation = await prisma.traderInvitation.findFirst({
-        where: { inviteeUserId: userId }
-      })
+        where: { inviteeUserId: userId },
+      });
 
       if (invitation) {
         await referralService.awardCredits({
           traderId: invitation.traderId,
           inviteeId: userId,
-          action: 'USER_BECAME_ACTIVE',
-          amount: 10 // 10 credits for active user
-        })
+          action: "USER_BECAME_ACTIVE",
+          amount: 10, // 10 credits for active user
+        });
       }
     }
 
-    return isActive
+    return isActive;
   }
 }
 ```
@@ -804,37 +832,37 @@ Background jobs pour tracking automatique.
  * Run daily
  */
 export const checkActiveInviteesJob = new CronJob(
-  '0 2 * * *', // Every day at 2am
+  "0 2 * * *", // Every day at 2am
   async () => {
-    logger.info('Starting check active invitees job')
+    logger.info("Starting check active invitees job");
 
     // Find invitees créés il y a 30 jours, pas encore marked active
-    const targetDate = subDays(new Date(), 30)
+    const targetDate = subDays(new Date(), 30);
 
     const pendingInvitees = await prisma.traderInvitation.findMany({
       where: {
         inviteeActive: false,
         inviteeUserId: { not: null },
         acceptedAt: {
-          lte: targetDate
-        }
+          lte: targetDate,
+        },
       },
       include: {
-        invitee: true
-      }
-    })
+        invitee: true,
+      },
+    });
 
-    logger.info(`Found ${pendingInvitees.length} invitees to check`)
+    logger.info(`Found ${pendingInvitees.length} invitees to check`);
 
     for (const invitation of pendingInvitees) {
-      if (!invitation.invitee) continue
+      if (!invitation.invitee) continue;
 
-      await trackingService.checkUserActive(invitation.invitee.id)
+      await trackingService.checkUserActive(invitation.invitee.id);
     }
 
-    logger.info('Check active invitees job completed')
-  }
-)
+    logger.info("Check active invitees job completed");
+  },
+);
 ```
 
 ---
@@ -847,30 +875,32 @@ export const checkActiveInviteesJob = new CronJob(
 
 ```tsx
 export default async function TraderInvitationsPage() {
-  const user = await getRequiredUser()
-  const traderProfile = await getTraderProfileByUserId(user.id)
+  const user = await getRequiredUser();
+  const traderProfile = await getTraderProfileByUserId(user.id);
 
-  if (!traderProfile) redirect('/account/become-trader')
+  if (!traderProfile) redirect("/account/become-trader");
 
   // Fetch data
-  const creditBalance = await referralService.getCreditBalance(user.id)
-  const tier = await prisma.referralTier.findUnique({ where: { userId: user.id } })
+  const creditBalance = await referralService.getCreditBalance(user.id);
+  const tier = await prisma.referralTier.findUnique({
+    where: { userId: user.id },
+  });
   const invitations = await prisma.traderInvitation.findMany({
     where: { traderId: user.id },
-    orderBy: { createdAt: 'desc' },
-    take: 50
-  })
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
 
   // Conversion stats
   const stats = {
     totalSent: invitations.length,
-    accepted: invitations.filter(i => i.status === 'ACCEPTED').length,
-    active: invitations.filter(i => i.inviteeActive).length,
-    upgraded: invitations.filter(i => i.inviteeUpgraded).length
-  }
+    accepted: invitations.filter((i) => i.status === "ACCEPTED").length,
+    active: invitations.filter((i) => i.inviteeActive).length,
+    upgraded: invitations.filter((i) => i.inviteeUpgraded).length,
+  };
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto space-y-8 py-8">
       {/* Header */}
       <PageHeader
         title="Referral Program"
@@ -896,7 +926,7 @@ export default async function TraderInvitationsPage() {
       {/* Rewards Catalog */}
       <RewardsCatalogCard balance={creditBalance} />
     </div>
-  )
+  );
 }
 ```
 
@@ -912,10 +942,8 @@ export function CreditsBalanceCard({ balance }: { balance: number }) {
         <CardTitle className="text-sm">Credits Balance</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold text-primary">
-          {balance} credits
-        </div>
-        <p className="text-muted-foreground text-xs mt-2">
+        <div className="text-primary text-3xl font-bold">{balance} credits</div>
+        <p className="text-muted-foreground mt-2 text-xs">
           Earn more by inviting followers!
         </p>
         <Button asChild variant="outline" size="sm" className="mt-4">
@@ -926,7 +954,7 @@ export function CreditsBalanceCard({ balance }: { balance: number }) {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -934,17 +962,17 @@ export function CreditsBalanceCard({ balance }: { balance: number }) {
 
 ```tsx
 export function CurrentTierCard({ tier }: { tier: ReferralTier | null }) {
-  const currentTier = tier?.currentTier ?? 'NONE'
+  const currentTier = tier?.currentTier ?? "NONE";
 
   const tierConfig = {
-    NONE: { icon: '🎯', label: 'No Tier', color: 'text-gray-500' },
-    BRONZE: { icon: '🥉', label: 'Bronze', color: 'text-orange-600' },
-    SILVER: { icon: '🥈', label: 'Silver', color: 'text-gray-400' },
-    GOLD: { icon: '🥇', label: 'Gold', color: 'text-yellow-500' },
-    DIAMOND: { icon: '💎', label: 'Diamond', color: 'text-blue-500' }
-  }
+    NONE: { icon: "🎯", label: "No Tier", color: "text-gray-500" },
+    BRONZE: { icon: "🥉", label: "Bronze", color: "text-orange-600" },
+    SILVER: { icon: "🥈", label: "Silver", color: "text-gray-400" },
+    GOLD: { icon: "🥇", label: "Gold", color: "text-yellow-500" },
+    DIAMOND: { icon: "💎", label: "Diamond", color: "text-blue-500" },
+  };
 
-  const config = tierConfig[currentTier]
+  const config = tierConfig[currentTier];
 
   return (
     <Card>
@@ -965,7 +993,7 @@ export function CurrentTierCard({ tier }: { tier: ReferralTier | null }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -974,24 +1002,24 @@ export function CurrentTierCard({ tier }: { tier: ReferralTier | null }) {
 ```tsx
 export function NextTierProgressCard({
   tier,
-  invitations
+  invitations,
 }: {
-  tier: ReferralTier | null
-  invitations: TraderInvitation[]
+  tier: ReferralTier | null;
+  invitations: TraderInvitation[];
 }) {
-  const activeCount = tier?.activeInvitesCount ?? 0
-  const currentTier = tier?.currentTier ?? 'NONE'
+  const activeCount = tier?.activeInvitesCount ?? 0;
+  const currentTier = tier?.currentTier ?? "NONE";
 
   // Determine next tier target
   const tierTargets = {
-    NONE: { next: 'BRONZE', target: 10 },
-    BRONZE: { next: 'SILVER', target: 50 },
-    SILVER: { next: 'GOLD', target: 100 },
-    GOLD: { next: 'DIAMOND', target: 250 },
-    DIAMOND: { next: null, target: null }
-  }
+    NONE: { next: "BRONZE", target: 10 },
+    BRONZE: { next: "SILVER", target: 50 },
+    SILVER: { next: "GOLD", target: 100 },
+    GOLD: { next: "DIAMOND", target: 250 },
+    DIAMOND: { next: null, target: null },
+  };
 
-  const { next, target } = tierTargets[currentTier]
+  const { next, target } = tierTargets[currentTier];
 
   if (!next) {
     return (
@@ -1005,11 +1033,11 @@ export function NextTierProgressCard({
           </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  const progress = (activeCount / target) * 100
-  const remaining = target - activeCount
+  const progress = (activeCount / target) * 100;
+  const remaining = target - activeCount;
 
   return (
     <Card>
@@ -1028,54 +1056,56 @@ export function NextTierProgressCard({
           <Progress value={progress} />
 
           <p className="text-muted-foreground text-xs">
-            {remaining} more invite{remaining > 1 ? 's' : ''} to reach {next} tier!
+            {remaining} more invite{remaining > 1 ? "s" : ""} to reach {next}{" "}
+            tier!
           </p>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
 #### 4. ReferralLinkCard (Enhanced)
 
 ```tsx
-'use client'
+"use client";
 
 export function ReferralLinkCard({ traderId }: { traderId: string }) {
-  const referralUrl = `${window.location.origin}/invite/${traderId}`
-  const [copied, setCopied] = useState(false)
+  const referralUrl = `${window.location.origin}/invite/${traderId}`;
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(referralUrl)
-    setCopied(true)
-    toast.success('Referral link copied!')
-    setTimeout(() => setCopied(false), 2000)
-  }
+    navigator.clipboard.writeText(referralUrl);
+    setCopied(true);
+    toast.success("Referral link copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleShareTwitter = () => {
     const text = encodeURIComponent(
-      "Check out my trading signals on MyCryptoPilot! Get 30 days Pro free 🚀"
-    )
+      "Check out my trading signals on MyCryptoPilot! Get 30 days Pro free 🚀",
+    );
     window.open(
       `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(referralUrl)}`,
-      '_blank'
-    )
-  }
+      "_blank",
+    );
+  };
 
   const handleShareTelegram = () => {
     window.open(
       `https://t.me/share/url?url=${encodeURIComponent(referralUrl)}&text=Check out my trading signals!`,
-      '_blank'
-    )
-  }
+      "_blank",
+    );
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Your Referral Link</CardTitle>
         <CardDescription>
-          Share this link to invite followers. They get 30 days Pro free, you earn credits!
+          Share this link to invite followers. They get 30 days Pro free, you
+          earn credits!
         </CardDescription>
       </CardHeader>
 
@@ -1085,9 +1115,13 @@ export function ReferralLinkCard({ traderId }: { traderId: string }) {
           <Input value={referralUrl} readOnly />
           <Button onClick={handleCopy} variant="outline">
             {copied ? (
-              <><Check className="mr-2 size-4" /> Copied</>
+              <>
+                <Check className="mr-2 size-4" /> Copied
+              </>
             ) : (
-              <><Copy className="mr-2 size-4" /> Copy</>
+              <>
+                <Copy className="mr-2 size-4" /> Copy
+              </>
             )}
           </Button>
         </div>
@@ -1122,7 +1156,7 @@ export function ReferralLinkCard({ traderId }: { traderId: string }) {
         </Alert>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -1130,17 +1164,14 @@ export function ReferralLinkCard({ traderId }: { traderId: string }) {
 
 ```tsx
 export function ConversionFunnelCard({ stats }: { stats: ConversionStats }) {
-  const conversionRate = stats.totalSent > 0
-    ? (stats.accepted / stats.totalSent) * 100
-    : 0
+  const conversionRate =
+    stats.totalSent > 0 ? (stats.accepted / stats.totalSent) * 100 : 0;
 
-  const activeRate = stats.accepted > 0
-    ? (stats.active / stats.accepted) * 100
-    : 0
+  const activeRate =
+    stats.accepted > 0 ? (stats.active / stats.accepted) * 100 : 0;
 
-  const upgradeRate = stats.active > 0
-    ? (stats.upgraded / stats.active) * 100
-    : 0
+  const upgradeRate =
+    stats.active > 0 ? (stats.upgraded / stats.active) * 100 : 0;
 
   return (
     <Card>
@@ -1158,7 +1189,9 @@ export function ConversionFunnelCard({ stats }: { stats: ConversionStats }) {
               </div>
               <div>
                 <p className="font-medium">Invitations Sent</p>
-                <p className="text-muted-foreground text-sm">{stats.totalSent} total</p>
+                <p className="text-muted-foreground text-sm">
+                  {stats.totalSent} total
+                </p>
               </div>
             </div>
             <span className="text-2xl font-bold">{stats.totalSent}</span>
@@ -1220,7 +1253,7 @@ export function ConversionFunnelCard({ stats }: { stats: ConversionStats }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -1230,48 +1263,48 @@ export function ConversionFunnelCard({ stats }: { stats: ConversionStats }) {
 export function RewardsCatalogCard({ balance }: { balance: number }) {
   const rewards = [
     {
-      name: '1 Month Pro',
+      name: "1 Month Pro",
       cost: 100,
-      value: '$49',
+      value: "$49",
       icon: <Zap className="size-6" />,
-      action: 'SPENT_PLAN_UPGRADE'
+      action: "SPENT_PLAN_UPGRADE",
     },
     {
-      name: '1 Month Ultra',
+      name: "1 Month Ultra",
       cost: 200,
-      value: '$99',
+      value: "$99",
       icon: <Crown className="size-6" />,
-      action: 'SPENT_PLAN_UPGRADE'
+      action: "SPENT_PLAN_UPGRADE",
     },
     {
-      name: 'Featured Placement (1 week)',
+      name: "Featured Placement (1 week)",
       cost: 50,
-      value: '$20',
+      value: "$20",
       icon: <Star className="size-6" />,
-      action: 'SPENT_FEATURED_PLACEMENT'
+      action: "SPENT_FEATURED_PLACEMENT",
     },
     {
-      name: 'Analytics Premium Unlock',
+      name: "Analytics Premium Unlock",
       cost: 30,
-      value: '$15',
+      value: "$15",
       icon: <BarChart3 className="size-6" />,
-      action: 'SPENT_ANALYTICS_UNLOCK'
+      action: "SPENT_ANALYTICS_UNLOCK",
     },
     {
-      name: 'Custom Badge',
+      name: "Custom Badge",
       cost: 150,
-      value: 'Unique',
+      value: "Unique",
       icon: <Award className="size-6" />,
-      action: 'SPENT_CUSTOM_BADGE'
+      action: "SPENT_CUSTOM_BADGE",
     },
     {
-      name: 'Profile Boost (2x visibility)',
+      name: "Profile Boost (2x visibility)",
       cost: 75,
-      value: '$30',
+      value: "$30",
       icon: <TrendingUp className="size-6" />,
-      action: 'SPENT_PROFILE_BOOST'
-    }
-  ]
+      action: "SPENT_PROFILE_BOOST",
+    },
+  ];
 
   return (
     <Card>
@@ -1285,16 +1318,19 @@ export function RewardsCatalogCard({ balance }: { balance: number }) {
       <CardContent>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {rewards.map((reward) => {
-            const canAfford = balance >= reward.cost
+            const canAfford = balance >= reward.cost;
 
             return (
-              <Card key={reward.name} className={cn(
-                "transition-all hover:shadow-md",
-                !canAfford && "opacity-50"
-              )}>
+              <Card
+                key={reward.name}
+                className={cn(
+                  "transition-all hover:shadow-md",
+                  !canAfford && "opacity-50",
+                )}
+              >
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center gap-3 text-center">
-                    <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+                    <div className="bg-primary/10 flex size-12 items-center justify-center rounded-full">
                       {reward.icon}
                     </div>
 
@@ -1318,12 +1354,12 @@ export function RewardsCatalogCard({ balance }: { balance: number }) {
                   </div>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -1333,12 +1369,12 @@ export function RewardsCatalogCard({ balance }: { balance: number }) {
 
 ```tsx
 export default async function InvitationLandingPage({
-  params
+  params,
 }: {
-  params: { traderId: string }
+  params: { traderId: string };
 }) {
-  const trader = await getTraderProfileById(params.traderId)
-  if (!trader) notFound()
+  const trader = await getTraderProfileById(params.traderId);
+  if (!trader) notFound();
 
   // Track landing view (analytics)
   // await trackingService.trackLandingView(...)
@@ -1347,7 +1383,7 @@ export default async function InvitationLandingPage({
     <div className="container mx-auto py-12">
       <div className="mx-auto max-w-4xl space-y-8">
         {/* Hero */}
-        <div className="text-center space-y-4">
+        <div className="space-y-4 text-center">
           <Badge variant="secondary" className="mb-4">
             <Gift className="mr-2 size-4" />
             Special Invitation
@@ -1358,7 +1394,8 @@ export default async function InvitationLandingPage({
           </h1>
 
           <p className="text-muted-foreground text-xl">
-            {trader.displayName} invited you to follow their trading signals on MyCryptoPilot
+            {trader.displayName} invited you to follow their trading signals on
+            MyCryptoPilot
           </p>
         </div>
 
@@ -1372,7 +1409,7 @@ export default async function InvitationLandingPage({
               </Avatar>
 
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 flex items-center gap-2">
                   <h2 className="text-2xl font-bold">{trader.displayName}</h2>
                   {trader.verified && (
                     <Badge variant="secondary">
@@ -1417,7 +1454,7 @@ export default async function InvitationLandingPage({
               <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-green-100">
                 <Gift className="size-6 text-green-600" />
               </div>
-              <h3 className="font-semibold mb-2">30 Days Pro Free</h3>
+              <h3 className="mb-2 font-semibold">30 Days Pro Free</h3>
               <p className="text-muted-foreground text-sm">
                 Full access to Pro features worth $49
               </p>
@@ -1429,7 +1466,7 @@ export default async function InvitationLandingPage({
               <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-blue-100">
                 <Signal className="size-6 text-blue-600" />
               </div>
-              <h3 className="font-semibold mb-2">Real-Time Signals</h3>
+              <h3 className="mb-2 font-semibold">Real-Time Signals</h3>
               <p className="text-muted-foreground text-sm">
                 Get instant notifications on trading opportunities
               </p>
@@ -1441,7 +1478,7 @@ export default async function InvitationLandingPage({
               <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-purple-100">
                 <Shield className="size-6 text-purple-600" />
               </div>
-              <h3 className="font-semibold mb-2">No Credit Card</h3>
+              <h3 className="mb-2 font-semibold">No Credit Card</h3>
               <p className="text-muted-foreground text-sm">
                 Sign up in seconds, no payment required
               </p>
@@ -1452,24 +1489,24 @@ export default async function InvitationLandingPage({
         {/* CTA */}
         <Card className="border-primary">
           <CardContent className="pt-6 text-center">
-            <h3 className="text-xl font-bold mb-4">
+            <h3 className="mb-4 text-xl font-bold">
               Ready to start your free trial?
             </h3>
 
-            <Button asChild size="lg" className="text-lg px-8">
+            <Button asChild size="lg" className="px-8 text-lg">
               <Link href={`/signup?ref=${trader.userId}`}>
                 Get Started - It's Free!
               </Link>
             </Button>
 
-            <p className="text-muted-foreground text-sm mt-4">
+            <p className="text-muted-foreground mt-4 text-sm">
               By signing up, you'll automatically follow {trader.displayName}
             </p>
           </CardContent>
         </Card>
 
         {/* Trust Signals */}
-        <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex items-center justify-center gap-8 text-sm">
           <div className="flex items-center gap-2">
             <Shield className="size-4" />
             <span>Secure & Encrypted</span>
@@ -1485,7 +1522,7 @@ export default async function InvitationLandingPage({
         </div>
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -1502,7 +1539,7 @@ export async function ReferralLeaderboard() {
   // Top traders par invités actifs (monthly)
   const topTraders = await prisma.user.findMany({
     where: {
-      traderProfile: { isNot: null }
+      traderProfile: { isNot: null },
     },
     include: {
       traderProfile: true,
@@ -1512,20 +1549,20 @@ export async function ReferralLeaderboard() {
             where: {
               inviteeActive: true,
               createdAt: {
-                gte: startOfMonth(new Date())
-              }
-            }
-          }
-        }
-      }
+                gte: startOfMonth(new Date()),
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
       invitationsSent: {
-        _count: 'desc'
-      }
+        _count: "desc",
+      },
     },
-    take: 10
-  })
+    take: 10,
+  });
 
   return (
     <Card>
@@ -1539,8 +1576,8 @@ export async function ReferralLeaderboard() {
       <CardContent>
         <div className="space-y-4">
           {topTraders.map((trader, index) => {
-            const rank = index + 1
-            const invitesCount = trader._count.invitationsSent
+            const rank = index + 1;
+            const invitesCount = trader._count.invitationsSent;
 
             return (
               <div key={trader.id} className="flex items-center gap-4">
@@ -1565,19 +1602,19 @@ export async function ReferralLeaderboard() {
                 <div className="flex-1">
                   <p className="font-medium">{trader.name}</p>
                   <p className="text-muted-foreground text-sm">
-                    {invitesCount} active follower{invitesCount > 1 ? 's' : ''}
+                    {invitesCount} active follower{invitesCount > 1 ? "s" : ""}
                   </p>
                 </div>
 
                 {/* Badge Tier */}
                 <TierBadge tier={trader.referralTier?.currentTier} />
               </div>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -1590,21 +1627,24 @@ export async function ReferralLeaderboard() {
 if (activeInvitesCount === 5) {
   await sendNotification({
     userId: traderId,
-    type: 'MILESTONE',
-    title: 'Halfway to Bronze! 🎯',
-    message: '5 active followers! Just 5 more to unlock Bronze tier.',
-    action: { label: 'Invite More', href: '/dashboard/trader/invitations' }
-  })
+    type: "MILESTONE",
+    title: "Halfway to Bronze! 🎯",
+    message: "5 active followers! Just 5 more to unlock Bronze tier.",
+    action: { label: "Invite More", href: "/dashboard/trader/invitations" },
+  });
 }
 
 if (activeInvitesCount === 10) {
   await sendNotification({
     userId: traderId,
-    type: 'TIER_UPGRADE',
-    title: 'Bronze Tier Unlocked! 🥉',
-    message: 'Congrats! You earned 10% lifetime discount.',
-    action: { label: 'View Rewards', href: '/dashboard/trader/invitations#rewards' }
-  })
+    type: "TIER_UPGRADE",
+    title: "Bronze Tier Unlocked! 🥉",
+    message: "Congrats! You earned 10% lifetime discount.",
+    action: {
+      label: "View Rewards",
+      href: "/dashboard/trader/invitations#rewards",
+    },
+  });
 }
 ```
 
@@ -1620,58 +1660,58 @@ if (activeInvitesCount === 10) {
 const LIMITS = {
   invitationsPerDay: 20,
   invitationsPerWeek: 50,
-  invitationsPerMonth: 200
-}
+  invitationsPerMonth: 200,
+};
 
 export async function checkInvitationRateLimit(traderId: string): Promise<{
-  allowed: boolean
-  limit: number
-  current: number
-  resetAt: Date
+  allowed: boolean;
+  limit: number;
+  current: number;
+  resetAt: Date;
 }> {
-  const today = startOfDay(new Date())
-  const thisWeek = startOfWeek(new Date())
+  const today = startOfDay(new Date());
+  const thisWeek = startOfWeek(new Date());
 
   // Count invitations sent today
   const todayCount = await prisma.traderInvitation.count({
     where: {
       traderId,
-      createdAt: { gte: today }
-    }
-  })
+      createdAt: { gte: today },
+    },
+  });
 
   if (todayCount >= LIMITS.invitationsPerDay) {
     return {
       allowed: false,
       limit: LIMITS.invitationsPerDay,
       current: todayCount,
-      resetAt: addDays(today, 1)
-    }
+      resetAt: addDays(today, 1),
+    };
   }
 
   // Count invitations sent this week
   const weekCount = await prisma.traderInvitation.count({
     where: {
       traderId,
-      createdAt: { gte: thisWeek }
-    }
-  })
+      createdAt: { gte: thisWeek },
+    },
+  });
 
   if (weekCount >= LIMITS.invitationsPerWeek) {
     return {
       allowed: false,
       limit: LIMITS.invitationsPerWeek,
       current: weekCount,
-      resetAt: addWeeks(thisWeek, 1)
-    }
+      resetAt: addWeeks(thisWeek, 1),
+    };
   }
 
   return {
     allowed: true,
     limit: LIMITS.invitationsPerDay,
     current: todayCount,
-    resetAt: addDays(today, 1)
-  }
+    resetAt: addDays(today, 1),
+  };
 }
 ```
 
@@ -1681,18 +1721,22 @@ export async function checkInvitationRateLimit(traderId: string): Promise<{
 // src/lib/referral/fraud-detection.ts
 
 export async function detectSuspiciousInvite(params: {
-  inviteeEmail: string
-  inviteeIP: string
-  inviteeFingerprint: string
+  inviteeEmail: string;
+  inviteeIP: string;
+  inviteeFingerprint: string;
 }): Promise<{ suspicious: boolean; reason?: string }> {
-  const { inviteeEmail, inviteeIP, inviteeFingerprint } = params
+  const { inviteeEmail, inviteeIP, inviteeFingerprint } = params;
 
   // Check 1: Email domain abuse (temp email services)
-  const tempEmailDomains = ['tempmail.com', '10minutemail.com', 'guerrillamail.com']
-  const emailDomain = inviteeEmail.split('@')[1]
+  const tempEmailDomains = [
+    "tempmail.com",
+    "10minutemail.com",
+    "guerrillamail.com",
+  ];
+  const emailDomain = inviteeEmail.split("@")[1];
 
   if (tempEmailDomains.includes(emailDomain)) {
-    return { suspicious: true, reason: 'Temporary email detected' }
+    return { suspicious: true, reason: "Temporary email detected" };
   }
 
   // Check 2: Same IP multiple signups (within 24h)
@@ -1700,25 +1744,28 @@ export async function detectSuspiciousInvite(params: {
     where: {
       createdAt: { gte: subDays(new Date(), 1) },
       // TODO: add IP tracking field
-    }
-  })
+    },
+  });
 
   if (recentSignupsFromIP > 5) {
-    return { suspicious: true, reason: 'Too many signups from same IP' }
+    return { suspicious: true, reason: "Too many signups from same IP" };
   }
 
   // Check 3: Same device fingerprint
   const existingUser = await prisma.user.findFirst({
     where: {
       // TODO: add device fingerprint field
-    }
-  })
+    },
+  });
 
   if (existingUser) {
-    return { suspicious: true, reason: 'Device fingerprint matches existing user' }
+    return {
+      suspicious: true,
+      reason: "Device fingerprint matches existing user",
+    };
   }
 
-  return { suspicious: false }
+  return { suspicious: false };
 }
 ```
 
@@ -1730,27 +1777,29 @@ Si invité devient inactif ou frauduleux, retirer credits.
 export async function clawbackRewards(inviteeId: string, reason: string) {
   // Find trader qui a invité
   const invitation = await prisma.traderInvitation.findFirst({
-    where: { inviteeUserId: inviteeId }
-  })
+    where: { inviteeUserId: inviteeId },
+  });
 
-  if (!invitation) return
+  if (!invitation) return;
 
   // Find credits awarded
-  const creditsAwarded = invitation.creditsAwarded
+  const creditsAwarded = invitation.creditsAwarded;
 
   if (creditsAwarded > 0) {
     // Deduct credits
     await prisma.referralCredit.create({
       data: {
         userId: invitation.traderId,
-        type: 'EARNED_SIGNUP', // Opposite type
+        type: "EARNED_SIGNUP", // Opposite type
         amount: -creditsAwarded, // Negative
         description: `Clawback: ${reason}`,
-        sourceId: inviteeId
-      }
-    })
+        sourceId: inviteeId,
+      },
+    });
 
-    logger.warn(`Clawback ${creditsAwarded} credits from ${invitation.traderId} (reason: ${reason})`)
+    logger.warn(
+      `Clawback ${creditsAwarded} credits from ${invitation.traderId} (reason: ${reason})`,
+    );
   }
 }
 ```
@@ -1762,6 +1811,7 @@ export async function clawbackRewards(inviteeId: string, reason: string) {
 ### KPIs à Tracker
 
 **Trader Metrics:**
+
 - Total invitations envoyées
 - Invitation → Signup conversion rate
 - Signup → Active user retention rate (30d)
@@ -1770,6 +1820,7 @@ export async function clawbackRewards(inviteeId: string, reason: string) {
 - Time to first reward redemption
 
 **Invitee Metrics:**
+
 - Source attribution (email vs referral link vs social)
 - Landing page → Signup conversion
 - Trial → Paid conversion rate
@@ -1777,6 +1828,7 @@ export async function clawbackRewards(inviteeId: string, reason: string) {
 - Lifetime value (LTV) invités vs organic
 
 **Platform Metrics:**
+
 - Viral coefficient K (invités per user)
 - CAC reduction (cost saved via referrals)
 - Referral revenue attribution
@@ -1789,22 +1841,34 @@ export async function clawbackRewards(inviteeId: string, reason: string) {
 export async function getReferralFunnelData(traderId: string) {
   const invitations = await prisma.traderInvitation.findMany({
     where: { traderId },
-    include: { invitee: true }
-  })
+    include: { invitee: true },
+  });
 
   return {
     step1_sent: invitations.length,
-    step2_landed: invitations.filter(i => i.landingViews > 0).length,
-    step3_signed: invitations.filter(i => i.status === 'ACCEPTED').length,
-    step4_active: invitations.filter(i => i.inviteeActive).length,
-    step5_upgraded: invitations.filter(i => i.inviteeUpgraded).length,
+    step2_landed: invitations.filter((i) => i.landingViews > 0).length,
+    step3_signed: invitations.filter((i) => i.status === "ACCEPTED").length,
+    step4_active: invitations.filter((i) => i.inviteeActive).length,
+    step5_upgraded: invitations.filter((i) => i.inviteeUpgraded).length,
 
     // Conversion rates
-    landedRate: (invitations.filter(i => i.landingViews > 0).length / invitations.length) * 100,
-    signupRate: (invitations.filter(i => i.status === 'ACCEPTED').length / invitations.length) * 100,
-    activeRate: (invitations.filter(i => i.inviteeActive).length / invitations.filter(i => i.status === 'ACCEPTED').length) * 100,
-    upgradeRate: (invitations.filter(i => i.inviteeUpgraded).length / invitations.filter(i => i.inviteeActive).length) * 100
-  }
+    landedRate:
+      (invitations.filter((i) => i.landingViews > 0).length /
+        invitations.length) *
+      100,
+    signupRate:
+      (invitations.filter((i) => i.status === "ACCEPTED").length /
+        invitations.length) *
+      100,
+    activeRate:
+      (invitations.filter((i) => i.inviteeActive).length /
+        invitations.filter((i) => i.status === "ACCEPTED").length) *
+      100,
+    upgradeRate:
+      (invitations.filter((i) => i.inviteeUpgraded).length /
+        invitations.filter((i) => i.inviteeActive).length) *
+      100,
+  };
 }
 ```
 
@@ -1815,12 +1879,14 @@ export async function getReferralFunnelData(traderId: string) {
 ### Phase 1: Credits System (2 semaines)
 
 **Semaine 1: DB & Backend**
+
 - [ ] Migrations Prisma (4 nouveaux modèles)
 - [ ] ReferralService implementation
 - [ ] Award/spend credits logic
 - [ ] Tests unitaires (100% coverage)
 
 **Semaine 2: UI Credits**
+
 - [ ] CreditsBalanceCard component
 - [ ] RewardsCatalogCard component
 - [ ] Redeem rewards flow
@@ -1831,6 +1897,7 @@ export async function getReferralFunnelData(traderId: string) {
 ### Phase 2: Tiers & Gamification (1 semaine)
 
 **Semaine 3: Tiers System**
+
 - [ ] ReferralTier model & logic
 - [ ] Auto-upgrade tiers (Bronze/Silver/Gold/Diamond)
 - [ ] Tier rewards (free months, badges)
@@ -1842,6 +1909,7 @@ export async function getReferralFunnelData(traderId: string) {
 ### Phase 3: Enhanced Invitations (1 semaine)
 
 **Semaine 4: UX Invitations**
+
 - [ ] Landing page `/invite/[traderId]`
 - [ ] Social share buttons (Twitter, Telegram)
 - [ ] Email templates personnalisés
@@ -1853,6 +1921,7 @@ export async function getReferralFunnelData(traderId: string) {
 ### Phase 4: Anti-Gaming & Polish (1 semaine optionnelle)
 
 **Semaine 5: Security & Fraud**
+
 - [ ] Rate limiting invitations
 - [ ] Multi-account detection
 - [ ] Reward clawback logic
@@ -1869,6 +1938,7 @@ export async function getReferralFunnelData(traderId: string) {
 ### Scénario Conservateur
 
 **Hypothèses:**
+
 - 1,000 users actifs actuels
 - 30% sont traders (300 traders)
 - Chaque trader invite en moyenne 10 personnes
@@ -1877,6 +1947,7 @@ export async function getReferralFunnelData(traderId: string) {
 - 15% active → upgrade payant
 
 **Calculs:**
+
 ```
 Invitations envoyées: 300 traders × 10 = 3,000
 Signups: 3,000 × 30% = 900 nouveaux users
@@ -1900,10 +1971,12 @@ NET SAVINGS: 40,000$
 ### Scénario Optimiste (Growth Viral)
 
 **Hypothèses:**
+
 - K = 1.2 (chaque user recrute 1.2 nouveaux users)
 - Croissance exponentielle sur 6 mois
 
 **Calculs:**
+
 ```
 Mois 1: 1,000 users → 1,200 nouveaux → 2,200 total
 Mois 2: 2,200 users → 2,640 nouveaux → 4,840 total
@@ -1930,6 +2003,7 @@ Annual Recurring Revenue (ARR): ~1.5M$
 ### ✅ GO avec Option A: Credits System
 
 **Pourquoi:**
+
 1. ✅ Flexible (traders choose rewards)
 2. ✅ Scalable (add new rewards easily)
 3. ✅ Gamification naturelle (progress visible)
@@ -1939,12 +2013,14 @@ Annual Recurring Revenue (ARR): ~1.5M$
 ### 🎁 Incentives Recommandés
 
 **Pour Traders:**
+
 - 5 credits invitation accepted
 - 10 credits invité actif (30+ jours)
 - 50 credits invité upgrade Pro
 - 100 credits invité upgrade Ultra
 
 **Pour Invités:**
+
 - 30 jours Pro trial (vs 7 jours normal)
 - 25 credits bienvenue
 - 50% off premier mois si upgrade rapide
@@ -1952,12 +2028,14 @@ Annual Recurring Revenue (ARR): ~1.5M$
 ### 🎮 Gamification Layers
 
 **Tiers:**
+
 - 🥉 Bronze (10 invités): 10% discount
 - 🥈 Silver (50 invités): 3 mois Pro gratuit
 - 🥇 Gold (100 invités): 3 mois Ultra + Featured
 - 💎 Diamond (250 invités): Ultra lifetime
 
 **Leaderboard:**
+
 - Monthly top 10 recruiters
 - Prizes: Credits bonus, Featured placement
 

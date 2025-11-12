@@ -56,14 +56,14 @@ pnpm dev
 
 ## 🧪 Tests & QA
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm test` | Tests Vitest (unitaires/intégration). |
-| `pnpm test:ci` | Vitest en mode CI (utilisé dans GitHub Actions). |
-| `pnpm test:e2e` | Playwright en local (requires `scripts/setup-test-db.sh`). |
-| `pnpm test:e2e:ci` | Pipeline complet (reset DB + Playwright headless). |
-| `./scripts/dev-tools/check-test-env.sh` | Diagnostic (Postgres, Prisma, Playwright, pnpm). |
-| `./scripts/dev-tools/test-*.ts` | Scripts ciblés (checkout, RPC, crypto addresses, etc.). |
+| Commande                                | Description                                                |
+| --------------------------------------- | ---------------------------------------------------------- |
+| `pnpm test`                             | Tests Vitest (unitaires/intégration).                      |
+| `pnpm test:ci`                          | Vitest en mode CI (utilisé dans GitHub Actions).           |
+| `pnpm test:e2e`                         | Playwright en local (requires `scripts/setup-test-db.sh`). |
+| `pnpm test:e2e:ci`                      | Pipeline complet (reset DB + Playwright headless).         |
+| `./scripts/dev-tools/check-test-env.sh` | Diagnostic (Postgres, Prisma, Playwright, pnpm).           |
+| `./scripts/dev-tools/test-*.ts`         | Scripts ciblés (checkout, RPC, crypto addresses, etc.).    |
 
 Plus de détails dans `.claude/docs/TESTING.md`.
 
@@ -71,32 +71,32 @@ Plus de détails dans `.claude/docs/TESTING.md`.
 
 ## 📚 Documentation interne
 
-| Sujet | Emplacement |
-|-------|-------------|
-| Guide contributeurs & conventions | `.claude/CLAUDE.md` |
-| État du projet & roadmap | `.claude/docs/DEVELOPMENT.md` |
-| Base de données & migrations | `.claude/docs/DATABASE.md` |
-| Trading system | `.claude/docs/TRADING-SYSTEM.md` |
-| Portfolio tracking | `.claude/docs/PORTFOLIO-TRACKING.md` |
-| Paiements crypto & sweep | `.claude/docs/CRYPTO-PAYMENTS.md` + `scripts/README-SWEEP.md` + `scripts/SWEEP_SETUP.md` |
-| Abonnements & rôles Discord | `.claude/docs/SUBSCRIPTIONS.md` |
-| Variables d’environnement | `.claude/docs/ENV-VARIABLES-MAPPING.md` |
-| Audit doc/scripts (2 nov 2025) | `.claude/docs/AUDIT-2025-11-02.md` |
-| Scripts CLI | `scripts/README.md` |
+| Sujet                             | Emplacement                                                                              |
+| --------------------------------- | ---------------------------------------------------------------------------------------- |
+| Guide contributeurs & conventions | `.claude/CLAUDE.md`                                                                      |
+| État du projet & roadmap          | `.claude/docs/DEVELOPMENT.md`                                                            |
+| Base de données & migrations      | `.claude/docs/DATABASE.md`                                                               |
+| Trading system                    | `.claude/docs/TRADING-SYSTEM.md`                                                         |
+| Portfolio tracking                | `.claude/docs/PORTFOLIO-TRACKING.md`                                                     |
+| Paiements crypto & sweep          | `.claude/docs/CRYPTO-PAYMENTS.md` + `scripts/README-SWEEP.md` + `scripts/SWEEP_SETUP.md` |
+| Abonnements & rôles Discord       | `.claude/docs/SUBSCRIPTIONS.md`                                                          |
+| Variables d’environnement         | `.claude/docs/ENV-VARIABLES-MAPPING.md`                                                  |
+| Audit doc/scripts (2 nov 2025)    | `.claude/docs/AUDIT-2025-11-02.md`                                                       |
+| Scripts CLI                       | `scripts/README.md`                                                                      |
 
 ---
 
 ## 🧰 Scripts utiles
 
-| Script | Usage |
-|--------|-------|
-| `scripts/sweep-to-binance.ts` | Sweep fonds Base/Tron vers Binance (dry-run par défaut, utilise `.env.sweep`). |
-| `scripts/generate-mainnet-xpubs.ts` / `generate-testnet-xpubs.ts` | Génère les XPUB HD wallet. |
-| `scripts/upgrade-to-pro.ts <email> [days]` | Upgrade manuel utilisateur (plan PRO). |
-| `scripts/upgrade-to-ultra.ts <email> [days]` | Upgrade manuel utilisateur (plan ULTRA). |
-| `scripts/deploy-railway.sh` | Déploiement bot Discord sur Railway. |
-| `scripts/run-e2e-tests.sh` | Reset DB + Playwright pour CI. |
-| `scripts/setup-test-db.sh` | Prépare la base de tests locale. |
+| Script                                                            | Usage                                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `scripts/sweep-to-binance.ts`                                     | Sweep fonds Base/Tron vers Binance (dry-run par défaut, utilise `.env.sweep`). |
+| `scripts/generate-mainnet-xpubs.ts` / `generate-testnet-xpubs.ts` | Génère les XPUB HD wallet.                                                     |
+| `scripts/upgrade-to-pro.ts <email> [days]`                        | Upgrade manuel utilisateur (plan PRO).                                         |
+| `scripts/upgrade-to-ultra.ts <email> [days]`                      | Upgrade manuel utilisateur (plan ULTRA).                                       |
+| `scripts/deploy-railway.sh`                                       | Déploiement bot Discord sur Railway.                                           |
+| `scripts/run-e2e-tests.sh`                                        | Reset DB + Playwright pour CI.                                                 |
+| `scripts/setup-test-db.sh`                                        | Prépare la base de tests locale.                                               |
 
 Le dossier `scripts/dev-tools/` contient les scripts de debug ciblés (checkout, RPC, tests environnement). Voir `scripts/README.md` pour l’index complet.
 
@@ -139,4 +139,3 @@ Les priorités courantes (2 nov 2025) sont listées dans `.claude/CLAUDE.md` et 
 ## 📝 Licence
 
 MIT — voir [LICENSE](LICENSE).
-

@@ -17,16 +17,19 @@ Ce guide explique comment configurer et exploiter `scripts/sweep-to-binance.ts`,
 ## 1. Configurer les adresses Binance
 
 ### Base (USDC)
+
 1. Binance → Wallet → **Fiat and Spot**.
 2. Bouton **Deposit** → Token **USDC** → Réseau **Base**.
 3. Copier l’adresse `0x...`.
 
 ### Tron (USDT)
+
 1. Même parcours.
 2. Token **USDT** → Réseau **TRC20**.
 3. Copier l’adresse `T...`.
 
 Ajouter les valeurs dans `.env.local` (ou `.env` pour la prod) :
+
 ```bash
 BINANCE_MASTER_WALLET_BASE="0x..."
 BINANCE_MASTER_WALLET_TRON="T..."
@@ -43,6 +46,7 @@ cp .env.sweep.example .env.sweep
 ```
 
 Compléter avec :
+
 ```bash
 # Seeds HD wallet (DOIT correspondre aux XPUB utilisés côté checkout)
 SWEEP_MNEMONIC_BASE="mots ..."
@@ -64,6 +68,7 @@ npx tsx scripts/sweep-to-binance.ts
 ```
 
 Sortie attendue (mode dry-run) :
+
 ```
 🧹 Starting sweep of all crypto addresses to Binance...
 Mode: 🔍 DRY RUN (preview only)
@@ -139,4 +144,3 @@ Si tu souhaites exécuter le sweep sur un serveur ou via cron :
 - `.claude/docs/ENV-VARIABLES-MAPPING.md`
 - `scripts/README-SWEEP.md`
 - `scripts/sweep-to-binance.ts`
-

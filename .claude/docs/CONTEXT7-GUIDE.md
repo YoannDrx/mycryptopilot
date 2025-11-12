@@ -13,6 +13,7 @@
 Context7 est déjà configuré dans ton projet :
 
 **Fichier** : `.claude/config.json`
+
 ```json
 {
   "mcpServers": {
@@ -37,6 +38,7 @@ Il suffit de demander dans ta conversation Claude Code :
 ```
 
 Claude utilisera automatiquement les outils MCP pour :
+
 1. Résoudre l'ID de la bibliothèque
 2. Charger la documentation à jour
 3. L'utiliser dans ses réponses
@@ -44,11 +46,13 @@ Claude utilisera automatiquement les outils MCP pour :
 ### Les 2 Outils MCP Context7
 
 #### 1. `resolve-library-id`
+
 - **But** : Trouve l'ID Context7 d'une bibliothèque
 - **Entrée** : Nom de package (ex: "next", "prisma", "react")
 - **Sortie** : ID Context7 (ex: "vercel/nextjs", "prisma/prisma")
 
 #### 2. `get-library-docs`
+
 - **But** : Récupère la documentation complète
 - **Entrée** : ID Context7
 - **Sortie** : Documentation à jour avec exemples de code
@@ -58,32 +62,39 @@ Claude utilisera automatiquement les outils MCP pour :
 Voici les bibliothèques principales de ton projet et leurs IDs Context7 probables :
 
 ### Core Framework
+
 - **Next.js 15** → `vercel/nextjs`
 - **React 19** → `facebook/react`
 - **TypeScript** → `microsoft/typescript`
 
 ### Base de données & ORM
+
 - **Prisma** → `prisma/prisma`
 - **PostgreSQL** → `postgresql/postgresql`
 
 ### Authentification
+
 - **Better Auth** → `better-auth/better-auth` (si disponible, sinon consulter docs officielles)
 
 ### UI/UX
+
 - **TailwindCSS 4** → `tailwindlabs/tailwindcss`
 - **Radix UI** → `radix-ui/primitives`
 - **Shadcn/UI** → Note: Shadcn est déjà intégré nativement dans Claude Code !
 
 ### State Management
+
 - **TanStack Query** → `tanstack/query`
 - **Zustand** → `pmndrs/zustand`
 - **nuqs** → `47ng/nuqs`
 
 ### Forms & Validation
+
 - **React Hook Form** → `react-hook-form/react-hook-form`
 - **Zod** → `colinhacks/zod`
 
 ### Crypto & Web3
+
 - **Ethers.js** → `ethers-io/ethers.js`
 - **TronWeb** → `tronprotocol/tronweb`
 - **ccxt** → `ccxt/ccxt`
@@ -91,14 +102,17 @@ Voici les bibliothèques principales de ton projet et leurs IDs Context7 probabl
 - **@scure/bip39** → `paulmillr/scure-bip39`
 
 ### Testing
+
 - **Vitest** → `vitest-dev/vitest`
 - **Playwright** → Note: Playwright est déjà intégré nativement dans Claude Code !
 - **Testing Library** → `testing-library/react-testing-library`
 
 ### AI & assistants
+
 - **@ai-sdk/openai** → `ai-sdk/openai` (ou `vercel/ai` pour l’intégration complète)
 
 ### Other
+
 - **Discord.js** → `discordjs/discord.js`
 - **date-fns** → `date-fns/date-fns`
 - **drizzle-kit** → `drizzle-team/drizzle-orm` (pour référence rapide si besoin)
@@ -108,11 +122,13 @@ Voici les bibliothèques principales de ton projet et leurs IDs Context7 probabl
 ### Exemple 1 : Implémenter une feature Next.js 15
 
 **Tu demandes** :
+
 ```
 Use context7 for Next.js 15. Comment utiliser les Server Actions avec revalidatePath ?
 ```
 
 **Claude va** :
+
 1. Résoudre "next" → "vercel/nextjs"
 2. Charger la doc Next.js 15
 3. Te donner la réponse exacte avec la syntaxe à jour
@@ -120,11 +136,13 @@ Use context7 for Next.js 15. Comment utiliser les Server Actions avec revalidate
 ### Exemple 2 : Optimiser des queries Prisma
 
 **Tu demandes** :
+
 ```
 Use context7 for Prisma. Comment faire un include avec des nested relations ?
 ```
 
 **Claude va** :
+
 1. Résoudre "prisma" → "prisma/prisma"
 2. Charger la doc Prisma
 3. Te montrer les patterns recommandés à jour
@@ -132,11 +150,13 @@ Use context7 for Prisma. Comment faire un include avec des nested relations ?
 ### Exemple 3 : Comparer plusieurs bibliothèques
 
 **Tu demandes** :
+
 ```
 Use context7 for TanStack Query and Zustand. Quelle approche est meilleure pour gérer l'état des signaux de trading ?
 ```
 
 **Claude va** :
+
 1. Charger la doc des deux bibliothèques
 2. Comparer les approches avec code à jour
 3. Te recommander la meilleure solution
@@ -168,15 +188,18 @@ Use context7 for TanStack Query and Zustand. Quelle approche est meilleure pour 
 ## 🔧 Troubleshooting
 
 ### "Library not found"
+
 - Vérifie le nom exact du package npm
 - Essaie avec l'org : "vercel/nextjs" au lieu de "next"
 - Certaines libraries peuvent ne pas être supportées (très rares ou privées)
 
 ### "Documentation outdated"
+
 - Context7 met à jour régulièrement, mais parfois avec 1-2 semaines de retard
 - Pour des features très récentes (sorties il y a 1-2 jours), consulte directement la doc officielle
 
 ### Performance lente
+
 - Context7 utilise `npx -y` qui télécharge le package au premier lancement
 - Les appels suivants sont plus rapides grâce au cache npm
 
@@ -192,6 +215,7 @@ Context7 supporte **des milliers de bibliothèques**, incluant :
 - ✅ Et bien plus...
 
 Pour vérifier si une library est supportée, demande simplement à Claude :
+
 ```
 Is [library-name] available on context7?
 ```

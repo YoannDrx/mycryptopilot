@@ -69,9 +69,7 @@ export function TradingSidebar({
   );
 
   // Utiliser store Zustand pour persister l'état collapsed/expanded
-  const collapsedSections = useSidebarState(
-    (state) => state.collapsedSections,
-  );
+  const collapsedSections = useSidebarState((state) => state.collapsedSections);
   const toggleSection = useSidebarState((state) => state.toggleSection);
   const hasHydrated = useSidebarState((state) => state.hasHydrated);
 

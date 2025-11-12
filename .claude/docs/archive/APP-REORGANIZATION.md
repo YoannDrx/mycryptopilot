@@ -10,6 +10,7 @@
 ## 📋 Objectif Global
 
 Réorganiser l'application MyCryptoPilot en **4 espaces distincts** avec leurs sidebars dédiées:
+
 1. **Trading** - Signaux, Dashboard, Marketplace, Analytics, Checkout
 2. **Account** - Settings, Profile, Become Trader, Following, Discord
 3. **Crypto School** - Formation, Cours, Quiz, Progression
@@ -52,6 +53,7 @@ app/orgs/[orgSlug]/(navigation)/
 ## ✅ Phase 1: Restructuration & Trading (EN COURS)
 
 ### Étape 1.1: Lecture & Analyse ✅
+
 - [x] Lire `org-navigation.links.ts`
 - [x] Lire `org-sidebar.tsx`
 - [x] Lire `org-command.tsx`
@@ -59,11 +61,13 @@ app/orgs/[orgSlug]/(navigation)/
 - [x] Créer document de suivi
 
 ### Étape 1.2: Nettoyage Doublons ✅
+
 - [x] Supprimer `/app/orgs/[orgSlug]/(navigation)/account/` (vide)
 - [x] Supprimer `/app/orgs/[orgSlug]/(navigation)/settings/` (B2B legacy)
 - [x] Vérifier qu'aucune import ne casse
 
 ### Étape 1.3: Créer Structure Trading ✅
+
 - [x] Créer dossier `(trading)/`
 - [x] Déplacer `dashboard/` → `(trading)/dashboard/`
 - [x] Déplacer `traders/` → `(trading)/traders/`
@@ -73,6 +77,7 @@ app/orgs/[orgSlug]/(navigation)/
 - [x] Créer `(trading)/layout.tsx`
 
 ### Étape 1.4: Mise à Jour Navigation ✅
+
 - [x] Mettre à jour `org-navigation.links.ts` (4 groupes: Home, Trading, School, Tax)
 - [x] Tester TypeScript compilation
 - [x] Tester build Next.js
@@ -83,6 +88,7 @@ app/orgs/[orgSlug]/(navigation)/
 ## 📦 Phase 2: Crypto School ✅
 
 ### Étape 2.1: Structure de Base ✅
+
 - [x] Créer dossier `(school)/`
 - [x] Créer `(school)/layout.tsx`
 - [x] Créer pages placeholder:
@@ -91,11 +97,13 @@ app/orgs/[orgSlug]/(navigation)/
   - [ ] `certificates/page.tsx` (badges) - Optionnel pour plus tard
 
 ### Étape 2.2: Modèles DB (Plus tard)
+
 - [ ] Créer schémas Prisma (Chapter, Lesson, Progress, Quiz)
 - [ ] Migration DB
 - [ ] Seed données test
 
 ### Étape 2.3: Pages & Composants
+
 - [ ] Page catalogue cours
 - [ ] Page leçon individuelle
 - [ ] Composant quiz
@@ -106,6 +114,7 @@ app/orgs/[orgSlug]/(navigation)/
 ## 📦 Phase 3: Tax & Declaration ✅
 
 ### Étape 3.1: Structure de Base ✅
+
 - [x] Créer dossier `(tax)/`
 - [x] Créer `(tax)/layout.tsx`
 - [x] Créer pages placeholder:
@@ -114,12 +123,14 @@ app/orgs/[orgSlug]/(navigation)/
   - [ ] `history/page.tsx` (historique) - Optionnel pour plus tard
 
 ### Étape 3.2: Parser CSV (Plus tard)
+
 - [ ] Parser Binance CSV
 - [ ] Parser Bybit CSV
 - [ ] Validation Zod
 - [ ] Tests unitaires
 
 ### Étape 3.3: Calculs & Rapports
+
 - [ ] Algorithme FIFO
 - [ ] Calcul PnL
 - [ ] Génération rapport
@@ -130,11 +141,13 @@ app/orgs/[orgSlug]/(navigation)/
 ## 🚨 Checklist Nettoyage
 
 ### Doublons Identifiés
+
 - [x] `/app/orgs/[orgSlug]/(navigation)/account/following/` (vide) → ✅ SUPPRIMÉ
 - [x] `/app/orgs/[orgSlug]/(navigation)/settings/` (B2B legacy) → ✅ SUPPRIMÉ
 - [x] `/app/(logged-in)/(account-layout)/account/` (standalone) → ✅ CONSERVÉ
 
 ### Liens à Vérifier
+
 - [x] TypeScript compilation → ✅ PASS
 - [x] Next.js build → ✅ PASS
 - [x] Routes générées → ✅ Toutes les routes Trading OK
@@ -144,21 +157,23 @@ app/orgs/[orgSlug]/(navigation)/
 
 ## 📊 Progression Globale
 
-| Phase | Tâches | Complétées | Status |
-|-------|---------|------------|---------|
-| Phase 1: Trading | 14 | 14 | 🟢 100% |
-| Phase 2: School | 5 | 5 | 🟢 100% |
-| Phase 3: Tax | 5 | 5 | 🟢 100% |
-| **TOTAL** | **24** | **24** | **🟢 100%** |
+| Phase            | Tâches | Complétées | Status      |
+| ---------------- | ------ | ---------- | ----------- |
+| Phase 1: Trading | 14     | 14         | 🟢 100%     |
+| Phase 2: School  | 5      | 5          | 🟢 100%     |
+| Phase 3: Tax     | 5      | 5          | 🟢 100%     |
+| **TOTAL**        | **24** | **24**     | **🟢 100%** |
 
 ---
 
 ## 📝 Notes & Décisions
 
 ### Décision 1: Gestion Account/Settings
+
 **Problème:** Doublon entre `/account` et `/orgs/[orgSlug]/settings`
 
 **Décision:**
+
 - ✅ Garder `/account` (standalone, hors org)
 - ❌ Supprimer `/settings` dans orgs (inutile en B2C)
 - 🔗 Ajouter lien "Settings" dans sidebar → `/account`
@@ -166,17 +181,21 @@ app/orgs/[orgSlug]/(navigation)/
 **Raison:** App B2C (1 user = 1 org), pas besoin de settings par org.
 
 ### Décision 2: Route Groups
+
 **Choix:** Utiliser route groups `(trading)`, `(school)`, `(tax)`
 
 **Avantages:**
+
 - Isolation logique
 - Layouts spécifiques par section
 - URL non affectées (pas de `/trading/` dans l'URL)
 
 ### Décision 3: Navigation
+
 **Choix:** 3 groupes collapsibles dans sidebar
 
 **Implémentation:**
+
 - Garder `OrgSidebar` actuel
 - Mettre à jour `ORGANIZATION_LINKS` avec 3 groupes
 - `OrgCommand` (cmd+k) liste automatiquement les nouveaux liens
@@ -208,6 +227,7 @@ npx prisma migrate dev
 ## 📅 Prochaines Étapes
 
 ### ✅ Phase 1 Complète (Trading)
+
 1. ✅ Créer document de suivi
 2. ✅ Supprimer doublons account/settings
 3. ✅ Créer structure `(trading)/`
@@ -218,12 +238,14 @@ npx prisma migrate dev
 8. ✅ Vérifier build Next.js
 
 ### Court terme (Phase 2 & 3)
+
 1. Créer structures `(school)/` et `(tax)/`
 2. Pages placeholder
 3. Layouts spécifiques
 4. Tests navigation
 
 ### Moyen terme (Implémentation)
+
 1. Modèles DB School
 2. Parser CSV Tax
 3. Logique métier
@@ -235,6 +257,7 @@ npx prisma migrate dev
 **Status:** 🎉 **PROJET COMPLET - 100% + UI POLISH** 🎉
 
 ### Architecture Finale - 4 Espaces
+
 - ✅ Phase 1: Trading section avec sidebar dédiée
 - ✅ Phase 1.5: Account section avec sidebar dédiée
 - ✅ Phase 2: School placeholders créés
@@ -243,6 +266,7 @@ npx prisma migrate dev
 - ✅ Chaque espace a sa sidebar spécialisée avec ses propres liens
 
 ### UI Polish (Phase 7)
+
 - ✅ Trading cards: style professionnel et subtil (effets réduits de 60%)
 - ✅ Chart image viewer avec zoom full-screen + watermark MyCryptoPilot
 - ✅ Suppression d'images dans formulaires

@@ -115,16 +115,19 @@ CRYPTO_XPUB_TRON_TESTNET="xpub6..."
 ```
 
 **Réseaux testnet**:
+
 - Base Sepolia (testnet Ethereum L2)
 - Tron Shasta (testnet Tron)
 
 **Avantages**:
+
 - ✅ Tester le flow complet sans argent réel
 - ✅ Obtenir des tokens testnet gratuits (faucets)
 - ✅ Badge UI "TESTNET MODE" visible dans le checkout
 - ✅ Liens explorateurs adaptés automatiquement (Sepolia BaseScan, Shasta TronScan)
 
 **Obtenir des tokens testnet**:
+
 - Base Sepolia USDC: https://faucet.circle.com
 - Tron Shasta USDT: https://www.trongrid.io/shasta/#/
 
@@ -167,6 +170,7 @@ Nouveau plan `test` permettant aux users de tester le système de paiement avec 
 #### Composants UI
 
 **Success Dialog** (`test-payment-success-dialog.tsx`):
+
 ```typescript
 <TestPaymentSuccessDialog
   open={showDialog}
@@ -176,12 +180,14 @@ Nouveau plan `test` permettant aux users de tester le système de paiement avec 
 ```
 
 **Email Template** (`test-payment-success.tsx`):
+
 - Confirmation paiement $1
 - Détails transaction (hash, network, time)
 - Lien explorer blockchain
 - CTA vers plans Pro/Ultra
 
 **Payment History** (`account/payments/page.tsx`):
+
 - Liste tous les paiements (test + real)
 - Badge "Test Payment" pour plan test
 - Status (PENDING/CONFIRMED)
@@ -831,6 +837,7 @@ CRYPTO_XPUB_TRON="xpub6D..." # Configuré dans Vercel
 ```
 
 **Test Payment $1** fonctionne directement en prod:
+
 - User clique "Send $1 Test Payment" sur `/pricing`
 - Paie 1 USDC (Base) ou 1 USDT (Tron)
 - Reçoit popup success + email de confirmation
@@ -873,6 +880,7 @@ Le système de test payment est **100% fonctionnel** et prêt à être testé. D
 > 🎯 **C'est l'option la plus simple!** Aucun setup testnet, aucun faucet, aucune confusion. Lance l'app, clique "Send $1 Test Payment", paie, c'est fait.
 
 **Avantages**:
+
 - ✅ Teste le flow blockchain réel (Base ou Tron mainnet)
 - ✅ **Zéro setup** - Tes XPUBs mainnet sont déjà configurés
 - ✅ **Rapide** (< 5 min total du début à la fin)
@@ -881,6 +889,7 @@ Le système de test payment est **100% fonctionnel** et prêt à être testé. D
 - ✅ **Pas de faucet** à gérer (parfois lents ou en panne)
 
 **Prérequis**:
+
 - Un wallet crypto (MetaMask, Trust Wallet, Binance, etc.)
 - 1 USDC sur Base OU 1 USDT sur Tron + frais gas
 
@@ -900,6 +909,7 @@ pnpm dev
 **Steps dans l'interface**:
 
 1. **Aller sur `/pricing`**
+
    ```
    http://localhost:3000/orgs/[ton-org-slug]/pricing
    ```
@@ -920,6 +930,7 @@ pnpm dev
 4. **Envoyer le Payment depuis ton wallet**
 
    **Option 1 - Base Network (USDC)** ⚡ Plus rapide:
+
    ```
    Réseau:  Base Mainnet (Chain ID: 8453)
    Token:   USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
@@ -934,6 +945,7 @@ pnpm dev
    ```
 
    **Option 2 - Tron Network (USDT)**:
+
    ```
    Réseau:  Tron Mainnet
    Token:   USDT TRC-20 (TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t)
@@ -962,6 +974,7 @@ pnpm dev
    ```
    http://localhost:3000/orgs/[ton-org-slug]/account/payments
    ```
+
    - ✅ Payment visible avec badge "Test Payment"
    - ✅ Status: CONFIRMED
    - ✅ Lien vers explorer (BaseScan ou TronScan)
@@ -993,11 +1006,13 @@ npx prisma studio
 > ⚠️ **Option avancée** - Nécessite setup initial ~15-20 min. Recommandé UNIQUEMENT si tu veux tester plusieurs fois gratuitement.
 
 **Avantages**:
+
 - ✅ Totalement gratuit (tokens testnet)
 - ✅ Aucun risque financier
 - ✅ Teste le flow blockchain réel
 
 **Inconvénients**:
+
 - ⚠️ Setup initial (~15-20 min)
 - ⚠️ Faucets parfois lents ou en maintenance
 - ⚠️ Nécessite de générer des XPUBs testnet séparés
@@ -1022,6 +1037,7 @@ Adresse (Destination pour recevoir des fonds)
 ```
 
 **Analogie**:
+
 - XPUB = "Usine à adresses" (génère des adresses)
 - Adresse = "Boîte aux lettres" (reçoit de l'argent)
 
@@ -1036,6 +1052,7 @@ npx tsx scripts/generate-testnet-xpubs.ts
 ```
 
 **Output du script**:
+
 ```
 📝 Generated Mnemonic: [12 words] ← SAUVEGARDER!
 ✅ Base XPUB: xpub6F8yv...
@@ -1094,6 +1111,7 @@ pnpm dev
 5. **Attendre 1-2 min** → Tu reçois 10 USDC testnet gratuits
 
 **Si erreur "Please enter a valid wallet address for Base"**:
+
 - Tu as probablement collé le XPUB au lieu de l'adresse
 - Utilise l'adresse `0x...` depuis la page checkout
 
@@ -1125,6 +1143,7 @@ pnpm dev
 8. ✅ Vérifier payment history
 
 **Liens Explorers Testnet**:
+
 - Base Sepolia: https://sepolia.basescan.org/
 - Tron Shasta: https://shasta.tronscan.org/
 
@@ -1137,6 +1156,7 @@ pnpm dev
 **Cause**: XPUBs manquants ou invalides
 
 **Solution**:
+
 ```bash
 # Vérifier .env.local
 cat .env.local | grep CRYPTO_XPUB
@@ -1154,12 +1174,14 @@ CRYPTO_NETWORK="testnet"
 #### Problème: "Payment not detected"
 
 **Causes possibles**:
+
 1. Mauvais réseau (envoi sur mainnet alors que testnet configuré)
 2. Montant incorrect (< $0.95 ou > $1.05 pour test plan)
 3. RPC down ou rate limited
 4. Pas assez de confirmations
 
 **Solutions**:
+
 ```bash
 # 1. Vérifier tx sur explorer
 # Base Mainnet: https://basescan.org/tx/[TX_HASH]
@@ -1193,11 +1215,13 @@ TRON_RPC_URL="https://api.trongrid.io?TRON_PRO_API_KEY=YOUR_KEY"
 #### Problème: "Email not received"
 
 **Causes**:
+
 1. Resend API key manquant
 2. Email dans spam
 3. Email server down
 
 **Solution**:
+
 ```bash
 # Vérifier Resend config
 cat .env.local | grep RESEND
@@ -1216,6 +1240,7 @@ cat .env.local | grep RESEND
 Après avoir testé le test payment, vérifier que:
 
 **Frontend**:
+
 - [ ] Page pricing affiche CTA "Send $1 Test Payment"
 - [ ] Checkout génère 2 adresses (Base + Tron)
 - [ ] QR codes s'affichent correctement
@@ -1227,6 +1252,7 @@ Après avoir testé le test payment, vérifier que:
 - [ ] Popup success s'affiche après confirmation
 
 **Backend**:
+
 - [ ] Addresses générées avec derivation index unique
 - [ ] CryptoAddress créées en DB avec expiresAt = +15min
 - [ ] RPC monitoring détecte le payment on-chain
@@ -1237,12 +1263,14 @@ Après avoir testé le test payment, vérifier que:
 - [ ] Tx hash stocké correctement
 
 **Database** (via Prisma Studio):
+
 - [ ] Table CryptoAddress: 2 entrées (BASE + TRON)
 - [ ] Table CryptoPayment: 1 entrée avec plan = "test"
 - [ ] confirmations >= seuil (1 Base, 2 Tron)
 - [ ] confirmedAt timestamp présent
 
 **Payment History**:
+
 - [ ] Payment visible dans `/account/payments`
 - [ ] Badge "Test Payment" affiché
 - [ ] Status = CONFIRMED
@@ -1254,6 +1282,7 @@ Après avoir testé le test payment, vérifier que:
 ### 📊 Métriques de Performance
 
 **Temps attendu**:
+
 - Génération adresses: < 1 seconde
 - Confirmation Base: 2-10 secondes (1 block)
 - Confirmation Tron: 6-20 secondes (2 blocks)
@@ -1261,6 +1290,7 @@ Après avoir testé le test payment, vérifier que:
 - Total flow: **< 30 secondes** (Base) ou **< 1 minute** (Tron)
 
 **Si plus lent**:
+
 - Check RPC provider (latency)
 - Check network congestion (gas price)
 - Check polling interval (10s par défaut)
@@ -1270,18 +1300,21 @@ Après avoir testé le test payment, vérifier que:
 ### 🎯 Recommandations
 
 **Pour Dev**:
+
 1. Commencer avec **Testnet** (gratuit, aucun risque)
 2. Tester plusieurs fois pour valider stabilité
 3. Tester les 2 réseaux (Base + Tron)
 4. Tester edge cases (montant incorrect, timeout, etc.)
 
 **Pour Staging/Prod**:
+
 1. Utiliser **Mainnet** avec test payment $1 réel
 2. Valider une fois en staging avant prod
 3. Monitorer RPC latency et rate limits
 4. Setup alertes email si RPC down
 
 **Après Test Réussi**:
+
 - ✅ Système crypto payment validé
 - ✅ Prêt à recevoir vrais paiements Pro ($49) et Ultra ($99)
 - ✅ Peut lancer en beta avec confiance

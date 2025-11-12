@@ -1,8 +1,8 @@
-import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker";
 import type { Page } from "@playwright/test";
 import { retry } from "./retry";
+import { testLogger } from "./test-logger";
 
 export const getUserEmail = () =>
   `playwright-test-${faker.internet.email().toLowerCase()}`;
@@ -40,7 +40,7 @@ export async function createTestAccount(options: {
 
   // Wait for navigation to complete - we should be redirected to the callback URL
   if (options.callbackURL) {
-    await options.page.waitForLoadState("networkidle");
+    await options.page.waitForLoadState("domcontentloaded");
     // Extract pathname from callbackURL and match it regardless of domain
     const callbackPath = new URL(options.callbackURL, "http://localhost")
       .pathname;
@@ -56,21 +56,17 @@ export async function createTestAccount(options: {
 
   if (options.admin) {
     const user = await retry(
-      async () => {
-        // Force Prisma to refresh its connection to avoid cache issues
-        await prisma.$disconnect();
-        await prisma.$connect();
-        return prisma.user.findUniqueOrThrow({
+      async () =>
+        prisma.user.findUniqueOrThrow({
           where: { email: userData.email },
-        });
-      },
+        }),
       {
         maxAttempts: 5,
         delayMs: 1000,
         backoff: true,
       },
     );
-    logger.info("Creating admin user", user);
+    testLogger.info("Creating admin user", user);
     await prisma.user.update({
       where: { id: user.id },
       data: { role: "admin" },
@@ -123,7 +119,7 @@ export async function signInAccount(options: {
         { timeout: 30000 },
       );
     } catch (error) {
-      logger.error("Error waiting for navigation to complete", error);
+      testLogger.error("Error waiting for navigation to complete", error);
     }
   }
 
@@ -138,7 +134,7 @@ export async function signOutAccount(options: { page: Page }) {
   const { page } = options;
 
   // Wait for page to be ready (we're already on an authenticated page)
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("domcontentloaded");
 
   // Find and click the user menu button in the sidebar
   const userButton = page.getByTestId("user-menu-button");

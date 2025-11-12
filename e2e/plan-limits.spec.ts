@@ -49,7 +49,7 @@ test.describe("Plan Limits", () => {
 
     // 3. Follow the trader
     await page.goto(`/traders/${trader.id}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     await page
       .getByRole("button", { name: /follow/i })
@@ -61,7 +61,7 @@ test.describe("Plan Limits", () => {
 
     // 4. Navigate to dashboard to see signals
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // 5. Verify first 3 signals are clear (activeSignalsLimit = 3 for Free)
     // Remaining 7 signals should be blurred or show upgrade CTA
@@ -127,7 +127,7 @@ test.describe("Plan Limits", () => {
       // eslint-disable-next-line no-await-in-loop
       await page.goto(`/traders/${traders[i]?.id}`);
       // eslint-disable-next-line no-await-in-loop
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // eslint-disable-next-line no-await-in-loop
       await page
@@ -142,7 +142,7 @@ test.describe("Plan Limits", () => {
 
     // 5. Try to follow 6th trader (should fail - exceeds Pro limit)
     await page.goto(`/traders/${traders[5]?.id}`);
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     await page
       .getByRole("button", { name: /follow/i })
@@ -212,7 +212,7 @@ test.describe("Plan Limits", () => {
       // eslint-disable-next-line no-await-in-loop
       await page.goto(`/traders/${trader.id}`);
       // eslint-disable-next-line no-await-in-loop
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // eslint-disable-next-line no-await-in-loop
       await page
@@ -238,7 +238,7 @@ test.describe("Plan Limits", () => {
     // 6. Verify Ultra user can see unlimited signals
     // Navigate to dashboard
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Ultra plan has activeSignalsLimit: 999 (unlimited)
     // Should see all signals without blur or upgrade prompts

@@ -53,6 +53,7 @@ Redirect vers /auth/goodbye
 ```
 
 **Problèmes** :
+
 - ❌ Pas de déconnexion automatique
 - ❌ Pas d'email de confirmation finale
 - ❌ Discord ID reste en base (`discordId` field)
@@ -74,6 +75,7 @@ Email envoyé
 ```
 
 **Problème** :
+
 - ❌ Email envoyé à CHAQUE signup
 - ❌ Pas de distinction "première connexion"
 - ❌ Si user se reconnecte avec OAuth, pas d'email
@@ -159,7 +161,7 @@ if (user.isFirstConnection) {
   await sendDiscordInviteEmail(user.email, user.name);
   await prisma.user.update({
     where: { id: user.id },
-    data: { isFirstConnection: false }
+    data: { isFirstConnection: false },
   });
 }
 
@@ -168,7 +170,7 @@ if (user.isFirstConnection) {
   await sendDiscordInviteEmail(user.email, user.name);
   await prisma.user.update({
     where: { id: user.id },
-    data: { isFirstConnection: false }
+    data: { isFirstConnection: false },
   });
 }
 ```
@@ -180,16 +182,16 @@ if (user.isFirstConnection) {
 Créer `/app/api/auth/complete-delete/route.ts` :
 
 ```typescript
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { removeUserFromDiscord } from '@/lib/discord/user-management';
-import { sendGoodbyeEmail } from '@/lib/mail/goodbye-email';
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { removeUserFromDiscord } from "@/lib/discord/user-management";
+import { sendGoodbyeEmail } from "@/lib/mail/goodbye-email";
 
 export const POST = auth.api.handler(async (req, ctx) => {
   const userId = ctx.user?.id;
 
   if (!userId) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // 1. Get user data before deletion
@@ -199,12 +201,12 @@ export const POST = auth.api.handler(async (req, ctx) => {
       email: true,
       name: true,
       discordId: true,
-      planName: true
-    }
+      planName: true,
+    },
   });
 
   if (!user) {
-    return Response.json({ error: 'User not found' }, { status: 404 });
+    return Response.json({ error: "User not found" }, { status: 404 });
   }
 
   // 2. Remove Discord access (if linked)
@@ -214,12 +216,12 @@ export const POST = auth.api.handler(async (req, ctx) => {
 
   // 3. Invalidate all sessions (logout)
   await prisma.session.deleteMany({
-    where: { userId }
+    where: { userId },
   });
 
   // 4. Delete user (cascade handles related data)
   await prisma.user.delete({
-    where: { id: userId }
+    where: { id: userId },
   });
 
   // 5. Send goodbye email
@@ -234,20 +236,22 @@ export const POST = auth.api.handler(async (req, ctx) => {
 Créer `/src/lib/discord/user-management.ts` :
 
 ```typescript
-import { discordBot } from './bot-client';
-import { logger } from '../logger';
-import { env } from '../env';
+import { discordBot } from "./bot-client";
+import { logger } from "../logger";
+import { env } from "../env";
 
 /**
  * Retirer un user du Discord complètement
  * - Retirer tous les rôles
  * - Optionnel: Kick du serveur
  */
-export async function removeUserFromDiscord(discordId: string): Promise<boolean> {
+export async function removeUserFromDiscord(
+  discordId: string,
+): Promise<boolean> {
   const client = discordBot.getClient();
 
   if (!client || !env.DISCORD_GUILD_ID) {
-    logger.warn('Discord bot not configured, skipping user removal');
+    logger.warn("Discord bot not configured, skipping user removal");
     return false;
   }
 
@@ -256,22 +260,23 @@ export async function removeUserFromDiscord(discordId: string): Promise<boolean>
     const member = await guild.members.fetch(discordId).catch(() => null);
 
     if (!member) {
-      logger.info(`Discord user ${discordId} not found in guild, already removed`);
+      logger.info(
+        `Discord user ${discordId} not found in guild, already removed`,
+      );
       return true;
     }
 
     // Option 1: Retirer tous les rôles (user reste dans le serveur mais sans accès)
     logger.info(`Removing all roles from Discord user ${discordId}...`);
-    await member.roles.set([], 'User account deleted from MyCryptoPilot');
+    await member.roles.set([], "User account deleted from MyCryptoPilot");
 
     // Option 2: Kick du serveur (plus radical)
     // await member.kick('User account deleted from MyCryptoPilot');
 
     logger.info(`✅ Discord access revoked for user ${discordId}`);
     return true;
-
   } catch (error) {
-    logger.error('Error removing user from Discord:', error);
+    logger.error("Error removing user from Discord:", error);
     return false;
   }
 }
@@ -282,11 +287,13 @@ export async function removeUserFromDiscord(discordId: string): Promise<boolean>
  */
 export async function revokePrivateChannelAccess(
   discordId: string,
-  traderId: string
+  traderId: string,
 ): Promise<boolean> {
   // TODO: Implémenter quand les channels privés par trader seront créés
   // Pour l'instant, les channels sont publics (FREE/PRO/ULTRA)
-  logger.info(`Private channel access revoked for ${discordId} from trader ${traderId}`);
+  logger.info(
+    `Private channel access revoked for ${discordId} from trader ${traderId}`,
+  );
   return true;
 }
 ```
@@ -323,8 +330,8 @@ export function GoodbyeEmail({ userName }: GoodbyeEmailProps) {
       </Text>
 
       <Text className="text-base text-gray-700">
-        If you had a Discord account linked, your access to premium channels
-        has been revoked.
+        If you had a Discord account linked, your access to premium channels has
+        been revoked.
       </Text>
 
       <Text className="text-base text-gray-700">
@@ -351,32 +358,32 @@ export default GoodbyeEmail;
 Créer `/src/lib/mail/goodbye-email.ts` :
 
 ```typescript
-import { resend } from './resend';
-import { env } from '../env';
-import GoodbyeEmail from '@email/goodbye';
-import { logger } from '../logger';
+import { resend } from "./resend";
+import { env } from "../env";
+import GoodbyeEmail from "@email/goodbye";
+import { logger } from "../logger";
 
 export async function sendGoodbyeEmail(
   userEmail: string,
-  userName: string
+  userName: string,
 ): Promise<boolean> {
   try {
     const { error } = await resend.emails.send({
       from: env.EMAIL_FROM,
       to: userEmail,
-      subject: 'Your account has been deleted - MyCryptoPilot',
-      react: GoodbyeEmail({ userName: userName || userEmail.split('@')[0] })
+      subject: "Your account has been deleted - MyCryptoPilot",
+      react: GoodbyeEmail({ userName: userName || userEmail.split("@")[0] }),
     });
 
     if (error) {
-      logger.error('Error sending goodbye email:', error);
+      logger.error("Error sending goodbye email:", error);
       return false;
     }
 
     logger.info(`✅ Goodbye email sent to ${userEmail}`);
     return true;
   } catch (error) {
-    logger.error('Exception in sendGoodbyeEmail:', error);
+    logger.error("Exception in sendGoodbyeEmail:", error);
     return false;
   }
 }
@@ -531,12 +538,14 @@ deleteUser: {
 ### Discord Bot Permissions Required
 
 Pour `removeUserFromDiscord()` :
+
 - `MANAGE_ROLES` : retirer les rôles
 - `KICK_MEMBERS` : si on veut kick (optionnel)
 
 ### Prisma Cascade
 
 Les relations suivantes ont déjà `onDelete: Cascade` :
+
 - `Session` → `User`
 - `Account` → `User`
 - `TraderProfile` → `User`

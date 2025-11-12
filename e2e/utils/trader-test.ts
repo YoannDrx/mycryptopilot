@@ -67,14 +67,10 @@ export async function createTestTrader(options: {
 
   // Get user from database (with retry to handle DB transaction timing)
   const user = await retry(
-    async () => {
-      // Force Prisma to refresh its connection to avoid cache issues
-      await prisma.$disconnect();
-      await prisma.$connect();
-      return prisma.user.findUniqueOrThrow({
+    async () =>
+      prisma.user.findUniqueOrThrow({
         where: { email: userData.email },
-      });
-    },
+      }),
     {
       maxAttempts: 5,
       delayMs: 1000,
