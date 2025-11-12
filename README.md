@@ -61,7 +61,7 @@ pnpm dev
 | `pnpm test`                             | Tests Vitest (unitaires/intégration).                      |
 | `pnpm test:ci`                          | Vitest en mode CI (utilisé dans GitHub Actions).           |
 | `pnpm test:e2e`                         | Playwright en local (requires `scripts/setup-test-db.sh`). |
-| `pnpm test:e2e:ci`                      | Pipeline complet (reset DB + Playwright headless).         |
+| `pnpm test:e2e:ci`                      | Pipeline complet (reset DB + Playwright headless). `--reuse-db`/`--reuse-server` pour accélérer. |
 | `./scripts/dev-tools/check-test-env.sh` | Diagnostic (Postgres, Prisma, Playwright, pnpm).           |
 | `./scripts/dev-tools/test-*.ts`         | Scripts ciblés (checkout, RPC, crypto addresses, etc.).    |
 

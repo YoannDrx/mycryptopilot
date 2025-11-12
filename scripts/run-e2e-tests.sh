@@ -6,7 +6,7 @@
 # Ce script automatise le setup et l'exécution des tests E2E Playwright
 #
 # Usage:
-#   ./scripts/run-e2e-tests.sh
+#   ./scripts/run-e2e-tests.sh [--reuse-db] [--reuse-server] [playwright-args...]
 #   ou: pnpm test:e2e:ci
 #
 # Ce script va:
@@ -17,6 +17,36 @@
 # ==============================================================================
 
 set -e  # Exit on error
+
+# ------------------------------------------------------------------------------
+# CLI flags
+# ------------------------------------------------------------------------------
+SKIP_DB_SETUP=${SKIP_DB_SETUP:-false}
+SKIP_SERVER_CLEANUP=${SKIP_SERVER_CLEANUP:-false}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --reuse-db)
+      SKIP_DB_SETUP=true
+      shift
+      ;;
+    --reuse-server)
+      SKIP_SERVER_CLEANUP=true
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      # Unknown flag -> stop parsing and let Playwright handle it
+      break
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 # Colors for output
 RED='\033[0;31m'
@@ -46,13 +76,22 @@ if [[ -n "${PLAYWRIGHT_TEST_BASE_URL:-}" ]]; then
   USE_EXTERNAL_SERVER=true
 fi
 
+if [[ "$USE_EXTERNAL_SERVER" == true && "$SKIP_DB_SETUP" == false ]]; then
+  SKIP_DB_SETUP=true
+  echo -e "${GREEN}   ℹ️  Serveur externe détecté → DB conservée (utilisez --reuse-db=false pour forcer le reset)\n${NC}"
+fi
+
 # ------------------------------------------------------------------------------
 # Step 1: Cleanup existing Next.js servers (unless external server is provided)
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🧹 Étape 1/4 : Nettoyage des serveurs Next.js existants...\n${NC}"
 
-if [[ "$USE_EXTERNAL_SERVER" == true ]]; then
-  echo -e "${GREEN}   ℹ️  Serveur externe détecté (${PLAYWRIGHT_TEST_BASE_URL}), nettoyage ignoré\n${NC}"
+if [[ "$USE_EXTERNAL_SERVER" == true || "$SKIP_SERVER_CLEANUP" == true ]]; then
+  if [[ "$SKIP_SERVER_CLEANUP" == true && "$USE_EXTERNAL_SERVER" != true ]]; then
+    echo -e "${GREEN}   ℹ️  Option --reuse-server activée, nettoyage ignoré\n${NC}"
+  else
+    echo -e "${GREEN}   ℹ️  Serveur externe détecté (${PLAYWRIGHT_TEST_BASE_URL}), nettoyage ignoré\n${NC}"
+  fi
 else
   # Kill all next-server processes
   if pkill -f "next-server" 2>/dev/null; then
@@ -70,8 +109,8 @@ fi
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🔓 Étape 2/4 : Libération du port 3000...\n${NC}"
 
-if [[ "$USE_EXTERNAL_SERVER" == true ]]; then
-  echo -e "${GREEN}   ℹ️  Port 3000 géré par le serveur externe, aucune action\n${NC}"
+if [[ "$USE_EXTERNAL_SERVER" == true || "$SKIP_SERVER_CLEANUP" == true ]]; then
+  echo -e "${GREEN}   ℹ️  Port 3000 conservé (serveur externe ou --reuse-server)\n${NC}"
 else
   # Kill any process using port 3000
   if lsof -ti:3000 >/dev/null 2>&1; then
@@ -91,13 +130,17 @@ fi
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🗄️  Étape 3/4 : Configuration de la base de données de test...\n${NC}"
 
-# Run the test database setup script with NODE_ENV=test
-# This ensures .env.test.local is loaded (overrides .env.local)
-if NODE_ENV=test ./scripts/setup-test-db.sh; then
-  echo -e "${GREEN}   ✅ Base de données de test prête\n${NC}"
+if [[ "$SKIP_DB_SETUP" == true ]]; then
+  echo -e "${GREEN}   ℹ️  Option --reuse-db activée, réutilisation de la base existante\n${NC}"
 else
-  echo -e "${RED}   ❌ Échec du setup de la base de données\n${NC}"
-  exit 1
+  # Run the test database setup script with NODE_ENV=test
+  # This ensures .env.test.local is loaded (overrides .env.local)
+  if NODE_ENV=test ./scripts/setup-test-db.sh; then
+    echo -e "${GREEN}   ✅ Base de données de test prête\n${NC}"
+  else
+    echo -e "${RED}   ❌ Échec du setup de la base de données\n${NC}"
+    exit 1
+  fi
 fi
 
 # ------------------------------------------------------------------------------
@@ -134,7 +177,13 @@ fi
 #   ./scripts/run-e2e-tests.sh e2e/follow-unfollow.spec.ts:7  # Run specific test
 #   ./scripts/run-e2e-tests.sh e2e/follow-unfollow.spec.ts     # Run specific file
 PLAYWRIGHT_HEADLESS="${HEADLESS:-true}"
-if NODE_ENV=test HEADLESS="$PLAYWRIGHT_HEADLESS" npx playwright test "$@"; then
+PLAYWRIGHT_ARGS=("$@")
+
+if [[ -n "${PLAYWRIGHT_SHARD_INDEX:-}" && -n "${PLAYWRIGHT_SHARD_TOTAL:-}" ]]; then
+  PLAYWRIGHT_ARGS+=("--shard=${PLAYWRIGHT_SHARD_INDEX}/${PLAYWRIGHT_SHARD_TOTAL}")
+fi
+
+if NODE_ENV=test HEADLESS="$PLAYWRIGHT_HEADLESS" npx playwright test "${PLAYWRIGHT_ARGS[@]}"; then
   echo -e "\n${GREEN}==============================================================================\n${NC}"
   echo -e "${GREEN}✅ Tests E2E terminés avec succès !\n${NC}"
   echo -e "${GREEN}==============================================================================\n${NC}"
