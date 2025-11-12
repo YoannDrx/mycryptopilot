@@ -4,6 +4,7 @@ import { createTestAccount } from "./utils/auth-test";
 import {
   createTestTraderDirectly,
   createTestSignal,
+  createTestSignalsBatch,
 } from "./utils/trader-test";
 
 test.describe("User Dashboard", () => {
@@ -198,15 +199,11 @@ test.describe("User Dashboard", () => {
       },
     });
 
-    // Create 10 signals (sequentially to avoid timestamp conflicts)
-    for (let i = 0; i < 10; i++) {
-      // eslint-disable-next-line no-await-in-loop
-      await createTestSignal({
-        traderId: trader.id,
-        symbol: `ASSET${i + 1}-USDT`,
-        rationale: `Signal ${i + 1}`,
-      });
-    }
+    await createTestSignalsBatch({
+      traderId: trader.id,
+      count: 10,
+      symbolPrefix: "ASSET",
+    });
 
     // Verify 10 signals were created in database
     const dbSignals = await prisma.signal.count({
