@@ -189,16 +189,20 @@ npx tsx scripts/start-discord-bot.ts
 
 ---
 
-### `deploy-railway.sh` (4K) ✅ DEPLOYMENT
+### `start-fly-worker.ts` (4.5K) ✅ PROD + LOCAL
 
-**Description**: Déploie le bot Discord sur Railway (login CLI + `railway up`).
+**Description**: Entrypoint unique pour le worker Fly.io (cron jobs + payment watcher + bot Discord).
 **Usage**:
 
 ```bash
-./scripts/deploy-railway.sh
+# Local (charge .env/.env.local)
+pnpm worker
+
+# Production (via Fly)
+fly deploy --config fly.worker.toml --ha=false
 ```
 
-**Notes**: Vérifie la présence de Railway CLI, invite au login si besoin, rappelle les variables à configurer (`DISCORD_BOT_*`, `DATABASE_URL`, etc.).
+**Notes**: Programme les jobs (sync exchanges, expiration reminders, tier check, active invitees), lance le watcher on-chain et démarre le bot Discord si `DISCORD_BOT_ENABLED=true`.
 
 ---
 

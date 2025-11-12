@@ -1,0 +1,12 @@
+.git
+.github
+.next
+node_modules
+pnpm-lock.yaml.save
+*.log
+playwright-report
+playwright-results
+coverage
+dist
+tmp
+*.local

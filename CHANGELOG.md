@@ -190,7 +190,7 @@ npx prisma migrate status
   - Signal creation form: 515 lines (`create-signal-form.tsx`)
   - TradingCard component: 170 lines
   - Discord webhook integration: Automatic signal posting to #signals channel
-  - Discord Bot: Deployed 24/7 on Railway with 5 slash commands
+  - Discord Bot: Deployed 24/7 (aujourd'hui sur Fly worker) avec 5 slash commands
 - 🔴 **CRITICAL BLOCKER**: 5 Prisma migrations exist but NOT applied to database
 - ⚠️ **4 issues reopened** (#4, #5, #13, #17) - closed prematurely, not actually complete
 
@@ -235,7 +235,7 @@ npx prisma migrate status   # Verify all applied
 - 5 slash commands (/help, /status, /upgrade, /signals, /follow)
 - Automatic role assignment (Free, Pro, Ultra, Verified, Admin)
 - DM notifications for signals
-- Deployed on Railway 24/7
+- Deployed 24/7 (migré depuis Railway vers Fly worker)
 
 ### 📊 **Updated Progress**
 
