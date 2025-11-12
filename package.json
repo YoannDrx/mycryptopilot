@@ -20,7 +20,7 @@
     "ts": "tsc --noEmit",
     "vercel-build": "echo '🔧 Generating Prisma client...' && prisma generate && echo '🗄️  Deploying migrations...' && prisma migrate deploy && echo '✅ Migrations deployed!' && echo '🏗️  Building Next.js app...' && pnpm build",
     "test": "vitest",
-    "test:e2e": "NODE_ENV=test HEADLESS=false playwright test --ui",
+    "test:e2e": "HEADLESS=false ./scripts/run-e2e-tests.sh --ui",
     "test:ci": "vitest run",
     "test:e2e:ci": "./scripts/run-e2e-tests.sh",
     "lint:ci": "eslint .",
