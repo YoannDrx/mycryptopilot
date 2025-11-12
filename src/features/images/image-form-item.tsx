@@ -39,8 +39,10 @@ export const ImageFormItem = ({
           alt=""
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity">
-          <p className="text-sm text-muted-foreground">Click or drag to upload</p>
+        <div className="absolute inset-0 flex items-center justify-center transition-opacity group-hover:opacity-0">
+          <p className="text-muted-foreground text-sm">
+            Click or drag to upload
+          </p>
         </div>
       )}
       <UseImageUpload onChange={onChange} hasImage={!!hasImage} />
@@ -49,7 +51,7 @@ export const ImageFormItem = ({
           type="button"
           variant="destructive"
           size="icon"
-          className="absolute top-2 right-2 z-20 size-8 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-2 right-2 z-20 size-8 opacity-0 transition-opacity group-hover:opacity-100"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -80,7 +82,12 @@ const Overlay = (props: PropsWithChildren<{ isLoading?: boolean }>) => {
   );
 };
 
-const UseImageUpload = ({ onChange }: { onChange: (url: string) => void; hasImage: boolean }) => {
+const UseImageUpload = ({
+  onChange,
+}: {
+  onChange: (url: string) => void;
+  hasImage: boolean;
+}) => {
   const uploadImageMutation = useMutation({
     mutationFn: async (file: File) => {
       // Convert File to base64 on client side (FileReader is browser-only API)

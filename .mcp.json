@@ -3,6 +3,14 @@
     "shadcn": {
       "command": "npx",
       "args": ["-y", "mcp-remote", "https://www.shadcn.io/api/mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
     }
   }
 }

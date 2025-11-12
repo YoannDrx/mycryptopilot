@@ -17,6 +17,7 @@ import { CheckCircle2, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
 import { parseAsString, parseAsStringLiteral, useQueryStates } from "nuqs";
 import { MarketplaceFilters } from "./marketplace-filters";
+import { TradersInfiniteScroll } from "./traders-infinite-scroll";
 import {
   LayoutHeader,
   LayoutTitle,
@@ -60,12 +61,12 @@ export function TradersListClient({
   initialData,
   userId,
 }: TradersListClientProps) {
-  // URL state with nuqs (shallow: true = no navigation)
+  // URL state with nuqs (shallow: false to trigger re-fetch)
   const [filters] = useQueryStates(marketplaceSearchParams, {
-    shallow: true,
+    shallow: false,
   });
 
-  // Fetch traders with TanStack Query
+  // Fetch traders with TanStack Query (only first page)
   const { data, isFetching } = useQuery({
     queryKey: ["traders", filters],
     queryFn: async () => {
@@ -188,7 +189,19 @@ export function TradersListClient({
             </CardContent>
           </Card>
         ) : (
-          <TradersList traders={traders} userId={userId} />
+          <TradersInfiniteScroll
+            initialTraders={traders}
+            initialCursor={data.nextCursor ?? null}
+            hasMore={data.hasNextPage}
+            filters={{
+              search: filters.search || undefined,
+              verified: filters.filter === "verified" ? true : undefined,
+              sort: filters.sort,
+            }}
+            renderTraders={(tradersToRender) => (
+              <TradersList traders={tradersToRender} userId={userId} />
+            )}
+          />
         )}
 
         {/* CTA Section */}
@@ -242,7 +255,7 @@ function TradersList({ traders, userId }: TradersListProps) {
       className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
     >
       {traders.map((trader) => (
-        <TraderCard key={trader.id} trader={trader} userId={userId} />
+        <TraderCard key={trader.userId} trader={trader} userId={userId} />
       ))}
     </div>
   );

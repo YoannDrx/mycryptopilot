@@ -17,14 +17,9 @@ const nextConfig: NextConfig = {
     // All external images are automatically proxied through /api/image-proxy
     remotePatterns: [],
   },
-  // Disable Next.js dev overlay in test environment
-  // Prevents overlay from blocking Playwright interactions
-  ...(process.env.NODE_ENV === "test" && {
-    devIndicators: {
-      buildActivity: false,
-      buildActivityPosition: "bottom-right",
-    },
-  }),
+  // Disable Next.js dev indicators in test environment
+  // Prevents overlay portal from blocking Playwright click interactions
+  devIndicators: process.env.NODE_ENV === "test" ? false : undefined,
 };
 
 export default nextConfig;

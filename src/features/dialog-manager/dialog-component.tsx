@@ -83,6 +83,7 @@ export function DialogComponent(props: { dialog: Dialog }) {
               to confirm this action.
             </Typography>
             <Input
+              data-testid="dialog-confirm-input"
               autoFocus
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}

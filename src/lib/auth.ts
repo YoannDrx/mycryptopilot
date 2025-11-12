@@ -294,7 +294,13 @@ export const auth = betterAuth({
     storeIPAddress: true, // Store user IP addresses in sessions
     useSecureCookies: env.NODE_ENV === "production",
   },
-  trustedOrigins: [getServerUrl()],
+  trustedOrigins: [
+    getServerUrl(),
+    // Support both www and non-www domains in production
+    ...(env.NODE_ENV === "production"
+      ? ["https://mycryptopilot.app", "https://www.mycryptopilot.app"]
+      : []),
+  ],
   trustProxy: true, // Required to read IP from X-Forwarded-For header (Vercel, proxies)
   emailAndPassword: {
     enabled: true,

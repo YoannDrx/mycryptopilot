@@ -308,6 +308,7 @@ export const CheckoutForm = ({
                       src={qrCodes.base}
                       alt="Base USDC Address QR Code"
                       className="rounded-lg border"
+                      data-testid="base-qr"
                     />
                   </div>
                 )}
@@ -316,7 +317,10 @@ export const CheckoutForm = ({
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-medium">Send USDC to:</span>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
+                    <code
+                      className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all"
+                      data-testid="base-address"
+                    >
                       {addresses.base.address}
                     </code>
                     <Button
@@ -332,7 +336,10 @@ export const CheckoutForm = ({
                 </div>
 
                 {/* Amount */}
-                <div className="bg-muted/50 rounded-lg border p-4">
+                <div
+                  className="bg-muted/50 rounded-lg border p-4"
+                  data-testid="base-amount"
+                >
                   <p className="text-sm font-medium">
                     <span className="font-semibold">Amount:</span> $
                     {planData.priceUSD} USDC
@@ -379,6 +386,7 @@ export const CheckoutForm = ({
                       src={qrCodes.tron}
                       alt="Tron USDT Address QR Code"
                       className="rounded-lg border"
+                      data-testid="tron-qr"
                     />
                   </div>
                 )}
@@ -389,7 +397,10 @@ export const CheckoutForm = ({
                     Send USDT (TRC-20) to:
                   </span>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all">
+                    <code
+                      className="flex-1 rounded-md border-2 px-3 py-2 font-mono text-xs break-all"
+                      data-testid="tron-address"
+                    >
                       {addresses.tron.address}
                     </code>
                     <Button
@@ -405,7 +416,10 @@ export const CheckoutForm = ({
                 </div>
 
                 {/* Amount */}
-                <div className="bg-muted/50 rounded-lg border p-4">
+                <div
+                  className="bg-muted/50 rounded-lg border p-4"
+                  data-testid="tron-amount"
+                >
                   <p className="text-sm font-medium">
                     <span className="font-semibold">Amount:</span> $
                     {planData.priceUSD} USDT

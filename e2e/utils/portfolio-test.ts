@@ -100,7 +100,7 @@ export async function createMockExchangeTrades(options: {
 
     trades.push({
       connectionId: options.connectionId,
-      externalOrderId: `${faker.number.int({ min: 1000000, max: 9999999 })}`,
+      externalOrderId: `${options.connectionId}-${Date.now()}-${i}-${faker.string.alphanumeric(8)}`,
       symbol,
       side,
       type: "MARKET" as const,

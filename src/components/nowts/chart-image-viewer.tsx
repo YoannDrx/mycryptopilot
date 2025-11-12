@@ -12,7 +12,11 @@ type ChartImageViewerProps = {
   className?: string;
 };
 
-export const ChartImageViewer = ({ src, alt, className }: ChartImageViewerProps) => {
+export const ChartImageViewer = ({
+  src,
+  alt,
+  className,
+}: ChartImageViewerProps) => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -115,8 +119,8 @@ export const ChartImageViewer = ({ src, alt, className }: ChartImageViewerProps)
       {/* Chart Image - clickable to zoom */}
       <div
         className={cn(
-          "mb-6 bg-gradient-to-br from-slate-900/50 to-transparent border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer group relative",
-          className
+          "group relative mb-6 cursor-pointer overflow-hidden rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-900/50 to-transparent",
+          className,
         )}
         onClick={(e) => {
           e.stopPropagation();
@@ -127,69 +131,73 @@ export const ChartImageViewer = ({ src, alt, className }: ChartImageViewerProps)
         <img
           src={src}
           alt={alt}
-          className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center pointer-events-none">
-          <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/20">
+          <span className="font-medium text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             Click to zoom
           </span>
         </div>
       </div>
 
       {/* Zoomed Modal - Portal to body */}
-      {isMounted && isZoomed && createPortal(
-        <div
-          className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex items-center justify-center p-8"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsZoomed(false);
-          }}
-        >
+      {isMounted &&
+        isZoomed &&
+        createPortal(
           <div
-            className="relative w-full h-full flex items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-8 backdrop-blur-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsZoomed(false);
+            }}
           >
-            {/* Controls Bar */}
-            <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 bg-gradient-to-b from-black/50 to-transparent">
-              <h3 className="text-white text-lg font-medium">Market Chart Analysis</h3>
-              <div className="flex items-center gap-2">
-                {/* Download Button */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    void handleDownload();
-                  }}
-                >
-                  <Download className="size-5" />
-                </Button>
-                {/* Close Button */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:bg-white/10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsZoomed(false);
-                  }}
-                >
-                  <X className="size-5" />
-                </Button>
+            <div
+              className="relative flex h-full w-full items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Controls Bar */}
+              <div className="absolute top-0 right-0 left-0 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent p-4">
+                <h3 className="text-lg font-medium text-white">
+                  Market Chart Analysis
+                </h3>
+                <div className="flex items-center gap-2">
+                  {/* Download Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void handleDownload();
+                    }}
+                  >
+                    <Download className="size-5" />
+                  </Button>
+                  {/* Close Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsZoomed(false);
+                    }}
+                  >
+                    <X className="size-5" />
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Zoomed Image */}
-            <img
-              src={src}
-              alt={alt}
-              className="max-w-full max-h-full object-contain rounded-xl border-2 border-violet-500/50 shadow-2xl shadow-violet-500/30"
-            />
-          </div>
-        </div>,
-        document.body
-      )}
+              {/* Zoomed Image */}
+              <img
+                src={src}
+                alt={alt}
+                className="max-h-full max-w-full rounded-xl border-2 border-violet-500/50 object-contain shadow-2xl shadow-violet-500/30"
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
 
       {/* Hidden canvas for watermark generation */}
       <canvas ref={canvasRef} className="hidden" />

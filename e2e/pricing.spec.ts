@@ -82,17 +82,10 @@ test.describe("Pricing Page", () => {
     await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
-    // 3. Click "Subscribe Now" button for Pro plan
-    // Find Pro plan card by searching for $49 price, then get its Subscribe button
-    const subscribeButton = page
-      .getByText(/\$49/)
-      .locator("..")
-      .locator("..")
-      .locator("..")
-      .getByRole("link", { name: /subscribe now/i });
-    await expect(subscribeButton).toBeVisible();
-
-    await subscribeButton.click();
+    // 3. Click "Subscribe Now" button for Pro plan via data-testid
+    const proSubscribeButton = page.getByTestId("subscribe-pro");
+    await expect(proSubscribeButton).toBeVisible();
+    await proSubscribeButton.click();
 
     // 4. Verify redirect to checkout page
     await page.waitForURL(/\/checkout\/pro/, {
@@ -110,14 +103,8 @@ test.describe("Pricing Page", () => {
     await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
-    const ultraSubscribeButton = page
-      .getByText(/\$99/)
-      .locator("..")
-      .locator("..")
-      .locator("..")
-      .getByRole("link", { name: /subscribe now/i });
+    const ultraSubscribeButton = page.getByTestId("subscribe-ultra");
     await expect(ultraSubscribeButton).toBeVisible();
-
     await ultraSubscribeButton.click();
 
     await page.waitForURL(/\/checkout\/ultra/, {
@@ -133,12 +120,7 @@ test.describe("Pricing Page", () => {
     await page.goto("/pricing");
     await page.waitForLoadState("networkidle");
 
-    const freeCard = page.locator("div").filter({ hasText: /free/i }).first();
-    await expect(freeCard).toBeVisible();
-
-    const getStartedButton = freeCard.getByRole("link", {
-      name: /get started/i,
-    });
+    const getStartedButton = page.getByTestId("subscribe-free");
     await expect(getStartedButton).toBeVisible();
 
     await getStartedButton.click();

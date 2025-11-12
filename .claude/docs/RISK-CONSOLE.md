@@ -26,17 +26,18 @@ La **Risk Console** est l'outil central de gestion du risque de MyCryptoPilot. E
 **Principe**: Ne jamais risquer plus de 2% de son capital sur un seul trade.
 
 **Pourquoi c'est critique**:
+
 - Avec 2% de risque par trade, vous pouvez survivre à 50 pertes consécutives
 - Avec 10% de risque par trade, vous explosez après 10 pertes
 - Protection contre le "revenge trading" et l'over-leverage
 
 ### Disponibilité
 
-| Plan  | Accès                                                  |
-|-------|--------------------------------------------------------|
-| FREE  | ❌ Démo sur landing page uniquement (pas de login)    |
-| PRO   | ✅ Accès complet authentifié + historique + presets   |
-| ULTRA | ✅ Accès complet + capital live depuis exchanges      |
+| Plan  | Accès                                               |
+| ----- | --------------------------------------------------- |
+| FREE  | ❌ Démo sur landing page uniquement (pas de login)  |
+| PRO   | ✅ Accès complet authentifié + historique + presets |
+| ULTRA | ✅ Accès complet + capital live depuis exchanges    |
 
 **Important**: Cette distinction est maintenant cohérente dans tout le codebase (FAQ, pricing, hero).
 
@@ -72,12 +73,12 @@ src/
 
 ```typescript
 type RiskConsoleCalculatorProps = {
-  compact?: boolean;              // Mode compact pour intégration
-  showHistory?: boolean;          // Afficher l'historique
-  defaultCapital?: number;        // Capital par défaut
+  compact?: boolean; // Mode compact pour intégration
+  showHistory?: boolean; // Afficher l'historique
+  defaultCapital?: number; // Capital par défaut
   onResultChange?: (result: CalculationResult) => void; // Callback results
-  className?: string;             // Styling
-  heading?: React.ReactNode;      // Custom header
+  className?: string; // Styling
+  heading?: React.ReactNode; // Custom header
 };
 
 type CalculationResult = {
@@ -98,6 +99,7 @@ type CalculationResult = {
 ```
 
 **Features implémentées**:
+
 - ✅ 2% rule position sizing
 - ✅ Multiple Take Profit targets (jusqu'à 4)
 - ✅ Allocation weighted des TPs (25%, 33%, 50%, 100%)
@@ -116,6 +118,7 @@ type CalculationResult = {
 **Fichier**: `src/features/landing/risk-console-demo.tsx` (332 lignes)
 
 **Features**:
+
 - Accessible sans login (démo publique)
 - Calcul position size en temps réel
 - Risk/Reward ratio avec validation LONG/SHORT
@@ -123,6 +126,7 @@ type CalculationResult = {
 - Explications intégrées
 
 **Validation R/R Ratio**:
+
 ```typescript
 // Détection position type
 const isLongPosition = stopLossNum < entryPriceNum;
@@ -136,10 +140,10 @@ if (isLongPosition) {
 }
 
 // Badge selon R/R ratio
-if (rrRatio >= 3) return "Excellent";  // Vert
-if (rrRatio >= 2) return "Good";       // Jaune
+if (rrRatio >= 3) return "Excellent"; // Vert
+if (rrRatio >= 2) return "Good"; // Jaune
 if (rrRatio >= 1) return "Acceptable"; // Orange
-return "Poor";                         // Rouge
+return "Poor"; // Rouge
 ```
 
 ### ✅ Page Authentifiée
@@ -147,24 +151,26 @@ return "Poor";                         // Rouge
 **Fichier**: `app/orgs/[orgSlug]/(trading)/risk-console/page.tsx`
 
 **Flow**:
+
 1. Server component récupère le plan de l'user
 2. Check `planLimits.riskConsole`
 3. Si `false` (FREE) → Affiche `<RiskConsolePaywall />`
 4. Si `true` (PRO/ULTRA) → Affiche `<RiskConsolePageContent />`
 
 **Paywall**:
+
 ```tsx
 export function RiskConsolePaywall() {
   return (
     <Card>
       <CardHeader>
-        <Lock className="size-12 text-muted-foreground" />
+        <Lock className="text-muted-foreground size-12" />
         <CardTitle>Risk Console - Pro/Ultra Feature</CardTitle>
       </CardHeader>
       <CardContent>
         <p>
-          Unlock unlimited access to the Risk Console with calculation
-          history, custom presets, and live capital integration.
+          Unlock unlimited access to the Risk Console with calculation history,
+          custom presets, and live capital integration.
         </p>
         <Button asChild>
           <Link href="/pricing">Upgrade to Pro</Link>
@@ -178,6 +184,7 @@ export function RiskConsolePaywall() {
 ### ✅ Navigation Integration
 
 **Fichiers modifiés**:
+
 - `app/orgs/[orgSlug]/(trading)/_navigation/trading-links.ts`
 - `app/orgs/[orgSlug]/(navigation)/_navigation/org-navigation.links.ts`
 
@@ -200,6 +207,7 @@ riskAmount = capital × (riskPercent / 100)
 ```
 
 **Exemple**:
+
 - Capital: $10,000
 - Risk: 2%
 - **Risk Amount**: $10,000 × 0.02 = **$200**
@@ -212,6 +220,7 @@ positionSize = riskAmount / (stopLossDistance / entryPrice)
 ```
 
 **Exemple LONG**:
+
 - Entry: $42,000
 - Stop Loss: $41,000
 - Distance: $1,000 (2.38% de $42,000)
@@ -219,6 +228,7 @@ positionSize = riskAmount / (stopLossDistance / entryPrice)
 - **Position Size**: $200 / 0.0238 = **$8,400**
 
 **Exemple SHORT**:
+
 - Entry: $42,000
 - Stop Loss: $43,000
 - Distance: $1,000 (2.38% de $42,000)
@@ -228,10 +238,11 @@ positionSize = riskAmount / (stopLossDistance / entryPrice)
 ### 3. Contracts (Quantité à Acheter)
 
 ```typescript
-contracts = positionSize / entryPrice
+contracts = positionSize / entryPrice;
 ```
 
 **Exemple**:
+
 - Position Size: $8,400
 - Entry: $42,000
 - **Contracts**: $8,400 / $42,000 = **0.2 BTC**
@@ -240,23 +251,25 @@ contracts = positionSize / entryPrice
 
 ```typescript
 // LONG
-potentialProfit = takeProfit - entryPrice
-potentialLoss = entryPrice - stopLoss
-rrRatio = potentialProfit / potentialLoss
+potentialProfit = takeProfit - entryPrice;
+potentialLoss = entryPrice - stopLoss;
+rrRatio = potentialProfit / potentialLoss;
 
 // SHORT
-potentialProfit = entryPrice - takeProfit
-potentialLoss = stopLoss - entryPrice
-rrRatio = potentialProfit / potentialLoss
+potentialProfit = entryPrice - takeProfit;
+potentialLoss = stopLoss - entryPrice;
+rrRatio = potentialProfit / potentialLoss;
 ```
 
 **Exemple LONG**:
+
 - Entry: $42,000
 - TP: $45,000 → Profit: $3,000
 - SL: $41,000 → Loss: $1,000
 - **R/R Ratio**: 3,000 / 1,000 = **1:3.00** (Excellent ✅)
 
 **Exemple SHORT**:
+
 - Entry: $42,000
 - TP: $39,000 → Profit: $3,000
 - SL: $43,000 → Loss: $1,000
@@ -287,6 +300,7 @@ for (const tp of takeProfits) {
 ```
 
 **Exemple**:
+
 - Entry: $42,000, SL: $41,000
 - TP1 (25%): $44,000 → R/R = 2:1
 - TP2 (50%): $46,000 → R/R = 4:1
@@ -323,7 +337,7 @@ type ExchangeBalance = {
 };
 
 export async function getUserExchangeBalances(
-  userId: string
+  userId: string,
 ): Promise<ExchangeBalance[]> {
   const connections = await prisma.userExchangeConnection.findMany({
     where: { userId, isActive: true },
@@ -345,12 +359,12 @@ export async function getUserExchangeBalances(
       const apiKey = decryptApiKey(
         conn.encryptedApiKey,
         conn.keyIv,
-        conn.keyTag
+        conn.keyTag,
       );
       const secretKey = decryptApiKey(
         conn.encryptedSecretKey,
         conn.keyIv,
-        conn.keyTag
+        conn.keyTag,
       );
 
       // Fetch balance from exchange
@@ -404,7 +418,9 @@ const [exchangeBalances, setExchangeBalances] = useState<ExchangeBalance[]>([]);
 // Fetch balances on mount
 useEffect(() => {
   async function fetchBalances() {
-    const balances = await fetch("/api/exchange/balances").then(r => r.json());
+    const balances = await fetch("/api/exchange/balances").then((r) =>
+      r.json(),
+    );
     setExchangeBalances(balances);
   }
   fetchBalances();
@@ -413,22 +429,25 @@ useEffect(() => {
 // UI
 <div className="space-y-2">
   <Label>Capital Source</Label>
-  <Select value={capitalSource} onValueChange={(value) => {
-    setCapitalSource(value);
-    if (value !== "manual") {
-      // Auto-fill from exchange
-      const balance = exchangeBalances.find(b => b.exchange === value);
-      if (balance) {
-        setCapital(balance.available.toString());
+  <Select
+    value={capitalSource}
+    onValueChange={(value) => {
+      setCapitalSource(value);
+      if (value !== "manual") {
+        // Auto-fill from exchange
+        const balance = exchangeBalances.find((b) => b.exchange === value);
+        if (balance) {
+          setCapital(balance.available.toString());
+        }
       }
-    }
-  }}>
+    }}
+  >
     <SelectTrigger>
       <SelectValue />
     </SelectTrigger>
     <SelectContent>
       <SelectItem value="manual">Manual Input</SelectItem>
-      {exchangeBalances.map(balance => (
+      {exchangeBalances.map((balance) => (
         <SelectItem key={balance.exchange} value={balance.exchange}>
           {balance.exchange} - ${balance.available.toFixed(2)}
           {balance.isActive && <Badge className="ml-2">🟢 Live</Badge>}
@@ -436,7 +455,7 @@ useEffect(() => {
       ))}
     </SelectContent>
   </Select>
-</div>
+</div>;
 ```
 
 #### 1.3. API Route
@@ -509,6 +528,7 @@ model User {
 ```
 
 **Migration**:
+
 ```bash
 npx prisma migrate dev --name add-risk-calculation-history
 npx prisma generate
@@ -535,7 +555,7 @@ const SaveRiskCalculationSchema = z.object({
     z.object({
       price: z.number().positive(),
       allocation: z.number().min(0).max(100),
-    })
+    }),
   ),
   riskAmount: z.number(),
   positionSize: z.number(),
@@ -550,7 +570,7 @@ const SaveRiskCalculationSchema = z.object({
 type SaveRiskCalculationType = z.infer<typeof SaveRiskCalculationSchema>;
 
 export async function saveRiskCalculationAction(
-  input: SaveRiskCalculationType
+  input: SaveRiskCalculationType,
 ) {
   const user = await getRequiredUser();
 
@@ -588,7 +608,7 @@ import type { RiskCalculation } from "@prisma/client";
 
 export async function getUserRiskCalculations(
   userId: string,
-  limit = 20
+  limit = 20,
 ): Promise<RiskCalculation[]> {
   return prisma.riskCalculation.findMany({
     where: { userId, isPreset: false },
@@ -598,7 +618,7 @@ export async function getUserRiskCalculations(
 }
 
 export async function getUserRiskPresets(
-  userId: string
+  userId: string,
 ): Promise<RiskCalculation[]> {
   return prisma.riskCalculation.findMany({
     where: { userId, isPreset: true },
@@ -622,7 +642,7 @@ export default async function RiskConsoleHistoryPage() {
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6">Risk Console History</h1>
+      <h1 className="mb-6 text-3xl font-bold">Risk Console History</h1>
       <RiskCalculationHistory calculations={calculations} />
     </div>
   );
@@ -637,7 +657,14 @@ export default async function RiskConsoleHistoryPage() {
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { RiskCalculation } from "@prisma/client";
 import { format } from "date-fns";
@@ -675,29 +702,38 @@ export function RiskCalculationHistory({ calculations }: Props) {
       <TableBody>
         {calculations.map((calc) => (
           <TableRow key={calc.id}>
+            <TableCell>{format(calc.createdAt, "MMM dd, HH:mm")}</TableCell>
+            <TableCell>{calc.symbol ?? "—"}</TableCell>
             <TableCell>
-              {format(calc.createdAt, "MMM dd, HH:mm")}
-            </TableCell>
-            <TableCell>
-              {calc.symbol ?? "—"}
-            </TableCell>
-            <TableCell>
-              <Badge variant={calc.positionType === "LONG" ? "default" : "destructive"}>
+              <Badge
+                variant={
+                  calc.positionType === "LONG" ? "default" : "destructive"
+                }
+              >
                 {calc.positionType}
               </Badge>
             </TableCell>
             <TableCell>${calc.capital.toFixed(2)}</TableCell>
             <TableCell>${calc.positionSize.toFixed(2)}</TableCell>
             <TableCell>
-              <Badge variant={
-                Number(calc.rrRatio) >= 3 ? "success" :
-                Number(calc.rrRatio) >= 2 ? "warning" : "default"
-              }>
+              <Badge
+                variant={
+                  Number(calc.rrRatio) >= 3
+                    ? "success"
+                    : Number(calc.rrRatio) >= 2
+                      ? "warning"
+                      : "default"
+                }
+              >
                 1:{calc.rrRatio.toFixed(2)}
               </Badge>
             </TableCell>
             <TableCell>
-              <Button size="sm" variant="outline" onClick={() => handleReload(calc)}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleReload(calc)}
+              >
                 Reload
               </Button>
             </TableCell>
@@ -744,7 +780,7 @@ const handleSave = async () => {
 // UI
 <Button onClick={handleSave} variant="outline" className="w-full">
   💾 Save to History
-</Button>
+</Button>;
 ```
 
 ---
@@ -816,7 +852,7 @@ export async function saveCustomPresetAction(input: {
       {/* Global presets */}
       <SelectGroup>
         <SelectLabel>Global Presets</SelectLabel>
-        {GLOBAL_PRESETS.map(preset => (
+        {GLOBAL_PRESETS.map((preset) => (
           <SelectItem key={preset.name} value={preset.name}>
             {preset.name}
           </SelectItem>
@@ -827,7 +863,7 @@ export async function saveCustomPresetAction(input: {
       {userPresets.length > 0 && (
         <SelectGroup>
           <SelectLabel>My Presets</SelectLabel>
-          {userPresets.map(preset => (
+          {userPresets.map((preset) => (
             <SelectItem key={preset.id} value={preset.id}>
               {preset.presetName}
             </SelectItem>
@@ -836,12 +872,14 @@ export async function saveCustomPresetAction(input: {
       )}
     </SelectContent>
   </Select>
-</div>
+</div>;
 
-{/* Save Custom Preset Button */}
+{
+  /* Save Custom Preset Button */
+}
 <Button onClick={() => setShowSavePresetDialog(true)}>
   ⭐ Save as Custom Preset
-</Button>
+</Button>;
 ```
 
 ---
@@ -859,36 +897,40 @@ export async function saveCustomPresetAction(input: {
 Ajouter section après les champs `entry`, `invalidation`, `takeProfits`:
 
 ```tsx
-{/* Risk Analysis Section */}
-{form.watch("entry") && form.watch("invalidation") && (
-  <div className="rounded-lg border p-4 space-y-4">
-    <h3 className="font-semibold flex items-center gap-2">
-      <Calculator className="size-5" />
-      Risk Analysis Helper
-    </h3>
+{
+  /* Risk Analysis Section */
+}
+{
+  form.watch("entry") && form.watch("invalidation") && (
+    <div className="space-y-4 rounded-lg border p-4">
+      <h3 className="flex items-center gap-2 font-semibold">
+        <Calculator className="size-5" />
+        Risk Analysis Helper
+      </h3>
 
-    <RiskConsoleCalculator
-      compact
-      defaultCapital={10000}
-      onResultChange={(result) => {
-        // Auto-populate form with calculated values
-        if (result.isValid) {
-          form.setValue("positionSizeUSD", result.positionSize);
-          form.setValue("rrRatio", result.rrRatio);
-        }
-      }}
-      // Pre-fill with signal data
-      entryPrice={form.watch("entry")}
-      stopLoss={form.watch("invalidation")}
-      takeProfits={form.watch("takeProfits")}
-    />
+      <RiskConsoleCalculator
+        compact
+        defaultCapital={10000}
+        onResultChange={(result) => {
+          // Auto-populate form with calculated values
+          if (result.isValid) {
+            form.setValue("positionSizeUSD", result.positionSize);
+            form.setValue("rrRatio", result.rrRatio);
+          }
+        }}
+        // Pre-fill with signal data
+        entryPrice={form.watch("entry")}
+        stopLoss={form.watch("invalidation")}
+        takeProfits={form.watch("takeProfits")}
+      />
 
-    <p className="text-sm text-muted-foreground">
-      This helper shows followers what position size they should use based
-      on the 2% rule. It doesn't affect your signal creation.
-    </p>
-  </div>
-)}
+      <p className="text-muted-foreground text-sm">
+        This helper shows followers what position size they should use based on
+        the 2% rule. It doesn't affect your signal creation.
+      </p>
+    </div>
+  );
+}
 ```
 
 ---
@@ -898,22 +940,27 @@ Ajouter section après les champs `entry`, `invalidation`, `takeProfits`:
 ### Liens avec Autres Features
 
 #### 1. Signals
+
 - Mini-console dans create signal form aide traders à valider R/R ratio
 - Afficher position size recommandée sur TradingCard display
 
 #### 2. Copy Trading
+
 - Utiliser risk console pour calculer position size auto sur copy trades
 - Respecter max risk défini par user
 
 #### 3. Portfolio Tracking
+
 - Capital live fetch depuis UserExchangeConnection
 - Binance/Bybit balance USDT pour auto-fill
 
 #### 4. Discord Bot
+
 - Commande `/risk` pour quick calculation via Discord
 - Retourne position size en DM
 
 #### 5. Subscriptions
+
 - FREE: Démo landing only (pas de login)
 - PRO: Full access + history + presets
 - ULTRA: + Live capital from exchanges
@@ -928,7 +975,10 @@ Ajouter section après les champs `entry`, `invalidation`, `takeProfits`:
 
 ```typescript
 import { describe, it, expect } from "vitest";
-import { calculatePositionSize, calculateRRRatio } from "@/lib/risk-console/utils";
+import {
+  calculatePositionSize,
+  calculateRRRatio,
+} from "@/lib/risk-console/utils";
 
 describe("Risk Console Calculations", () => {
   describe("Position Size - LONG", () => {
@@ -1041,10 +1091,13 @@ test.describe("Risk Console", () => {
 // Cache exchange balances for 5 minutes
 const BALANCE_CACHE_TTL = 5 * 60 * 1000;
 
-const cachedBalances = new Map<string, {
-  data: ExchangeBalance[];
-  timestamp: number;
-}>();
+const cachedBalances = new Map<
+  string,
+  {
+    data: ExchangeBalance[];
+    timestamp: number;
+  }
+>();
 
 export async function getCachedExchangeBalances(userId: string) {
   const cached = cachedBalances.get(userId);

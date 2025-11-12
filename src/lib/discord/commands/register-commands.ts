@@ -58,7 +58,9 @@ export function registerCommands() {
     // Commande /link
     new SlashCommandBuilder()
       .setName("link")
-      .setDescription("Vérifier ou connecter ton compte Discord à MyCryptoPilot")
+      .setDescription(
+        "Vérifier ou connecter ton compte Discord à MyCryptoPilot",
+      )
       .toJSON(),
 
     // Commande /pricing
@@ -90,10 +92,7 @@ export function registerCommands() {
           .setRequired(true),
       )
       .addNumberOption((option) =>
-        option
-          .setName("stop")
-          .setDescription("Stop loss")
-          .setRequired(true),
+        option.setName("stop").setDescription("Stop loss").setRequired(true),
       )
       .addNumberOption((option) =>
         option

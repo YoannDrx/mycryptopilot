@@ -19,17 +19,17 @@ Ce document synthétise le fonctionnement du trading social, depuis la création
 
 ## 🌐 Entités clés (prisma/schema.prisma)
 
-| Modèle | Rôle | Champs notables |
-|--------|------|-----------------|
-| `TraderProfile` | Profil public | `statsJson`, `verified`, relation 1–1 avec `User`. |
-| `Signal` | Signal publié | `payloadJson`, `ttlSec`, `hash`, `linkedTradeId` (vers `TraderTrade`). |
-| `Follow` | Relation follower/trader | `status`, `source`, `invitationId`. |
-| `TraderTrade` | Position agrégée | Quantités d’entrée/sortie, `source` (`BINANCE`, `BYBIT`, `MANUAL`), `signals[]`. |
-| `ExchangeTrade` | Fill brut exchange | Utilisé pour compléter `TraderTrade`. |
-| `TraderPerformanceSnapshot` | KPI traders | `period`, `winrate`, `profitFactor`, `maxDrawdown`… |
-| `UserExchangeConnection` | Connexion API utilisateur | `mode` (`MANUAL`/`AUTO`), `encrypted*` clés, `isActive`. |
-| `CopyTrade` | Position copiée | `status` (inclut `CLOSED`), `fills`, `pnl`. |
-| `TraderInvitation` & co | Referral traders | Voir `.claude/docs/future-features/REFERRAL-SYSTEM.md`. |
+| Modèle                      | Rôle                      | Champs notables                                                                  |
+| --------------------------- | ------------------------- | -------------------------------------------------------------------------------- |
+| `TraderProfile`             | Profil public             | `statsJson`, `verified`, relation 1–1 avec `User`.                               |
+| `Signal`                    | Signal publié             | `payloadJson`, `ttlSec`, `hash`, `linkedTradeId` (vers `TraderTrade`).           |
+| `Follow`                    | Relation follower/trader  | `status`, `source`, `invitationId`.                                              |
+| `TraderTrade`               | Position agrégée          | Quantités d’entrée/sortie, `source` (`BINANCE`, `BYBIT`, `MANUAL`), `signals[]`. |
+| `ExchangeTrade`             | Fill brut exchange        | Utilisé pour compléter `TraderTrade`.                                            |
+| `TraderPerformanceSnapshot` | KPI traders               | `period`, `winrate`, `profitFactor`, `maxDrawdown`…                              |
+| `UserExchangeConnection`    | Connexion API utilisateur | `mode` (`MANUAL`/`AUTO`), `encrypted*` clés, `isActive`.                         |
+| `CopyTrade`                 | Position copiée           | `status` (inclut `CLOSED`), `fills`, `pnl`.                                      |
+| `TraderInvitation` & co     | Referral traders          | Voir `.claude/docs/future-features/REFERRAL-SYSTEM.md`.                          |
 
 ---
 
@@ -67,6 +67,7 @@ Le système de Copy Trading permet aux utilisateurs de répliquer les trades de 
 #### 🔄 Modes de Copy Trading
 
 **MANUAL Mode (Journal Personnel)**:
+
 - User copie le signal dans son journal de trading personnel
 - Aucune exécution automatique
 - Position tracking manuel via `CopyTrade` avec `status: PENDING`
@@ -74,6 +75,7 @@ Le système de Copy Trading permet aux utilisateurs de répliquer les trades de 
 - **Setup requis**: Aucun - juste un compte MyCryptoPilot
 
 **AUTO Mode (Exécution Automatique)**:
+
 - Exécution automatique via API Binance/Bybit de l'utilisateur
 - Réplication en temps réel des positions du trader
 - Position sizing ajustée au capital utilisateur
@@ -83,6 +85,7 @@ Le système de Copy Trading permet aux utilisateurs de répliquer les trades de 
 #### 🎯 SPOT vs FUTURES Copy Trading
 
 **SPOT Trading**:
+
 ```typescript
 // Position sizing simple
 const spotQuantity = userCapital / entryPrice;
@@ -90,6 +93,7 @@ const spotQuantity = userCapital / entryPrice;
 ```
 
 **FUTURES Trading**:
+
 ```typescript
 // Position sizing avec leverage
 const futuresQuantity = (userCapital * leverage) / entryPrice;
@@ -97,6 +101,7 @@ const futuresQuantity = (userCapital * leverage) / entryPrice;
 ```
 
 **Différences clés**:
+
 - **SPOT**: Pas de liquidation, ownership direct, pas de leverage
 - **FUTURES**: Liquidation price tracking, margin requirements, leverage 1-125x
 - **Risk**: FUTURES = higher risk/reward, SPOT = lower risk
@@ -104,6 +109,7 @@ const futuresQuantity = (userCapital * leverage) / entryPrice;
 #### 🔐 Sécurité & Circuit Breakers
 
 **1. Max Position Size**: Limite par copy (ex: $1000)
+
 ```typescript
 if (copyValue > maxPositionSize) {
   throw new Error("Position size exceeds limit");
@@ -111,6 +117,7 @@ if (copyValue > maxPositionSize) {
 ```
 
 **2. Daily Trade Limit**: Max 10 copies/jour par utilisateur
+
 ```typescript
 const dailyCopies = await getCopyTradesCountToday(userId);
 if (dailyCopies >= 10) {
@@ -119,6 +126,7 @@ if (dailyCopies >= 10) {
 ```
 
 **3. Stop Loss Auto**: Désactivation automatique si pertes excessives
+
 ```typescript
 const dailyPnl = await calculateDailyPnL(userId);
 if (dailyPnl < -maxDailyLoss) {
@@ -129,16 +137,19 @@ if (dailyPnl < -maxDailyLoss) {
 #### 🔧 Implémentation Technique
 
 **Connexion Exchange**:
+
 - `UserExchangeConnection` stocke API keys encrypted (AES-256-GCM)
 - Service: `src/lib/trading/user-exchange-connection.service.ts`
 - Validation API avant activation (TODO: validation réelle)
 
 **Copy Execution**:
+
 - Service: `src/lib/trading/copy-trade.service.ts`
 - Create `CopyTrade` lors réception signal/trade
 - Queue d'exécution pour AUTO mode (TODO: line 191)
 
 **UI Components**:
+
 - `src/components/copy-trading/copy-trade-button.tsx` - Bouton copy avec dialog
 - `src/components/copy-trading/copy-trade-dialog.tsx` - Configuration MANUAL/AUTO
 
@@ -147,6 +158,7 @@ if (dailyPnl < -maxDailyLoss) {
 **Guide de test complet**: `.claude/docs/UNIFIED-TRADING-SYSTEM-TESTING.md`
 
 **4 Scénarios couverts**:
+
 1. **Copy MANUAL SPOT** - Journal personnel
 2. **Copy AUTO SPOT** - Exécution automatique Binance
 3. **Copy FUTURES** - Leverage + liquidation tracking
@@ -180,4 +192,3 @@ if (dailyPnl < -maxDailyLoss) {
 - `.claude/docs/CRYPTO-PAYMENTS.md` — HD wallet, watcher, checkout.
 - `.claude/docs/TESTING.md` — scénarios manuels + automatisation.
 - `.claude/docs/DISCORD-SETUP.md` — configuration complète du bot.
-

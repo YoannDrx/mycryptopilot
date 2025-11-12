@@ -16,6 +16,7 @@ Git Worktrees permet d'avoir **plusieurs copies du même repo** avec des branche
 ```
 
 **Avantages** :
+
 - ✅ Travail parallèle sur plusieurs features
 - ✅ Isolation complète (dépendances, DB, env)
 - ✅ Pas besoin de stash/commit en WIP
@@ -25,15 +26,16 @@ Git Worktrees permet d'avoir **plusieurs copies du même repo** avec des branche
 
 > **⚠️ Note importante**: Conductor était un outil de gestion de workspaces dev qui n'est **plus activement utilisé** dans ce projet. **Git Worktrees est désormais la méthode recommandée** pour travailler sur plusieurs features en parallèle.
 
-| Concept | Conductor (Legacy) | Git Worktrees (Actuel) |
-|---------|-----------|---------------|
-| **But** | Gestion workspaces dev (services, DB, env) | Branches Git parallèles |
-| **Isolation** | Services (Postgres, Redis, etc.) | Code Git uniquement |
-| **Quand utiliser** | ~~1 feature à la fois~~ (déprécié) | Plusieurs features en parallèle |
-| **Setup DB** | Auto (Postgres.app) | Manuel (copie .env) |
-| **Status** | 🔴 Scripts conservés mais non maintenus | ✅ Workflow actif et recommandé |
+| Concept            | Conductor (Legacy)                         | Git Worktrees (Actuel)          |
+| ------------------ | ------------------------------------------ | ------------------------------- |
+| **But**            | Gestion workspaces dev (services, DB, env) | Branches Git parallèles         |
+| **Isolation**      | Services (Postgres, Redis, etc.)           | Code Git uniquement             |
+| **Quand utiliser** | ~~1 feature à la fois~~ (déprécié)         | Plusieurs features en parallèle |
+| **Setup DB**       | Auto (Postgres.app)                        | Manuel (copie .env)             |
+| **Status**         | 🔴 Scripts conservés mais non maintenus    | ✅ Workflow actif et recommandé |
 
 **Migration Conductor → Git Worktrees**:
+
 - Les scripts Conductor (`conductor-setup-script.sh`, `conductor-archive-script.sh`) sont conservés dans `scripts/` mais ne sont plus utilisés activement depuis l'adoption de Git Worktrees.
 - Si tu cherchais Conductor pour gérer plusieurs environnements dev, **utilise Git Worktrees à la place** (voir ci-dessous).
 
@@ -88,11 +90,13 @@ pnpm worktree:setup https://github.com/YoannDrx/mycryptopilot/issues/123
    - `.env.test.local` → PostgreSQL local test
 
 4. 📦 **Installe les dépendances**
+
    ```bash
    pnpm install
    ```
 
 5. 🗄️ **Génère Prisma Client**
+
    ```bash
    pnpm prisma generate
    ```
@@ -112,6 +116,7 @@ git worktree list
 ```
 
 **Output exemple** :
+
 ```
 /Users/yoannandrieux/Projets/mycryptopilot                            66498c3 [main]
 /Users/yoannandrieux/Developer/worktrees/issue-42-add-portfolio-page  a1b2c3d [issue-42]
@@ -144,6 +149,7 @@ pnpm worktree:check
 ```
 
 **Affiche** :
+
 - ✅ CLI tools installés (gh, claude, jq, Ghostty)
 - 📊 Worktrees existants
 - 💾 Espace disque utilisé
@@ -215,24 +221,29 @@ pnpm worktree:clean
 **Important** : Les worktrees partagent la même DB !
 
 **Development** :
+
 - `.env.local` est copié → Pointe vers **Neon Cloud dev**
 - Tous les worktrees utilisent la **même DB Neon**
 
 **Tests E2E** :
+
 - `.env.test.local` est copié → Pointe vers **PostgreSQL Local test**
 - DB : `mycryptopilot_test` sur Postgres.app
 
 **Recommandation** :
+
 - Si tu veux isoler les données, utilise des **branches Neon** différentes
 - Ou crée des DB locales séparées (non recommandé)
 
 ### Prisma
 
 **Multi-file schema** :
+
 - `prisma/schema.prisma` (main)
 - `prisma/schema/better-auth.prisma` (auth)
 
 Le script exécute automatiquement :
+
 ```bash
 pnpm prisma generate
 ```
@@ -242,11 +253,13 @@ Grâce à `prisma.config.ts`, tous les schémas sont chargés ✅
 ### Variables d'environnement
 
 **Fichiers copiés automatiquement** :
+
 - `.env.local` → Neon dev credentials
 - `.env.test.local` → PostgreSQL local test
 - Tout autre `.env*` dans le projet
 
 **Secrets** :
+
 - `BETTER_AUTH_SECRET`
 - Discord tokens
 - Neon credentials
@@ -321,14 +334,14 @@ pnpm db:setup-test
 
 ## 🚀 Commandes Rapides
 
-| Commande | Description |
-|----------|-------------|
-| `pnpm worktree:setup <url>` | Créer worktree pour une issue |
-| `pnpm worktree:clean` | Nettoyer worktrees obsolètes |
-| `pnpm worktree:list` | Lister worktrees actifs |
-| `pnpm worktree:check` | Diagnostic complet |
-| `git worktree list` | Lister (Git natif) |
-| `git worktree remove <path>` | Supprimer manuellement |
+| Commande                     | Description                   |
+| ---------------------------- | ----------------------------- |
+| `pnpm worktree:setup <url>`  | Créer worktree pour une issue |
+| `pnpm worktree:clean`        | Nettoyer worktrees obsolètes  |
+| `pnpm worktree:list`         | Lister worktrees actifs       |
+| `pnpm worktree:check`        | Diagnostic complet            |
+| `git worktree list`          | Lister (Git natif)            |
+| `git worktree remove <path>` | Supprimer manuellement        |
 
 ## 💡 Quand Utiliser Git Worktrees ?
 
@@ -346,6 +359,7 @@ pnpm db:setup-test
 - Tu as **peu d'espace disque** (chaque worktree = ~500MB)
 
 **Workflow simple** :
+
 ```bash
 # Sans worktrees (simple)
 git switch main
@@ -356,6 +370,7 @@ git push
 ```
 
 **Workflow avancé** :
+
 ```bash
 # Avec worktrees (parallèle)
 pnpm worktree:setup <issue-42-url>

@@ -16,7 +16,7 @@ import { X, Filter } from "lucide-react";
 import { useState } from "react";
 
 type SignalsFiltersProps = {
-  totalSignals: number;
+  totalSignals?: number;
 };
 
 const POPULAR_SYMBOLS = [
@@ -31,14 +31,20 @@ const POPULAR_SYMBOLS = [
 ];
 
 export function SignalsFilters({ totalSignals }: SignalsFiltersProps) {
-  const [filters, setFilters] = useQueryStates({
-    symbols: parseAsArrayOf(parseAsString),
-    bias: parseAsString,
-    status: parseAsString,
-    traderName: parseAsString,
-    instrumentType: parseAsString,
-    verifiedOnly: parseAsString,
-  });
+  const [filters, setFilters] = useQueryStates(
+    {
+      symbols: parseAsArrayOf(parseAsString),
+      bias: parseAsString,
+      status: parseAsString,
+      traderName: parseAsString,
+      instrumentType: parseAsString,
+      verifiedOnly: parseAsString,
+    },
+    {
+      // Force server-side re-fetch on filter changes (not shallow navigation)
+      shallow: false,
+    },
+  );
 
   const [symbolInput, setSymbolInput] = useState("");
 
@@ -261,9 +267,11 @@ export function SignalsFilters({ totalSignals }: SignalsFiltersProps) {
       </div>
 
       {/* Results count */}
-      <div className="text-muted-foreground border-t pt-3 text-sm">
-        {totalSignals} signal{totalSignals !== 1 ? "s" : ""} found
-      </div>
+      {totalSignals !== undefined && (
+        <div className="text-muted-foreground border-t pt-3 text-sm">
+          {totalSignals} signal{totalSignals !== 1 ? "s" : ""} found
+        </div>
+      )}
     </div>
   );
 }

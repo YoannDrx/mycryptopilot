@@ -18,12 +18,14 @@
 **MILESTONE**: Extension du portfolio tracking avec support Bybit + architecture multi-exchange unifiée!
 
 **🏗️ Architecture Multi-Exchange**:
+
 - Factory pattern (`exchange-service-factory.ts`) pour abstraction Binance + Bybit
 - Services spécialisés: `binance-service.ts` (existing) + `bybit-service.ts` (new, 396 lignes)
 - Sync engine unifié (`sync-service.ts`) supportant les deux exchanges
 - Encryption AES-256-GCM pour les API keys (`encryption-service.ts`)
 
 **📊 Modèles Database**:
+
 - `ExchangeConnection` - Connexions traders (API keys chiffrées, sync status)
 - `ExchangeTrade` - Historique trades (fills importés depuis exchanges)
 - `TraderPerformanceSnapshot` - KPI pré-calculés (winrate, profit factor, drawdown)
@@ -31,12 +33,14 @@
 - `CopyTrade` - Copy trades (MANUAL/AUTO modes, status CLOSED ajouté)
 
 **🔧 Features Implémentées**:
+
 - Import automatique des trades Bybit (spot + perps)
 - Calcul métriques: winrate, profit factor, max drawdown, Sharpe ratio
 - UI: Connexion exchanges, dashboard performances, tableaux trades
 - Guides: `content/docs/bybit-setup.mdx` (234 lignes)
 
 **🧪 Tests**:
+
 - Tests unitaires services Bybit
 - Tests E2E connexion exchanges
 - Validation encryption/decryption API keys
@@ -54,18 +58,21 @@
 **MILESTONE**: Navigation refactorisée en 4 espaces indépendants avec sidebars dédiées + UI polish professionnel!
 
 **🏗️ Architecture 4 Espaces**:
+
 - **Trading Space**: Sidebar avec 6 liens (Dashboard, Signals, Traders, Pricing, Checkout, Trader Dashboard)
 - **Account Space**: Sidebar avec 5 liens (Profile, Discord, Email, Following, Danger Zone)
 - **Crypto School Space**: Sidebar avec 2 liens placeholder (Courses, Progress)
 - **Tax & Declaration Space**: Sidebar avec 2 liens placeholder (Import, Reports)
 
 **📦 Composants Créés**:
+
 - `base-sidebar-layout.tsx` - Layout wrapper partagé entre les 4 espaces
 - `global-search-command.tsx` - Recherche globale (cmd+k) affichant tous les liens
 - `trading-sidebar.tsx`, `account-sidebar.tsx`, `school-sidebar.tsx`, `tax-sidebar.tsx`
 - Chaque espace a ses propres `*-links.ts` et `layout.tsx`
 
 **🎨 UI Polish**:
+
 - Trading cards: Style professionnel et subtil (effets réduits de 60% pour look plus clean)
 - Chart image viewer avec zoom full-screen + watermark "MyCryptoPilot"
 - Suppression d'images dans formulaires signaux
@@ -73,6 +80,7 @@
 - **Correction de 10 erreurs ESLint** (orgSlug, imports non utilisés, exports manquants)
 
 **🧹 Nettoyage Code**:
+
 - Supprimé l'ancien layout global avec sidebar unique
 - Supprimé `org-sidebar.tsx` et `org-command.tsx` (remplacés par composants spécialisés)
 - Mis à jour toutes les routes Account (`/account/*` → `/orgs/${slug}/account/*`)
@@ -90,6 +98,7 @@
 **FEATURE**: Feed signaux avec 12 paramètres de filtrage + pagination cursor-based + URL state management!
 
 **🔍 Filtres Implémentés**:
+
 1. **Search** - Recherche textuelle multi-champs (asset, rationales, trader name)
 2. **Status** - ACTIVE / TP_HIT / INVALIDATED / All
 3. **Bias** - LONG / SHORT / All
@@ -104,17 +113,20 @@
 12. **Pagination** - Cursor-based (next/previous)
 
 **📦 Composants Créés**:
+
 - `signal-filters.tsx` - Composant filtres (200+ lignes)
 - `signal-feed-with-filters.tsx` - Client component orchestrant tout
 - `getFilteredSignals()` - Server query avec Prisma (12 paramètres)
 - Hook `useSignalFilters()` - URL state management avec `nuqs`
 
 **🧪 Tests Unitaires**:
+
 - **26 tests Vitest** couvrant toutes les combinaisons de filtres
 - Tests de validation Zod schemas
 - Tests de logique métier (tri, pagination, search)
 
 **Performance**:
+
 - Pagination cursor-based (scalable à millions de signaux)
 - Indexes DB optimisés ([traderId, status], [asset, status], [publishedAt])
 - Debounce sur search input (300ms)

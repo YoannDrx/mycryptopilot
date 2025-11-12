@@ -3,6 +3,7 @@
 **Dernière mise à jour**: 2 novembre 2025 — ajout de `DISCORD_BOT_ENABLED` et retours Railway
 
 Ce guide détaille la configuration complète du bot Discord MyCryptoPilot, incluant:
+
 - Configuration Developer Portal (permissions)
 - Activation des Gateway Intents
 - Hiérarchie des rôles serveur
@@ -42,32 +43,32 @@ Le bot a besoin des permissions suivantes pour fonctionner correctement:
 
 #### Permissions Critiques (P0 - Bloquantes)
 
-| Permission | Raison | Requis pour |
-|------------|--------|-------------|
-| **Manage Roles** | Assigner rôles Free/Pro/Ultra automatiquement | Subscription system |
-| **Manage Channels** | Créer channels privés `#trader-{name}` | Phase 2 |
-| **Create Instant Invite** | Générer invites Discord automatiques | Phase 3 |
-| **Send Messages** | Envoyer signaux dans channels | Webhook signals |
+| Permission                | Raison                                        | Requis pour         |
+| ------------------------- | --------------------------------------------- | ------------------- |
+| **Manage Roles**          | Assigner rôles Free/Pro/Ultra automatiquement | Subscription system |
+| **Manage Channels**       | Créer channels privés `#trader-{name}`        | Phase 2             |
+| **Create Instant Invite** | Générer invites Discord automatiques          | Phase 3             |
+| **Send Messages**         | Envoyer signaux dans channels                 | Webhook signals     |
 
 #### Permissions Importantes (P1)
 
-| Permission | Raison |
-|------------|--------|
-| **Manage Messages** | Épingler/supprimer messages importants |
-| **Read Message History** | Lire historique messages |
-| **View Channels** | Voir tous les channels |
-| **Embed Links** | Envoyer embeds riches (signaux) |
-| **Attach Files** | Joindre fichiers (screenshots, etc.) |
-| **Use External Emojis** | Utiliser emojis custom |
-| **Add Reactions** | Réagir aux messages |
+| Permission               | Raison                                 |
+| ------------------------ | -------------------------------------- |
+| **Manage Messages**      | Épingler/supprimer messages importants |
+| **Read Message History** | Lire historique messages               |
+| **View Channels**        | Voir tous les channels                 |
+| **Embed Links**          | Envoyer embeds riches (signaux)        |
+| **Attach Files**         | Joindre fichiers (screenshots, etc.)   |
+| **Use External Emojis**  | Utiliser emojis custom                 |
+| **Add Reactions**        | Réagir aux messages                    |
 
 #### Permissions Optionnelles (P2)
 
-| Permission | Raison |
-|------------|--------|
-| **Moderate Members** | Timeout/kick users si abus |
-| **View Audit Log** | Tracking actions pour monitoring |
-| **Manage Webhooks** | Créer webhooks pour intégrations |
+| Permission           | Raison                           |
+| -------------------- | -------------------------------- |
+| **Moderate Members** | Timeout/kick users si abus       |
+| **View Audit Log**   | Tracking actions pour monitoring |
+| **Manage Webhooks**  | Créer webhooks pour intégrations |
 
 ### 1.3 - Cocher les Permissions
 
@@ -109,6 +110,7 @@ Dans Developer Portal → Bot → Bot Permissions:
 ```
 
 **Pourquoi c'est requis?**
+
 - `SERVER MEMBERS INTENT`: Pour récupérer les membres Discord et lier `discordId` (utilisé dans `bot-client.ts`)
 - `MESSAGE CONTENT INTENT`: Pour lire le contenu des messages (modération, teasers, Phase 4)
 
@@ -123,12 +125,14 @@ Dans Developer Portal → Bot → Bot Permissions:
 1. Aller dans Developer Portal → **OAuth2** → **URL Generator**
 
 2. **Sélectionner Scopes**:
+
 ```
 ✅ bot
 ✅ applications.commands
 ```
 
 3. **Sélectionner Bot Permissions** (même liste que Phase 1):
+
 ```
 ✅ Manage Roles
 ✅ Manage Channels
@@ -170,6 +174,7 @@ Si vous avez modifié les permissions après avoir invité le bot:
 ⚠️ **RÈGLE DISCORD**: Un bot ne peut assigner/gérer que les rôles **EN DESSOUS** de lui dans la hiérarchie!
 
 **Exemple**:
+
 ```
 ✅ Bot peut gérer "Free Member" si Bot est au-dessus
 ❌ Bot ne peut PAS gérer "Admin" si Admin est au-dessus du Bot
@@ -197,6 +202,7 @@ Aller sur Discord Server → Server Settings → Roles, et **ORDONNER AINSI**:
 Le bot crée automatiquement les rôles Free/Pro/Ultra s'ils n'existent pas (via `ensureRolesExist()`).
 
 **Noms des rôles** (définis dans `config.ts`):
+
 - `Free Member` (Gray - 0x6b7280)
 - `Pro Trader` (Amber - 0xf59e0b)
 - `Ultra Trader` (Purple - 0x8b5cf6)
@@ -243,14 +249,14 @@ Créer manuellement la structure suivante sur votre serveur Discord:
 2. Onglet **Permissions** → Cliquer sur **"Advanced permissions"**
 3. Configurer:
 
-| Rôle/User | Permission | Valeur |
-|-----------|----------|--------|
-| `@everyone` | View Channels | ❌ **Deny** |
-| `BotMyCryptoPilot` | View Channels | ✅ **Allow** |
+| Rôle/User          | Permission      | Valeur       |
+| ------------------ | --------------- | ------------ |
+| `@everyone`        | View Channels   | ❌ **Deny**  |
+| `BotMyCryptoPilot` | View Channels   | ✅ **Allow** |
 | `BotMyCryptoPilot` | Manage Channels | ✅ **Allow** |
-| `BotMyCryptoPilot` | Send Messages | ✅ **Allow** |
-| `Admin` | View Channels | ✅ **Allow** |
-| `Admin` | Manage Channels | ✅ **Allow** |
+| `BotMyCryptoPilot` | Send Messages   | ✅ **Allow** |
+| `Admin`            | View Channels   | ✅ **Allow** |
+| `Admin`            | Manage Channels | ✅ **Allow** |
 
 **Résultat**: Seuls le bot et les admins peuvent voir/gérer cette catégorie. Les users ne verront que les channels traders qu'ils follow.
 
@@ -258,10 +264,10 @@ Créer manuellement la structure suivante sur votre serveur Discord:
 
 Channel public, tous peuvent voir:
 
-| Rôle | Permission | Valeur |
-|------|-----------|--------|
-| `@everyone` | View Channels | ✅ **Allow** |
-| `@everyone` | Send Messages | ❌ **Deny** |
+| Rôle               | Permission    | Valeur       |
+| ------------------ | ------------- | ------------ |
+| `@everyone`        | View Channels | ✅ **Allow** |
+| `@everyone`        | Send Messages | ❌ **Deny**  |
 | `BotMyCryptoPilot` | Send Messages | ✅ **Allow** |
 
 ---
@@ -283,6 +289,7 @@ Une fois le mode développeur activé:
 3. Coller l'ID dans un fichier texte temporaire
 
 **IDs à récupérer**:
+
 - `#signals-free` → Variable `DISCORD_FREE_SIGNALS_CHANNEL_ID`
 - `#bot-logs` → Variable `DISCORD_LOG_CHANNEL_ID`
 
@@ -294,6 +301,7 @@ Une fois le mode développeur activé:
 4. Coller l'ID dans un fichier texte
 
 **ID à récupérer**:
+
 - `Admin` role → Variable `DISCORD_ROLE_ADMIN_ID`
 
 ### 6.4 - Obtenir Guild ID
@@ -301,6 +309,7 @@ Une fois le mode développeur activé:
 **Déjà configuré** (variable `DISCORD_GUILD_ID` dans `.env`).
 
 Si besoin de le récupérer:
+
 1. **Clic-droit** sur le nom du serveur (en haut à gauche)
 2. Cliquer sur **"Copy ID"**
 
@@ -366,6 +375,7 @@ Ajouter les variables:
 Pour tester le bot Discord localement avant déploiement:
 
 **Prérequis**:
+
 - ✅ `.env.local` configuré avec toutes les variables Discord (voir Phase 7.1)
 - ✅ `DISCORD_BOT_ENABLED=true` dans `.env.local`
 - ✅ Database accessible (pour les requêtes profils/signaux)
@@ -377,6 +387,7 @@ npx tsx scripts/start-discord-bot.ts
 ```
 
 **Comportement du script**:
+
 1. Charge automatiquement `.env.local` (fallback `.env.development` puis `.env`)
 2. Vérifie que `DISCORD_BOT_ENABLED=true`
 3. Initialise le client Discord et enregistre les commandes slash
@@ -394,6 +405,7 @@ Loaded environment from .env.local
 **Arrêter le bot**: `Ctrl+C` (graceful shutdown)
 
 **Troubleshooting**:
+
 - Si erreur `Discord bot is disabled` → Vérifier `DISCORD_BOT_ENABLED=true` dans `.env.local`
 - Si erreur `Missing DISCORD_BOT_TOKEN` → Vérifier les variables Phase 7.1
 - Si erreur `Invalid token` → Regénérer le token sur Discord Developer Portal
@@ -409,27 +421,32 @@ Loaded environment from .env.local
 Avant de passer aux Phases 2-5 (code), vérifier:
 
 **Developer Portal**:
+
 - ✅ Permissions bot (Manage Roles, Manage Channels, Create Instant Invite, etc.)
 - ✅ Gateway Intents (SERVER MEMBERS INTENT ✅, MESSAGE CONTENT INTENT ✅)
 - ✅ URL invitation générée et bot réinvité
 
 **Serveur Discord**:
+
 - ✅ Hiérarchie rôles (Bot en haut > Admin > Mod > Ultra > Pro > Free)
 - ✅ Structure channels créée (PUBLIC, SIGNALS PRIVÉS, STAFF)
 - ✅ Permissions catégorie "SIGNALS PRIVÉS" configurées
 - ✅ Mode développeur activé
 
 **IDs Récupérés**:
+
 - ✅ `DISCORD_FREE_SIGNALS_CHANNEL_ID` (ID de #signals-free)
 - ✅ `DISCORD_LOG_CHANNEL_ID` (ID de #bot-logs)
 - ✅ `DISCORD_ROLE_ADMIN_ID` (ID du rôle Admin)
 
 **Variables Env**:
+
 - ✅ `.env.local` rempli (dev)
 - ✅ Railway variables ajoutées (bot production)
 - ✅ Vercel variables ajoutées (site production)
 
 **Bot Redéployé**:
+
 - ✅ Railway bot redéployé après ajout variables env
 - ✅ Logs Railway affichent:
   - `Discord bot logged in as MyCryptoPilot#1234` ✅
@@ -466,6 +483,7 @@ Le bot Discord MyCryptoPilot supporte **11 commandes slash** (5 utilisateur + 6 
 ### Commandes Utilisateur
 
 #### `/help`
+
 Affiche la liste des commandes disponibles.
 
 ```
@@ -477,9 +495,11 @@ Affiche la liste des commandes disponibles.
 ```
 
 #### `/status`
+
 Affiche le statut d'abonnement de l'utilisateur.
 
 **Exemple de réponse**:
+
 ```
 📊 Statut de ton abonnement
 
@@ -491,9 +511,11 @@ Affiche le statut d'abonnement de l'utilisateur.
 ```
 
 #### `/upgrade`
+
 Affiche les plans disponibles avec leurs avantages.
 
 **Exemple**:
+
 ```
 ⬆️ Upgrade ton abonnement
 
@@ -511,9 +533,11 @@ Affiche les plans disponibles avec leurs avantages.
 ```
 
 #### `/link`
+
 Permet de lier le compte Discord à MyCryptoPilot.
 
 #### `/portfolio`
+
 Affiche le portfolio et les exchanges connectés.
 
 ### Commandes Admin (Restricted)
@@ -521,21 +545,27 @@ Affiche le portfolio et les exchanges connectés.
 Seuls les utilisateurs avec le rôle **Admin** peuvent utiliser ces commandes.
 
 #### `/deploy-commands`
+
 Force la republication des slash commands sur Discord.
 
 #### `/create-roles`
+
 Crée les 3 rôles Free/Pro/Ultra s'ils n'existent pas.
 
 #### `/sync-roles`
+
 Synchronise tous les rôles Discord avec les plans DB.
 
 #### `/test-signal <traderId>`
+
 Envoie un signal de test dans le channel Discord.
 
 #### `/stats`
+
 Affiche les statistiques du serveur (membres, signaux, etc.).
 
 #### `/purge <count>`
+
 Supprime les N derniers messages du channel (modération).
 
 ---
@@ -545,12 +575,14 @@ Supprime les N derniers messages du channel (modération).
 ### 🆓 Free Member (Niveau 0)
 
 **Permissions de base**:
+
 - ✅ Voir les channels publics
 - ✅ Envoyer des messages
 - ✅ Lire l'historique
 - ✅ Utiliser les commandes bot
 
 **Limitations**:
+
 - ❌ 5 signaux/jour max
 - ❌ Suivre 1 seul trader
 - ❌ Pas d'accès channels premium
@@ -561,6 +593,7 @@ Supprime les N derniers messages du channel (modération).
 ### 💎 Pro Trader (Niveau 1)
 
 **Hérite de Free Member +**:
+
 - ✅ Emojis externes
 - ✅ Attacher fichiers
 - ✅ Intégrer liens (preview)
@@ -575,6 +608,7 @@ Supprime les N derniers messages du channel (modération).
 ### 🚀 Ultra Trader (Niveau 2)
 
 **Hérite de Pro + Free +**:
+
 - ✅ Créer threads privés
 - ✅ Accès channels `#ultra-lounge` et `#strategy-talks`
 - ✅ **Signaux illimités**
@@ -590,15 +624,18 @@ Supprime les N derniers messages du channel (modération).
 ### Channels Structure
 
 **Channels Publics** (tous les rôles):
+
 - `#general` - Discussion générale
 - `#announcements` - Annonces officielles
 - `#signals` - Signaux publics (lecture seule pour Free)
 
 **Channels Pro** (`@Pro Trader` requis):
+
 - `#pro-signals` - Signaux détaillés pour Pro
 - `#support-pro` - Support dédié Pro
 
 **Channels Ultra** (`@Ultra Trader` requis):
+
 - `#ultra-lounge` - Salon privé Ultra
 - `#strategy-talks` - Discussions stratégies avancées
 - `#alpha-features` - Preview nouvelles features
@@ -622,6 +659,7 @@ Les rôles sont assignés automatiquement dans 3 cas:
 **Cause**: Hiérarchie des rôles incorrecte.
 
 **Solution**:
+
 1. Aller dans Server Settings → Roles
 2. Drag & drop le rôle `BotMyCryptoPilot` **en première position** (juste après owner)
 3. Retester
@@ -631,6 +669,7 @@ Les rôles sont assignés automatiquement dans 3 cas:
 **Cause**: Variables env manquantes ou Gateway Intents pas activés.
 
 **Solution**:
+
 1. Vérifier logs Railway: `railway logs --tail`
 2. Si `Missing DISCORD_BOT_TOKEN` → Ajouter variable sur Railway
 3. Si `PrivilegedIntentsRequired` → Activer intents dans Developer Portal, puis redéployer
@@ -640,6 +679,7 @@ Les rôles sont assignés automatiquement dans 3 cas:
 **Cause**: Bot pas ré-invité avec scope `applications.commands`.
 
 **Solution**:
+
 1. Générer nouvelle URL invitation (Phase 3)
 2. S'assurer que scope `applications.commands` est coché
 3. Ouvrir URL et "Réautoriser" le bot

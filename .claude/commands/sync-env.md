@@ -31,11 +31,13 @@ Tu vas analyser les variables d'environnement locales et distantes, identifier l
 ## Étape 1: Parser les Fichiers Locaux
 
 **Lire et parser**:
+
 - `.env` → Production backup (mainnet)
 - `.env.local` → Development (testnet)
 - `.env.test` → E2E tests (testnet local)
 
 **Extraire toutes les variables** (format `VAR_NAME=value`):
+
 ```bash
 # Extraire noms de variables uniquement (sans valeurs pour sécurité)
 grep -E "^[A-Z_].*=" .env | cut -d'=' -f1
@@ -44,6 +46,7 @@ grep -E "^[A-Z_].*=" .env.test | cut -d'=' -f1
 ```
 
 **Créer un inventaire** des variables uniques avec leur source:
+
 - Variables présentes dans `.env` uniquement
 - Variables présentes dans `.env.local` uniquement
 - Variables présentes dans `.env.test` uniquement
@@ -63,6 +66,7 @@ vercel env ls
 ```
 
 **Parser la sortie** pour extraire:
+
 - Nom de variable
 - Environnements (Production, Preview, Development)
 
@@ -86,6 +90,7 @@ railway status 2>&1 | grep -q "No Railway project linked" && echo "⚠️ Railwa
 ```
 
 **Parser la sortie** pour extraire:
+
 - Nom de variable
 - Valeur (pour comparaison - NE PAS logger les valeurs sensibles!)
 
@@ -286,6 +291,7 @@ Pour chaque variable locale, déterminer:
    - ❌ **Absent**: pas du tout présente sur distant
 
 Pour chaque variable distante, vérifier:
+
 - Est-elle définie dans un fichier local?
 - Si non, c'est une **variable orpheline** (à supprimer?)
 
@@ -295,7 +301,7 @@ Pour chaque variable distante, vérifier:
 
 **Format du rapport**:
 
-```markdown
+````markdown
 # 🔄 Rapport de Synchronisation des Variables d'Environnement
 
 **Date**: <DATE_ACTUELLE>
@@ -306,18 +312,20 @@ Pour chaque variable distante, vérifier:
 ## 📊 Résumé Global
 
 | Environnement         | Total Variables | ✅ Sync | ⚠️ Missing | 🚫 Extra | ❌ Absent |
-|-----------------------|-----------------|---------|-----------|----------|-----------|
-| **Vercel Production** | 45              | 40      | 5         | 0        | 0         |
-| **Vercel Preview**    | 42              | 38      | 4         | 0        | 0         |
-| **GitHub Actions**    | 15              | 10      | 5         | 0        | 0         |
-| **Railway (Bot)**     | 15 (optimal)    | 13      | 2         | 0        | 0         |
+| --------------------- | --------------- | ------- | ---------- | -------- | --------- |
+| **Vercel Production** | 45              | 40      | 5          | 0        | 0         |
+| **Vercel Preview**    | 42              | 38      | 4          | 0        | 0         |
+| **GitHub Actions**    | 15              | 10      | 5          | 0        | 0         |
+| **Railway (Bot)**     | 15 (optimal)    | 13      | 2          | 0        | 0         |
 
 **Fichiers Locaux**:
+
 - `.env` (production): <N> variables
 - `.env.local` (development): <N> variables
 - `.env.test` (tests): <N> variables
 
 **⚠️ Railway Status**:
+
 - **Objectif**: 15 variables (Discord Bot uniquement)
 - **Actuel**: <N> variables
 - **Variables interdites détectées**: <N> (à supprimer!)
@@ -341,13 +349,14 @@ Ces variables sont présentes partout où elles devraient être:
 
 Variables définies localement mais absentes de Vercel PROD:
 
-| Variable | Source Locale | Valeur (premiers chars) | Action |
-|----------|---------------|-------------------------|--------|
-| `CRYPTO_XPUB_BASE` | `.env` line 106 | xpub6Ejw... | Ajouter à PROD |
-| `DATABASE_URL` | `.env` line 26 | postgresql://... | Ajouter à PROD |
-| ... | ... | ... | ... |
+| Variable           | Source Locale   | Valeur (premiers chars) | Action         |
+| ------------------ | --------------- | ----------------------- | -------------- |
+| `CRYPTO_XPUB_BASE` | `.env` line 106 | xpub6Ejw...             | Ajouter à PROD |
+| `DATABASE_URL`     | `.env` line 26  | postgresql://...        | Ajouter à PROD |
+| ...                | ...             | ...                     | ...            |
 
 **Commandes pour corriger**:
+
 ```bash
 # Ajouter CRYPTO_XPUB_BASE à Production
 vercel env add CRYPTO_XPUB_BASE production
@@ -359,18 +368,20 @@ vercel env add DATABASE_URL production
 
 # ... etc pour chaque variable
 ```
+````
 
 ### Vercel Preview
 
 Variables définies localement mais absentes de Vercel PREVIEW:
 
-| Variable | Source Locale | Valeur (premiers chars) | Action |
-|----------|---------------|-------------------------|--------|
-| `CRYPTO_XPUB_BASE` | `.env.local` line 101 | xpub6MKM... | Ajouter à PREVIEW |
-| `BASE_RPC_URL_TESTNET` | `.env.local` line 96 | https://sepolia... | Ajouter à PREVIEW |
-| ... | ... | ... | ... |
+| Variable               | Source Locale         | Valeur (premiers chars) | Action            |
+| ---------------------- | --------------------- | ----------------------- | ----------------- |
+| `CRYPTO_XPUB_BASE`     | `.env.local` line 101 | xpub6MKM...             | Ajouter à PREVIEW |
+| `BASE_RPC_URL_TESTNET` | `.env.local` line 96  | https://sepolia...      | Ajouter à PREVIEW |
+| ...                    | ...                   | ...                     | ...               |
 
 **Commandes pour corriger**:
+
 ```bash
 # Ajouter CRYPTO_XPUB_BASE (testnet) à Preview
 vercel env add CRYPTO_XPUB_BASE preview
@@ -387,13 +398,14 @@ vercel env add BASE_RPC_URL_TESTNET preview
 
 Variables définies localement mais absentes de GitHub Actions:
 
-| Variable | Source Locale | Valeur (premiers chars) | Action |
-|----------|---------------|-------------------------|--------|
-| `DATABASE_URL` | `.env.test` line 24 | postgresql://postgres... | Ajouter secret |
-| `BETTER_AUTH_SECRET_TEST` | `.env.test` line 32 | OeoX... | Ajouter secret |
-| ... | ... | ... | ... |
+| Variable                  | Source Locale       | Valeur (premiers chars)  | Action         |
+| ------------------------- | ------------------- | ------------------------ | -------------- |
+| `DATABASE_URL`            | `.env.test` line 24 | postgresql://postgres... | Ajouter secret |
+| `BETTER_AUTH_SECRET_TEST` | `.env.test` line 32 | OeoX...                  | Ajouter secret |
+| ...                       | ...                 | ...                      | ...            |
 
 **Commandes pour corriger**:
+
 ```bash
 # Ajouter DATABASE_URL à GitHub Actions
 gh secret set DATABASE_URL -R YoannDrx/mycryptopilot
@@ -410,17 +422,18 @@ gh secret set BETTER_AUTH_SECRET_TEST -R YoannDrx/mycryptopilot
 
 Variables nécessaires pour le Discord Bot mais absentes de Railway:
 
-| Variable | Source Locale | Valeur (premiers chars) | Action |
-|----------|---------------|-------------------------|--------|
-| `DISCORD_PRO_ROLE_ID` | `.env` line 85 | 142699... | Ajouter à Railway |
-| `DATABASE_URL_UNPOOLED` | `.env` line 27 | postgresql://... | Ajouter à Railway |
-| ... | ... | ... | ... |
+| Variable                | Source Locale  | Valeur (premiers chars) | Action            |
+| ----------------------- | -------------- | ----------------------- | ----------------- |
+| `DISCORD_PRO_ROLE_ID`   | `.env` line 85 | 142699...               | Ajouter à Railway |
+| `DATABASE_URL_UNPOOLED` | `.env` line 27 | postgresql://...        | Ajouter à Railway |
+| ...                     | ...            | ...                     | ...               |
 
 **Commandes pour corriger**:
 
 ⚠️ **Note**: Railway CLI ne permet pas d'ajouter des variables via CLI. Tu dois utiliser le dashboard.
 
 **Via Dashboard Railway**:
+
 1. Va sur https://railway.app/dashboard
 2. Sélectionne le projet **MyCryptoPilot**
 3. Sélectionne le service **mycryptopilot**
@@ -429,6 +442,7 @@ Variables nécessaires pour le Discord Bot mais absentes de Railway:
 6. Copie-colle les valeurs depuis `.env`
 
 **Liste des variables à ajouter**:
+
 ```
 DISCORD_PRO_ROLE_ID = <valeur depuis .env ligne 85>
 DATABASE_URL_UNPOOLED = <valeur depuis .env ligne 27>
@@ -441,13 +455,14 @@ DATABASE_URL_UNPOOLED = <valeur depuis .env ligne 27>
 
 Variables présentes sur distant mais **non définies dans les fichiers locaux**:
 
-| Variable | Environnement | Âge | Action Recommandée |
-|----------|---------------|-----|---------------------|
-| `OLD_VARIABLE_NAME` | Vercel PROD | 30d ago | ⚠️ Supprimer (obsolète) |
-| `DEPRECATED_KEY` | GitHub Actions | 15d ago | ⚠️ Supprimer (non utilisée) |
-| ... | ... | ... | ... |
+| Variable            | Environnement  | Âge     | Action Recommandée          |
+| ------------------- | -------------- | ------- | --------------------------- |
+| `OLD_VARIABLE_NAME` | Vercel PROD    | 30d ago | ⚠️ Supprimer (obsolète)     |
+| `DEPRECATED_KEY`    | GitHub Actions | 15d ago | ⚠️ Supprimer (non utilisée) |
+| ...                 | ...            | ...     | ...                         |
 
 **Commandes pour nettoyer**:
+
 ```bash
 # Supprimer OLD_VARIABLE_NAME de Vercel
 vercel env rm OLD_VARIABLE_NAME production --yes
@@ -464,14 +479,14 @@ gh secret delete DEPRECATED_KEY -R YoannDrx/mycryptopilot
 
 Railway héberge uniquement le **Discord Bot**, qui n'utilise **AUCUNE variable crypto/payment**.
 
-| Variable | Environnement | Raison | Action Urgente |
-|----------|---------------|--------|----------------|
-| `BASE_RPC_URL` | Railway | Crypto payments (Vercel only) | 🔴 SUPPRIMER |
-| `CRON_SECRET` | Railway | Cron jobs (Vercel only) | 🔴 SUPPRIMER |
-| `CRYPTO_NETWORK` | Railway | Crypto config (Vercel only) | 🔴 SUPPRIMER |
-| `CRYPTO_XPUB_BASE` | Railway | HD wallet (Vercel only) | 🔴 SUPPRIMER |
-| `CRYPTO_XPUB_TRON` | Railway | HD wallet (Vercel only) | 🔴 SUPPRIMER |
-| `TRON_RPC_URL` | Railway | Crypto payments (Vercel only) | 🔴 SUPPRIMER |
+| Variable           | Environnement | Raison                        | Action Urgente |
+| ------------------ | ------------- | ----------------------------- | -------------- |
+| `BASE_RPC_URL`     | Railway       | Crypto payments (Vercel only) | 🔴 SUPPRIMER   |
+| `CRON_SECRET`      | Railway       | Cron jobs (Vercel only)       | 🔴 SUPPRIMER   |
+| `CRYPTO_NETWORK`   | Railway       | Crypto config (Vercel only)   | 🔴 SUPPRIMER   |
+| `CRYPTO_XPUB_BASE` | Railway       | HD wallet (Vercel only)       | 🔴 SUPPRIMER   |
+| `CRYPTO_XPUB_TRON` | Railway       | HD wallet (Vercel only)       | 🔴 SUPPRIMER   |
+| `TRON_RPC_URL`     | Railway       | Crypto payments (Vercel only) | 🔴 SUPPRIMER   |
 
 **Impact**: Ces variables ne sont **PAS utilisées** par le Discord Bot et polluent l'environnement Railway.
 
@@ -488,6 +503,7 @@ Railway héberge uniquement le **Discord Bot**, qui n'utilise **AUCUNE variable 
 7. Confirme la suppression
 
 **Variables à supprimer** (6 au total):
+
 ```
 ❌ BASE_RPC_URL
 ❌ CRON_SECRET
@@ -505,11 +521,11 @@ Railway héberge uniquement le **Discord Bot**, qui n'utilise **AUCUNE variable 
 
 Variables définies localement mais **absentes de TOUS les environnements distants**:
 
-| Variable | Source Locale | Mapping Recommandé | Priorité |
-|----------|---------------|-------------------|----------|
-| `NEW_API_KEY` | `.env` line 150 | Vercel PROD + PREVIEW | P1 |
-| `TEST_FEATURE_FLAG` | `.env.local` line 200 | Vercel PREVIEW | P2 |
-| ... | ... | ... | ... |
+| Variable            | Source Locale         | Mapping Recommandé    | Priorité |
+| ------------------- | --------------------- | --------------------- | -------- |
+| `NEW_API_KEY`       | `.env` line 150       | Vercel PROD + PREVIEW | P1       |
+| `TEST_FEATURE_FLAG` | `.env.local` line 200 | Vercel PREVIEW        | P2       |
+| ...                 | ...                   | ...                   | ...      |
 
 **Action**: Ajouter ces variables selon le mapping recommandé.
 
@@ -520,12 +536,14 @@ Variables définies localement mais **absentes de TOUS les environnements distan
 ### Variables Critiques (P0 - Bloquantes)
 
 #### `DATABASE_URL`
+
 - **Devrait être**: Vercel PROD, Vercel PREVIEW (dev branch), GitHub Actions
 - **Est sur**: ❌ Aucun environnement
 - **Source**: `.env` line 26 (PROD), `.env.test` line 24 (CI)
 - **Action**: Ajouter IMMÉDIATEMENT (bloque app en production)
 
 #### `CRYPTO_XPUB_BASE`
+
 - **Devrait être**: Vercel PROD (mainnet), Vercel PREVIEW (testnet)
 - **Est sur**: ❌ Aucun environnement
 - **Source**: `.env` line 106 (mainnet), `.env.local` line 101 (testnet)
@@ -622,7 +640,8 @@ Suivre les commandes dans les sections "Commandes pour corriger" ci-dessus, une 
 **🎉 Fin du Rapport**
 
 _Généré par `/sync-env` le <DATE>_
-```
+
+````
 
 ---
 
@@ -673,17 +692,20 @@ echo "VALUE_HERE" | vercel env add VAR_NAME production
 
 # Exemple:
 echo "xpub6Ejw21u9tffx..." | vercel env add CRYPTO_XPUB_BASE production
-```
+````
 
 **Variables à synchroniser sur Vercel PROD**:
+
 - Toutes les variables de `.env` selon mapping (section E3)
 - Utiliser `production` comme environnement
 
 **Variables à synchroniser sur Vercel PREVIEW**:
+
 - Toutes les variables de `.env.local` selon mapping (section E3)
 - Utiliser `preview` comme environnement
 
 **Variables COMMUNES (PROD + PREVIEW)**:
+
 - Ajouter 2 fois (une fois avec `production`, une fois avec `preview`)
 
 #### GitHub Actions (via gh CLI avec stdin)
@@ -697,6 +719,7 @@ echo "postgresql://..." | gh secret set DATABASE_URL -R YoannDrx/mycryptopilot
 ```
 
 **Variables à synchroniser sur GitHub Actions**:
+
 - Variables de `.env.test` nécessaires pour CI
 - Voir mapping section E3-D
 
@@ -705,6 +728,7 @@ echo "postgresql://..." | gh secret set DATABASE_URL -R YoannDrx/mycryptopilot
 ⚠️ **Railway CLI ne permet PAS d'ajouter des variables automatiquement**.
 
 Pour Railway, générer uniquement des **instructions manuelles** avec:
+
 - Nom de la variable
 - Valeur à copier-coller
 - Lien direct vers dashboard
@@ -717,12 +741,14 @@ Avant d'exécuter les commandes, afficher:
 ## 🚀 Plan de Synchronisation
 
 **Variables à ajouter**:
+
 - Vercel Production: <N> variables
 - Vercel Preview: <N> variables
 - GitHub Actions: <N> secrets
 - Railway: <N> variables (manuel)
 
 **⚠️ ATTENTION**:
+
 - Les valeurs seront ajoutées automatiquement depuis les fichiers .env locaux
 - Vercel et GitHub Actions seront mis à jour via CLI
 - Railway nécessite une configuration manuelle (limitation CLI)
@@ -731,6 +757,7 @@ Avant d'exécuter les commandes, afficher:
 ```
 
 **Attendre la réponse de l'utilisateur** avec `AskUserQuestion`:
+
 - Option 1: "Oui, synchroniser maintenant" → Continuer
 - Option 2: "Non, seulement afficher le rapport" → Skip sync, afficher rapport
 - Option 3: "Annuler" → Arrêter la commande
@@ -764,6 +791,7 @@ Si l'utilisateur confirme:
 ### D. Gestion des Erreurs
 
 Pour chaque commande exécutée:
+
 - ✅ **Succès**: Logger et continuer
 - ❌ **Échec**: Logger l'erreur, demander si continuer ou arrêter
 - ⚠️ **Warning**: Variable existe déjà → Skip ou demander confirmation pour override
@@ -776,22 +804,26 @@ Après synchronisation, afficher:
 ## ✅ Synchronisation Terminée!
 
 **Résultats**:
+
 - Vercel Production: <N> variables ajoutées (✅ <success> / ❌ <failed>)
 - Vercel Preview: <N> variables ajoutées (✅ <success> / ❌ <failed>)
 - GitHub Actions: <N> secrets ajoutés (✅ <success> / ❌ <failed>)
 - Railway: <N> variables à ajouter manuellement (instructions ci-dessous)
 
 **Variables ajoutées avec succès**:
+
 - ✅ DATABASE_URL → Vercel PROD
 - ✅ CRYPTO_XPUB_BASE → Vercel PROD
 - ✅ BETTER_AUTH_SECRET → Vercel PROD + PREVIEW
 - ...
 
 **Erreurs rencontrées**:
+
 - ❌ STRIPE_SECRET_KEY → Vercel PROD (erreur: already exists)
 - ...
 
 **Actions manuelles requises**:
+
 - Railway: Ajouter 2 variables via dashboard (voir instructions ci-dessous)
 ```
 
@@ -818,6 +850,7 @@ Lorsque l'utilisateur lance `/sync-env`:
 **Durée totale estimée**: 3-5 minutes (incluant exécution).
 
 **Sécurité**:
+
 - Ne JAMAIS logger les valeurs complètes des secrets (premiers/derniers 4 chars seulement)
 - Parser les fichiers .env localement (pas de transmission)
 - Utiliser stdin pour passer les valeurs (plus sécurisé que arguments CLI)

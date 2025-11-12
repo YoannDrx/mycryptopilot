@@ -37,7 +37,9 @@ export async function notifyNewSignal(signal: {
   const channelId = env.DISCORD_FREE_SIGNALS_CHANNEL_ID;
 
   if (!channelId) {
-    logger.warn("No Discord channel configured for signal notifications (DISCORD_FREE_SIGNALS_CHANNEL_ID)");
+    logger.warn(
+      "No Discord channel configured for signal notifications (DISCORD_FREE_SIGNALS_CHANNEL_ID)",
+    );
     return false;
   }
 
@@ -72,7 +74,8 @@ export async function notifyNewSignal(signal: {
         channel = await guild.channels.create({
           name: "signals",
           type: 0, // Text channel
-          topic: "Trading signals from MyCryptoPilot verified traders (fallback)",
+          topic:
+            "Trading signals from MyCryptoPilot verified traders (fallback)",
         });
         logger.info("✅ #signals channel created");
       }
@@ -191,9 +194,7 @@ export async function notifyNewSignal(signal: {
     // Envoyer le message dans le channel privé du trader (ou #signals fallback)
     await channel.send({ embeds: [embed] });
 
-    logger.info(
-      `✅ Signal notification sent to ${channel.name}: ${signal.id}`,
-    );
+    logger.info(`✅ Signal notification sent to ${channel.name}: ${signal.id}`);
 
     // Poster aussi un teaser dans #signals-free (Phase 4.2 - non-bloquant)
     void postSignalTeaser(signal).catch((err) => {

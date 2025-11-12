@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export type SerializableLink = {
@@ -44,13 +44,22 @@ export function GlobalSearchCommand({
   allLinks: SerializableGroup[];
 }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  // Fix hydration: only render Dialog after client mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleOpen = () => {
     setOpen((open) => !open);
   };
 
-  useHotkeys("mod+k", toggleOpen);
+  // Disable hotkeys in test environment to prevent accidental triggers
+  useHotkeys("mod+k", toggleOpen, {
+    enabled: process.env.NODE_ENV !== "test",
+  });
 
   return (
     <>
@@ -74,28 +83,30 @@ export function GlobalSearchCommand({
         </div>
       </div>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type to search..." />
-        <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          {allLinks.map((group, index) => (
-            <CommandGroup heading={group.title} key={index}>
-              {group.links.map((link) => (
-                <CommandItem
-                  key={link.href}
-                  onSelect={() => {
-                    router.push(link.href);
-                    setOpen(false);
-                  }}
-                >
-                  <Search className="mr-2 size-4" />
-                  <span>{link.label}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          ))}
-        </CommandList>
-      </CommandDialog>
+      {mounted && (
+        <CommandDialog open={open} onOpenChange={setOpen}>
+          <CommandInput placeholder="Type to search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            {allLinks.map((group, index) => (
+              <CommandGroup heading={group.title} key={index}>
+                {group.links.map((link) => (
+                  <CommandItem
+                    key={link.href}
+                    onSelect={() => {
+                      router.push(link.href);
+                      setOpen(false);
+                    }}
+                  >
+                    <Search className="mr-2 size-4" />
+                    <span>{link.label}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </CommandDialog>
+      )}
     </>
   );
 }

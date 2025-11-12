@@ -32,6 +32,7 @@ pnpm worktree:setup https://github.com/YoannDrx/mycryptopilot/issues/42
 ```
 
 **What happens:**
+
 - Creates worktree at: `~/Developer/worktrees/mycryptopilot-worktrees/issue-XX-descriptive-name/`
 - Copies all `.env*` files from main project
 - Installs dependencies (`pnpm install`)
