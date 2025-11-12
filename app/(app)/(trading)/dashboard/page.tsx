@@ -43,6 +43,14 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   const user = await getRequiredUser();
+  const currentPlanName = user.userSubscription?.plan ?? "free";
+  const formattedPlanName =
+    currentPlanName.charAt(0).toUpperCase() + currentPlanName.slice(1);
+  const planDescription = user.userSubscription?.periodEnd
+    ? `Expires ${new Date(
+        user.userSubscription.periodEnd,
+      ).toLocaleDateString()}`
+    : "Upgrade to Pro for more features";
 
   // Fetch user's followed traders count
   const followedTradersCount = await prisma.follow.count({
@@ -141,19 +149,20 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-testid="plan-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Your Plan</CardTitle>
               <BookOpen className="text-muted-foreground size-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {user.userSubscription?.plan ?? "Free"}
+              <div className="text-2xl font-bold" data-testid="plan-name">
+                {formattedPlanName}
               </div>
-              <p className="text-muted-foreground text-xs">
-                {user.userSubscription?.periodEnd
-                  ? `Expires ${new Date(user.userSubscription.periodEnd).toLocaleDateString()}`
-                  : "Upgrade to Pro for more features"}
+              <p
+                className="text-muted-foreground text-xs"
+                data-testid="plan-status"
+              >
+                {planDescription}
               </p>
             </CardContent>
           </Card>

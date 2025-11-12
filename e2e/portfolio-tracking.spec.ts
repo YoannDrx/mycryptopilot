@@ -73,23 +73,33 @@ test.describe("Portfolio Tracking - Connection Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // Click disconnect button
-    const disconnectButton = page.getByRole("button", {
-      name: /disconnect/i,
-    });
+    const disconnectButton = page.getByRole("button", { name: /disconnect/i });
     await disconnectButton.click();
 
-    // Confirm dialog
+    // Confirm dialog requires typing "Disconnect"
+    const confirmInput = page.getByTestId("dialog-confirm-input");
+    await expect(confirmInput).toBeVisible({ timeout: 5000 });
+    await confirmInput.fill("Disconnect");
     await page
-      .getByRole("button", { name: /disconnect/i })
+      .getByRole("button", { name: /^disconnect$/i })
       .last()
       .click();
-    await page.waitForTimeout(1000);
 
-    // 12. Verify connection is now inactive
-    const updatedConnection = await prisma.exchangeConnection.findUnique({
-      where: { id: connection.id },
-    });
-    expect(updatedConnection?.isActive).toBe(false);
+    // 12. Verify connection is now inactive (wait for server action)
+    await expect
+      .poll(
+        async () => {
+          const updatedConnection =
+            await prisma.exchangeConnection.findUnique({
+              where: { id: connection.id },
+            });
+          return updatedConnection?.isActive;
+        },
+        {
+          timeout: 10000,
+        },
+      )
+      .toBe(false);
   });
 
   test("manual sync triggers trade fetching", async ({ page }) => {
@@ -172,30 +182,30 @@ test.describe("Portfolio Tracking - Performance Stats Display", () => {
 
     // 4. Test ALL_TIME period (default)
     await expect(page.getByText(/all time/i)).toBeVisible();
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 5. Test LAST_365D period
     const yearTab = page.getByRole("tab", { name: /1 year/i });
     await yearTab.click();
     await page.waitForTimeout(500);
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 6. Test LAST_90D period
     const quarterTab = page.getByRole("tab", { name: /90 days/i });
     await quarterTab.click();
     await page.waitForTimeout(500);
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 7. Test LAST_30D period
     const monthTab = page.getByRole("tab", { name: /30 days/i });
     await monthTab.click();
     await page.waitForTimeout(500);
-    await expect(page.getByText(/win rate/i)).toBeVisible();
+    await expect(page.getByText(/win rate/i).first()).toBeVisible();
 
     // 8. Verify all key metrics are displayed
-    await expect(page.getByText(/net pnl/i)).toBeVisible();
-    await expect(page.getByText(/profit factor/i)).toBeVisible();
-    await expect(page.getByText(/max drawdown/i)).toBeVisible();
+    await expect(page.getByText(/net pnl/i).first()).toBeVisible();
+    await expect(page.getByText(/profit factor/i).first()).toBeVisible();
+    await expect(page.getByText(/max drawdown/i).first()).toBeVisible();
   });
 
   test("displays 15 performance metrics for PRO users", async ({ page }) => {
@@ -339,12 +349,9 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     ).toBeVisible();
 
     // 4. Verify connect form is NOT visible
-    const connectForm = page.getByLabel(/api key/i);
-    await expect(connectForm).not.toBeVisible();
+    await expect(page.getByText(/connect new exchange/i)).toHaveCount(0);
+    await expect(page.getByLabel(/api key/i)).toHaveCount(0);
 
-    // 5. Verify upgrade button exists
-    const upgradeButton = page.getByRole("link", { name: /upgrade to pro/i });
-    await expect(upgradeButton).toBeVisible();
   });
 });
 

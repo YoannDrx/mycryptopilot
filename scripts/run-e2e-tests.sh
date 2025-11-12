@@ -25,6 +25,17 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+load_test_env_file() {
+  local file="$1"
+  if [[ -f "$file" ]]; then
+    echo -e "${GREEN}   ℹ️  Variables chargées depuis ${file}\n${NC}"
+    set -a
+    # shellcheck disable=SC1090
+    source "$file"
+    set +a
+  fi
+}
+
 echo -e "${BLUE}==============================================================================\n${NC}"
 echo -e "${BLUE}🧪 MyCryptoPilot - E2E Tests Runner\n${NC}"
 echo -e "${BLUE}==============================================================================\n${NC}"
@@ -90,6 +101,17 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Load local test env vars (only outside CI) so Next.js + Playwright share DB
+# ------------------------------------------------------------------------------
+if [[ -z "${CI:-}" ]]; then
+  echo -e "${YELLOW}🔐 Chargement des variables d'environnement de test locales...\n${NC}"
+  load_test_env_file ".env.test"
+  load_test_env_file ".env.test.local"
+else
+  echo -e "${GREEN}   ℹ️  Environnement CI détecté - variables existantes conservées\n${NC}"
+fi
+
+# ------------------------------------------------------------------------------
 # Step 4: Run E2E tests
 # ------------------------------------------------------------------------------
 echo -e "${YELLOW}🧪 Étape 4/4 : Lancement des tests E2E...\n${NC}"
@@ -111,7 +133,8 @@ fi
 #   ./scripts/run-e2e-tests.sh                           # Run all tests
 #   ./scripts/run-e2e-tests.sh e2e/follow-unfollow.spec.ts:7  # Run specific test
 #   ./scripts/run-e2e-tests.sh e2e/follow-unfollow.spec.ts     # Run specific file
-if NODE_ENV=test HEADLESS=true npx playwright test "$@"; then
+PLAYWRIGHT_HEADLESS="${HEADLESS:-true}"
+if NODE_ENV=test HEADLESS="$PLAYWRIGHT_HEADLESS" npx playwright test "$@"; then
   echo -e "\n${GREEN}==============================================================================\n${NC}"
   echo -e "${GREEN}✅ Tests E2E terminés avec succès !\n${NC}"
   echo -e "${GREEN}==============================================================================\n${NC}"

@@ -54,6 +54,7 @@ export default async function PricingPage() {
           {MYCRYPTOPILOT_PLANS.filter((p) => p.name !== "test").map((plan) => (
             <Card
               key={plan.name}
+              data-testid={`plan-card-${plan.name}`}
               className={
                 plan.isPopular
                   ? "border-primary relative shadow-lg"
@@ -146,7 +147,9 @@ export default async function PricingPage() {
                     size="lg"
                     asChild
                   >
-                    <Link href="/dashboard">Get Started</Link>
+                    <Link href="/dashboard" data-testid="subscribe-free">
+                      Get Started
+                    </Link>
                   </Button>
                 ) : (
                   <Button
@@ -155,7 +158,12 @@ export default async function PricingPage() {
                     size="lg"
                     asChild
                   >
-                    <Link href={`/checkout/${plan.name}`}>Subscribe Now</Link>
+                    <Link
+                      href={`/checkout/${plan.name}`}
+                      data-testid={`subscribe-${plan.name}`}
+                    >
+                      Subscribe Now
+                    </Link>
                   </Button>
                 )}
               </CardFooter>

@@ -34,52 +34,50 @@ test.describe("Crypto Checkout Flow", () => {
       timeout: 30000,
     });
 
-    // 4. Select payment network (Base - USDC)
-    const baseOption = page.getByLabel(/base.*usdc/i);
-    if (await baseOption.isVisible()) {
-      await baseOption.click();
-    }
+    // 4. Wait for Base + Tron addresses to generate automatically
+    const baseAddressField = page.getByTestId("base-address");
+    const tronAddressField = page.getByTestId("tron-address");
 
-    // 5. Click "Generate Payment Address" button
-    const generateButton = page.getByRole("button", {
-      name: /generate.*address|get.*address/i,
+    await expect(baseAddressField).toBeVisible({ timeout: 30000 });
+    await expect(tronAddressField).toBeVisible({ timeout: 30000 });
+
+    const baseAddress = (await baseAddressField.innerText()).trim();
+    const tronAddress = (await tronAddressField.innerText()).trim();
+
+    expect(baseAddress).toMatch(/^0x[a-fA-F0-9]{40}$/);
+    expect(tronAddress).toMatch(/^T[a-zA-Z0-9]{30,}$/);
+
+    // 5. Verify QR codes and instructions are visible
+    await expect(page.getByTestId("base-qr")).toBeVisible();
+    await expect(page.getByTestId("tron-qr")).toBeVisible();
+    await expect(page.getByText(/send usdc to/i)).toBeVisible();
+    await expect(page.getByText(/send usdt/i)).toBeVisible();
+
+    // 6. Verify crypto addresses recorded in database
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: userData.email },
     });
 
-    if (await generateButton.isVisible()) {
-      await generateButton.click();
+    const addresses = await prisma.cryptoAddress.findMany({
+      where: {
+        userId: user.id,
+        network: { in: ["BASE", "TRON"] },
+      },
+    });
 
-      // 6. Wait for payment address to be generated and displayed
-      await expect(page.getByText(/0x[a-fA-F0-9]{40}/)).toBeVisible({
-        timeout: 15000,
-      });
-
-      // 7. Verify QR code appears
-      await expect(page.locator("canvas, img[alt*='QR']")).toBeVisible({
-        timeout: 5000,
-      });
-
-      // 8. Verify payment instructions displayed
-      await expect(page.getByText(/send.*usdc|transfer.*usdc/i)).toBeVisible();
-
-      // 9. Verify crypto address was created in database
-      const user = await prisma.user.findUniqueOrThrow({
-        where: { email: userData.email },
-      });
-
-      const cryptoAddress = await prisma.cryptoAddress.findFirst({
-        where: {
-          userId: user.id,
-          network: "BASE",
-        },
-      });
-
-      expect(cryptoAddress).not.toBeNull();
-      expect(cryptoAddress?.address).toMatch(/^0x[a-fA-F0-9]{40}$/);
-      expect(cryptoAddress?.isActive).toBe(true);
-    }
+    expect(addresses).toHaveLength(2);
+    expect(
+      addresses.find((addr) => addr.network === "BASE")?.address,
+    ).toMatch(/^0x[a-fA-F0-9]{40}$/);
+    expect(
+      addresses.find((addr) => addr.network === "TRON")?.address,
+    ).toMatch(/^T[a-zA-Z0-9]{30,}$/);
+    addresses.forEach((addr) => expect(addr.isActive).toBe(true));
   });
 
-  test("user can switch between payment networks", async ({ page }) => {
+  test("checkout displays Base and Tron payment options simultaneously", async ({
+    page,
+  }) => {
     // 1. Create a user account
     await createTestAccount({
       page,
@@ -92,25 +90,16 @@ test.describe("Crypto Checkout Flow", () => {
     await page.goto("/checkout/ultra");
     await page.waitForLoadState("networkidle");
 
-    // 3. Select Base (USDC) network
-    const baseOption = page.getByLabel(/base.*usdc/i);
-    if (await baseOption.isVisible()) {
-      await baseOption.click();
+    // 3. Verify Base & Tron sections render addresses + amounts without toggling
+    await expect(page.getByTestId("base-address")).toBeVisible({
+      timeout: 30000,
+    });
+    await expect(page.getByTestId("tron-address")).toBeVisible({
+      timeout: 30000,
+    });
 
-      // Verify price shown in USDC
-      await expect(page.getByText(/99.*usdc/i)).toBeVisible({
-        timeout: 5000,
-      });
-
-      // 4. Switch to Tron (USDT) network
-      const tronOption = page.getByLabel(/tron.*usdt/i);
-      await tronOption.click();
-
-      // Verify price shown in USDT
-      await expect(page.getByText(/99.*usdt/i)).toBeVisible({
-        timeout: 5000,
-      });
-    }
+    await expect(page.getByTestId("base-amount")).toContainText(/99.*USDC/i);
+    await expect(page.getByTestId("tron-amount")).toContainText(/99.*USDT/i);
   });
 
   test("checkout page shows plan features correctly", async ({ page }) => {

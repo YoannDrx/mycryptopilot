@@ -83,10 +83,11 @@ test.describe("Subscription Activation Flow", () => {
     await page.goto("/dashboard");
     await page.waitForLoadState("networkidle");
 
-    // Verify "Pro" plan badge or indicator visible
-    await expect(page.getByText(/pro.*plan/i)).toBeVisible({
-      timeout: 10000,
-    });
+    // Verify plan card reflects Pro status
+    const planCard = page.getByTestId("plan-card");
+    await expect(planCard).toBeVisible({ timeout: 10000 });
+    await expect(planCard.getByTestId("plan-name")).toHaveText(/pro/i);
+    await expect(planCard.getByTestId("plan-status")).toContainText(/expire/i);
   });
 
   test("pro-rata payment grants correct days", async ({ page }) => {
