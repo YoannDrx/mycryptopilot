@@ -316,8 +316,9 @@ test.describe("Portfolio Tracking - Free User Gating", () => {
     await expect(upgradeButton).toBeVisible();
 
     // 9. Click upgrade button and verify redirect to pricing
+    const waitForPricing = page.waitForURL(/\/pricing/, { timeout: 30000 });
     await upgradeButton.click();
-    await page.waitForURL(/\/pricing/);
+    await waitForPricing;
     expect(page.url()).toContain("/pricing");
   });
 

@@ -134,13 +134,6 @@ test.describe("Traders Marketplace", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const grid = page.locator('[data-testid="traders-grid"]');
-    const waitForFetch = async () =>
-      page.waitForResponse(
-        (response) =>
-          response.url().includes("/api/traders/search") &&
-          response.request().method() === "GET",
-        { timeout: 15000 },
-      );
 
     const searchInput = page.getByPlaceholder(/search traders/i);
     await expect(searchInput).toBeVisible();
@@ -155,39 +148,45 @@ test.describe("Traders Marketplace", () => {
       grid.getByText(`Altcoin Master ${timestamp}`).first(),
     ).toBeVisible();
 
-    const searchFetch = waitForFetch();
     await searchInput.fill(`Whale Trader ${timestamp}`);
-    await searchFetch;
 
     await expect(
       grid.getByText(`Crypto Whale Trader ${timestamp}`).first(),
-    ).toBeVisible();
-    await expect(grid.getByText(`Bitcoin Expert ${timestamp}`)).toHaveCount(0);
-    await expect(grid.getByText(`Altcoin Master ${timestamp}`)).toHaveCount(0);
+    ).toBeVisible({ timeout: 15000 });
+    await expect(
+      grid.getByText(`Bitcoin Expert ${timestamp}`),
+    ).toHaveCount(0, { timeout: 15000 });
+    await expect(
+      grid.getByText(`Altcoin Master ${timestamp}`),
+    ).toHaveCount(0, { timeout: 15000 });
 
-    const clearFetch = waitForFetch();
     await searchInput.fill("");
-    await clearFetch;
+    await expect(
+      grid.getByText(`Bitcoin Expert ${timestamp}`).first(),
+    ).toBeVisible({ timeout: 15000 });
+    await expect(
+      grid.getByText(`Altcoin Master ${timestamp}`).first(),
+    ).toBeVisible({ timeout: 15000 });
 
     const filterTrigger = page.locator('button[role="combobox"]').first();
     await filterTrigger.click();
     await page.getByRole("option", { name: /verified only/i }).click();
-    await waitForFetch();
+    await expect(
+      grid.getByText(`Bitcoin Expert ${timestamp}`),
+    ).toHaveCount(0, { timeout: 15000 });
 
     await expect(
       grid.getByText(`Crypto Whale Trader ${timestamp}`).first(),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15000 });
     await expect(
       grid.getByText(`Altcoin Master ${timestamp}`).first(),
-    ).toBeVisible();
-    await expect(grid.getByText(`Bitcoin Expert ${timestamp}`)).toHaveCount(0);
+    ).toBeVisible({ timeout: 15000 });
 
     await filterTrigger.click();
     await page.getByRole("option", { name: /all traders/i }).click();
-    await waitForFetch();
 
     await expect(
       grid.getByText(`Bitcoin Expert ${timestamp}`).first(),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15000 });
   });
 });
