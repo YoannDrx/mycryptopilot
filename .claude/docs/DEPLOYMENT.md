@@ -75,10 +75,7 @@ mycryptopilot/
 
 ### Déploiement
 
-```bash
-# Depuis la racine du repo
-fly deploy --config fly.worker.toml --ha=false
-```
+- Depuis la racine du repo : `pnpm worker:deploy` (alias de `fly deploy --config fly.worker.toml --ha=false`).
 
 - `--ha=false` évite la création d’un standby VM (1 seule machine shared-cpu-1x).
 - Le build lance `pnpm install`, `prisma generate`, puis démarre `pnpm worker`.

@@ -39,7 +39,7 @@ The worker needs the same secrets as the Next.js app plus the crypto watcher inp
 | --- | --- |
 | Database & crypto | `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `ENCRYPTION_SECRET`, `CRYPTO_NETWORK`, `CRYPTO_XPUB_BASE`, `CRYPTO_XPUB_TRON`, `BASE_RPC_URL`, `TRON_RPC_URL`, `USDC_BASE_CONTRACT`, `USDT_TRON_CONTRACT` |
 | Auth & site config | `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_EMAIL_CONTACT`, `EMAIL_FROM` |
-| Notifications & Discord | `RESEND_API_KEY`, `DISCORD_BOT_ENABLED`, `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`, `DISCORD_PRO_ROLE_ID`, `DISCORD_ULTRA_ROLE_ID`, `DISCORD_FREE_ROLE_ID`, `DISCORD_ROLE_ADMIN_ID`, `DISCORD_LOG_CHANNEL_ID`, etc. |
+| Notifications & Discord | `RESEND_API_KEY`, `DISCORD_BOT_ENABLED`, `DISCORD_BOT_TOKEN`, **`DISCORD_CLIENT_ID`** (required for slash commands), `DISCORD_GUILD_ID`, `DISCORD_PRO_ROLE_ID`, `DISCORD_ULTRA_ROLE_ID`, `DISCORD_FREE_ROLE_ID`, `DISCORD_ROLE_ADMIN_ID`, `DISCORD_LOG_CHANNEL_ID`, etc. |
 | Cron-only | `CRON_SECRET` (still used by the HTTP fallback routes), `PAYMENT_WATCHER_INTERVAL_MS` (optional override, defaults to 60 000 ms) |
 
 Set them in one shot (example):
@@ -64,6 +64,7 @@ fly secrets set \
   RESEND_API_KEY="re_..." \
   DISCORD_BOT_ENABLED="true" \
   DISCORD_BOT_TOKEN="..." \
+  DISCORD_CLIENT_ID="..." \
   DISCORD_GUILD_ID="..." \
   DISCORD_PRO_ROLE_ID="..." \
   DISCORD_ULTRA_ROLE_ID="..." \
@@ -77,10 +78,11 @@ Add any other env vars used by the jobs (e.g. Stripe legacy keys if still refere
 ## 3. Deploy
 
 ```bash
+# alias: pnpm worker:deploy
 fly deploy --config fly.worker.toml --ha=false
 ```
 
-Passing `--ha=false` prevents Fly from creating a standby VM, keeping the footprint at a single shared-cpu-1x machine (~$0.60/mo). The Dockerfile installs dependencies, runs `pnpm prisma generate`, and starts the worker via `pnpm worker`.
+Passing `--ha=false` prevents Fly from creating a standby VM. Pour aller plus vite, utilise `pnpm worker:deploy` (défini dans `package.json`), qui lance exactement la commande ci-dessus.
 
 ## 4. Monitor & operate
 
@@ -89,6 +91,37 @@ Passing `--ha=false` prevents Fly from creating a standby VM, keeping the footpr
 - **SSH console** (for inspecting running machines): `fly ssh console -a <app-name>`
 - **Redeploy** after code changes: `fly deploy --config fly.worker.toml --ha=false`
 - **Remove a stray standby VM** (if one gets re-created): `fly machines list -a <app-name>` then `fly machines remove <id> -a <app-name> --force`
+
+## 4.1. Resources & Performance
+
+### RAM Requirements
+
+Le worker Fly.io exécute simultanément :
+- Discord.js client (~40-60 MB)
+- Prisma ORM (~30-40 MB)
+- Payment watcher (ethers.js + TronWeb) (~30-40 MB)
+- 4 cron jobs (~20-30 MB)
+- Node.js runtime (~50-80 MB)
+
+**Configuration recommandée** : **512 MB RAM minimum**
+
+Si vous rencontrez des erreurs OOM (Out Of Memory) dans les logs, augmentez la RAM :
+
+```bash
+fly scale memory 512 -a mycryptopilot-worker
+```
+
+Le fichier `fly.worker.toml` inclut déjà une optimisation Node.js (`--max-old-space-size=384`) pour limiter l'utilisation du heap à 384 MB (75% de 512 MB), forçant un garbage collection plus agressif.
+
+### Monitoring OOM
+
+Pour vérifier si le worker crash à cause de la RAM :
+
+```bash
+fly logs -a mycryptopilot-worker --no-tail | grep -i "oom\|memory\|killed"
+```
+
+Si vous voyez `Out of memory: Killed process` ou `OOM killed`, augmentez la RAM.
 
 ## 5. Local testing
 

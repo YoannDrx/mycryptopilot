@@ -112,8 +112,8 @@ Le dossier `scripts/dev-tools/` contient les scripts de debug ciblés (checkout,
 
 ### Worker Fly.io (Cron + Discord bot)
 
-1. Installer Fly CLI : `brew install flyctl` puis `fly auth login`.
-2. Déployer via `fly deploy --config fly.worker.toml --ha=false` (pense à charger les secrets avant).
+1. Installer Fly CLI : `brew install flyctl` puis `fly auth login`.
+2. Déployer ou redémarrer rapidement via `pnpm worker:deploy` (alias pour `fly deploy --config fly.worker.toml --ha=false`, pense à charger les secrets avant).
 3. Surveiller avec `fly logs -a mycryptopilot-worker --no-tail`.
 
 Tous les détails (secrets requis, commandes, monitoring) sont décrits dans `.claude/docs/FLY-WORKER.md` et la section Discord de `.claude/docs/DISCORD-SETUP.md`.
