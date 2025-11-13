@@ -38,6 +38,57 @@ const SSE_HEADERS = {
 };
 
 /**
+ * HEAD /api/trader/[traderId]/balance/stream
+ *
+ * Check if SSE is available for this trader
+ * Returns 200 if balance is cached (worker is active)
+ * Returns 404 if no balance available yet
+ */
+export async function HEAD(
+  request: NextRequest,
+  { params }: { params: Promise<{ traderId: string }> },
+) {
+  try {
+    const { traderId } = await params;
+
+    // Authentication check
+    const user = await getUser();
+    if (!user) {
+      return new Response(null, { status: 401 });
+    }
+
+    // Authorization check
+    if (user.id !== traderId && user.role !== "admin") {
+      return new Response(null, { status: 403 });
+    }
+
+    // Check if balance is available
+    const hasBalance = balanceCache.has(traderId);
+
+    if (hasBalance) {
+      return new Response(null, {
+        status: 200,
+        headers: {
+          "X-Balance-Available": "true",
+          "Cache-Control": "no-cache",
+        },
+      });
+    }
+
+    return new Response(null, {
+      status: 404,
+      headers: {
+        "X-Balance-Available": "false",
+        "Cache-Control": "no-cache",
+      },
+    });
+  } catch (error) {
+    logger.error("Failed to check SSE availability", { error });
+    return new Response(null, { status: 500 });
+  }
+}
+
+/**
  * GET /api/trader/[traderId]/balance/stream
  *
  * Stream real-time balance updates via SSE
