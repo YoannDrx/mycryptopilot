@@ -597,27 +597,170 @@ export class BinanceService implements ExchangeAdapter {
    * Create order (for copy-trading)
    * @implements ExchangeAdapter.createOrder
    */
-  async createOrder(_params: CreateOrderParams): Promise<OrderResult> {
-    // TODO: Implement in Phase 3 (copy-trading)
-    throw new Error("createOrder not yet implemented (Phase 3)");
+  async createOrder(params: CreateOrderParams): Promise<OrderResult> {
+    try {
+      const {
+        symbol,
+        side,
+        type,
+        quantity,
+        price,
+        timeInForce,
+        clientOrderId,
+        instrumentType,
+        positionSide,
+        reduceOnly,
+      } = params;
+
+      // Convert our side to CCXT format
+      const ccxtSide = side === "BUY" ? "buy" : "sell";
+
+      // Convert our type to CCXT format
+      const ccxtType = this.mapOrderTypeToCCXT(type);
+
+      // Build CCXT params
+      const ccxtParams: Record<string, unknown> = {};
+
+      // Set market type based on instrumentType
+      if (
+        instrumentType === "FUTURES_USDT" ||
+        instrumentType === "FUTURES_COIN"
+      ) {
+        ccxtParams.type = "future";
+      } else if (instrumentType === "MARGIN") {
+        ccxtParams.type = "margin";
+      }
+
+      // Add optional parameters
+      if (timeInForce) ccxtParams.timeInForce = timeInForce;
+      if (clientOrderId) ccxtParams.clientOrderId = clientOrderId;
+      if (positionSide) ccxtParams.positionSide = positionSide;
+      if (reduceOnly !== undefined) ccxtParams.reduceOnly = reduceOnly;
+
+      // Create order via CCXT
+      const ccxtOrder = await this.exchange.createOrder(
+        symbol,
+        ccxtType,
+        ccxtSide,
+        quantity,
+        price,
+        ccxtParams,
+      );
+
+      // Convert CCXT response to OrderResult
+      const orderResult: OrderResult = {
+        orderId: String(ccxtOrder.id),
+        clientOrderId: ccxtOrder.clientOrderId
+          ? String(ccxtOrder.clientOrderId)
+          : null,
+        symbol: String(ccxtOrder.symbol),
+        status: this.mapCCXTOrderStatus(ccxtOrder.status ?? "open"),
+        executedQty: Number(ccxtOrder.filled),
+        executedPrice: Number(ccxtOrder.average),
+        cummulativeQuoteQty: Number(ccxtOrder.cost),
+        fills: ccxtOrder.trades.map((trade) => ({
+          price: Number(trade.price),
+          quantity: Number(trade.amount),
+          fee: Number(trade.fee?.cost ?? 0),
+          feeCurrency: String(trade.fee?.currency ?? "USDT"),
+        })),
+        transactTime: ccxtOrder.timestamp
+          ? new Date(ccxtOrder.timestamp)
+          : new Date(),
+        raw: ccxtOrder.info as unknown,
+      };
+
+      logger.info("Order created successfully", {
+        orderId: orderResult.orderId,
+        symbol,
+        side,
+        type,
+      });
+
+      return orderResult;
+    } catch (error) {
+      logger.error("Failed to create order", { error, params });
+      throw error;
+    }
   }
 
   /**
    * Cancel order
    * @implements ExchangeAdapter.cancelOrder
    */
-  async cancelOrder(_params: CancelOrderParams): Promise<void> {
-    // TODO: Implement in Phase 3 (copy-trading)
-    throw new Error("cancelOrder not yet implemented (Phase 3)");
+  async cancelOrder(params: CancelOrderParams): Promise<void> {
+    try {
+      const { symbol, orderId, clientOrderId } = params;
+
+      // CCXT cancelOrder requires orderId or clientOrderId
+      if (!orderId && !clientOrderId) {
+        throw new Error("Either orderId or clientOrderId must be provided");
+      }
+
+      const ccxtParams: Record<string, unknown> = {};
+      if (clientOrderId) {
+        ccxtParams.clientOrderId = clientOrderId;
+      }
+
+      // Cancel order via CCXT
+      const orderIdToCancel = orderId ?? clientOrderId ?? "";
+      await this.exchange.cancelOrder(orderIdToCancel, symbol, ccxtParams);
+
+      logger.info("Order canceled successfully", {
+        orderId,
+        clientOrderId,
+        symbol,
+      });
+    } catch (error) {
+      logger.error("Failed to cancel order", { error, params });
+      throw error;
+    }
   }
 
   /**
    * Get order status
    * @implements ExchangeAdapter.getOrderStatus
    */
-  async getOrderStatus(_params: CancelOrderParams): Promise<OrderStatus> {
-    // TODO: Implement in Phase 3 (copy-trading)
-    throw new Error("getOrderStatus not yet implemented (Phase 3)");
+  async getOrderStatus(params: CancelOrderParams): Promise<OrderStatus> {
+    try {
+      const { symbol, orderId, clientOrderId } = params;
+
+      // CCXT fetchOrder requires orderId or clientOrderId
+      if (!orderId && !clientOrderId) {
+        throw new Error("Either orderId or clientOrderId must be provided");
+      }
+
+      const ccxtParams: Record<string, unknown> = {};
+      if (clientOrderId) {
+        ccxtParams.clientOrderId = clientOrderId;
+      }
+
+      // Fetch order via CCXT
+      const orderIdToFetch = orderId ?? clientOrderId ?? "";
+      const ccxtOrder = await this.exchange.fetchOrder(
+        orderIdToFetch,
+        symbol,
+        ccxtParams,
+      );
+
+      // Convert CCXT response to OrderStatus
+      const orderStatus: OrderStatus = {
+        orderId: String(ccxtOrder.id),
+        status: this.mapCCXTOrderStatus(ccxtOrder.status ?? "open"),
+        executedQty: Number(ccxtOrder.filled),
+        price: Number(ccxtOrder.price),
+        stopPrice: ccxtOrder.stopPrice ? Number(ccxtOrder.stopPrice) : null,
+        updatedAt: ccxtOrder.timestamp
+          ? new Date(ccxtOrder.timestamp)
+          : new Date(),
+        raw: ccxtOrder.info as unknown,
+      };
+
+      return orderStatus;
+    } catch (error) {
+      logger.error("Failed to get order status", { error, params });
+      throw error;
+    }
   }
 
   /**
@@ -909,5 +1052,64 @@ export class BinanceService implements ExchangeAdapter {
 
     // Coin-margined futures (inverse)
     return "FUTURES_COIN";
+  }
+
+  /**
+   * Map our order type to CCXT order type
+   * Helper for createOrder()
+   */
+  private mapOrderTypeToCCXT(
+    orderType: string,
+  ):
+    | "market"
+    | "limit"
+    | "stop_loss"
+    | "stop_loss_limit"
+    | "take_profit"
+    | "take_profit_limit" {
+    switch (orderType.toUpperCase()) {
+      case "MARKET":
+        return "market";
+      case "LIMIT":
+        return "limit";
+      case "STOP_LOSS":
+        return "stop_loss";
+      case "STOP_LOSS_LIMIT":
+        return "stop_loss_limit";
+      case "TAKE_PROFIT":
+        return "take_profit";
+      case "TAKE_PROFIT_LIMIT":
+        return "take_profit_limit";
+      default:
+        return "market"; // Default fallback
+    }
+  }
+
+  /**
+   * Map CCXT order status to our OrderStatus enum
+   * Helper for createOrder() and getOrderStatus()
+   */
+  private mapCCXTOrderStatus(
+    ccxtStatus: string,
+  ): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" {
+    switch (ccxtStatus.toLowerCase()) {
+      case "open":
+      case "new":
+        return "NEW";
+      case "partially_filled":
+      case "partial":
+        return "PARTIALLY_FILLED";
+      case "filled":
+      case "closed":
+        return "FILLED";
+      case "canceled":
+      case "cancelled":
+        return "CANCELED";
+      case "rejected":
+      case "expired":
+        return "REJECTED";
+      default:
+        return "NEW"; // Default fallback
+    }
   }
 }
