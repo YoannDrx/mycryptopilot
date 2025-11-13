@@ -4,10 +4,24 @@
  * Automatic risk management for copy-trading.
  * Prevents excessive losses and trades per user.
  * Resets daily at midnight UTC.
+ *
+ * ARCHITECTURE (Phase 2.1 - Atomic Operations):
+ * - Redis: Real-time atomic counters (trades, loss) with TTL
+ * - Prisma: Configuration (limits) + persistent state (isTripped)
+ *
+ * This hybrid approach ensures:
+ * - Atomic operations prevent race conditions (Redis)
+ * - Configuration persistence across restarts (Prisma)
+ * - Graceful degradation if Redis unavailable
  */
 
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
+import {
+  checkAndIncrementTrades as atomicCheckAndIncrementTrades,
+  incrementLoss as atomicIncrementLoss,
+  getCounters as getRedisCounters,
+} from "./circuit-breaker-redis";
 
 /**
  * Custom error for circuit breaker trips
@@ -27,84 +41,124 @@ export class CircuitBreakerTrippedError extends Error {
  * Check if circuit breaker is tripped for a user
  * Throws CircuitBreakerTrippedError if breaker is tripped
  *
- * This function is called before executing any copy-trade
- * Uses transaction to ensure atomic check + update
+ * Phase 2.1 - Atomic Operations:
+ * - Uses Redis atomic INCR for trade counter (prevents race conditions)
+ * - Checks Prisma for manual trip status and configuration
+ * - Atomically increments counter BEFORE executing trade
+ *
+ * Old pattern (race condition):
+ *   1. Check count < limit (READ)
+ *   2. Execute trade
+ *   3. Increment count (WRITE)
+ *   ❌ Gap between steps 1-3 allows race condition
+ *
+ * New pattern (atomic):
+ *   1. Atomic INCR + check (single operation)
+ *   2. Execute trade (only if step 1 succeeded)
+ *   ✅ No gap, no race condition
  */
 export async function checkCircuitBreaker(userId: string): Promise<void> {
-  await prisma.$transaction(async (tx) => {
-    // Get or create circuit breaker for user
-    let breaker = await tx.circuitBreaker.findUnique({
-      where: { userId },
+  // Get or create circuit breaker configuration
+  let breaker = await prisma.circuitBreaker.findUnique({
+    where: { userId },
+  });
+
+  if (!breaker) {
+    // Create default circuit breaker
+    breaker = await prisma.circuitBreaker.create({
+      data: {
+        userId,
+        maxDailyTrades: 20,
+        maxLossPercent: 5.0,
+      },
     });
+    logger.info("Circuit breaker created for user", { userId });
+  }
 
-    if (!breaker) {
-      // Create default circuit breaker
-      breaker = await tx.circuitBreaker.create({
-        data: {
-          userId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-        },
-      });
-      logger.info("Circuit breaker created for user", { userId });
-    }
+  // Check if manually tripped
+  if (breaker.isTripped) {
+    throw new CircuitBreakerTrippedError(
+      `Circuit breaker is tripped: ${breaker.tripReason}`,
+      breaker.tripReason ?? "unknown",
+      userId,
+    );
+  }
 
-    // Check if we need to reset daily counters
-    const now = new Date();
-    const lastReset = new Date(breaker.lastResetAt);
-    const isNewDay =
-      now.getUTCDate() !== lastReset.getUTCDate() ||
-      now.getUTCMonth() !== lastReset.getUTCMonth() ||
-      now.getUTCFullYear() !== lastReset.getUTCFullYear();
+  // Atomically check and increment trade counter using Redis
+  // This replaces the old check-then-increment pattern
+  // Throws CircuitBreakerTrippedError if limit exceeded
+  await atomicCheckAndIncrementTrades(userId, breaker.maxDailyTrades);
 
-    if (isNewDay) {
-      // Reset daily counters
-      breaker = await tx.circuitBreaker.update({
-        where: { userId },
-        data: {
-          dailyTradesCount: 0,
-          dailyLossUsd: 0,
-          isTripped: false,
-          tripReason: null,
-          lastResetAt: now,
-        },
-      });
-      logger.info("Circuit breaker reset for new day", { userId });
-    }
+  // Note: Loss limit is checked separately when loss is recorded
+  // (after trade completes and PnL is calculated)
 
-    // Check if already tripped
-    if (breaker.isTripped) {
-      throw new CircuitBreakerTrippedError(
-        `Circuit breaker is tripped: ${breaker.tripReason}`,
-        breaker.tripReason ?? "unknown",
-        userId,
-      );
-    }
+  logger.debug("Circuit breaker check passed", {
+    userId,
+    maxTrades: breaker.maxDailyTrades,
+  });
+}
 
-    // Check daily trade limit
-    if (breaker.dailyTradesCount >= breaker.maxDailyTrades) {
-      await tx.circuitBreaker.update({
-        where: { userId },
-        data: {
-          isTripped: true,
-          tripReason: "max_trades",
-          lastTrippedAt: new Date(),
-        },
-      });
-      logger.warn("Circuit breaker tripped", { userId, reason: "max_trades" });
-      throw new CircuitBreakerTrippedError(
-        `Max daily trades exceeded (${breaker.maxDailyTrades})`,
-        "max_trades",
-        userId,
-      );
-    }
+/**
+ * Increment trade counter after successful execution
+ * Called after a copy-trade is executed
+ *
+ * @deprecated Phase 2.1 - No longer needed with atomic operations
+ *
+ * With atomic pattern, counter is incremented in checkCircuitBreaker()
+ * BEFORE executing the trade (not after). This prevents race conditions.
+ *
+ * This function is now a no-op for backwards compatibility.
+ * It will be removed in a future version.
+ */
+export async function incrementTradeCounter(userId: string): Promise<void> {
+  // No-op: Counter already incremented atomically in checkCircuitBreaker()
+  logger.debug("incrementTradeCounter called (no-op with atomic pattern)", {
+    userId,
+  });
+}
 
-    // Check daily loss limit (if maxLossAmount is set)
-    if (
-      breaker.maxLossAmount &&
-      breaker.dailyLossUsd.toNumber() >= breaker.maxLossAmount.toNumber()
-    ) {
-      await tx.circuitBreaker.update({
+/**
+ * Record loss for circuit breaker
+ * Called after a losing trade
+ *
+ * Phase 2.1 - Atomic Operations:
+ * - Uses Redis atomic INCRBYFLOAT for loss counter
+ * - Trips circuit breaker if limit exceeded
+ * - Updates Prisma for persistent trip status
+ */
+export async function recordLoss(
+  userId: string,
+  lossUsd: number,
+): Promise<void> {
+  // Get configuration
+  const breaker = await prisma.circuitBreaker.findUnique({
+    where: { userId },
+  });
+
+  if (!breaker) {
+    logger.warn("Circuit breaker not found for user, skipping loss record", {
+      userId,
+    });
+    return;
+  }
+
+  // Atomically increment loss counter in Redis
+  try {
+    await atomicIncrementLoss(
+      userId,
+      lossUsd,
+      breaker.maxLossAmount?.toNumber() ?? null,
+    );
+
+    logger.warn("Loss recorded (atomic)", {
+      userId,
+      lossUsd,
+      maxLossAmount: breaker.maxLossAmount?.toNumber(),
+    });
+  } catch (error) {
+    if (error instanceof CircuitBreakerTrippedError) {
+      // Trip circuit breaker in Prisma for persistence
+      await prisma.circuitBreaker.update({
         where: { userId },
         data: {
           isTripped: true,
@@ -112,77 +166,16 @@ export async function checkCircuitBreaker(userId: string): Promise<void> {
           lastTrippedAt: new Date(),
         },
       });
-      logger.warn("Circuit breaker tripped", { userId, reason: "max_loss" });
-      throw new CircuitBreakerTrippedError(
-        `Max daily loss exceeded ($${breaker.maxLossAmount})`,
-        "max_loss",
-        userId,
-      );
+
+      logger.warn("Circuit breaker tripped due to max loss", { userId });
+      throw error; // Re-throw to notify caller
     }
 
-    logger.debug("Circuit breaker check passed", {
+    // Log but don't fail if Redis error (graceful degradation)
+    logger.error("Failed to record loss in Redis", {
       userId,
-      dailyTrades: breaker.dailyTradesCount,
-      maxTrades: breaker.maxDailyTrades,
-      dailyLoss: breaker.dailyLossUsd.toNumber(),
+      error: error instanceof Error ? error.message : String(error),
     });
-  });
-}
-
-/**
- * Increment trade counter after successful execution
- * Called after a copy-trade is executed
- */
-export async function incrementTradeCounter(userId: string): Promise<void> {
-  await prisma.circuitBreaker.update({
-    where: { userId },
-    data: {
-      dailyTradesCount: {
-        increment: 1,
-      },
-    },
-  });
-
-  logger.info("Trade counter incremented", { userId });
-}
-
-/**
- * Record loss for circuit breaker
- * Called after a losing trade
- */
-export async function recordLoss(
-  userId: string,
-  lossUsd: number,
-): Promise<void> {
-  const breaker = await prisma.circuitBreaker.update({
-    where: { userId },
-    data: {
-      dailyLossUsd: {
-        increment: lossUsd,
-      },
-    },
-  });
-
-  logger.warn("Loss recorded", {
-    userId,
-    lossUsd,
-    totalDailyLoss: breaker.dailyLossUsd.toNumber(),
-  });
-
-  // Check if we've exceeded loss limit
-  if (
-    breaker.maxLossAmount &&
-    breaker.dailyLossUsd.toNumber() >= breaker.maxLossAmount.toNumber()
-  ) {
-    await prisma.circuitBreaker.update({
-      where: { userId },
-      data: {
-        isTripped: true,
-        tripReason: "max_loss",
-        lastTrippedAt: new Date(),
-      },
-    });
-    logger.warn("Circuit breaker tripped due to max loss", { userId });
   }
 }
 
@@ -221,6 +214,10 @@ export async function manualResetCircuitBreaker(userId: string): Promise<void> {
 
 /**
  * Get circuit breaker status for a user
+ *
+ * Phase 2.1 - Atomic Operations:
+ * - Gets real-time counters from Redis (trades, loss)
+ * - Gets configuration from Prisma (limits, trip status)
  */
 export async function getCircuitBreakerStatus(userId: string) {
   let breaker = await prisma.circuitBreaker.findUnique({
@@ -236,12 +233,15 @@ export async function getCircuitBreakerStatus(userId: string) {
     },
   });
 
+  // Get real-time counters from Redis
+  const counters = await getRedisCounters(userId);
+
   return {
     isTripped: breaker.isTripped,
     tripReason: breaker.tripReason,
-    dailyTradesCount: breaker.dailyTradesCount,
+    dailyTradesCount: counters.trades, // From Redis (real-time)
     maxDailyTrades: breaker.maxDailyTrades,
-    dailyLossUsd: breaker.dailyLossUsd.toNumber(),
+    dailyLossUsd: counters.loss, // From Redis (real-time)
     maxLossAmount: breaker.maxLossAmount?.toNumber() ?? null,
     lastResetAt: breaker.lastResetAt,
     lastTrippedAt: breaker.lastTrippedAt,
