@@ -318,6 +318,7 @@ export const enableAutoCopyAction = authAction
       traderProfileId: z.string(),
       copyRatio: z.number().min(0.01).max(1).default(1),
       maxAmountPerTrade: z.number().positive().optional(),
+      exchangeConnectionId: z.string().optional(),
     }),
   )
   .action(async ({ parsedInput, ctx: { user } }) => {
@@ -357,18 +358,58 @@ export const enableAutoCopyAction = authAction
       throw new ActionError("You must follow the trader to enable auto-copy");
     }
 
-    // Store auto-copy preferences (would need a new table for this)
-    // For now, just log the intent
+    // Verify exchange connection if provided
+    if (parsedInput.exchangeConnectionId) {
+      const exchangeConnection = await prisma.userExchangeConnection.findFirst({
+        where: {
+          id: parsedInput.exchangeConnectionId,
+          userId: user.id,
+          isActive: true,
+        },
+      });
+
+      if (!exchangeConnection) {
+        throw new ActionError("Exchange connection not found or inactive");
+      }
+    }
+
+    // Create or update auto-copy preference
+    const preference = await prisma.autoCopyPreference.upsert({
+      where: {
+        userId_traderProfileId: {
+          userId: user.id,
+          traderProfileId: parsedInput.traderProfileId,
+        },
+      },
+      create: {
+        userId: user.id,
+        traderProfileId: parsedInput.traderProfileId,
+        copyRatio: parsedInput.copyRatio,
+        maxAmountPerTrade: parsedInput.maxAmountPerTrade ?? null,
+        exchangeConnectionId: parsedInput.exchangeConnectionId ?? null,
+        isEnabled: true,
+      },
+      update: {
+        copyRatio: parsedInput.copyRatio,
+        maxAmountPerTrade: parsedInput.maxAmountPerTrade ?? null,
+        exchangeConnectionId: parsedInput.exchangeConnectionId ?? null,
+        isEnabled: true,
+        updatedAt: new Date(),
+      },
+    });
+
     logger.info("Auto-copy enabled", {
       userId: user.id,
       traderProfileId: parsedInput.traderProfileId,
       copyRatio: parsedInput.copyRatio,
       maxAmountPerTrade: parsedInput.maxAmountPerTrade,
+      preferenceId: preference.id,
     });
 
     return {
       success: true,
       message: "Auto-copy enabled for this trader",
+      preference,
     };
   });
 
@@ -382,8 +423,22 @@ export const disableAutoCopyAction = authAction
     }),
   )
   .action(async ({ parsedInput, ctx: { user } }) => {
-    // Remove auto-copy preferences (would need a new table for this)
-    // For now, just log the intent
+    // Disable auto-copy preference
+    const preference = await prisma.autoCopyPreference.updateMany({
+      where: {
+        userId: user.id,
+        traderProfileId: parsedInput.traderProfileId,
+      },
+      data: {
+        isEnabled: false,
+        updatedAt: new Date(),
+      },
+    });
+
+    if (preference.count === 0) {
+      throw new ActionError("Auto-copy preference not found for this trader");
+    }
+
     logger.info("Auto-copy disabled", {
       userId: user.id,
       traderProfileId: parsedInput.traderProfileId,

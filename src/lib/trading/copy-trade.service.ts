@@ -22,6 +22,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
+import { recordLoss } from "@/lib/queue/circuit-breaker.service";
 import type { CopyTrade, TraderTrade, User } from "@/generated/prisma";
 
 // ============= Types =============
@@ -609,7 +610,7 @@ export async function closeOriginalTradeCopies(
     }
 
     // Update the copy trade with exit information
-    return prisma.copyTrade.update({
+    const updatedCopy = await prisma.copyTrade.update({
       where: { id: copy.id },
       data: {
         manualExit: exitPrice,
@@ -620,6 +621,28 @@ export async function closeOriginalTradeCopies(
           : `Closed at $${exitPrice.toFixed(2)} (PnL: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} USDT)`,
       },
     });
+
+    // Record loss in circuit breaker if PnL is negative
+    if (pnl < 0 && copy.mode === "AUTO") {
+      const lossUsd = Math.abs(pnl);
+      try {
+        await recordLoss(copy.userId, lossUsd);
+        logger.info("Loss recorded in circuit breaker", {
+          userId: copy.userId,
+          copyTradeId: copy.id,
+          lossUsd,
+        });
+      } catch (error) {
+        logger.error("Failed to record loss in circuit breaker", {
+          userId: copy.userId,
+          copyTradeId: copy.id,
+          lossUsd,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    return updatedCopy;
   });
 
   // Execute all updates in parallel

@@ -55,6 +55,9 @@ model User {
   // Issue #84 Phase 5: Circuit Breaker for copy-trading
   circuitBreaker CircuitBreaker?
 
+  // Issue #84 Phase 6: Auto-copy preferences
+  autoCopyPreferences AutoCopyPreference[]
+
   @@map("user")
 }
 

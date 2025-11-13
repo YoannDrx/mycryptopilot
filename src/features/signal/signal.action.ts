@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
 import { notifyNewSignal } from "@/lib/discord/webhook";
 import { notifyFollowersOfNewSignal } from "@/lib/mail/send-signal-notification";
+import { queueAutoCopyTradesForSignal } from "@/lib/queue/copy-trade-integration";
 import { logger } from "@/lib/logger";
 import { checkUserHasTraderProfile } from "../trader/trader-queries";
 import { signalHashExists } from "./signal-queries";
@@ -149,6 +150,25 @@ export const createSignalAction = authAction
     } catch (error) {
       logger.error(
         `Failed to send email notifications for signal ${signal.id}:`,
+        error,
+      );
+      // Ne pas throw d'erreur car le signal a été créé avec succès
+    }
+
+    // Queue auto-copy trades for followers (ne pas bloquer en cas d'erreur)
+    try {
+      const autoCopyResult = await queueAutoCopyTradesForSignal(
+        signal.id,
+        user.id,
+      );
+      logger.info(`Auto-copy trades queued for signal ${signal.id}`, {
+        created: autoCopyResult.created,
+        queued: autoCopyResult.queued,
+        errors: autoCopyResult.errors,
+      });
+    } catch (error) {
+      logger.error(
+        `Failed to queue auto-copy trades for signal ${signal.id}:`,
         error,
       );
       // Ne pas throw d'erreur car le signal a été créé avec succès

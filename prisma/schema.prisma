@@ -34,6 +34,7 @@ model TraderProfile {
   exchangeConnections  ExchangeConnection[]
   performanceSnapshots TraderPerformanceSnapshot[]
   traderTrades         TraderTrade[]
+  autoCopyPreferences  AutoCopyPreference[] // Users who auto-copy this trader
 
   @@map("trader_profile")
 }
@@ -672,4 +673,36 @@ model CircuitBreaker {
   @@index([userId, isTripped])
   @@index([lastResetAt])
   @@map("circuit_breakers")
+}
+
+/// AutoCopyPreference: User preferences for automatic copy-trading
+/// Stores which traders a user wants to auto-copy and with what settings
+/// When a signal is created, all followers with auto-copy enabled will get jobs queued
+model AutoCopyPreference {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  traderProfileId String        @map("trader_profile_id")
+  traderProfile   TraderProfile @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+
+  // Copy settings
+  copyRatio            Float    @default(1.0) @map("copy_ratio") @db.DoublePrecision // Percentage of trader's position size (0.01 to 1.0)
+  maxAmountPerTrade    Decimal? @map("max_amount_per_trade") @db.Decimal(20, 8) // Max USDT amount per trade
+  exchangeConnectionId String?  @map("exchange_connection_id") // Which exchange to use for execution
+
+  // Status
+  isEnabled Boolean @default(true) @map("is_enabled")
+
+  // Stats (for monitoring)
+  totalCopiesMade Int       @default(0) @map("total_copies_made")
+  lastCopiedAt    DateTime? @map("last_copied_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, traderProfileId])
+  @@index([userId, isEnabled])
+  @@index([traderProfileId, isEnabled])
+  @@map("auto_copy_preferences")
 }
