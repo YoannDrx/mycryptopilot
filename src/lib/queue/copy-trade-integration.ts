@@ -12,6 +12,10 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { batchQueueCopyTrades } from "./copy-trade-jobs";
 import type { CopyTradeJobData } from "./copy-trade-jobs";
+import {
+  createTraderTradeFromSignal,
+  getTraderTradeBySignalId,
+} from "@/lib/trading/trader-trade.service";
 
 /**
  * Queue copy trades for all followers with auto-copy enabled
@@ -80,6 +84,42 @@ export async function queueAutoCopyTradesForSignal(
         payload,
       });
       return { created: 0, queued: 0, errors: 0 };
+    }
+
+    // Create or get TraderTrade from Signal
+    // This is necessary because CopyTrade.originalTradeId must reference TraderTrade.id
+    let traderTrade = await getTraderTradeBySignalId(signalId);
+
+    if (!traderTrade) {
+      logger.info("Creating TraderTrade from Signal for auto-copy", {
+        signalId,
+        traderProfileId: traderProfile.id,
+      });
+
+      traderTrade = await createTraderTradeFromSignal(
+        {
+          id: signal.id,
+          symbol: signal.symbol,
+          payloadJson: signal.payloadJson,
+        },
+        traderProfile.id,
+      );
+
+      // Link the signal to the trader trade
+      await prisma.signal.update({
+        where: { id: signalId },
+        data: { linkedTradeId: traderTrade.id },
+      });
+
+      logger.info("TraderTrade created and linked to Signal", {
+        signalId,
+        traderTradeId: traderTrade.id,
+      });
+    } else {
+      logger.info("Using existing TraderTrade for Signal", {
+        signalId,
+        traderTradeId: traderTrade.id,
+      });
     }
 
     // Find all users with auto-copy enabled for this trader
@@ -158,7 +198,7 @@ export async function queueAutoCopyTradesForSignal(
         const copyTrade = await prisma.copyTrade.create({
           data: {
             userId: pref.userId,
-            originalTradeId: signalId, // Using signal as reference (simplified)
+            originalTradeId: traderTrade.id, // ✅ Now using TraderTrade.id instead of signalId
             mode: "AUTO",
             status: "PENDING",
             notes: `Auto-copy from signal ${signalId}`,
@@ -169,7 +209,7 @@ export async function queueAutoCopyTradesForSignal(
         const jobData: CopyTradeJobData = {
           userId: pref.userId,
           copyTradeId: copyTrade.id,
-          originalTradeId: signalId,
+          originalTradeId: traderTrade.id, // ✅ Use TraderTrade.id for consistency
           traderProfileId: traderProfile.id,
           symbol: signal.symbol,
           side,
@@ -183,6 +223,7 @@ export async function queueAutoCopyTradesForSignal(
           exchangeId: exchangeConnectionId,
           createdAt: new Date(),
           signalId,
+          instrumentType: payload.instrumentType ?? "SPOT", // ✅ Pass instrumentType to worker
         };
 
         return jobData;

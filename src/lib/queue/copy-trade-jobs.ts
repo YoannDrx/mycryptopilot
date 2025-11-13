@@ -40,6 +40,7 @@ export type CopyTradeJobData = {
   side: "BUY" | "SELL"; // LONG or SHORT position
   orderType: "MARKET" | "LIMIT"; // Usually MARKET for copy trading
   quantity: number; // Calculated quantity for user
+  instrumentType?: "SPOT" | "PERP"; // Instrument type (default: SPOT)
 
   // Optional parameters
   limitPrice?: number; // For LIMIT orders

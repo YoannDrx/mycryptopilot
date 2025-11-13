@@ -174,7 +174,7 @@ async function processCopyTradeJob(job: {
       quantity,
       price: data.limitPrice,
       clientOrderId: copyTradeId, // Use copyTradeId as clientOrderId for tracking
-      instrumentType: "SPOT", // Default to spot for copy trading
+      instrumentType: data.instrumentType === "PERP" ? "FUTURES_USDT" : "SPOT", // ✅ Use instrumentType from job data (PERP -> FUTURES_USDT)
       timeInForce: orderType === "LIMIT" ? "GTC" : undefined,
     });
 
