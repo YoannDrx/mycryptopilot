@@ -7,6 +7,7 @@ primary_region = "cdg"
 
 [env]
   NODE_ENV = "production"
+  NODE_OPTIONS = "--max-old-space-size=384"
 
 [processes]
   worker = "pnpm worker"
@@ -14,4 +15,4 @@ primary_region = "cdg"
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 256
+  memory_mb = 512
