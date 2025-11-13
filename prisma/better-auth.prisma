@@ -1,71 +1,74 @@
 model User {
-  id              String          @id
-  name            String
-  email           String          @unique
-  emailVerified   Boolean
-  image           String?
-  createdAt       DateTime
-  updatedAt       DateTime
-  resendContactId String?
-  role            String?
-  banned          Boolean?
-  banReason       String?
-  banExpires      DateTime?
-  userRole        UserRole        @default(USER)
-  planName        String?
-  planExpiresAt   DateTime?
-  dailySignalsUsed Int            @default(0)
-  lastSignalReset DateTime        @default(now())
-  discordId       String?         @unique
-  discordIntegrationEnabled Boolean @default(true) // true = veut les notifications Discord, false = a explicitement unlinked
-  isFirstConnection Boolean        @default(true) // true = première connexion, envoyer email Discord bienvenue
-  onboardingCompleted Boolean      @default(false) // true = a terminé l'onboarding wizard
+  id                        String    @id
+  name                      String
+  email                     String    @unique
+  emailVerified             Boolean
+  image                     String?
+  createdAt                 DateTime
+  updatedAt                 DateTime
+  resendContactId           String?
+  role                      String?
+  banned                    Boolean?
+  banReason                 String?
+  banExpires                DateTime?
+  userRole                  UserRole  @default(USER)
+  planName                  String?
+  planExpiresAt             DateTime?
+  dailySignalsUsed          Int       @default(0)
+  lastSignalReset           DateTime  @default(now())
+  discordId                 String?   @unique
+  discordIntegrationEnabled Boolean   @default(true) // true = veut les notifications Discord, false = a explicitement unlinked
+  isFirstConnection         Boolean   @default(true) // true = première connexion, envoyer email Discord bienvenue
+  onboardingCompleted       Boolean   @default(false) // true = a terminé l'onboarding wizard
 
   // Email Preferences (granular control)
-  emailNotificationsEnabled Boolean @default(true) // Master toggle for all non-critical emails
-  emailNotifyNewSignals Boolean @default(true) // Trading signals from followed traders
+  emailNotificationsEnabled        Boolean @default(true) // Master toggle for all non-critical emails
+  emailNotifyNewSignals            Boolean @default(true) // Trading signals from followed traders
   emailNotifySubscriptionReminders Boolean @default(true) // Subscription expiration reminders
-  emailNotifyExchangeSyncFailures Boolean @default(true) // Exchange sync failure alerts
-  emailNotifyTraderInvitations Boolean @default(true) // Invitations from traders
-  emailNotifyWeeklyPerformance Boolean @default(true) // Weekly performance summary (traders only)
-  emailNotifyMarketingUpdates Boolean @default(false) // Newsletter & product updates
+  emailNotifyExchangeSyncFailures  Boolean @default(true) // Exchange sync failure alerts
+  emailNotifyTraderInvitations     Boolean @default(true) // Invitations from traders
+  emailNotifyWeeklyPerformance     Boolean @default(true) // Weekly performance summary (traders only)
+  emailNotifyMarketingUpdates      Boolean @default(false) // Newsletter & product updates
 
-  trialEndsAt     DateTime? // Date de fin du trial (14 jours Pro gratuit)
-  trialPlan       String? // Plan du trial: "pro" ou "ultra"
-  feedbacks        Feedback[]
-  accounts         Account[]
-  cryptoAddresses  CryptoAddress[]
-  cryptoPayments   CryptoPayment[]
-  followers        Follow[]            @relation("TraderFollowers")
-  follows          Follow[]            @relation("UserFollows")
-  sessions         Session[]
-  signals          Signal[]
-  traderProfile    TraderProfile?
-  traderInvitations TraderInvitation[]
-  referralCredits  ReferralCredit[]
-  referralRewards  ReferralReward[]
-  referralTier     ReferralTier?
+  trialEndsAt             DateTime? // Date de fin du trial (14 jours Pro gratuit)
+  trialPlan               String? // Plan du trial: "pro" ou "ultra"
+  feedbacks               Feedback[]
+  accounts                Account[]
+  cryptoAddresses         CryptoAddress[]
+  cryptoPayments          CryptoPayment[]
+  followers               Follow[]                 @relation("TraderFollowers")
+  follows                 Follow[]                 @relation("UserFollows")
+  sessions                Session[]
+  signals                 Signal[]
+  traderProfile           TraderProfile?
+  traderInvitations       TraderInvitation[]
+  referralCredits         ReferralCredit[]
+  referralRewards         ReferralReward[]
+  referralTier            ReferralTier?
   userExchangeConnections UserExchangeConnection[]
-  copyTrades       CopyTrade[]
-  riskCalculations RiskCalculation[]
+  copyTrades              CopyTrade[]
+  riskCalculations        RiskCalculation[]
 
   // Refactoring Issue #77: New user-centric models
   userSubscription UserSubscription?
+
+  // Issue #84 Phase 5: Circuit Breaker for copy-trading
+  circuitBreaker CircuitBreaker?
 
   @@map("user")
 }
 
 model Session {
-  id                   String   @id
-  expiresAt            DateTime
-  token                String   @unique
-  createdAt            DateTime
-  updatedAt            DateTime
-  ipAddress            String?
-  userAgent            String?
-  userId               String
-  impersonatedBy       String?
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
