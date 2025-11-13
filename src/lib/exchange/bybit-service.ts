@@ -271,7 +271,154 @@ export class BybitService implements ExchangeAdapter {
         }
       }
 
-      // TODO: Fetch futures balance (Phase 2)
+      // Fetch futures balance if enabled
+      let futuresBalance = null;
+      try {
+        const futuresData = await this.exchange.fetchBalance({
+          type: "future",
+        });
+        const futuresAssets: Record<
+          string,
+          {
+            asset: string;
+            free: number;
+            locked: number;
+            total: number;
+            usdValue?: number;
+          }
+        > = {};
+        let futuresTotalUsd = 0;
+
+        for (const [asset, data] of Object.entries(futuresData)) {
+          if (
+            asset === "info" ||
+            asset === "free" ||
+            asset === "used" ||
+            asset === "total" ||
+            asset === "timestamp" ||
+            asset === "datetime"
+          ) {
+            continue;
+          }
+
+          const balanceData = data as {
+            free?: number;
+            used?: number;
+            total?: number;
+          };
+          if (balanceData.total && balanceData.total > 0) {
+            futuresAssets[asset] = {
+              asset,
+              free: balanceData.free ?? 0,
+              locked: balanceData.used ?? 0,
+              total: balanceData.total,
+              usdValue: undefined,
+            };
+          }
+        }
+
+        // Extract Bybit futures-specific info
+        const futuresInfo = futuresData.info as {
+          totalWalletBalance?: string;
+          totalMarginBalance?: string;
+          totalUnrealizedProfit?: string;
+          availableBalance?: string;
+        };
+
+        const totalWalletBalance = Number(
+          futuresInfo.totalWalletBalance ?? "0",
+        );
+        const totalMarginBalance = Number(
+          futuresInfo.totalMarginBalance ?? "0",
+        );
+        const unrealizedPnl = Number(futuresInfo.totalUnrealizedProfit ?? "0");
+        const availableBalance = Number(futuresInfo.availableBalance ?? "0");
+
+        futuresTotalUsd = totalWalletBalance;
+
+        futuresBalance = {
+          totalUsd: futuresTotalUsd,
+          assets: futuresAssets,
+          marginUsed: totalMarginBalance - availableBalance,
+          marginAvailable: availableBalance,
+          unrealizedPnl,
+          leverage: null, // Not available at account level for Bybit
+          raw: futuresData.info,
+        };
+      } catch (error) {
+        logger.warn("Failed to fetch futures balance, skipping", { error });
+      }
+
+      // Fetch margin balance if enabled
+      let marginBalance = null;
+      try {
+        const marginData = await this.exchange.fetchBalance({ type: "margin" });
+        const marginAssets: Record<
+          string,
+          {
+            asset: string;
+            free: number;
+            locked: number;
+            total: number;
+            usdValue?: number;
+          }
+        > = {};
+        let marginTotalUsd = 0;
+
+        for (const [asset, data] of Object.entries(marginData)) {
+          if (
+            asset === "info" ||
+            asset === "free" ||
+            asset === "used" ||
+            asset === "total" ||
+            asset === "timestamp" ||
+            asset === "datetime"
+          ) {
+            continue;
+          }
+
+          const balanceData = data as {
+            free?: number;
+            used?: number;
+            total?: number;
+          };
+          if (balanceData.total && balanceData.total > 0) {
+            marginAssets[asset] = {
+              asset,
+              free: balanceData.free ?? 0,
+              locked: balanceData.used ?? 0,
+              total: balanceData.total,
+              usdValue: undefined,
+            };
+          }
+        }
+
+        // Extract Bybit margin-specific info
+        const marginInfo = marginData.info as {
+          totalEquity?: string;
+          totalLiability?: string;
+        };
+
+        const borrowed = Number(marginInfo.totalLiability ?? "0");
+        marginTotalUsd = Number(marginInfo.totalEquity ?? "0");
+
+        marginBalance = {
+          totalUsd: marginTotalUsd,
+          assets: marginAssets,
+          borrowed,
+          interest: 0, // Not directly available in balance endpoint
+          raw: marginData.info,
+        };
+      } catch (error) {
+        logger.warn("Failed to fetch margin balance, skipping", { error });
+      }
+
+      // Calculate total equity
+      const totalEquityUsd =
+        spotTotalUsd +
+        (futuresBalance?.totalUsd ?? 0) +
+        (marginBalance?.totalUsd ?? 0);
+
       const consolidatedBalance: ConsolidatedBalance = {
         timestamp,
         spot: {
@@ -279,7 +426,9 @@ export class BybitService implements ExchangeAdapter {
           assets: spotAssets,
           raw: spotBalance.info,
         },
-        totalEquityUsd: spotTotalUsd,
+        futures: futuresBalance ?? undefined,
+        margin: marginBalance ?? undefined,
+        totalEquityUsd,
       };
 
       return consolidatedBalance;
@@ -294,9 +443,70 @@ export class BybitService implements ExchangeAdapter {
    * @implements ExchangeAdapter.fetchOpenPositions
    */
   async fetchOpenPositions(): Promise<PositionSnapshot[]> {
-    // TODO: Implement in Phase 2 (requires futures API)
-    logger.warn("fetchOpenPositions not yet implemented for Bybit");
-    return [];
+    try {
+      // CCXT fetchPositions() returns all open positions
+      const ccxtPositions = await this.exchange.fetchPositions();
+
+      // Filter out positions with zero amount (closed positions)
+      const activePositions = ccxtPositions.filter(
+        (pos) => pos.contracts && Number(pos.contracts) > 0,
+      );
+
+      // Convert to PositionSnapshot format
+      const positions: PositionSnapshot[] = activePositions.map(
+        (pos): PositionSnapshot => {
+          const symbol = String(pos.symbol);
+          const side = String(pos.side).toUpperCase() as "LONG" | "SHORT";
+          const quantity = Number(pos.contracts ?? 0);
+          const entryPrice = Number(pos.entryPrice ?? 0);
+          const markPrice = Number(pos.markPrice ?? pos.entryPrice ?? 0);
+          const leverage = pos.leverage ? Number(pos.leverage) : null;
+          const margin = Number(pos.collateral ?? pos.initialMargin ?? 0);
+          const unrealizedPnl = Number(pos.unrealizedPnl ?? 0);
+          const liquidationPrice = pos.liquidationPrice
+            ? Number(pos.liquidationPrice)
+            : null;
+
+          // Determine position type based on symbol and margin mode
+          const marginMode = pos.marginMode as string | undefined;
+          const type = this.determinePositionType(symbol, marginMode);
+
+          const timestamp = pos.timestamp
+            ? new Date(pos.timestamp)
+            : new Date();
+
+          return {
+            symbol,
+            side,
+            quantity,
+            entryPrice,
+            markPrice,
+            leverage,
+            margin,
+            unrealizedPnl,
+            liquidationPrice,
+            type,
+            openedAt: timestamp,
+            lastUpdatedAt: timestamp,
+            metadata: {
+              marginMode: marginMode ?? "unknown",
+              notional: Number(pos.notional ?? 0),
+              percentage: Number(pos.percentage ?? 0),
+            },
+            raw: pos.info as unknown,
+          };
+        },
+      );
+
+      logger.info("Fetched open positions", {
+        count: positions.length,
+      });
+
+      return positions;
+    } catch (error) {
+      logger.error("Failed to fetch open positions", { error });
+      throw error;
+    }
   }
 
   /**
@@ -677,5 +887,47 @@ export class BybitService implements ExchangeAdapter {
       default:
         return "MARKET"; // Default fallback
     }
+  }
+
+  /**
+   * Determine position type based on symbol and margin mode
+   * Helper for fetchOpenPositions()
+   */
+  private determinePositionType(
+    symbol: string,
+    marginMode?: string,
+  ):
+    | "SPOT"
+    | "MARGIN_CROSS"
+    | "MARGIN_ISOLATED"
+    | "FUTURES_USDT"
+    | "FUTURES_COIN" {
+    // Bybit futures symbols contain ":"
+    // Examples:
+    // - BTC/USDT:USDT -> USDT-margined futures (linear)
+    // - BTC/USD:BTC -> Coin-margined futures (inverse)
+    // - BTC/USDT -> Spot
+
+    if (!symbol.includes(":")) {
+      // Spot or margin
+      if (marginMode === "cross") {
+        return "MARGIN_CROSS";
+      } else if (marginMode === "isolated") {
+        return "MARGIN_ISOLATED";
+      }
+      return "SPOT";
+    }
+
+    // Futures: check settlement currency
+    const parts = symbol.split(":");
+    const settlementCurrency = parts[1];
+
+    // USDT-margined futures (linear)
+    if (settlementCurrency === "USDT" || settlementCurrency === "USDC") {
+      return "FUTURES_USDT";
+    }
+
+    // Coin-margined futures (inverse)
+    return "FUTURES_COIN";
   }
 }
