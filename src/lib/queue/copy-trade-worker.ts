@@ -97,6 +97,8 @@ async function processCopyTradeJob(job: {
         await failCopyTrade(
           copyTradeId,
           `Circuit breaker tripped: ${error.reason}`,
+          "CIRCUIT_BREAKER_TRIPPED",
+          JSON.stringify({ reason: error.reason, userId }, null, 2),
         );
 
         // Throw non-retryable error (BullMQ won't retry)
@@ -123,13 +125,23 @@ async function processCopyTradeJob(job: {
 
     if (!exchangeConnection) {
       logger.error("Exchange connection not found", { exchangeId });
-      await failCopyTrade(copyTradeId, "Exchange connection not found");
+      await failCopyTrade(
+        copyTradeId,
+        "Exchange connection not found",
+        "EXCHANGE_CONNECTION_NOT_FOUND",
+        JSON.stringify({ exchangeId }, null, 2),
+      );
       throw new Error("EXCHANGE_CONNECTION_NOT_FOUND");
     }
 
     if (!exchangeConnection.isActive) {
       logger.error("Exchange connection is not active", { exchangeId });
-      await failCopyTrade(copyTradeId, "Exchange connection is not active");
+      await failCopyTrade(
+        copyTradeId,
+        "Exchange connection is not active",
+        "EXCHANGE_CONNECTION_INACTIVE",
+        JSON.stringify({ exchangeId, userId }, null, 2),
+      );
       throw new Error("EXCHANGE_CONNECTION_INACTIVE");
     }
 
@@ -246,6 +258,14 @@ async function processCopyTradeJob(job: {
 
     // Determine if error is retryable
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack =
+      error instanceof Error
+        ? (error.stack ?? "No stack trace")
+        : "No stack trace";
+
+    // Extract error code from message (format: "ERROR_CODE: description")
+    const errorCodeMatch = errorMessage.match(/^([A-Z_]+):/);
+    const errorCode = errorCodeMatch?.[1] ?? "UNKNOWN_ERROR";
 
     // Non-retryable errors
     if (
@@ -258,10 +278,24 @@ async function processCopyTradeJob(job: {
       logger.warn("Non-retryable error - will not retry", {
         copyTradeId,
         error: errorMessage,
+        errorCode,
       });
 
       // Don't throw - job will be marked as failed without retry
-      await failCopyTrade(copyTradeId, errorMessage);
+      await failCopyTrade(
+        copyTradeId,
+        errorMessage,
+        errorCode,
+        JSON.stringify(
+          {
+            message: errorMessage,
+            stack: errorStack,
+            jobId: job.id,
+          },
+          null,
+          2,
+        ),
+      );
       throw new Error(errorMessage);
     }
 
@@ -330,12 +364,53 @@ export function startCopyTradeWorker(): Worker<CopyTradeJobData> {
     });
   });
 
-  worker.on("failed", (job, err) => {
-    logger.error("Copy trade job failed", {
+  worker.on("failed", async (job, err) => {
+    logger.error("Copy trade job failed permanently", {
       jobId: job?.id,
       error: err.message,
       attempts: job?.attemptsMade,
+      maxAttempts: job?.opts.attempts,
     });
+
+    // If job data contains copyTradeId, mark the CopyTrade as FAILED
+    // This handles the case where all retries are exhausted
+    if (job?.data.copyTradeId) {
+      try {
+        // Extract error code from message (format: "ERROR_CODE: description")
+        const errorCodeMatch = err.message.match(/^([A-Z_]+):/);
+        const errorCode = errorCodeMatch?.[1] ?? "JOB_EXHAUSTED";
+
+        await failCopyTrade(
+          job.data.copyTradeId,
+          `Job failed after ${job.attemptsMade} attempts: ${err.message}`,
+          errorCode,
+          JSON.stringify(
+            {
+              message: err.message,
+              stack: err.stack ?? "No stack trace",
+              attempts: job.attemptsMade,
+              maxAttempts: job.opts.attempts,
+              jobId: job.id,
+            },
+            null,
+            2,
+          ),
+        );
+
+        logger.info("CopyTrade status synced to FAILED after job exhausted", {
+          copyTradeId: job.data.copyTradeId,
+          jobId: job.id,
+          errorCode,
+        });
+      } catch (syncError) {
+        logger.error("Failed to sync CopyTrade status to FAILED", {
+          copyTradeId: job.data.copyTradeId,
+          jobId: job.id,
+          error:
+            syncError instanceof Error ? syncError.message : String(syncError),
+        });
+      }
+    }
   });
 
   worker.on("error", (err) => {
