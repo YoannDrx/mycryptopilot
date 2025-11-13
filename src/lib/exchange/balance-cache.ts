@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 import { logger } from "@/lib/logger";
 import type { ConsolidatedBalance } from "./types";
+import { publishBalanceUpdate } from "@/lib/redis/redis-pubsub";
 
 /**
  * Balance Cache
@@ -63,7 +64,7 @@ export class BalanceCache extends EventEmitter {
 
   /**
    * Set balance for trader
-   * Emits 'balance:updated' event
+   * Emits 'balance:updated' event AND publishes to Redis
    */
   set(traderId: string, balance: ConsolidatedBalance): void {
     const entry: BalanceCacheEntry = {
@@ -78,11 +79,20 @@ export class BalanceCache extends EventEmitter {
       totalEquityUsd: balance.totalEquityUsd,
     });
 
-    // Emit event for SSE listeners
+    // Emit event for SSE listeners (local process only - for backwards compatibility)
     this.emit("balance:updated", {
       traderId,
       balance,
       timestamp: entry.updatedAt,
+    });
+
+    // Publish to Redis for cross-process SSE (Fly worker → Vercel serverless)
+    // Fire-and-forget (async without await) to not block balance updates
+    void publishBalanceUpdate(traderId, balance).catch((error) => {
+      logger.error("Failed to publish balance update to Redis", {
+        traderId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     });
   }
 

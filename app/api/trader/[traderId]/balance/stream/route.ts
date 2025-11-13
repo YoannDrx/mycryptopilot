@@ -24,6 +24,8 @@ import type { NextRequest } from "next/server";
 import { balanceCache } from "@/lib/exchange/balance-cache";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/auth/auth-user";
+import { subscribeToBalanceUpdates } from "@/lib/redis/redis-pubsub";
+import type { BalanceSubscription } from "@/lib/redis/redis-pubsub";
 
 export const dynamic = "force-dynamic";
 
@@ -67,9 +69,10 @@ export async function GET(
     // Create readable stream
     const encoder = new TextEncoder();
     let isConnectionClosed = false;
+    let redisSubscription: BalanceSubscription | null = null;
 
     const stream = new ReadableStream({
-      start(controller) {
+      async start(controller) {
         // Send initial balance if available
         const initialBalance = balanceCache.get(traderId);
         if (initialBalance) {
@@ -89,40 +92,87 @@ export async function GET(
         })}\n\n`;
         controller.enqueue(encoder.encode(connectMsg));
 
-        // Balance update listener
-        const balanceUpdateHandler = (data: {
-          traderId: string;
-          balance: unknown;
-          timestamp: Date;
-        }) => {
-          // Only send updates for this trader
-          if (data.traderId !== traderId) {
-            return;
-          }
+        // Subscribe to Redis pub/sub for real-time balance updates
+        // This works across processes (Fly worker → Vercel serverless)
+        try {
+          redisSubscription = await subscribeToBalanceUpdates(
+            traderId,
+            (message) => {
+              if (isConnectionClosed) {
+                return;
+              }
 
-          if (isConnectionClosed) {
-            return;
-          }
+              try {
+                const sseMessage = `data: ${JSON.stringify({
+                  type: "balance",
+                  balance: message.balance,
+                  timestamp: message.timestamp,
+                })}\n\n`;
+                controller.enqueue(encoder.encode(sseMessage));
 
-          try {
-            const message = `data: ${JSON.stringify({
-              type: "balance",
-              balance: data.balance,
-              timestamp: data.timestamp.toISOString(),
-            })}\n\n`;
-            controller.enqueue(encoder.encode(message));
+                logger.debug("SSE balance update sent (via Redis)", {
+                  traderId,
+                  timestamp: message.timestamp,
+                });
+              } catch (error) {
+                logger.error("Failed to send SSE message", { error });
+              }
+            },
+          );
 
-            logger.debug("SSE balance update sent", {
+          logger.info("Redis subscription established for SSE", { traderId });
+        } catch (error) {
+          logger.error(
+            "Failed to subscribe to Redis, falling back to local EventEmitter",
+            {
               traderId,
-              timestamp: data.timestamp,
-            });
-          } catch (error) {
-            logger.error("Failed to send SSE message", { error });
-          }
-        };
+              error,
+            },
+          );
 
-        // Subscribe to balance updates
-        balanceCache.on("balance:updated", balanceUpdateHandler);
+          // Fallback to local EventEmitter if Redis fails
+          const balanceUpdateHandler = (data: {
+            traderId: string;
+            balance: unknown;
+            timestamp: Date;
+          }) => {
+            // Only send updates for this trader
+            if (data.traderId !== traderId) {
+              return;
+            }
+
+            if (isConnectionClosed) {
+              return;
+            }
+
+            try {
+              const message = `data: ${JSON.stringify({
+                type: "balance",
+                balance: data.balance,
+                timestamp: data.timestamp.toISOString(),
+              })}\n\n`;
+              controller.enqueue(encoder.encode(message));
+
+              logger.debug(
+                "SSE balance update sent (via EventEmitter fallback)",
+                {
+                  traderId,
+                  timestamp: data.timestamp,
+                },
+              );
+            } catch (error) {
+              logger.error("Failed to send SSE message", { error });
+            }
+          };
+
+          // Subscribe to local EventEmitter as fallback
+          balanceCache.on("balance:updated", balanceUpdateHandler);
+
+          // Store handler for cleanup
+          request.signal.addEventListener("abort", () => {
+            balanceCache.off("balance:updated", balanceUpdateHandler);
+          });
+        }
 
         // Heartbeat to keep connection alive (every 30 seconds)
         const heartbeatInterval = setInterval(() => {
@@ -146,7 +196,13 @@ export async function GET(
 
           isConnectionClosed = true;
           clearInterval(heartbeatInterval);
-          balanceCache.off("balance:updated", balanceUpdateHandler);
+
+          // Unsubscribe from Redis
+          if (redisSubscription) {
+            void redisSubscription.unsubscribe().catch((error) => {
+              logger.error("Failed to unsubscribe from Redis", { error });
+            });
+          }
 
           try {
             controller.close();
