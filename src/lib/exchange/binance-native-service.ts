@@ -525,17 +525,13 @@ export class BinanceNativeService implements ExchangeAdapter {
   }
 
   /**
-   * Fetch recent trades (all symbols)
-   *
-   * TODO: This method needs proper implementation with native SDK
-   * Currently returns empty array as placeholder
-   *
-   * @param _daysSince - Number of days to fetch
-   * @param _sinceDate - Start date for fetch
+   * Fetch recent trades (spot + futures)
+   * @param daysSince - Number of days to fetch (default 30)
+   * @param sinceDate - Start date for fetch (overrides daysSince if provided)
    */
   async fetchRecentTrades(
-    _daysSince = 30,
-    _sinceDate?: Date,
+    daysSince = 30,
+    sinceDate?: Date,
   ): Promise<
     {
       externalOrderId: string;
@@ -557,10 +553,191 @@ export class BinanceNativeService implements ExchangeAdapter {
       executedAt: Date;
     }[]
   > {
-    logger.warn(
-      "fetchRecentTrades called on native service - returning empty array. TODO: implement with native SDK",
-    );
-    return [];
+    try {
+      logger.info("Fetching Binance trades (native SDK)", {
+        daysSince,
+        sinceDate: sinceDate?.toISOString(),
+      });
+
+      // Calculate timestamp
+      const since =
+        sinceDate ?? new Date(Date.now() - daysSince * 24 * 60 * 60 * 1000);
+      const startTime = since.getTime();
+
+      // Fetch spot trades
+      const spotTrades = await this.fetchSpotTradesNative(startTime);
+
+      // Fetch futures trades
+      const futuresTrades = await this.fetchFuturesTradesNative(startTime);
+
+      const allTrades = [...spotTrades, ...futuresTrades];
+
+      // Sort by execution date (most recent first)
+      allTrades.sort((a, b) => b.executedAt.getTime() - a.executedAt.getTime());
+
+      logger.info("Binance trades fetched successfully (native SDK)", {
+        spotCount: spotTrades.length,
+        futuresCount: futuresTrades.length,
+        totalCount: allTrades.length,
+      });
+
+      return allTrades;
+    } catch (error) {
+      logger.error("Failed to fetch Binance trades (native SDK)", { error });
+      throw new Error(
+        `Failed to fetch trades: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
+  }
+
+  /**
+   * Fetch spot trades using native Binance SDK
+   * @private
+   */
+  private async fetchSpotTradesNative(startTime: number): Promise<
+    {
+      externalOrderId: string;
+      symbol: string;
+      side: "BUY" | "SELL";
+      type:
+        | "MARKET"
+        | "LIMIT"
+        | "STOP_LOSS"
+        | "STOP_LOSS_LIMIT"
+        | "TAKE_PROFIT"
+        | "TAKE_PROFIT_LIMIT";
+      quantity: number;
+      price: number;
+      quoteQuantity: number;
+      fee: number;
+      feeAsset: string;
+      realizedPnl: number | null;
+      executedAt: Date;
+    }[]
+  > {
+    try {
+      // Get all symbols from exchange info
+      const exchangeInfo = await this.mainClient.getExchangeInfo();
+      const symbols = exchangeInfo.symbols
+        .filter((s: { status: string }) => s.status === "TRADING")
+        .map((s: { symbol: string }) => s.symbol);
+
+      logger.info("Fetching spot trades (native)", {
+        symbolCount: symbols.length,
+      });
+
+      // Fetch trades for each symbol
+      const tradesPromises = symbols.map(async (symbol: string) => {
+        try {
+          const trades = await this.mainClient.getAccountTradeList({
+            symbol,
+            startTime,
+          });
+
+          return trades.map((trade) => ({
+            externalOrderId: String(trade.orderId),
+            symbol: trade.symbol,
+            side: trade.isBuyer ? ("BUY" as const) : ("SELL" as const),
+            type: "MARKET" as const, // Native SDK doesn't provide order type in trade response
+            quantity: Number(trade.qty),
+            price: Number(trade.price),
+            quoteQuantity: Number(trade.quoteQty),
+            fee: Number(trade.commission),
+            feeAsset: trade.commissionAsset,
+            realizedPnl: null, // Spot trades don't have realized PnL
+            executedAt: new Date(trade.time),
+          }));
+        } catch (error) {
+          // Some symbols might fail (no trades, permissions, etc.)
+          logger.debug("Failed to fetch spot trades for symbol (native)", {
+            symbol,
+            error: error instanceof Error ? error.message : "Unknown",
+          });
+          return [];
+        }
+      });
+
+      const tradesArrays = await Promise.all(tradesPromises);
+      return tradesArrays.flat();
+    } catch (error) {
+      logger.error("Failed to fetch spot trades (native)", { error });
+      return []; // Return empty array instead of throwing
+    }
+  }
+
+  /**
+   * Fetch futures trades using native Binance SDK
+   * @private
+   */
+  private async fetchFuturesTradesNative(startTime: number): Promise<
+    {
+      externalOrderId: string;
+      symbol: string;
+      side: "BUY" | "SELL";
+      type:
+        | "MARKET"
+        | "LIMIT"
+        | "STOP_LOSS"
+        | "STOP_LOSS_LIMIT"
+        | "TAKE_PROFIT"
+        | "TAKE_PROFIT_LIMIT";
+      quantity: number;
+      price: number;
+      quoteQuantity: number;
+      fee: number;
+      feeAsset: string;
+      realizedPnl: number | null;
+      executedAt: Date;
+    }[]
+  > {
+    try {
+      // Get all futures symbols
+      const exchangeInfo = await this.usdmClient.getExchangeInfo();
+      const symbols = exchangeInfo.symbols
+        .filter((s: { status: string }) => s.status === "TRADING")
+        .map((s: { symbol: string }) => s.symbol);
+
+      logger.info("Fetching futures trades (native)", {
+        symbolCount: symbols.length,
+      });
+
+      // Fetch trades for each symbol
+      const tradesPromises = symbols.map(async (symbol: string) => {
+        try {
+          const trades = await this.usdmClient.getAccountTrades({
+            symbol,
+            startTime,
+          });
+
+          return trades.map((trade) => ({
+            externalOrderId: String(trade.orderId),
+            symbol: trade.symbol,
+            side: trade.buyer ? ("BUY" as const) : ("SELL" as const),
+            type: "MARKET" as const, // Native SDK doesn't provide order type in trade response
+            quantity: Number(trade.qty),
+            price: Number(trade.price),
+            quoteQuantity: Number(trade.quoteQty),
+            fee: Number(trade.commission),
+            feeAsset: trade.commissionAsset,
+            realizedPnl: Number(trade.realizedPnl) || null,
+            executedAt: new Date(trade.time),
+          }));
+        } catch (error) {
+          // Some symbols might fail (no trades, permissions, etc.)
+          logger.debug("Failed to fetch futures trades for symbol (native)", {
+            symbol,
+            error: error instanceof Error ? error.message : "Unknown",
+          });
+          return [];
+        }
+      });
+
+      const tradesArrays = await Promise.all(tradesPromises);
+      return tradesArrays.flat();
+    } catch (error) {
+      logger.error("Failed to fetch futures trades (native)", { error });
+      return []; // Return empty array instead of throwing
+    }
   }
 
   // ==========================================

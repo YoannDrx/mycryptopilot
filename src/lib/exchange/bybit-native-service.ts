@@ -531,9 +531,14 @@ export class BybitNativeService implements ExchangeAdapter {
    * @param _daysSince - Number of days to fetch
    * @param _sinceDate - Start date for fetch
    */
+  /**
+   * Fetch recent trades (spot + linear futures)
+   * @param daysSince - Number of days to fetch (default 30)
+   * @param sinceDate - Start date for fetch (overrides daysSince if provided)
+   */
   async fetchRecentTrades(
-    _daysSince = 30,
-    _sinceDate?: Date,
+    daysSince = 30,
+    sinceDate?: Date,
   ): Promise<
     {
       externalOrderId: string;
@@ -555,10 +560,172 @@ export class BybitNativeService implements ExchangeAdapter {
       executedAt: Date;
     }[]
   > {
-    logger.warn(
-      "fetchRecentTrades called on native service - returning empty array. TODO: implement with native SDK",
-    );
-    return [];
+    try {
+      logger.info("Fetching Bybit trades (native SDK)", {
+        daysSince,
+        sinceDate: sinceDate?.toISOString(),
+      });
+
+      // Calculate timestamp
+      const since =
+        sinceDate ?? new Date(Date.now() - daysSince * 24 * 60 * 60 * 1000);
+      const startTime = since.getTime();
+
+      // Fetch spot trades
+      const spotTrades = await this.fetchSpotTradesNative(startTime);
+
+      // Fetch linear (futures) trades
+      const linearTrades = await this.fetchLinearTradesNative(startTime);
+
+      const allTrades = [...spotTrades, ...linearTrades];
+
+      // Sort by execution date (most recent first)
+      allTrades.sort((a, b) => b.executedAt.getTime() - a.executedAt.getTime());
+
+      logger.info("Bybit trades fetched successfully (native SDK)", {
+        spotCount: spotTrades.length,
+        linearCount: linearTrades.length,
+        totalCount: allTrades.length,
+      });
+
+      return allTrades;
+    } catch (error) {
+      logger.error("Failed to fetch Bybit trades (native SDK)", { error });
+      throw new Error(
+        `Failed to fetch trades: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
+  }
+
+  /**
+   * Fetch spot trades using native Bybit SDK
+   * @private
+   */
+  private async fetchSpotTradesNative(startTime: number): Promise<
+    {
+      externalOrderId: string;
+      symbol: string;
+      side: "BUY" | "SELL";
+      type:
+        | "MARKET"
+        | "LIMIT"
+        | "STOP_LOSS"
+        | "STOP_LOSS_LIMIT"
+        | "TAKE_PROFIT"
+        | "TAKE_PROFIT_LIMIT";
+      quantity: number;
+      price: number;
+      quoteQuantity: number;
+      fee: number;
+      feeAsset: string;
+      realizedPnl: number | null;
+      executedAt: Date;
+    }[]
+  > {
+    try {
+      logger.info("Fetching spot trades (Bybit native)", { startTime });
+
+      // Bybit API requires pagination for execution history
+      const trades = await this.client.getExecutionList({
+        category: "spot",
+        startTime,
+        limit: 100, // Max per request
+      });
+
+      return trades.result.list.map((trade) => ({
+        externalOrderId: trade.orderId,
+        symbol: trade.symbol,
+        side: trade.side === "Buy" ? ("BUY" as const) : ("SELL" as const),
+        type: this.mapBybitOrderType(trade.orderType),
+        quantity: Number(trade.execQty),
+        price: Number(trade.execPrice),
+        quoteQuantity: Number(trade.execValue),
+        fee: Number(trade.execFee),
+        feeAsset: trade.feeRate ? "USDT" : "USDT", // Bybit doesn't provide feeAsset in execList
+        realizedPnl: null, // Spot trades don't have realized PnL
+        executedAt: new Date(Number(trade.execTime)),
+      }));
+    } catch (error) {
+      logger.error("Failed to fetch spot trades (Bybit native)", { error });
+      return []; // Return empty array instead of throwing
+    }
+  }
+
+  /**
+   * Fetch linear (futures) trades using native Bybit SDK
+   * @private
+   */
+  private async fetchLinearTradesNative(startTime: number): Promise<
+    {
+      externalOrderId: string;
+      symbol: string;
+      side: "BUY" | "SELL";
+      type:
+        | "MARKET"
+        | "LIMIT"
+        | "STOP_LOSS"
+        | "STOP_LOSS_LIMIT"
+        | "TAKE_PROFIT"
+        | "TAKE_PROFIT_LIMIT";
+      quantity: number;
+      price: number;
+      quoteQuantity: number;
+      fee: number;
+      feeAsset: string;
+      realizedPnl: number | null;
+      executedAt: Date;
+    }[]
+  > {
+    try {
+      logger.info("Fetching linear trades (Bybit native)", { startTime });
+
+      // Bybit API requires pagination for execution history
+      const trades = await this.client.getExecutionList({
+        category: "linear",
+        startTime,
+        limit: 100, // Max per request
+      });
+
+      return trades.result.list.map((trade) => ({
+        externalOrderId: trade.orderId,
+        symbol: trade.symbol,
+        side: trade.side === "Buy" ? ("BUY" as const) : ("SELL" as const),
+        type: this.mapBybitOrderType(trade.orderType),
+        quantity: Number(trade.execQty),
+        price: Number(trade.execPrice),
+        quoteQuantity: Number(trade.execValue),
+        fee: Number(trade.execFee),
+        feeAsset: trade.feeRate ? "USDT" : "USDT", // Bybit linear uses USDT
+        realizedPnl: trade.closedSize ? Number(trade.closedSize) : null,
+        executedAt: new Date(Number(trade.execTime)),
+      }));
+    } catch (error) {
+      logger.error("Failed to fetch linear trades (Bybit native)", { error });
+      return []; // Return empty array instead of throwing
+    }
+  }
+
+  /**
+   * Map Bybit order type to our OrderType
+   * @private
+   */
+  private mapBybitOrderType(
+    bybitType: string,
+  ):
+    | "MARKET"
+    | "LIMIT"
+    | "STOP_LOSS"
+    | "STOP_LOSS_LIMIT"
+    | "TAKE_PROFIT"
+    | "TAKE_PROFIT_LIMIT" {
+    switch (bybitType) {
+      case "Market":
+        return "MARKET";
+      case "Limit":
+        return "LIMIT";
+      default:
+        return "LIMIT"; // Default to LIMIT for unknown types
+    }
   }
 
   // ==========================================
