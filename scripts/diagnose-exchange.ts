@@ -142,7 +142,7 @@ async function testBinance(traderId: string) {
     "cyan",
   );
 
-  const balance: any = null;
+  let balance: any = null;
 
   try {
     // 1. Get connection
@@ -190,7 +190,7 @@ async function testBinance(traderId: string) {
     logSection("Fetching Balance");
 
     try {
-      const balance = await service.fetchBalance();
+      balance = await service.fetchBalance();
 
       // Display non-zero balances
       const nonZeroBalances = Object.entries(balance)
@@ -339,6 +339,8 @@ async function testBybit(traderId: string) {
     "cyan",
   );
 
+  let balance: any = null;
+
   try {
     // 1. Get connection
     logSection("Fetching Connection");
@@ -377,7 +379,7 @@ async function testBybit(traderId: string) {
     logSection("Fetching Balance");
 
     try {
-      const balance = await service.fetchBalance();
+      balance = await service.fetchBalance();
 
       // Similar to Binance, show non-zero balances
       const nonZeroBalances = Object.entries(balance)
@@ -487,7 +489,9 @@ async function testBybit(traderId: string) {
     logSection("Diagnostic Summary");
     logSuccess("Connection: ✅ OK");
     logSuccess("API Keys: ✅ Valid");
-    logSuccess(`Balance: ✅ Fetched (SPOT only)`);
+    logSuccess(
+      `Balance: ✅ Fetched (SPOT only, ${Object.keys(balance ?? {}).length} assets)`,
+    );
     logInfo("Futures balance: ⚠️  Not included (limitation)");
     logInfo("Unrealized PnL: ⚠️  Not tracked (limitation)");
 
