@@ -287,14 +287,24 @@ export async function cancelCopyTrade(copyTradeId: string): Promise<CopyTrade> {
 
 /**
  * Mark copy trade as failed
+ *
+ * Phase 2.2 - Enhanced error tracking with errorCode and errorDetails
+ *
+ * @param copyTradeId - ID of the copy trade to mark as failed
+ * @param reason - Human-readable reason for failure
+ * @param errorCode - Standardized error code (e.g., CIRCUIT_BREAKER_TRIPPED, INSUFFICIENT_BALANCE)
+ * @param errorDetails - Full error details for debugging (stack trace, etc.)
  */
 export async function failCopyTrade(
   copyTradeId: string,
   reason: string,
+  errorCode?: string,
+  errorDetails?: string,
 ): Promise<CopyTrade> {
   logger.error("Marking copy trade as failed", {
     copyTradeId,
     reason,
+    errorCode,
   });
 
   const updatedCopy = await prisma.copyTrade.update({
@@ -302,6 +312,8 @@ export async function failCopyTrade(
     data: {
       status: "FAILED",
       notes: `Failed: ${reason}`,
+      errorCode: errorCode ?? null,
+      errorDetails: errorDetails ?? null,
     },
   });
 
