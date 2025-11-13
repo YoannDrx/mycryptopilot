@@ -16,6 +16,8 @@ import {
   createTraderTradeFromSignal,
   getTraderTradeBySignalId,
 } from "@/lib/trading/trader-trade.service";
+import { calculateSafeQuantity } from "@/lib/exchange/position-sizing.service";
+import { decryptApiKey } from "@/lib/crypto/encryption-service";
 
 /**
  * Queue copy trades for all followers with auto-copy enabled
@@ -167,66 +169,140 @@ export async function queueAutoCopyTradesForSignal(
         // Get or use default exchange connection
         let exchangeConnectionId = pref.exchangeConnectionId;
 
-        if (!exchangeConnectionId) {
-          // Use first active exchange connection
-          const defaultConnection =
-            await prisma.userExchangeConnection.findFirst({
+        // Fetch full exchange connection details (needed for decryption + balance)
+        const exchangeConnection = exchangeConnectionId
+          ? await prisma.userExchangeConnection.findUnique({
+              where: { id: exchangeConnectionId },
+              select: {
+                id: true,
+                exchange: true,
+                encryptedApiKey: true,
+                encryptedSecretKey: true,
+                keyIv: true,
+                keyTag: true,
+                isActive: true,
+              },
+            })
+          : await prisma.userExchangeConnection.findFirst({
               where: {
                 userId: pref.userId,
                 isActive: true,
               },
-              select: { id: true },
+              select: {
+                id: true,
+                exchange: true,
+                encryptedApiKey: true,
+                encryptedSecretKey: true,
+                keyIv: true,
+                keyTag: true,
+                isActive: true,
+              },
             });
 
-          if (!defaultConnection) {
-            logger.warn("No active exchange connection found for user", {
-              userId: pref.userId,
-              signalId,
-            });
-            return null;
-          }
-
-          exchangeConnectionId = defaultConnection.id;
+        if (!exchangeConnection) {
+          logger.warn("No active exchange connection found for user", {
+            userId: pref.userId,
+            signalId,
+          });
+          return null;
         }
 
-        // Calculate copy quantity based on copyRatio
-        // For now, we'll use a default quantity of 0.01 BTC (will be adjusted by worker based on balance)
-        const baseQuantity = 0.01; // This should be calculated based on user's portfolio size
-        const copyQuantity = baseQuantity * pref.copyRatio;
+        exchangeConnectionId = exchangeConnection.id;
 
-        // Create CopyTrade record with PENDING status
-        const copyTrade = await prisma.copyTrade.create({
-          data: {
+        // ========== Calculate Safe Quantity with Real Balance ==========
+
+        try {
+          // Decrypt API keys
+          const apiKey = decryptApiKey(
+            exchangeConnection.encryptedApiKey,
+            exchangeConnection.keyIv,
+            exchangeConnection.keyTag,
+          );
+          const secretKey = decryptApiKey(
+            exchangeConnection.encryptedSecretKey,
+            exchangeConnection.keyIv,
+            exchangeConnection.keyTag,
+          );
+
+          // Calculate safe quantity based on user's actual balance
+          const safeQuantityResult = await calculateSafeQuantity({
             userId: pref.userId,
-            originalTradeId: traderTrade.id, // ✅ Now using TraderTrade.id instead of signalId
-            mode: "AUTO",
-            status: "PENDING",
-            notes: `Auto-copy from signal ${signalId}`,
-          },
-        });
+            exchange: exchangeConnection.exchange,
+            apiKey,
+            secretKey,
+            symbol: signal.symbol,
+            entryPrice: entry,
+            instrumentType: payload.instrumentType ?? "SPOT",
+            copyRatio: pref.copyRatio,
+            maxAmount: pref.maxAmountPerTrade,
+          });
 
-        // Prepare job data
-        const jobData: CopyTradeJobData = {
-          userId: pref.userId,
-          copyTradeId: copyTrade.id,
-          originalTradeId: traderTrade.id, // ✅ Use TraderTrade.id for consistency
-          traderProfileId: traderProfile.id,
-          symbol: signal.symbol,
-          side,
-          orderType: "MARKET", // Default to market orders for auto-copy
-          quantity: copyQuantity,
-          limitPrice: entry,
-          stopLoss: payload.stopLoss ? parseFloat(payload.stopLoss) : undefined,
-          takeProfit: payload.targets?.map((t) => parseFloat(t)),
-          copyRatio: pref.copyRatio,
-          maxAmount: pref.maxAmountPerTrade?.toNumber(),
-          exchangeId: exchangeConnectionId,
-          createdAt: new Date(),
-          signalId,
-          instrumentType: payload.instrumentType ?? "SPOT", // ✅ Pass instrumentType to worker
-        };
+          logger.info("Safe quantity calculated", {
+            userId: pref.userId,
+            symbol: signal.symbol,
+            quantity: safeQuantityResult.quantity,
+            positionSizeUsd: safeQuantityResult.positionSizeUsd,
+            availableBalanceUsd: safeQuantityResult.availableBalanceUsd,
+            limitApplied: safeQuantityResult.limitApplied,
+            warnings: safeQuantityResult.warnings,
+          });
 
-        return jobData;
+          // Use calculated safe quantity
+          const copyQuantity = safeQuantityResult.quantity;
+
+          // Warn if position is below minimum or has other issues
+          if (safeQuantityResult.warnings.length > 0) {
+            logger.warn("Position sizing warnings", {
+              userId: pref.userId,
+              warnings: safeQuantityResult.warnings,
+            });
+          }
+
+          // Create CopyTrade record with PENDING status
+          const copyTrade = await prisma.copyTrade.create({
+            data: {
+              userId: pref.userId,
+              originalTradeId: traderTrade.id, // ✅ Now using TraderTrade.id instead of signalId
+              mode: "AUTO",
+              status: "PENDING",
+              notes: `Auto-copy from signal ${signalId}`,
+            },
+          });
+
+          // Prepare job data
+          const jobData: CopyTradeJobData = {
+            userId: pref.userId,
+            copyTradeId: copyTrade.id,
+            originalTradeId: traderTrade.id, // ✅ Use TraderTrade.id for consistency
+            traderProfileId: traderProfile.id,
+            symbol: signal.symbol,
+            side,
+            orderType: "MARKET", // Default to market orders for auto-copy
+            quantity: copyQuantity, // ✅ Now using calculated safe quantity
+            limitPrice: entry,
+            stopLoss: payload.stopLoss
+              ? parseFloat(payload.stopLoss)
+              : undefined,
+            takeProfit: payload.targets?.map((t) => parseFloat(t)),
+            copyRatio: pref.copyRatio,
+            maxAmount: pref.maxAmountPerTrade?.toNumber(),
+            exchangeId: exchangeConnectionId,
+            createdAt: new Date(),
+            signalId,
+            instrumentType: payload.instrumentType ?? "SPOT", // ✅ Pass instrumentType to worker
+          };
+
+          return jobData;
+        } catch (error) {
+          logger.error("Failed to calculate safe quantity", {
+            userId: pref.userId,
+            signalId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+
+          // Return null to skip this user (will be logged as error later)
+          return null;
+        }
       }),
     );
 
