@@ -31,6 +31,7 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { realtimeBalanceManager } from "@/lib/exchange/realtime-balance-manager";
 import { balanceCache } from "@/lib/exchange/balance-cache";
+import { decryptApiKey } from "@/lib/crypto/encryption-service";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const TRADER_DISCOVERY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -53,6 +54,8 @@ async function discoverActiveTraders() {
         exchange: true,
         encryptedApiKey: true,
         encryptedSecretKey: true,
+        keyIv: true,
+        keyTag: true,
         user: {
           select: {
             id: true,
@@ -105,11 +108,19 @@ async function subscribeAllTraders() {
         const traderId = conn.userId;
 
         try {
-          // Decrypt API keys (simplified - assumes encryption service)
-          const apiKey = conn.encryptedApiKey; // TODO: Decrypt
-          const secretKey = conn.encryptedSecretKey; // TODO: Decrypt
+          // Decrypt API keys using encryption service
+          const apiKey = decryptApiKey(
+            conn.encryptedApiKey,
+            conn.keyIv,
+            conn.keyTag,
+          );
+          const secretKey = decryptApiKey(
+            conn.encryptedSecretKey,
+            conn.keyIv,
+            conn.keyTag,
+          );
 
-          // Subscribe
+          // Subscribe to real-time balance updates
           await realtimeBalanceManager.subscribe(
             traderId,
             conn.exchange.toLowerCase() as "binance" | "bybit",
