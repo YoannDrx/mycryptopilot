@@ -17,6 +17,8 @@ import type {
   OrderStatus,
   NormalizedTrade,
 } from "./types";
+import { createRetryWrapper } from "./retry-logic";
+import { mapCCXTError } from "./errors";
 
 /**
  * Bybit Service
@@ -59,6 +61,7 @@ type ValidationResult = {
 
 export class BybitService implements ExchangeAdapter {
   private readonly exchange: InstanceType<typeof ccxt.bybit>;
+  private readonly retry = createRetryWrapper("bybit");
 
   constructor(apiKey: string, secretKey: string) {
     this.exchange = new ccxt.bybit({
@@ -153,10 +156,13 @@ export class BybitService implements ExchangeAdapter {
   async fetchBalance() {
     try {
       logger.info("Fetching Bybit balance");
-      return await this.exchange.fetchBalance();
+      return await this.retry(
+        async () => this.exchange.fetchBalance(),
+        "fetchBalance",
+      );
     } catch (error) {
-      logger.error("Failed to fetch Bybit balance", { error });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "bybit");
     }
   }
 
@@ -635,14 +641,18 @@ export class BybitService implements ExchangeAdapter {
       if (positionSide) ccxtParams.positionSide = positionSide;
       if (reduceOnly !== undefined) ccxtParams.reduceOnly = reduceOnly;
 
-      // Create order via CCXT
-      const ccxtOrder = await this.exchange.createOrder(
-        symbol,
-        ccxtType,
-        ccxtSide,
-        quantity,
-        price,
-        ccxtParams,
+      // Create order via CCXT with retry logic
+      const ccxtOrder = await this.retry(
+        async () =>
+          this.exchange.createOrder(
+            symbol,
+            ccxtType,
+            ccxtSide,
+            quantity,
+            price,
+            ccxtParams,
+          ),
+        "createOrder",
       );
 
       // Convert CCXT response to OrderResult
@@ -700,9 +710,13 @@ export class BybitService implements ExchangeAdapter {
         ccxtParams.clientOrderId = clientOrderId;
       }
 
-      // Cancel order via CCXT
+      // Cancel order via CCXT with retry logic
       const orderIdToCancel = orderId ?? clientOrderId ?? "";
-      await this.exchange.cancelOrder(orderIdToCancel, symbol, ccxtParams);
+      await this.retry(
+        async () =>
+          this.exchange.cancelOrder(orderIdToCancel, symbol, ccxtParams),
+        "cancelOrder",
+      );
 
       logger.info("Order canceled successfully", {
         orderId,
@@ -710,8 +724,8 @@ export class BybitService implements ExchangeAdapter {
         symbol,
       });
     } catch (error) {
-      logger.error("Failed to cancel order", { error, params });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "bybit");
     }
   }
 
@@ -733,12 +747,12 @@ export class BybitService implements ExchangeAdapter {
         ccxtParams.clientOrderId = clientOrderId;
       }
 
-      // Fetch order via CCXT
+      // Fetch order via CCXT with retry logic
       const orderIdToFetch = orderId ?? clientOrderId ?? "";
-      const ccxtOrder = await this.exchange.fetchOrder(
-        orderIdToFetch,
-        symbol,
-        ccxtParams,
+      const ccxtOrder = await this.retry(
+        async () =>
+          this.exchange.fetchOrder(orderIdToFetch, symbol, ccxtParams),
+        "getOrderStatus",
       );
 
       // Convert CCXT response to OrderStatus
@@ -756,8 +770,8 @@ export class BybitService implements ExchangeAdapter {
 
       return orderStatus;
     } catch (error) {
-      logger.error("Failed to get order status", { error, params });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "bybit");
     }
   }
 

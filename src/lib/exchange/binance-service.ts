@@ -17,6 +17,8 @@ import type {
   OrderStatus,
   NormalizedTrade,
 } from "./types";
+import { createRetryWrapper } from "./retry-logic";
+import { mapCCXTError } from "./errors";
 
 /**
  * Binance Service
@@ -59,6 +61,7 @@ type ValidationResult = {
 
 export class BinanceService implements ExchangeAdapter {
   private readonly exchange: InstanceType<typeof ccxt.binance>;
+  private readonly retry = createRetryWrapper("binance");
 
   constructor(apiKey: string, secretKey: string) {
     this.exchange = new ccxt.binance({
@@ -149,15 +152,18 @@ export class BinanceService implements ExchangeAdapter {
    * Fetch account balance from Binance
    *
    * @returns Promise<ccxt.Balances> - Account balance with total, free, and used amounts
-   * @throws Error if fetch fails
+   * @throws Error if fetch fails (after retries for network errors)
    */
   async fetchBalance() {
     try {
       logger.info("Fetching Binance balance");
-      return await this.exchange.fetchBalance();
+      return await this.retry(
+        async () => this.exchange.fetchBalance(),
+        "fetchBalance",
+      );
     } catch (error) {
-      logger.error("Failed to fetch Binance balance", { error });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "binance");
     }
   }
 
@@ -637,14 +643,18 @@ export class BinanceService implements ExchangeAdapter {
       if (positionSide) ccxtParams.positionSide = positionSide;
       if (reduceOnly !== undefined) ccxtParams.reduceOnly = reduceOnly;
 
-      // Create order via CCXT
-      const ccxtOrder = await this.exchange.createOrder(
-        symbol,
-        ccxtType,
-        ccxtSide,
-        quantity,
-        price,
-        ccxtParams,
+      // Create order via CCXT with retry logic
+      const ccxtOrder = await this.retry(
+        async () =>
+          this.exchange.createOrder(
+            symbol,
+            ccxtType,
+            ccxtSide,
+            quantity,
+            price,
+            ccxtParams,
+          ),
+        "createOrder",
       );
 
       // Convert CCXT response to OrderResult
@@ -702,9 +712,13 @@ export class BinanceService implements ExchangeAdapter {
         ccxtParams.clientOrderId = clientOrderId;
       }
 
-      // Cancel order via CCXT
+      // Cancel order via CCXT with retry logic
       const orderIdToCancel = orderId ?? clientOrderId ?? "";
-      await this.exchange.cancelOrder(orderIdToCancel, symbol, ccxtParams);
+      await this.retry(
+        async () =>
+          this.exchange.cancelOrder(orderIdToCancel, symbol, ccxtParams),
+        "cancelOrder",
+      );
 
       logger.info("Order canceled successfully", {
         orderId,
@@ -712,8 +726,8 @@ export class BinanceService implements ExchangeAdapter {
         symbol,
       });
     } catch (error) {
-      logger.error("Failed to cancel order", { error, params });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "binance");
     }
   }
 
@@ -735,12 +749,12 @@ export class BinanceService implements ExchangeAdapter {
         ccxtParams.clientOrderId = clientOrderId;
       }
 
-      // Fetch order via CCXT
+      // Fetch order via CCXT with retry logic
       const orderIdToFetch = orderId ?? clientOrderId ?? "";
-      const ccxtOrder = await this.exchange.fetchOrder(
-        orderIdToFetch,
-        symbol,
-        ccxtParams,
+      const ccxtOrder = await this.retry(
+        async () =>
+          this.exchange.fetchOrder(orderIdToFetch, symbol, ccxtParams),
+        "getOrderStatus",
       );
 
       // Convert CCXT response to OrderStatus
@@ -758,8 +772,8 @@ export class BinanceService implements ExchangeAdapter {
 
       return orderStatus;
     } catch (error) {
-      logger.error("Failed to get order status", { error, params });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "binance");
     }
   }
 
