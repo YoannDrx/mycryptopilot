@@ -39,7 +39,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should verify Redis atomic operations work", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -52,7 +51,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should atomically increment trade counter and pass if under limit", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -80,7 +78,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should throw and rollback if limit exceeded", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -108,7 +105,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should handle concurrent increments atomically (race condition test)", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -154,7 +150,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should atomically increment loss counter", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -180,7 +175,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should throw if loss limit exceeded", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -202,7 +196,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should handle null maxLossAmount gracefully", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -220,7 +213,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should return current counters from Redis", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -259,7 +251,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should reset both counters to zero", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 
@@ -284,7 +275,6 @@ describe("Circuit Breaker Atomic Operations", () => {
     it("should handle 100 concurrent operations without overflow", async () => {
       const redis = getRedisClient();
       if (!redis) {
-        console.warn("Redis not available, skipping test");
         return;
       }
 

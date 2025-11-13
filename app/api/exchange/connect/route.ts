@@ -141,7 +141,7 @@ export async function POST(request: Request) {
 
     let apiValidation;
     try {
-      apiValidation = await exchangeService.validateApiKeys();
+      apiValidation = await exchangeService.testConnection();
     } catch (error) {
       logger.error(`${exchange} API validation failed`, { error, exchange });
       return NextResponse.json(
