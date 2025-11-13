@@ -418,6 +418,10 @@ model CopyTrade {
   manualPnl   Decimal? @db.Decimal(20, 8) // Manual PnL calculation
   notes       String?  @db.Text // Personal notes
 
+  // Error Tracking (Phase 2.2)
+  errorCode    String? // Standardized error code (e.g., CIRCUIT_BREAKER_TRIPPED, INSUFFICIENT_BALANCE)
+  errorDetails String? @db.Text // Full error details for debugging
+
   // Risk Management
   stopLoss   Decimal? @db.Decimal(20, 8) // Custom SL
   takeProfit Json? // Custom TPs
