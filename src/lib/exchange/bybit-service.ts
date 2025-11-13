@@ -1,6 +1,22 @@
 import ccxt from "ccxt";
 import { logger } from "@/lib/logger";
 import type { TradeSide, OrderType } from "@/generated/prisma";
+import type {
+  ExchangeAdapter,
+  PaginationOptions,
+  FetchTradesResult,
+} from "./exchange-service-factory";
+import type {
+  ConsolidatedBalance,
+  PositionSnapshot,
+  ConnectionStatus,
+  RateLimitInfo,
+  CreateOrderParams,
+  OrderResult,
+  CancelOrderParams,
+  OrderStatus,
+  NormalizedTrade,
+} from "./types";
 
 /**
  * Bybit Service
@@ -41,7 +57,7 @@ type ValidationResult = {
   errorMessage?: string;
 };
 
-export class BybitService {
+export class BybitService implements ExchangeAdapter {
   private readonly exchange: InstanceType<typeof ccxt.bybit>;
 
   constructor(apiKey: string, secretKey: string) {
@@ -197,6 +213,239 @@ export class BybitService {
    */
   async close(): Promise<void> {
     await this.exchange.close();
+  }
+
+  // ==========================================
+  // ExchangeAdapter Interface Implementation
+  // ==========================================
+
+  /**
+   * Fetch consolidated balance (spot + futures + margin)
+   * @implements ExchangeAdapter.fetchConsolidatedBalance
+   */
+  async fetchConsolidatedBalance(): Promise<ConsolidatedBalance> {
+    try {
+      const timestamp = new Date();
+
+      // Fetch spot balance
+      const spotBalance = await this.exchange.fetchBalance();
+
+      // Build spot assets
+      const spotAssets: Record<
+        string,
+        {
+          asset: string;
+          free: number;
+          locked: number;
+          total: number;
+          usdValue?: number;
+        }
+      > = {};
+      const spotTotalUsd = 0;
+
+      for (const [asset, data] of Object.entries(spotBalance)) {
+        if (
+          asset === "info" ||
+          asset === "free" ||
+          asset === "used" ||
+          asset === "total" ||
+          asset === "timestamp" ||
+          asset === "datetime"
+        ) {
+          continue;
+        }
+
+        const balanceData = data as {
+          free?: number;
+          used?: number;
+          total?: number;
+        };
+        if (balanceData.total && balanceData.total > 0) {
+          spotAssets[asset] = {
+            asset,
+            free: balanceData.free ?? 0,
+            locked: balanceData.used ?? 0,
+            total: balanceData.total,
+            usdValue: undefined, // TODO: Add price conversion
+          };
+        }
+      }
+
+      // TODO: Fetch futures balance (Phase 2)
+      const consolidatedBalance: ConsolidatedBalance = {
+        timestamp,
+        spot: {
+          totalUsd: spotTotalUsd,
+          assets: spotAssets,
+          raw: spotBalance.info,
+        },
+        totalEquityUsd: spotTotalUsd,
+      };
+
+      return consolidatedBalance;
+    } catch (error) {
+      logger.error("Failed to fetch consolidated balance", { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch open positions
+   * @implements ExchangeAdapter.fetchOpenPositions
+   */
+  async fetchOpenPositions(): Promise<PositionSnapshot[]> {
+    // TODO: Implement in Phase 2 (requires futures API)
+    logger.warn("fetchOpenPositions not yet implemented for Bybit");
+    return [];
+  }
+
+  /**
+   * Fetch trades with pagination
+   * @implements ExchangeAdapter.fetchTradesPaginated
+   */
+  async fetchTradesPaginated(
+    symbol: string,
+    options?: PaginationOptions,
+  ): Promise<FetchTradesResult> {
+    try {
+      const limit = options?.limit ?? 500;
+      const since = options?.since;
+
+      // Fetch trades from ccxt
+      const ccxtTrades = await this.exchange.fetchMyTrades(
+        symbol,
+        since,
+        limit,
+      );
+
+      // Convert to NormalizedTrade format
+      const trades: NormalizedTrade[] = ccxtTrades.map(
+        (trade): NormalizedTrade => ({
+          id: String(trade.id),
+          orderId: String(trade.order),
+          symbol: String(trade.symbol),
+          side: trade.side === "buy" ? "BUY" : "SELL",
+          type: this.mapTradeType(trade.type ?? "market"),
+          quantity: Number(trade.amount),
+          price: Number(trade.price),
+          quoteQuantity: Number(trade.cost),
+          fee: Number(trade.fee?.cost ?? 0),
+          feeCurrency: trade.fee?.currency ?? "USDT",
+          executedAt: new Date(trade.timestamp ?? Date.now()),
+          instrumentType: "SPOT", // TODO: Detect futures
+          realizedPnl: null,
+          positionSide: null,
+          raw: trade.info as unknown,
+        }),
+      );
+
+      // Build cursor for pagination
+      const lastTrade = trades.length > 0 ? trades[trades.length - 1] : null;
+      const cursor = {
+        nextId: lastTrade ? lastTrade.id : null,
+        nextTimestamp: lastTrade ? lastTrade.executedAt.getTime() : null,
+        hasMore: trades.length === limit,
+      };
+
+      return { trades, cursor };
+    } catch (error) {
+      logger.error("Failed to fetch paginated trades", { error, symbol });
+      throw error;
+    }
+  }
+
+  /**
+   * Test connection and return status
+   * @implements ExchangeAdapter.testConnection
+   */
+  async testConnection(): Promise<ConnectionStatus> {
+    const validation = await this.validateApiKeys();
+    return {
+      isValid: validation.isValid,
+      isReadOnly: validation.isReadOnly,
+      hasSpotEnabled: validation.hasSpotEnabled,
+      hasFuturesEnabled: validation.hasFuturesEnabled,
+      canTrade: !validation.isReadOnly,
+      errorMessage: validation.errorMessage,
+    };
+  }
+
+  /**
+   * Get current rate limit info
+   * @implements ExchangeAdapter.getRateLimitInfo
+   */
+  getRateLimitInfo(): RateLimitInfo | null {
+    // ccxt doesn't expose rate limit info easily
+    // This will be available when we migrate to native SDK
+    logger.warn("getRateLimitInfo not available with ccxt");
+    return null;
+  }
+
+  /**
+   * Create order (for copy-trading)
+   * @implements ExchangeAdapter.createOrder
+   */
+  async createOrder(_params: CreateOrderParams): Promise<OrderResult> {
+    // TODO: Implement in Phase 3 (copy-trading)
+    throw new Error("createOrder not yet implemented (Phase 3)");
+  }
+
+  /**
+   * Cancel order
+   * @implements ExchangeAdapter.cancelOrder
+   */
+  async cancelOrder(_params: CancelOrderParams): Promise<void> {
+    // TODO: Implement in Phase 3 (copy-trading)
+    throw new Error("cancelOrder not yet implemented (Phase 3)");
+  }
+
+  /**
+   * Get order status
+   * @implements ExchangeAdapter.getOrderStatus
+   */
+  async getOrderStatus(_params: CancelOrderParams): Promise<OrderStatus> {
+    // TODO: Implement in Phase 3 (copy-trading)
+    throw new Error("getOrderStatus not yet implemented (Phase 3)");
+  }
+
+  /**
+   * Map ccxt trade type to NormalizedTrade type
+   */
+  private mapTradeType(
+    ccxtType: string,
+  ):
+    | "MARKET"
+    | "LIMIT"
+    | "STOP"
+    | "STOP_MARKET"
+    | "STOP_LIMIT"
+    | "TAKE_PROFIT"
+    | "TAKE_PROFIT_MARKET"
+    | "TRAILING_STOP" {
+    switch (ccxtType.toLowerCase()) {
+      case "market":
+        return "MARKET";
+      case "limit":
+        return "LIMIT";
+      case "stop":
+      case "stop_loss":
+        return "STOP";
+      case "stop_market":
+      case "stop_loss_market":
+        return "STOP_MARKET";
+      case "stop_limit":
+      case "stop_loss_limit":
+        return "STOP_LIMIT";
+      case "take_profit":
+        return "TAKE_PROFIT";
+      case "take_profit_market":
+        return "TAKE_PROFIT_MARKET";
+      case "trailing_stop":
+      case "trailing_stop_market":
+        return "TRAILING_STOP";
+      default:
+        return "MARKET";
+    }
   }
 
   /**

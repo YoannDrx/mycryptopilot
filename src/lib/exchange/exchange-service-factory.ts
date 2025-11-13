@@ -1,4 +1,16 @@
 import type { Exchange } from "@/generated/prisma";
+import type {
+  CancelOrderParams,
+  ConnectionStatus,
+  ConsolidatedBalance,
+  CreateOrderParams,
+  NormalizedTrade,
+  OrderResult,
+  OrderStatus,
+  PaginationCursor,
+  PositionSnapshot,
+  RateLimitInfo,
+} from "@/lib/exchange/types";
 import { BinanceService } from "./binance-service";
 import { BybitService } from "./bybit-service";
 
@@ -15,7 +27,33 @@ import { BybitService } from "./bybit-service";
  * await service.close();
  */
 
-export type ExchangeService = BinanceService | BybitService;
+export type PaginationOptions = {
+  since?: number;
+  limit?: number;
+  cursor?: PaginationCursor;
+};
+
+export type FetchTradesResult = {
+  trades: NormalizedTrade[];
+  cursor: PaginationCursor;
+};
+
+export type ExchangeAdapter = {
+  fetchConsolidatedBalance: () => Promise<ConsolidatedBalance>;
+  fetchOpenPositions: () => Promise<PositionSnapshot[]>;
+  fetchTradesPaginated: (
+    symbol: string,
+    options?: PaginationOptions,
+  ) => Promise<FetchTradesResult>;
+  testConnection: () => Promise<ConnectionStatus>;
+  getRateLimitInfo: () => RateLimitInfo | null;
+  createOrder: (params: CreateOrderParams) => Promise<OrderResult>;
+  cancelOrder: (params: CancelOrderParams) => Promise<void>;
+  getOrderStatus: (params: CancelOrderParams) => Promise<OrderStatus>;
+  close: () => Promise<void>;
+}
+
+export type ExchangeService = (BinanceService | BybitService) & ExchangeAdapter;
 
 /**
  * Create exchange service instance based on exchange type
