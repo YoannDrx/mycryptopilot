@@ -251,18 +251,15 @@ export class BybitNativeService implements ExchangeAdapter {
       const limit = options?.limit ?? 50;
       const startTime = options?.since;
 
-      // Fetch execution history from Bybit (spot trades)
-      const tradesResponse = await this.client.getHistoricOrders({
+      // Spot execution history via historic orders
+      const spotOrdersResponse = await this.client.getHistoricOrders({
         category: "spot",
         symbol,
         ...(startTime && { startTime }),
         limit,
       });
 
-      const tradesData = tradesResponse.result.list;
-
-      // Convert to NormalizedTrade format
-      const trades: NormalizedTrade[] = tradesData
+      const spotTrades: NormalizedTrade[] = spotOrdersResponse.result.list
         .filter((order) => order.orderStatus === "Filled")
         .map((order) => ({
           id: order.orderId,
@@ -274,7 +271,7 @@ export class BybitNativeService implements ExchangeAdapter {
           price: Number(order.avgPrice || order.price),
           quoteQuantity: Number(order.cumExecValue || 0),
           fee: Number(order.cumExecFee || 0),
-          feeCurrency: "USDT", // Bybit doesn't expose feeCurrency in order history
+          feeCurrency: "USDT",
           executedAt: new Date(Number(order.updatedTime)),
           instrumentType: "SPOT",
           realizedPnl: null,
@@ -282,17 +279,49 @@ export class BybitNativeService implements ExchangeAdapter {
           raw: order,
         }));
 
-      // Build cursor for pagination
+      // Linear futures executions via execution list
+      const linearExecutions = await this.client.getExecutionList({
+        category: "linear",
+        symbol,
+        ...(startTime && { startTime }),
+        limit,
+      });
+
+      const linearTrades: NormalizedTrade[] = linearExecutions.result.list.map(
+        (exec) => ({
+          id: exec.execId,
+          orderId: exec.orderId,
+          symbol: exec.symbol,
+          side: exec.side === "Buy" ? "BUY" : "SELL",
+          type: this.mapBybitOrderType(exec.orderType),
+          quantity: Number(exec.execQty),
+          price: Number(exec.execPrice),
+          quoteQuantity: Number(exec.execValue),
+          fee: Number(exec.execFee),
+          feeCurrency: exec.feeRate ? "USDT" : "USDT",
+          executedAt: new Date(Number(exec.execTime)),
+          instrumentType: "FUTURES_USDT",
+          realizedPnl: exec.closedSize ? Number(exec.closedSize) : null,
+          positionSide: exec.positionIdx ? String(exec.positionIdx) : null,
+          raw: exec,
+        }),
+      );
+
+      const trades = [...spotTrades, ...linearTrades].sort(
+        (a, b) => b.executedAt.getTime() - a.executedAt.getTime(),
+      );
+
       const lastTrade = trades.length > 0 ? trades[trades.length - 1] : null;
       const cursor = {
         nextId: lastTrade ? lastTrade.id : null,
         nextTimestamp: lastTrade ? lastTrade.executedAt.getTime() : null,
-        hasMore: trades.length === limit,
+        hasMore: trades.length >= limit, // crude indicator; Bybit doesn't provide cursor token
       };
 
       logger.info("Trades fetched", {
-        count: trades.length,
-        hasMore: cursor.hasMore,
+        total: trades.length,
+        spot: spotTrades.length,
+        linear: linearTrades.length,
       });
 
       return { trades, cursor };

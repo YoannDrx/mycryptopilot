@@ -28,6 +28,7 @@ import { logger } from "@/lib/logger";
 import { createExchangeService } from "./exchange-service-factory";
 import type { Exchange } from "@/generated/prisma";
 import type { Decimal } from "@prisma/client/runtime/library";
+import { getCachedBalance, setCachedBalance } from "./balance-cache.service";
 
 export type CalculateSafeQuantityInput = {
   // User identification
@@ -190,24 +191,43 @@ export async function calculateSafeQuantity(
         : null,
     });
 
-    // ========== Step 2: Fetch User Balance ==========
+    // ========== Step 2: Fetch User Balance (with Redis cache) ==========
 
-    const exchangeService = createExchangeService(exchange, apiKey, secretKey);
+    // Try to get cached balance first (TTL: 30s)
+    let balance = await getCachedBalance(userId, exchange);
 
-    let balance;
-    try {
-      balance = await exchangeService.fetchConsolidatedBalance();
-    } finally {
-      // Always close connection
-      await exchangeService.close();
+    if (balance) {
+      logger.debug("Balance cache hit (50ms)", {
+        userId,
+        exchange,
+        totalEquityUsd: balance.totalEquityUsd,
+      });
+    } else {
+      // Cache miss - fetch from exchange API (2000ms)
+      const exchangeService = createExchangeService(
+        exchange,
+        apiKey,
+        secretKey,
+      );
+
+      try {
+        balance = await exchangeService.fetchConsolidatedBalance();
+
+        logger.debug("Balance fetched from API (2000ms)", {
+          userId,
+          exchange,
+          totalEquityUsd: balance.totalEquityUsd,
+          spotTotalUsd: balance.spot.totalUsd,
+          futuresAvailable: balance.futures?.marginAvailable,
+        });
+
+        // Cache the balance for 30 seconds
+        await setCachedBalance(userId, exchange, balance);
+      } finally {
+        // Always close connection
+        await exchangeService.close();
+      }
     }
-
-    logger.debug("Balance fetched", {
-      userId,
-      totalEquityUsd: balance.totalEquityUsd,
-      spotTotalUsd: balance.spot.totalUsd,
-      futuresAvailable: balance.futures?.marginAvailable,
-    });
 
     // ========== Step 3: Determine Available Balance ==========
 

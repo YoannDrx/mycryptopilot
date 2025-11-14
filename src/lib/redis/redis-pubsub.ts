@@ -30,6 +30,7 @@
 import { logger } from "@/lib/logger";
 import { getRedisClient } from "@/lib/cache/redis-client";
 import type { ConsolidatedBalance } from "@/lib/exchange/types";
+import type Redis from "ioredis";
 
 // ============= Constants =============
 
@@ -48,6 +49,13 @@ export type BalanceUpdateMessage = {
   balance: ConsolidatedBalance;
   timestamp: string; // ISO 8601
 };
+
+let sharedSubscriber: Redis | null = null;
+const channelHandlers = new Map<
+  string,
+  Set<(message: BalanceUpdateMessage) => void>
+>();
+let subscriberListening = false;
 
 // ============= Publisher =============
 
@@ -145,95 +153,118 @@ export async function subscribeToBalanceUpdates(
   traderId: string,
   onUpdate: (message: BalanceUpdateMessage) => void,
 ): Promise<BalanceSubscription> {
-  // Create separate Redis client for subscriber
-  // IMPORTANT: Subscribers need dedicated connection (can't use same client)
-  const Redis = await import("ioredis").then((m) => m.default);
+  if (!process.env.REDIS_URL) {
+    throw new Error("REDIS_URL not configured");
+  }
+
+  const subscriber = await getSharedSubscriber();
+  const channel = `${BALANCE_CHANNEL_PREFIX}${traderId}`;
+
+  let handlers = channelHandlers.get(channel);
+  if (!handlers) {
+    handlers = new Set();
+    channelHandlers.set(channel, handlers);
+    await subscriber.subscribe(channel);
+    logger.debug("Subscribed to Redis channel", { channel });
+  }
+
+  const handler = (message: BalanceUpdateMessage) => onUpdate(message);
+  handlers.add(handler);
+
+  if (!subscriberListening) {
+    subscriber.on("message", (receivedChannel: string, payload: string) => {
+      const listeners = channelHandlers.get(receivedChannel);
+      if (!listeners || listeners.size === 0) {
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(payload) as BalanceUpdateMessage;
+        listeners.forEach((listener) => listener(parsed));
+      } catch (error) {
+        logger.error("Failed to parse balance update message", {
+          channel: receivedChannel,
+          error,
+        });
+      }
+    });
+
+    subscriberListening = true;
+  }
+
+  return {
+    traderId,
+    channel,
+    unsubscribe: async () => {
+      const channelSet = channelHandlers.get(channel);
+      if (!channelSet) {
+        return;
+      }
+
+      channelSet.delete(handler);
+
+      if (channelSet.size === 0) {
+        channelHandlers.delete(channel);
+        try {
+          await subscriber.unsubscribe(channel);
+        } catch (error) {
+          logger.error("Failed to unsubscribe Redis channel", {
+            traderId,
+            channel,
+            error,
+          });
+        }
+      }
+    },
+  };
+}
+
+export async function resetRedisSubscriberForTests(): Promise<void> {
+  channelHandlers.clear();
+  if (sharedSubscriber) {
+    await sharedSubscriber.quit();
+    sharedSubscriber = null;
+  }
+  subscriberListening = false;
+}
+
+async function getSharedSubscriber(): Promise<Redis> {
+  if (sharedSubscriber) {
+    return sharedSubscriber;
+  }
 
   if (!process.env.REDIS_URL) {
     throw new Error("REDIS_URL not configured");
   }
 
-  const subscriber = new Redis(process.env.REDIS_URL, {
-    maxRetriesPerRequest: null, // Important for pub/sub
+  const { default: RedisLib } = await import("ioredis");
+  sharedSubscriber = new RedisLib(process.env.REDIS_URL, {
+    maxRetriesPerRequest: null,
     enableReadyCheck: false,
     retryStrategy: (times: number) => {
       if (times > 10) {
-        logger.error("Redis subscriber connection failed after 10 retries");
-        return null; // Stop retrying
+        logger.error("Redis subscriber failed after repeated retries");
+        return null;
       }
-      const delay = Math.min(times * 100, 3000);
-      logger.warn(
-        `Redis subscriber reconnecting in ${delay}ms (attempt ${times})`,
-      );
-      return delay;
+      return Math.min(times * 100, 3000);
     },
   });
 
-  const channel = `${BALANCE_CHANNEL_PREFIX}${traderId}`;
+  return sharedSubscriber;
+}
 
-  // Message handler
-  const messageHandler = (receivedChannel: string, message: string) => {
-    // Only handle messages for this trader's channel
-    if (receivedChannel !== channel) {
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(message) as BalanceUpdateMessage;
-
-      logger.debug("Balance update received from Redis", {
-        traderId,
-        channel: receivedChannel,
-        timestamp: parsed.timestamp,
-      });
-
-      onUpdate(parsed);
-    } catch (error) {
-      logger.error("Failed to parse balance update message", {
-        traderId,
-        channel: receivedChannel,
-        error,
-      });
-    }
-  };
-
-  // Subscribe to channel
-  subscriber.on("message", messageHandler);
-
-  await subscriber.subscribe(channel);
-
-  logger.info("Subscribed to balance updates via Redis", {
-    traderId,
-    channel,
+export function getRedisSubscriberStats(): {
+  channels: number;
+  totalHandlers: number;
+} {
+  let totalHandlers = 0;
+  channelHandlers.forEach((handlers) => {
+    totalHandlers += handlers.size;
   });
 
-  // Return subscription handle
   return {
-    traderId,
-    channel,
-    unsubscribe: async () => {
-      logger.info("Unsubscribing from balance updates", {
-        traderId,
-        channel,
-      });
-
-      try {
-        await subscriber.unsubscribe(channel);
-        subscriber.off("message", messageHandler);
-        await subscriber.quit();
-
-        logger.debug("Unsubscribed from balance updates", {
-          traderId,
-          channel,
-        });
-      } catch (error) {
-        logger.error("Failed to unsubscribe from balance updates", {
-          traderId,
-          channel,
-          error,
-        });
-      }
-    },
+    channels: channelHandlers.size,
+    totalHandlers,
   };
 }
 

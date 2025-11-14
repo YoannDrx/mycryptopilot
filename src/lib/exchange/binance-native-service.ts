@@ -95,10 +95,13 @@ export class BinanceNativeService implements ExchangeAdapter {
     try {
       const timestamp = new Date();
 
-      // Fetch balances in parallel
-      const [spotAccount, futuresAccount] = await Promise.all([
-        this.mainClient.getAccountInformation(),
-        this.usdmClient.getBalance().catch(() => null), // Futures might not be enabled
+      // Fetch balances + pricing data in parallel
+      const [spotAccount, futuresAccount, marginAccount, priceMap] =
+        await Promise.all([
+          this.mainClient.getAccountInformation(),
+          this.usdmClient.getBalance().catch(() => null), // Futures might not be enabled
+          this.fetchMarginAccount().catch(() => null),
+          this.getUsdPriceMap(),
       ]);
 
       // Build spot balance
@@ -121,18 +124,21 @@ export class BinanceNativeService implements ExchangeAdapter {
         const total = free + locked;
 
         if (total > 0) {
+          const usdValue = this.calculateUsdValue(
+            balance.asset,
+            total,
+            priceMap,
+          );
+
           spotAssets[balance.asset] = {
             asset: balance.asset,
             free,
             locked,
             total,
-            usdValue: undefined, // TODO: Add price conversion
+            usdValue,
           };
 
-          // Estimate USD value (simplified - would need price data)
-          if (balance.asset === "USDT" || balance.asset === "USDC") {
-            spotTotalUsd += total;
-          }
+          spotTotalUsd += usdValue ?? 0;
         }
       }
 
@@ -186,8 +192,16 @@ export class BinanceNativeService implements ExchangeAdapter {
         };
       }
 
+      // Build margin balance if available
+      const marginBalance = marginAccount
+        ? this.mapMarginAccountToBalance(marginAccount, priceMap)
+        : undefined;
+
       // Calculate total equity
-      const totalEquityUsd = spotTotalUsd + (futuresBalance?.totalUsd ?? 0);
+      const totalEquityUsd =
+        spotTotalUsd +
+        (futuresBalance?.totalUsd ?? 0) +
+        (marginBalance?.totalUsd ?? 0);
 
       const consolidatedBalance: ConsolidatedBalance = {
         timestamp,
@@ -197,7 +211,7 @@ export class BinanceNativeService implements ExchangeAdapter {
           raw: spotAccount,
         },
         futures: futuresBalance,
-        margin: undefined, // TODO: Add margin support
+        margin: marginBalance,
         totalEquityUsd,
       };
 
@@ -952,5 +966,117 @@ export class BinanceNativeService implements ExchangeAdapter {
     }
 
     return orderResult;
+  }
+
+  private async fetchMarginAccount(): Promise<unknown> {
+    if ("sapiGetMarginAccount" in this.mainClient) {
+      // @ts-expect-error - SDK exposes sapi endpoints dynamically
+      return this.mainClient.sapiGetMarginAccount();
+    }
+    throw new Error("Margin account endpoint unavailable");
+  }
+
+  private async getUsdPriceMap(): Promise<Record<string, number>> {
+    try {
+      // @ts-expect-error - available in SDK
+      const tickers = await this.mainClient.getSymbolPriceTicker();
+      const map: Record<string, number> = {
+        USDT: 1,
+        BUSD: 1,
+        USDC: 1,
+      };
+
+      for (const ticker of tickers) {
+        const symbol = ticker.symbol as string;
+        const price = Number(ticker.price);
+
+        if (symbol.endsWith("USDT")) {
+          const asset = symbol.replace("USDT", "");
+          map[asset] = price;
+        } else if (symbol.endsWith("BUSD")) {
+          const asset = symbol.replace("BUSD", "");
+          map[asset] = price;
+        }
+      }
+
+      return map;
+    } catch {
+      return { USDT: 1, BUSD: 1, USDC: 1 };
+    }
+  }
+
+  private calculateUsdValue(
+    asset: string,
+    amount: number,
+    priceMap: Record<string, number>,
+  ): number | undefined {
+    if (asset === "USDT" || asset === "BUSD" || asset === "USDC") {
+      return amount;
+    }
+
+    if (priceMap[asset]) {
+      return amount * priceMap[asset];
+    }
+
+    return undefined;
+  }
+
+  private mapMarginAccountToBalance(
+    marginAccount: unknown,
+    priceMap: Record<string, number>,
+  ) {
+    const account = marginAccount as {
+      userAssets?: {
+        asset: string;
+        free: string;
+        borrowed: string;
+        interest: string;
+      }[];
+    };
+
+    if (!account.userAssets) {
+      return undefined;
+    }
+
+    const assets: Record<
+      string,
+      {
+        asset: string;
+        free: number;
+        borrowed: number;
+        total: number;
+        usdValue?: number;
+      }
+    > = {};
+
+    let totalUsd = 0;
+    let borrowedUsd = 0;
+
+    for (const asset of account.userAssets) {
+      const free = Number(asset.free);
+      const borrowed = Number(asset.borrowed);
+      const interest = Number(asset.interest);
+      const total = free + borrowed + interest;
+      const usdValue = this.calculateUsdValue(asset.asset, total, priceMap);
+
+      assets[asset.asset] = {
+        asset: asset.asset,
+        free,
+        borrowed,
+        total,
+        usdValue,
+      };
+
+      totalUsd += usdValue ?? 0;
+      borrowedUsd +=
+        this.calculateUsdValue(asset.asset, borrowed, priceMap) ?? 0;
+    }
+
+    return {
+      totalUsd,
+      borrowed: borrowedUsd,
+      assets,
+      raw: marginAccount,
+    };
   }
 }

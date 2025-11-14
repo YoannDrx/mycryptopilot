@@ -24,6 +24,7 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { recordLoss } from "@/lib/queue/circuit-breaker.service";
 import type { CopyTrade, TraderTrade, User } from "@/generated/prisma";
+import { invalidateCachedBalance } from "@/lib/exchange/balance-cache.service";
 
 // ============= Types =============
 
@@ -250,6 +251,34 @@ export async function executeCopyTrade(
     executedQuantity: input.executedQuantity,
     slippage,
   });
+
+  // Invalidate balance cache after trade execution
+  // This forces fresh balance fetch on next position sizing call
+  try {
+    const userExchange = await prisma.userExchangeConnection.findFirst({
+      where: {
+        userId: copyTrade.userId,
+        isActive: true,
+      },
+      select: {
+        exchange: true,
+      },
+    });
+
+    if (userExchange) {
+      await invalidateCachedBalance(copyTrade.userId, userExchange.exchange);
+      logger.debug("Balance cache invalidated after trade execution", {
+        userId: copyTrade.userId,
+        exchange: userExchange.exchange,
+      });
+    }
+  } catch (error) {
+    // Don't fail the whole operation if cache invalidation fails
+    logger.warn("Failed to invalidate balance cache after trade execution", {
+      userId: copyTrade.userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   return updatedCopy;
 }

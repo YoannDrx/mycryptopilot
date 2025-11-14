@@ -41,6 +41,10 @@ import {
   executeCopyTrade,
   failCopyTrade,
 } from "@/lib/trading/copy-trade.service";
+import {
+  assertSlippageWithinThreshold,
+  SlippageExceededError,
+} from "./slippage-guard";
 
 // ============= Worker Configuration =============
 
@@ -211,6 +215,39 @@ async function processCopyTradeJob(job: {
       slippage = ((executedPrice - data.limitPrice) / data.limitPrice) * 100;
     }
 
+    try {
+      assertSlippageWithinThreshold(slippage, data.instrumentType);
+    } catch (error) {
+      if (error instanceof SlippageExceededError) {
+        logger.warn("Slippage threshold exceeded, aborting execution", {
+          copyTradeId,
+          slippage,
+          threshold: error.threshold,
+          instrumentType: data.instrumentType ?? "SPOT",
+        });
+
+        await failCopyTrade(
+          copyTradeId,
+          error.message,
+          "SLIPPAGE_EXCEEDED",
+          JSON.stringify(
+            {
+              slippage,
+              threshold: error.threshold,
+              instrumentType: data.instrumentType ?? "SPOT",
+              copyTradeId,
+            },
+            null,
+            2,
+          ),
+        );
+
+        throw new Error(error.message);
+      }
+
+      throw error;
+    }
+
     await executeCopyTrade({
       copyTradeId,
       exchangeOrderId: orderResult.orderId,
@@ -273,7 +310,8 @@ async function processCopyTradeJob(job: {
       errorMessage.includes("EXCHANGE_CONNECTION_NOT_FOUND") ||
       errorMessage.includes("EXCHANGE_CONNECTION_INACTIVE") ||
       errorMessage.includes("INVALID_API_KEY") ||
-      errorMessage.includes("INSUFFICIENT_BALANCE")
+      errorMessage.includes("INSUFFICIENT_BALANCE") ||
+      errorMessage.includes("SLIPPAGE_EXCEEDED")
     ) {
       logger.warn("Non-retryable error - will not retry", {
         copyTradeId,
@@ -308,6 +346,12 @@ async function processCopyTradeJob(job: {
     // Throw to trigger retry
     throw error;
   }
+}
+
+export function processCopyTradeJobForTest(
+  jobData: CopyTradeJobData,
+): Promise<CopyTradeJobResult> {
+  return processCopyTradeJob({ data: jobData, id: "test-job" });
 }
 
 // ============= Worker Lifecycle =============

@@ -4,6 +4,7 @@ import {
   subscribeToBalanceUpdates,
   testRedisPubSub,
   BALANCE_CHANNEL_PREFIX,
+  resetRedisSubscriberForTests,
 } from "@/lib/redis/redis-pubsub";
 import type { ConsolidatedBalance } from "@/lib/exchange/types";
 
@@ -82,6 +83,7 @@ describe("Redis Pub/Sub", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.REDIS_URL = "redis://localhost:6379";
     getRedisClientMock.mockReturnValue(mockRedisClient);
     mockRedisClient.publish.mockResolvedValue(1); // 1 subscriber received
     mockRedisClient.subscribe.mockResolvedValue(undefined);
@@ -89,7 +91,9 @@ describe("Redis Pub/Sub", () => {
     mockRedisClient.quit.mockResolvedValue(undefined);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await resetRedisSubscriberForTests();
+    delete process.env.REDIS_URL;
     vi.clearAllMocks();
   });
 
@@ -155,6 +159,24 @@ describe("Redis Pub/Sub", () => {
     });
   });
 
+  it("shares Redis subscriber across multiple listeners", async () => {
+    const handler = vi.fn();
+    mockRedisClient.on.mockImplementation(() => mockRedisClient);
+
+    const first = await subscribeToBalanceUpdates(traderId, handler);
+    const second = await subscribeToBalanceUpdates(traderId, handler);
+
+    expect(mockRedisClient.subscribe).toHaveBeenCalledTimes(1);
+
+    await first.unsubscribe();
+    expect(mockRedisClient.unsubscribe).not.toHaveBeenCalled();
+
+    await second.unsubscribe();
+    expect(mockRedisClient.unsubscribe).toHaveBeenCalledWith(
+      `${BALANCE_CHANNEL_PREFIX}${traderId}`,
+    );
+  });
+
   describe("subscribeToBalanceUpdates", () => {
     it("subscribes to Redis channel and receives updates", async () => {
       const mockCallback = vi.fn();
@@ -184,13 +206,6 @@ describe("Redis Pub/Sub", () => {
 
       expect(mockRedisClient.subscribe).toHaveBeenCalledWith(
         `${BALANCE_CHANNEL_PREFIX}${traderId}`,
-      );
-
-      expect(loggerSpy.info).toHaveBeenCalledWith(
-        "Subscribed to balance updates via Redis",
-        expect.objectContaining({
-          traderId,
-        }),
       );
 
       // Simulate receiving a message
@@ -268,7 +283,7 @@ describe("Redis Pub/Sub", () => {
       expect(loggerSpy.error).toHaveBeenCalledWith(
         "Failed to parse balance update message",
         expect.objectContaining({
-          traderId,
+          channel: `${BALANCE_CHANNEL_PREFIX}${traderId}`,
         }),
       );
     });
@@ -296,14 +311,7 @@ describe("Redis Pub/Sub", () => {
       expect(mockRedisClient.unsubscribe).toHaveBeenCalledWith(
         `${BALANCE_CHANNEL_PREFIX}${traderId}`,
       );
-      expect(mockRedisClient.off).toHaveBeenCalledWith("message", handlers[0]);
-      expect(mockRedisClient.quit).toHaveBeenCalled();
-      expect(loggerSpy.debug).toHaveBeenCalledWith(
-        "Unsubscribed from balance updates",
-        expect.objectContaining({
-          traderId,
-        }),
-      );
+      expect(mockRedisClient.quit).not.toHaveBeenCalled();
     });
 
     it("handles unsubscribe errors gracefully", async () => {
@@ -324,9 +332,9 @@ describe("Redis Pub/Sub", () => {
       await subscription.unsubscribe();
 
       expect(loggerSpy.error).toHaveBeenCalledWith(
-        "Failed to unsubscribe from balance updates",
+        "Failed to unsubscribe Redis channel",
         expect.objectContaining({
-          traderId,
+          channel: `${BALANCE_CHANNEL_PREFIX}${traderId}`,
           error: expect.any(Error),
         }),
       );
