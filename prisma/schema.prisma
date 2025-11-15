@@ -388,6 +388,8 @@ model UserExchangeConnection {
   // Metadata
   lastSyncedAt DateTime?
   lastError    String?   @db.Text
+  lastHealthCheckAt DateTime?
+  balanceSnapshots   UserExchangeBalanceSnapshot[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -395,6 +397,29 @@ model UserExchangeConnection {
   @@unique([userId, exchange])
   @@index([userId])
   @@map("user_exchange_connection")
+}
+
+model UserExchangeBalanceSnapshot {
+  id             String   @id @default(cuid())
+  connectionId   String
+  connection     UserExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchange       Exchange
+  totalEquityUsd Decimal  @db.Decimal(32, 8)
+  availableUsd   Decimal  @db.Decimal(32, 8)
+  lockedUsd      Decimal  @db.Decimal(32, 8)
+  spotEquityUsd     Decimal? @db.Decimal(32, 8)
+  futuresEquityUsd  Decimal? @db.Decimal(32, 8)
+  marginEquityUsd   Decimal? @db.Decimal(32, 8)
+  payloadJson     Json?
+  capturedAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([connectionId, capturedAt])
+  @@index([userId, capturedAt])
+  @@map("user_exchange_balance_snapshot")
 }
 
 model CopyTrade {

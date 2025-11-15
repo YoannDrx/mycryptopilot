@@ -46,6 +46,7 @@ model User {
   referralRewards         ReferralReward[]
   referralTier            ReferralTier?
   userExchangeConnections UserExchangeConnection[]
+  exchangeBalanceSnapshots UserExchangeBalanceSnapshot[]
   copyTrades              CopyTrade[]
   riskCalculations        RiskCalculation[]
 

@@ -240,6 +240,7 @@ export async function queueAutoCopyTradesForSignal(
           // Calculate safe quantity based on user's actual balance
           const safeQuantityResult = await calculateSafeQuantity({
             userId: pref.userId,
+            connectionId: exchangeConnection.id,
             exchange: exchangeConnection.exchange,
             apiKey,
             secretKey,

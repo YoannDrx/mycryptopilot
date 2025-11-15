@@ -29,10 +29,16 @@ import { createExchangeService } from "./exchange-service-factory";
 import type { Exchange } from "@/generated/prisma";
 import type { Decimal } from "@prisma/client/runtime/library";
 import { getCachedBalance, setCachedBalance } from "./balance-cache.service";
+import {
+  getFreshSnapshotForConnection,
+  persistBalanceSnapshot,
+} from "./balance-snapshot.service";
+import type { ConsolidatedBalance } from "./types";
 
 export type CalculateSafeQuantityInput = {
   // User identification
   userId: string;
+  connectionId?: string;
 
   // Exchange connection
   exchange: Exchange; // "BINANCE" or "BYBIT"
@@ -62,6 +68,15 @@ export type SafeQuantityResult = {
     | "exchangeMinimum"
     | "insufficientBalance"; // Which limit was applied
   warnings: string[]; // Any warnings about the calculation
+};
+
+const ensureBalance = (
+  balance: ConsolidatedBalance | null,
+): ConsolidatedBalance => {
+  if (!balance) {
+    throw new Error("Unable to fetch balance for sizing");
+  }
+  return balance;
 };
 
 /**
@@ -157,6 +172,7 @@ export async function calculateSafeQuantity(
 ): Promise<SafeQuantityResult> {
   const {
     userId,
+    connectionId,
     exchange,
     apiKey,
     secretKey,
@@ -198,6 +214,7 @@ export async function calculateSafeQuantity(
     // ========== Step 2: Fetch User Balance (with Redis cache) ==========
 
     // Try to get cached balance first (TTL: 30s)
+    let balanceSource: "cache" | "snapshot" | "live" = "cache";
     let balance = await getCachedBalance(userId, exchange);
 
     if (balance) {
@@ -207,6 +224,23 @@ export async function calculateSafeQuantity(
         totalEquityUsd: balance.totalEquityUsd,
       });
     } else {
+      if (connectionId) {
+        const snapshot = await getFreshSnapshotForConnection(connectionId);
+        if (snapshot) {
+          balance = snapshot.balance;
+          balanceSource = "snapshot";
+          await setCachedBalance(userId, exchange, balance);
+          logger.debug("Balance snapshot reused for sizing", {
+            userId,
+            exchange,
+            connectionId,
+          });
+        }
+      }
+    }
+
+    if (!balance) {
+      balanceSource = "live";
       // Cache miss - fetch from exchange API (2000ms)
       const exchangeService = createExchangeService(
         exchange,
@@ -231,11 +265,22 @@ export async function calculateSafeQuantity(
 
         // Cache the balance for 30 seconds
         await setCachedBalance(userId, exchange, balance);
+
+        if (connectionId) {
+          await persistBalanceSnapshot({
+            connectionId,
+            userId,
+            exchange,
+            balance,
+          });
+        }
       } finally {
         // Always close connection
         await exchangeService.close();
       }
     }
+
+    const resolvedBalance = ensureBalance(balance);
 
     // ========== Step 3: Determine Available Balance ==========
 
@@ -243,18 +288,19 @@ export async function calculateSafeQuantity(
 
     if (instrumentType === "SPOT") {
       // For spot trades, use spot balance
-      availableBalanceUsd = balance.spot.totalUsd;
+      availableBalanceUsd = resolvedBalance.spot.totalUsd;
     } else {
       // For futures/perp trades, use futures margin available
-      if (!balance.futures) {
+      if (!resolvedBalance.futures) {
         throw new Error("Futures balance not available");
       }
-      availableBalanceUsd = balance.futures.marginAvailable;
+      availableBalanceUsd = resolvedBalance.futures.marginAvailable;
     }
 
     logger.debug("Available balance determined", {
       instrumentType,
       availableBalanceUsd,
+      balanceSource,
     });
 
     // ========== Step 4: Calculate Position Size ==========

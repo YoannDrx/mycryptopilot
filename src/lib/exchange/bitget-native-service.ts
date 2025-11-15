@@ -560,11 +560,14 @@ export class BitgetNativeService implements ExchangeAdapter {
     const client = this.getV3Client();
     const positions: PositionSnapshot[] = [];
 
-    for (const category of SUPPORTED_FUTURES_CATEGORIES) {
-      // Parallel calls yield marginal benefit and complicate error handling;
-      // there are only two categories to fetch, so sequential awaits are fine.
-      // eslint-disable-next-line no-await-in-loop
-      const response = await client.getCurrentPosition({ category });
+    const categoryResponses = await Promise.all(
+      SUPPORTED_FUTURES_CATEGORIES.map(async (category) =>
+        client.getCurrentPosition({ category }),
+      ),
+    );
+
+    categoryResponses.forEach((response, index) => {
+      const category = SUPPORTED_FUTURES_CATEGORIES[index];
       const list = response.data.list ?? [];
 
       for (const position of list) {
@@ -594,7 +597,7 @@ export class BitgetNativeService implements ExchangeAdapter {
           raw: position,
         });
       }
-    }
+    });
 
     return positions;
   }
