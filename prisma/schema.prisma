@@ -44,8 +44,10 @@ model ExchangeConnection {
   traderProfileId    String
   trader             TraderProfile   @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
   exchange           Exchange
+  bitgetAccountMode  BitgetAccountMode?
   encryptedApiKey    String          @db.Text
   encryptedSecretKey String          @db.Text
+  encryptedPassphrase String?        @db.Text
   keyIv              String
   keyTag             String
   isActive           Boolean         @default(true)
@@ -370,10 +372,12 @@ model UserExchangeConnection {
   userId   String
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   exchange Exchange // BINANCE, BYBIT
+  bitgetAccountMode BitgetAccountMode?
 
   // Encrypted API credentials
   encryptedApiKey    String @db.Text
   encryptedSecretKey String @db.Text
+  encryptedPassphrase String? @db.Text
   keyIv              String
   keyTag             String
 
@@ -554,6 +558,12 @@ enum TierLevel {
 enum Exchange {
   BINANCE
   BYBIT
+  BITGET
+}
+
+enum BitgetAccountMode {
+  UTA
+  CLASSIC
 }
 
 enum TradeSide {
@@ -584,6 +594,7 @@ enum PerformancePeriod {
 enum TradeSource {
   BINANCE
   BYBIT
+  BITGET
   MANUAL
 }
 

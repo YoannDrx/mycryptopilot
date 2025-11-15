@@ -125,6 +125,9 @@ importers:
       binance:
         specifier: 3.1.3
         version: 3.1.3(typescript@5.9.2)
+      bitget-api:
+        specifier: ^3.0.9
+        version: 3.0.9(typescript@5.9.2)
       bs58check:
         specifier: ^4.0.0
         version: 4.0.0
@@ -3270,6 +3273,9 @@ packages:
   binance@3.1.3:
     resolution: {integrity: sha512-9u6kvZ6mcBlZKtUTv2KT3Jm/CWNjffQp8XHxE0KeJkU6X0PWUd5rr4On9YUgCaEUWaIA/giGKd4ZC0f29VNJKQ==}
 
+  bitget-api@3.0.9:
+    resolution: {integrity: sha512-Ll1dQCTER8QYhbMG2B059CADcRV1ISYC1DmSH4xg2HlmdoPun8zItX0AXnqV7gPBCyRGKpXGGYcwSQPWcyJ4MA==}
+
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
 
@@ -4532,6 +4538,11 @@ packages:
 
   isomorphic-ws@4.0.1:
     resolution: {integrity: sha512-BhBvN2MBpWTaSHdWRb/bwdZJ1WaehQ2L1KngkCkfLUGF0mAWAT1sQUQacEmQ0jXkFw/czDXPNQSL5u2/Krsz1w==}
+    peerDependencies:
+      ws: '*'
+
+  isomorphic-ws@5.0.0:
+    resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
     peerDependencies:
       ws: '*'
 
@@ -6016,6 +6027,12 @@ packages:
     peerDependencies:
       webpack: ^5.0.0
 
+  source-map-loader@4.0.2:
+    resolution: {integrity: sha512-oYwAqCuL0OZhBoSgmdrLa7mv9MjommVMiQIWgcztf+eS4+8BfcUee6nenFnDhKOhzAVnk5gpZdfnz1iiBv+5sg==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      webpack: ^5.72.1
+
   source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
 
@@ -6193,10 +6210,6 @@ packages:
     resolution: {integrity: sha512-4WK/bYZmj8xLr+HUCODHGF1ZFzsYffasLUgEiMBY4fgtltdO6B4WJtlSbPaDTLpYTcGVwM2qLnFTICEcNxs3kA==}
     engines: {node: '>=6'}
 
-  tapable@2.2.3:
-    resolution: {integrity: sha512-ZL6DDuAlRlLGghwcfmSn9sK3Hr6ArtyudlSAiCqQ6IfE+b+HHbydbYDIG15IfS5do+7XQQBdBiubF/cV2dnDzg==}
-    engines: {node: '>=6'}
-
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
@@ -6319,6 +6332,13 @@ packages:
     peerDependencies:
       typescript: '*'
       webpack: '*'
+
+  ts-loader@9.5.4:
+    resolution: {integrity: sha512-nCz0rEwunlTZiy6rXFByQU1kVVpCIgUpc/psFiKVrUwrizdnIbRFu8w7bxhUF0X613DYwT4XzrZHpVyMe758hQ==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      typescript: '*'
+      webpack: ^5.0.0
 
   ts-mixer@6.0.4:
     resolution: {integrity: sha512-ufKpbmrugz5Aou4wcr5Wc1UUFWOLhq+Fm6qa6P0w0K5Qw2yhaUoiWszhCVuNQyNwrlGiscHOmqYoAox1PtvgjA==}
@@ -6775,6 +6795,18 @@ packages:
 
   ws@8.18.2:
     resolution: {integrity: sha512-DMricUmwGZUVr++AEAe2uiVM7UoO9MAVZMDu05UQOaUII0lp+zOzLLU4Xqh/JvTqklB1T4uELaaPBKyjE1r4fQ==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
+  ws@8.18.3:
+    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -9346,19 +9378,19 @@ snapshots:
       '@xtuc/long': 4.2.2
     optional: true
 
-  '@webpack-cli/configtest@1.2.0(webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1))(webpack@5.102.1)':
+  '@webpack-cli/configtest@1.2.0(webpack-cli@4.10.0)(webpack@5.102.1)':
     dependencies:
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
       webpack-cli: 4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1)
     optional: true
 
   '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.102.1)':
     dependencies:
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.102.1)
     optional: true
 
-  '@webpack-cli/info@1.5.0(webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1))':
+  '@webpack-cli/info@1.5.0(webpack-cli@4.10.0)':
     dependencies:
       envinfo: 7.20.0
       webpack-cli: 4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1)
@@ -9366,18 +9398,18 @@ snapshots:
 
   '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.102.1)':
     dependencies:
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.102.1)
     optional: true
 
-  '@webpack-cli/serve@1.7.0(webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1))':
+  '@webpack-cli/serve@1.7.0(webpack-cli@4.10.0)':
     dependencies:
       webpack-cli: 4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1)
     optional: true
 
   '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack@5.102.1)':
     dependencies:
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.102.1)
     optional: true
 
@@ -9632,6 +9664,29 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/core'
       - '@webpack-cli/generators'
+      - bufferutil
+      - debug
+      - esbuild
+      - typescript
+      - uglify-js
+      - utf-8-validate
+      - webpack-bundle-analyzer
+      - webpack-dev-server
+
+  bitget-api@3.0.9(typescript@5.9.2):
+    dependencies:
+      axios: 1.13.2
+      isomorphic-ws: 5.0.0(ws@8.18.3)
+      ws: 8.18.3
+    optionalDependencies:
+      source-map-loader: 4.0.2(webpack@5.102.1)
+      ts-loader: 9.5.4(typescript@5.9.2)(webpack@5.102.1)
+      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack-cli: 4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@webpack-cli/generators'
+      - '@webpack-cli/migrate'
       - bufferutil
       - debug
       - esbuild
@@ -10194,7 +10249,7 @@ snapshots:
   enhanced-resolve@5.18.3:
     dependencies:
       graceful-fs: 4.2.11
-      tapable: 2.2.3
+      tapable: 2.3.0
 
   entities@4.5.0: {}
 
@@ -11158,6 +11213,10 @@ snapshots:
   isomorphic-ws@4.0.1(ws@7.5.10):
     dependencies:
       ws: 7.5.10
+
+  isomorphic-ws@5.0.0(ws@8.18.3):
+    dependencies:
+      ws: 8.18.3
 
   iterator.prototype@1.1.5:
     dependencies:
@@ -13038,7 +13097,14 @@ snapshots:
       abab: 2.0.6
       iconv-lite: 0.6.3
       source-map-js: 0.6.2
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
+    optional: true
+
+  source-map-loader@4.0.2(webpack@5.102.1):
+    dependencies:
+      iconv-lite: 0.6.3
+      source-map-js: 1.2.1
+      webpack: 5.102.1(webpack-cli@5.1.4)
     optional: true
 
   source-map-support@0.5.21:
@@ -13231,10 +13297,7 @@ snapshots:
   tapable@1.1.3:
     optional: true
 
-  tapable@2.2.3: {}
-
-  tapable@2.3.0:
-    optional: true
+  tapable@2.3.0: {}
 
   tar@7.4.3:
     dependencies:
@@ -13252,7 +13315,7 @@ snapshots:
       schema-utils: 4.3.3
       serialize-javascript: 6.0.2
       terser: 5.44.1
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
     optional: true
 
   terser@5.44.1:
@@ -13347,7 +13410,18 @@ snapshots:
       micromatch: 4.0.8
       semver: 7.7.2
       typescript: 5.9.2
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
+    optional: true
+
+  ts-loader@9.5.4(typescript@5.9.2)(webpack@5.102.1):
+    dependencies:
+      chalk: 4.1.2
+      enhanced-resolve: 5.18.3
+      micromatch: 4.0.8
+      semver: 7.7.2
+      source-map: 0.7.6
+      typescript: 5.9.2
+      webpack: 5.102.1(webpack-cli@5.1.4)
     optional: true
 
   ts-mixer@6.0.4: {}
@@ -13726,9 +13800,9 @@ snapshots:
   webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 1.2.0(webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1))(webpack@5.102.1)
-      '@webpack-cli/info': 1.5.0(webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1))
-      '@webpack-cli/serve': 1.7.0(webpack-cli@4.10.0(webpack-bundle-analyzer@4.10.2)(webpack@5.102.1))
+      '@webpack-cli/configtest': 1.2.0(webpack-cli@4.10.0)(webpack@5.102.1)
+      '@webpack-cli/info': 1.5.0(webpack-cli@4.10.0)
+      '@webpack-cli/serve': 1.7.0(webpack-cli@4.10.0)
       colorette: 2.0.20
       commander: 7.2.0
       cross-spawn: 7.0.6
@@ -13736,7 +13810,7 @@ snapshots:
       import-local: 3.2.0
       interpret: 2.2.0
       rechoir: 0.7.1
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
       webpack-merge: 5.10.0
     optionalDependencies:
       webpack-bundle-analyzer: 4.10.2
@@ -13756,7 +13830,7 @@ snapshots:
       import-local: 3.2.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.102.1(webpack-cli@4.10.0)
+      webpack: 5.102.1(webpack-cli@5.1.4)
       webpack-merge: 5.10.0
     optional: true
 
@@ -13936,6 +14010,8 @@ snapshots:
   ws@8.17.1: {}
 
   ws@8.18.2: {}
+
+  ws@8.18.3: {}
 
   xml-name-validator@5.0.0: {}
 

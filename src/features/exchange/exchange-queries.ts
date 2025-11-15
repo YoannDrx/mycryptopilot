@@ -2,8 +2,14 @@ import { prisma } from "@/lib/prisma";
 import type { Exchange } from "@/generated/prisma";
 import { BinanceService } from "@/lib/exchange/binance-service";
 import { BybitService } from "@/lib/exchange/bybit-service";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 import { logger } from "@/lib/logger";
+import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
+import type { AssetBalance } from "@/lib/exchange/types";
 
 /**
  * Get all exchange connections for a trader
@@ -49,6 +55,10 @@ export async function getExchangeConnectionById(connectionId: string) {
     },
   });
 }
+
+export type ExchangeConnectionWithTrader = NonNullable<
+  Awaited<ReturnType<typeof getExchangeConnectionById>>
+>;
 
 /**
  * Check if a trader already has a connection for a specific exchange
@@ -158,7 +168,7 @@ export async function getConnectionTradeStats(connectionId: string) {
  * Exchange Balance Type
  */
 export type ExchangeBalance = {
-  exchange: "BINANCE" | "BYBIT";
+  exchange: "BINANCE" | "BYBIT" | "BITGET";
   totalUSDT: number;
   available: number;
   locked: number;
@@ -184,9 +194,11 @@ export async function getUserExchangeBalances(
       exchange: true,
       encryptedApiKey: true,
       encryptedSecretKey: true,
+      encryptedPassphrase: true,
       keyIv: true,
       keyTag: true,
       lastSyncedAt: true,
+      bitgetAccountMode: true,
     },
   });
 
@@ -199,8 +211,13 @@ export async function getUserExchangeBalances(
         conn.keyIv,
         conn.keyTag,
       );
-      const secretKey = decryptApiKey(
+      const secretKey = decryptSerializedPayload(
         conn.encryptedSecretKey,
+        conn.keyIv,
+        conn.keyTag,
+      );
+      const passphrase = decryptOptionalSerializedPayload(
+        conn.encryptedPassphrase,
         conn.keyIv,
         conn.keyTag,
       );
@@ -209,28 +226,60 @@ export async function getUserExchangeBalances(
       const service =
         conn.exchange === "BINANCE"
           ? new BinanceService(apiKey, secretKey)
-          : new BybitService(apiKey, secretKey);
+          : conn.exchange === "BYBIT"
+            ? new BybitService(apiKey, secretKey)
+            : null;
 
-      // Fetch balance from exchange
-      const balance = await service.fetchBalance();
+      let totalUSDT = 0;
+      let availableUSDT = 0;
+      let lockedUSDT = 0;
 
-      // Extract USDT balance (ccxt returns object with currency keys)
-      const totalObj = balance.total as unknown as Record<
-        string,
-        number | undefined
-      >;
-      const freeObj = balance.free as unknown as Record<
-        string,
-        number | undefined
-      >;
-      const usedObj = balance.used as unknown as Record<
-        string,
-        number | undefined
-      >;
+      if (service) {
+        // Fetch balance from exchange via ccxt wrapper
+        const balance = await service.fetchBalance();
 
-      const totalUSDT = totalObj.USDT ?? 0;
-      const availableUSDT = freeObj.USDT ?? 0;
-      const lockedUSDT = usedObj.USDT ?? 0;
+        const totalObj = balance.total as unknown as Record<
+          string,
+          number | undefined
+        >;
+        const freeObj = balance.free as unknown as Record<
+          string,
+          number | undefined
+        >;
+        const usedObj = balance.used as unknown as Record<
+          string,
+          number | undefined
+        >;
+
+        totalUSDT = totalObj.USDT ?? 0;
+        availableUSDT = freeObj.USDT ?? 0;
+        lockedUSDT = usedObj.USDT ?? 0;
+      } else {
+        // Bitget (or future exchanges) use native adapter
+        const adapter = createExchangeService(
+          conn.exchange,
+          apiKey,
+          secretKey,
+          {
+            passphrase,
+            bitgetAccountMode: conn.bitgetAccountMode ?? undefined,
+          },
+        );
+
+        try {
+          const consolidated = await adapter.fetchConsolidatedBalance();
+          const assetsBySymbol = consolidated.spot.assets as Record<
+            string,
+            AssetBalance | undefined
+          >;
+          const usdtAsset = assetsBySymbol.USDT;
+          totalUSDT = usdtAsset?.total ?? 0;
+          availableUSDT = usdtAsset?.free ?? 0;
+          lockedUSDT = usdtAsset?.locked ?? 0;
+        } finally {
+          await adapter.close();
+        }
+      }
 
       logger.info("Fetched exchange balance for Risk Console", {
         userId,

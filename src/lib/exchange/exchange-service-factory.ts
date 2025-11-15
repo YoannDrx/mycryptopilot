@@ -13,6 +13,7 @@ import type {
 } from "@/lib/exchange/types";
 import { BinanceNativeService } from "./binance-native-service";
 import { BybitNativeService } from "./bybit-native-service";
+import { BitgetNativeService } from "./bitget-native-service";
 
 /**
  * Exchange Service Factory
@@ -55,7 +56,8 @@ export type ExchangeAdapter = {
 
 export type ExchangeService =
   | (BinanceNativeService & ExchangeAdapter)
-  | (BybitNativeService & ExchangeAdapter);
+  | (BybitNativeService & ExchangeAdapter)
+  | (BitgetNativeService & ExchangeAdapter);
 
 /**
  * Create exchange service instance based on exchange type
@@ -74,12 +76,22 @@ export function createExchangeService(
   exchange: Exchange,
   apiKey: string,
   secretKey: string,
+  options?: { passphrase?: string | null; bitgetAccountMode?: "UTA" | "CLASSIC" },
 ): ExchangeService {
   switch (exchange) {
     case "BINANCE":
       return new BinanceNativeService(apiKey, secretKey);
     case "BYBIT":
       return new BybitNativeService(apiKey, secretKey);
+    case "BITGET":
+      return new BitgetNativeService(
+        apiKey,
+        secretKey,
+        options?.passphrase ?? null,
+        {
+          accountMode: options?.bitgetAccountMode ?? null,
+        },
+      );
     default: {
       // TypeScript exhaustiveness check
       const _exhaustive: never = exchange;
@@ -94,7 +106,7 @@ export function createExchangeService(
  * @returns Array of supported exchange names
  */
 export function getSupportedExchanges(): Exchange[] {
-  return ["BINANCE", "BYBIT"];
+  return ["BINANCE", "BYBIT", "BITGET"];
 }
 
 /**
@@ -104,5 +116,5 @@ export function getSupportedExchanges(): Exchange[] {
  * @returns True if exchange is supported
  */
 export function isExchangeSupported(exchange: string): exchange is Exchange {
-  return ["BINANCE", "BYBIT"].includes(exchange);
+  return ["BINANCE", "BYBIT", "BITGET"].includes(exchange);
 }

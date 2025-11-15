@@ -9,15 +9,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TraderProfile } from "@/generated/prisma";
-import { CheckCircle, MoreHorizontal, Trash, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  History,
+  MoreHorizontal,
+  Trash,
+  XCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   verifyTraderAction,
   rejectTraderAction,
   deleteTraderAction,
+  backfillTraderTradesAction,
 } from "../../_actions/trader-admin.actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type TraderActionsProps = {
   trader: TraderProfile;
@@ -96,6 +113,39 @@ export function TraderActions({ trader }: TraderActionsProps) {
     }
   };
 
+  const [backfillOpen, setBackfillOpen] = useState(false);
+  const [backfillYears, setBackfillYears] = useState(1);
+
+  const handleBackfill = async () => {
+    setIsLoading(true);
+    try {
+      const result = await backfillTraderTradesAction({
+        traderId: trader.id,
+        days: backfillYears * 365,
+      });
+      toast.success(
+        `Backfill terminé: ${result.summary.tradesUpserted} trade(s) importé(s).`,
+      );
+      setBackfillOpen(false);
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        `Backfill échoué: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const backfillOptions = useMemo(
+    () =>
+      Array.from({ length: 6 }).map((_, idx) => {
+        const years = idx + 1;
+        return { label: `${years} an${years > 1 ? "s" : ""}`, value: years };
+      }),
+    [],
+  );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -120,6 +170,16 @@ export function TraderActions({ trader }: TraderActionsProps) {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
+          onClick={() => setBackfillOpen(true)}
+          disabled={isLoading}
+        >
+          <History className="mr-2 h-4 w-4" />
+          Backfill Trades
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
           onClick={handleDelete}
           disabled={isLoading}
           className="text-destructive focus:text-destructive"
@@ -128,6 +188,49 @@ export function TraderActions({ trader }: TraderActionsProps) {
           Delete Trader
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <AlertDialog open={backfillOpen} onOpenChange={setBackfillOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Backfill de l&apos;historique</AlertDialogTitle>
+            <AlertDialogDescription>
+              Sélectionne la période à importer pour ce trader. L&apos;opération
+              peut prendre plusieurs minutes et sollicite l&apos;API Binance.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-4">
+            {backfillOptions.map((option) => (
+              <label
+                key={option.value}
+                className="flex cursor-pointer items-center gap-2 rounded-md border p-2"
+              >
+                <input
+                  type="radio"
+                  name="backfillYears"
+                  value={option.value}
+                  checked={backfillYears === option.value}
+                  onChange={() => setBackfillYears(option.value)}
+                  className="accent-primary"
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isLoading}
+              onClick={() => void handleBackfill()}
+            >
+              {isLoading
+                ? "Backfill en cours..."
+                : `Lancer (${backfillYears} an${backfillYears > 1 ? "s" : ""})`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DropdownMenu>
   );
 }

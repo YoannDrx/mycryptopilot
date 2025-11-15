@@ -8,11 +8,11 @@ async function main() {
   const stats = await getRealtimeHealthStats();
   const alerts: string[] = [];
 
-  if ((stats.queueStats.failed ?? 0) > 5) {
+  if (stats.queueStats.failed > 5) {
     alerts.push(`⚠️ ${stats.queueStats.failed} jobs en échec dans BullMQ`);
   }
 
-  if ((stats.redisStats.channels ?? 0) > 200) {
+  if (stats.redisStats.channels > 200) {
     alerts.push(
       `⚠️ ${stats.redisStats.channels} canaux SSE actifs (seuil 200)`,
     );

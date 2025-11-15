@@ -177,6 +177,7 @@ export class BybitService implements ExchangeAdapter {
   async fetchRecentTrades(
     daysSince = 30,
     sinceDate?: Date,
+    _knownSymbols: string[] = [],
   ): Promise<BybitTrade[]> {
     try {
       logger.info("Fetching Bybit trades", {

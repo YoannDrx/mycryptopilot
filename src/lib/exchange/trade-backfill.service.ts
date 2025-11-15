@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 import { createExchangeService } from "./exchange-service-factory";
 import { logger } from "@/lib/logger";
 import type { Exchange } from "@/generated/prisma";
 import { Prisma } from "@/generated/prisma";
+import { mapNormalizedOrderTypeToPrisma } from "./order-type.utils";
 
 export type BackfillOptions = {
   days?: number;
@@ -38,19 +43,39 @@ export async function backfillTraderTrades(
     );
   }
 
+  const existingSymbols = await prisma.exchangeTrade.findMany({
+    where: { connectionId: connection.id },
+    distinct: ["symbol"],
+    select: { symbol: true },
+  });
+  const knownSymbols = existingSymbols.map((record) => record.symbol);
+
   const apiKey = decryptApiKey(
     connection.encryptedApiKey,
     connection.keyIv,
     connection.keyTag,
   );
 
-  const secretKey = decryptApiKey(
+  const secretKey = decryptSerializedPayload(
     connection.encryptedSecretKey,
     connection.keyIv,
     connection.keyTag,
   );
+  const passphrase = decryptOptionalSerializedPayload(
+    connection.encryptedPassphrase,
+    connection.keyIv,
+    connection.keyTag,
+  );
 
-  const adapter = createExchangeService(connection.exchange, apiKey, secretKey);
+  const adapter = createExchangeService(
+    connection.exchange,
+    apiKey,
+    secretKey,
+    {
+      passphrase,
+      bitgetAccountMode: connection.bitgetAccountMode ?? undefined,
+    },
+  );
 
   try {
     logger.info("Fetching historical trades from exchange", {
@@ -59,7 +84,7 @@ export async function backfillTraderTrades(
       days,
     });
 
-    const trades = await adapter.fetchRecentTrades(days);
+    const trades = await adapter.fetchRecentTrades(days, undefined, knownSymbols);
 
     logger.info("Trades fetched", {
       traderProfileId,
@@ -69,49 +94,42 @@ export async function backfillTraderTrades(
     let upserted = 0;
 
     if (!dryRun) {
-      for (const trade of trades) {
-        if (!trade.externalOrderId) {
-          continue;
-        }
+      const upsertPayloads = trades
+        .filter((trade) => Boolean(trade.externalOrderId))
+        .map(async (trade) => {
+          const realizedPnl =
+            trade.realizedPnl === null
+              ? null
+              : new Prisma.Decimal(trade.realizedPnl);
+          const orderType = mapNormalizedOrderTypeToPrisma(trade.type);
+          const sharedFields = {
+            symbol: trade.symbol,
+            side: trade.side,
+            type: orderType,
+            quantity: new Prisma.Decimal(trade.quantity),
+            price: new Prisma.Decimal(trade.price),
+            quoteQuantity: new Prisma.Decimal(trade.quoteQuantity),
+            fee: new Prisma.Decimal(trade.fee),
+            feeAsset: trade.feeAsset,
+            realizedPnl,
+            executedAt: trade.executedAt,
+          };
 
-        await prisma.exchangeTrade.upsert({
-          where: {
-            externalOrderId: trade.externalOrderId,
-          },
-          update: {
-            symbol: trade.symbol,
-            side: trade.side,
-            type: trade.type,
-            quantity: new Prisma.Decimal(trade.quantity ?? 0),
-            price: new Prisma.Decimal(trade.price ?? 0),
-            quoteQuantity: new Prisma.Decimal(trade.quoteQuantity ?? 0),
-            fee: new Prisma.Decimal(trade.fee ?? 0),
-            feeAsset: trade.feeAsset ?? "USDT",
-            realizedPnl: trade.realizedPnl
-              ? new Prisma.Decimal(trade.realizedPnl)
-              : null,
-            executedAt: trade.executedAt,
-          },
-          create: {
-            connectionId: connection.id,
-            externalOrderId: trade.externalOrderId,
-            symbol: trade.symbol,
-            side: trade.side,
-            type: trade.type,
-            quantity: new Prisma.Decimal(trade.quantity ?? 0),
-            price: new Prisma.Decimal(trade.price ?? 0),
-            quoteQuantity: new Prisma.Decimal(trade.quoteQuantity ?? 0),
-            fee: new Prisma.Decimal(trade.fee ?? 0),
-            feeAsset: trade.feeAsset ?? "USDT",
-            realizedPnl: trade.realizedPnl
-              ? new Prisma.Decimal(trade.realizedPnl)
-              : null,
-            executedAt: trade.executedAt,
-          },
+          return prisma.exchangeTrade.upsert({
+            where: {
+              externalOrderId: trade.externalOrderId,
+            },
+            update: sharedFields,
+            create: {
+              connectionId: connection.id,
+              externalOrderId: trade.externalOrderId,
+              ...sharedFields,
+            },
+          });
         });
 
-        upserted++;
-      }
+      const results = await Promise.all(upsertPayloads);
+      upserted = results.length;
     }
 
     return {

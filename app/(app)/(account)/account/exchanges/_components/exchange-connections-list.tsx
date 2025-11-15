@@ -26,21 +26,17 @@ type ExchangeConnectionsListProps = {
 };
 
 export const ExchangeConnectionsList = ({
-  connections: initialConnections,
+  connections,
 }: ExchangeConnectionsListProps) => {
-  // Use initialConnections as default, then refetch with React Query for real-time updates
-  const { data: connections } = useQuery({
-    queryKey: ["exchange-connections"],
-    queryFn: async () => initialConnections,
-    initialData: initialConnections,
-  });
+  // Connections come from Server Component, refreshed via router.refresh()
+  // No need for React Query here - it's already server-rendered data
 
   if (connections.length === 0) {
     return null;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" suppressHydrationWarning>
       {connections.map((connection) => (
         <ConnectionWithStats key={connection.id} connection={connection} />
       ))}

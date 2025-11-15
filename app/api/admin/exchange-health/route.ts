@@ -1,8 +1,13 @@
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 import { BinanceService } from "@/lib/exchange/binance-service";
 import { BybitService } from "@/lib/exchange/bybit-service";
+import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
 import { logger } from "@/lib/logger";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -131,6 +136,7 @@ export async function GET(request: NextRequest) {
     // 4. Decrypt API keys
     let apiKey: string;
     let secretKey: string;
+    let passphrase: string | null = null;
 
     try {
       apiKey = decryptApiKey(
@@ -139,8 +145,13 @@ export async function GET(request: NextRequest) {
         connection.keyTag,
       );
 
-      secretKey = decryptApiKey(
+      secretKey = decryptSerializedPayload(
         connection.encryptedSecretKey,
+        connection.keyIv,
+        connection.keyTag,
+      );
+      passphrase = decryptOptionalSerializedPayload(
+        connection.encryptedPassphrase,
         connection.keyIv,
         connection.keyTag,
       );
@@ -181,10 +192,22 @@ export async function GET(request: NextRequest) {
         const service = new BinanceService(apiKey, secretKey);
         validationResult = await service.validateApiKeys();
         await service.close();
-      } else {
+      } else if (connection.exchange === "BYBIT") {
         // BYBIT
         const service = new BybitService(apiKey, secretKey);
         validationResult = await service.validateApiKeys();
+        await service.close();
+      } else {
+        const service = createExchangeService(
+          connection.exchange,
+          apiKey,
+          secretKey,
+          {
+            passphrase,
+            bitgetAccountMode: connection.bitgetAccountMode ?? undefined,
+          },
+        );
+        validationResult = await service.testConnection();
         await service.close();
       }
     } catch (error) {

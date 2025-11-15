@@ -21,7 +21,7 @@ type RealtimeHealthResponse = {
 };
 
 async function fetchRealtimeHealth(): Promise<RealtimeHealthResponse> {
-  const hdrs = headers();
+  const hdrs = await headers();
   const host = hdrs.get("host");
   if (!host) {
     throw new Error("Unable to determine host");

@@ -8,25 +8,26 @@
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { TraderTrade, Signal, CopyTrade } from "@/generated/prisma";
+import {
+  serializeTraderTrade,
+  type SerializableTraderTrade,
+} from "./trader-trade-serializer";
 
-/**
- * Get all trades for a trader profile
- */
 export async function getTraderTrades(
   traderProfileId: string,
   filters?: {
     status?: "OPEN" | "CLOSED" | "PARTIAL";
-    source?: "BINANCE" | "BYBIT" | "MANUAL";
+    source?: "BINANCE" | "BYBIT" | "BITGET" | "MANUAL";
     symbol?: string;
     limit?: number;
     orderBy?: "openedAt" | "closedAt" | "realizedPnl";
     orderDir?: "asc" | "desc";
   },
-): Promise<TraderTrade[]> {
+): Promise<SerializableTraderTrade[]> {
   const where: {
     traderProfileId: string;
     status?: "OPEN" | "CLOSED" | "PARTIAL";
-    source?: "BINANCE" | "BYBIT" | "MANUAL";
+    source?: "BINANCE" | "BYBIT" | "BITGET" | "MANUAL";
     symbol?: string;
   } = {
     traderProfileId,
@@ -61,7 +62,7 @@ export async function getTraderTrades(
     count: trades.length,
   });
 
-  return trades;
+  return trades.map(serializeTraderTrade);
 }
 
 /**

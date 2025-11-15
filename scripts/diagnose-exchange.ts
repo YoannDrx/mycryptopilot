@@ -28,7 +28,11 @@
 
 import { Command } from "commander";
 import { prisma } from "@/lib/prisma";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 import { BinanceService } from "@/lib/exchange/binance-service";
 import { BybitService } from "@/lib/exchange/bybit-service";
 import { logger } from "@/lib/logger";
@@ -105,6 +109,7 @@ async function getTraderConnection(traderId: string) {
 function decryptKeys(connection: {
   encryptedApiKey: string;
   encryptedSecretKey: string;
+  encryptedPassphrase?: string | null;
   keyIv: string;
   keyTag: string;
 }) {
@@ -117,15 +122,20 @@ function decryptKeys(connection: {
       connection.keyTag,
     );
 
-    const secretKey = decryptApiKey(
+    const secretKey = decryptSerializedPayload(
       connection.encryptedSecretKey,
+      connection.keyIv,
+      connection.keyTag,
+    );
+    const passphrase = decryptOptionalSerializedPayload(
+      connection.encryptedPassphrase,
       connection.keyIv,
       connection.keyTag,
     );
 
     logSuccess("API keys decrypted successfully");
 
-    return { apiKey, secretKey };
+    return { apiKey, secretKey, passphrase };
   } catch (error) {
     logError("Failed to decrypt API keys");
     throw error;

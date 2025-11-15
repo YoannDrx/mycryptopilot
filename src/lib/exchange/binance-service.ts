@@ -178,6 +178,7 @@ export class BinanceService implements ExchangeAdapter {
   async fetchRecentTrades(
     daysSince = 30,
     sinceDate?: Date,
+    _knownSymbols: string[] = [],
   ): Promise<BinanceTrade[]> {
     try {
       logger.info("Fetching Binance trades", {

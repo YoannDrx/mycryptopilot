@@ -42,6 +42,22 @@ import type {
   NormalizedTrade,
 } from "./types";
 
+const SPOT_QUOTE_ALLOWLIST = new Set([
+  "USDT",
+  "USDC",
+  "FDUSD",
+  "BUSD",
+  "TRY",
+  "BNB",
+  "BTC",
+  "ETH",
+  "EUR",
+  "USD",
+]);
+
+const DEFAULT_SPOT_SYMBOLS = ["BTCUSDT", "ETHUSDT", "BNBUSDT"];
+const MAX_SYMBOLS_PER_SYNC = 60;
+
 /**
  * Binance Native Service
  *
@@ -102,7 +118,7 @@ export class BinanceNativeService implements ExchangeAdapter {
           this.usdmClient.getBalance().catch(() => null), // Futures might not be enabled
           this.fetchMarginAccount().catch(() => null),
           this.getUsdPriceMap(),
-      ]);
+        ]);
 
       // Build spot balance
       const spotAssets: Record<
@@ -362,25 +378,29 @@ export class BinanceNativeService implements ExchangeAdapter {
     logger.info("Testing connection (Binance native)");
 
     try {
-      // Test connectivity
-      await this.mainClient.testConnectivity();
+      // Call API restrictions endpoint (works with read-only keys)
+      const restrictions = await this.getApiRestrictions();
 
-      // Get account info to check permissions
-      const accountInfo = await this.mainClient.getAccountInformation();
-
-      const canTrade = accountInfo.canTrade;
+      const hasSpot =
+        restrictions.enableSpotAndMarginTrading ??
+        restrictions.enableMargin ??
+        false;
+      const hasFutures = restrictions.enableFutures ?? false;
+      const canTrade = Boolean(hasSpot || hasFutures);
       const isReadOnly = !canTrade;
 
       logger.info("Connection test successful", {
         canTrade,
+        hasSpot,
+        hasFutures,
         isReadOnly,
       });
 
       return {
         isValid: true,
         isReadOnly,
-        hasSpotEnabled: true,
-        hasFuturesEnabled: true, // Assume futures available
+        hasSpotEnabled: hasSpot,
+        hasFuturesEnabled: hasFutures,
         canTrade,
       };
     } catch (error) {
@@ -546,6 +566,7 @@ export class BinanceNativeService implements ExchangeAdapter {
   async fetchRecentTrades(
     daysSince = 30,
     sinceDate?: Date,
+    knownSymbols: string[] = [],
   ): Promise<
     {
       externalOrderId: string;
@@ -579,10 +600,16 @@ export class BinanceNativeService implements ExchangeAdapter {
       const startTime = since.getTime();
 
       // Fetch spot trades
-      const spotTrades = await this.fetchSpotTradesNative(startTime);
+      const spotTrades = await this.fetchSpotTradesNative(
+        startTime,
+        knownSymbols,
+      );
 
       // Fetch futures trades
-      const futuresTrades = await this.fetchFuturesTradesNative(startTime);
+      const futuresTrades = await this.fetchFuturesTradesNative(
+        startTime,
+        knownSymbols,
+      );
 
       const allTrades = [...spotTrades, ...futuresTrades];
 
@@ -608,7 +635,10 @@ export class BinanceNativeService implements ExchangeAdapter {
    * Fetch spot trades using native Binance SDK
    * @private
    */
-  private async fetchSpotTradesNative(startTime: number): Promise<
+  private async fetchSpotTradesNative(
+    startTime: number,
+    knownSymbols: string[],
+  ): Promise<
     {
       externalOrderId: string;
       symbol: string;
@@ -630,11 +660,14 @@ export class BinanceNativeService implements ExchangeAdapter {
     }[]
   > {
     try {
-      // Get all symbols from exchange info
-      const exchangeInfo = await this.mainClient.getExchangeInfo();
-      const symbols = exchangeInfo.symbols
-        .filter((s: { status: string }) => s.status === "TRADING")
-        .map((s: { symbol: string }) => s.symbol);
+      const symbols = await this.getSpotSymbols(knownSymbols);
+
+      if (symbols.length === 0) {
+        logger.info("No spot symbols to query (native)", {
+          hintCount: knownSymbols.length,
+        });
+        return [];
+      }
 
       logger.info("Fetching spot trades (native)", {
         symbolCount: symbols.length,
@@ -683,7 +716,10 @@ export class BinanceNativeService implements ExchangeAdapter {
    * Fetch futures trades using native Binance SDK
    * @private
    */
-  private async fetchFuturesTradesNative(startTime: number): Promise<
+  private async fetchFuturesTradesNative(
+    startTime: number,
+    knownSymbols: string[],
+  ): Promise<
     {
       externalOrderId: string;
       symbol: string;
@@ -705,11 +741,14 @@ export class BinanceNativeService implements ExchangeAdapter {
     }[]
   > {
     try {
-      // Get all futures symbols
-      const exchangeInfo = await this.usdmClient.getExchangeInfo();
-      const symbols = exchangeInfo.symbols
-        .filter((s: { status: string }) => s.status === "TRADING")
-        .map((s: { symbol: string }) => s.symbol);
+      const symbols = await this.getFuturesSymbols(knownSymbols);
+
+      if (symbols.length === 0) {
+        logger.info("No futures symbols to query (native)", {
+          hintCount: knownSymbols.length,
+        });
+        return [];
+      }
 
       logger.info("Fetching futures trades (native)", {
         symbolCount: symbols.length,
@@ -968,6 +1007,85 @@ export class BinanceNativeService implements ExchangeAdapter {
     return orderResult;
   }
 
+  private async getSpotSymbols(knownSymbols: string[]): Promise<string[]> {
+    const symbolSet = new Set(
+      knownSymbols.filter((symbol) => typeof symbol === "string"),
+    );
+
+    try {
+      const accountInfo = await this.mainClient.getAccountInformation();
+      type SpotBalance = { asset: string; free: string; locked: string };
+      const balances: SpotBalance[] = Array.isArray(accountInfo.balances)
+        ? (accountInfo.balances as SpotBalance[])
+        : [];
+      const activeAssets = new Set(
+        balances
+          .filter(
+            (balance) => Number(balance.free) + Number(balance.locked) > 0,
+          )
+          .map((balance) => balance.asset),
+      );
+
+      if (activeAssets.size > 0) {
+        const exchangeInfo = await this.mainClient.getExchangeInfo();
+        const tradableSymbols = Array.isArray(exchangeInfo.symbols)
+          ? exchangeInfo.symbols
+          : [];
+
+        for (const info of tradableSymbols) {
+          if (
+            info.status !== "TRADING" ||
+            !activeAssets.has(info.baseAsset) ||
+            !SPOT_QUOTE_ALLOWLIST.has(info.quoteAsset)
+          ) {
+            continue;
+          }
+
+          symbolSet.add(info.symbol);
+
+          if (symbolSet.size >= MAX_SYMBOLS_PER_SYNC) {
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      logger.warn("Failed to derive spot symbol list", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    if (symbolSet.size === 0) {
+      DEFAULT_SPOT_SYMBOLS.forEach((symbol) => symbolSet.add(symbol));
+    }
+
+    return Array.from(symbolSet).slice(0, MAX_SYMBOLS_PER_SYNC);
+  }
+
+  private async getFuturesSymbols(knownSymbols: string[]): Promise<string[]> {
+    const symbolSet = new Set(
+      knownSymbols.filter((symbol) => typeof symbol === "string"),
+    );
+
+    try {
+      const rawPositions = await this.usdmClient.getPositionsV3();
+      const positions = Array.isArray(rawPositions) ? rawPositions : [];
+      for (const position of positions) {
+        if (Number(position.positionAmt) !== 0) {
+          symbolSet.add(position.symbol);
+          if (symbolSet.size >= MAX_SYMBOLS_PER_SYNC) {
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      logger.warn("Failed to derive futures symbol list", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return Array.from(symbolSet).slice(0, MAX_SYMBOLS_PER_SYNC);
+  }
+
   private async fetchMarginAccount(): Promise<unknown> {
     if ("sapiGetMarginAccount" in this.mainClient) {
       // @ts-expect-error - SDK exposes sapi endpoints dynamically
@@ -978,8 +1096,10 @@ export class BinanceNativeService implements ExchangeAdapter {
 
   private async getUsdPriceMap(): Promise<Record<string, number>> {
     try {
-      // @ts-expect-error - available in SDK
-      const tickers = await this.mainClient.getSymbolPriceTicker();
+      const tickerResponse = await this.mainClient.getSymbolPriceTicker();
+      const tickers = Array.isArray(tickerResponse)
+        ? tickerResponse
+        : [tickerResponse];
       const map: Record<string, number> = {
         USDT: 1,
         BUSD: 1,
@@ -1003,6 +1123,23 @@ export class BinanceNativeService implements ExchangeAdapter {
     } catch {
       return { USDT: 1, BUSD: 1, USDC: 1 };
     }
+  }
+
+  private async getApiRestrictions(): Promise<{
+    enableSpotAndMarginTrading?: boolean;
+    enableMargin?: boolean;
+    enableFutures?: boolean;
+  }> {
+    if ("getApiKeyPermissions" in this.mainClient) {
+      return this.mainClient.getApiKeyPermissions();
+    }
+
+    if ("sapiGetAccountApiRestrictions" in this.mainClient) {
+      // @ts-expect-error - legacy naming in older SDK versions
+      return this.mainClient.sapiGetAccountApiRestrictions();
+    }
+
+    throw new Error("API restrictions endpoint unavailable");
   }
 
   private calculateUsdValue(
@@ -1043,7 +1180,7 @@ export class BinanceNativeService implements ExchangeAdapter {
       {
         asset: string;
         free: number;
-        borrowed: number;
+        locked: number;
         total: number;
         usdValue?: number;
       }
@@ -1056,13 +1193,14 @@ export class BinanceNativeService implements ExchangeAdapter {
       const free = Number(asset.free);
       const borrowed = Number(asset.borrowed);
       const interest = Number(asset.interest);
-      const total = free + borrowed + interest;
+      const locked = borrowed + interest;
+      const total = free + locked;
       const usdValue = this.calculateUsdValue(asset.asset, total, priceMap);
 
       assets[asset.asset] = {
         asset: asset.asset,
         free,
-        borrowed,
+        locked,
         total,
         usdValue,
       };

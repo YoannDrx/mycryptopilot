@@ -36,7 +36,11 @@ import {
 } from "./circuit-breaker.service";
 import type { CopyTradeJobData, CopyTradeJobResult } from "./copy-trade-jobs";
 import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 import {
   executeCopyTrade,
   failCopyTrade,
@@ -157,8 +161,13 @@ async function processCopyTradeJob(job: {
       exchangeConnection.keyIv,
       exchangeConnection.keyTag,
     );
-    const secretKey = decryptApiKey(
+    const secretKey = decryptSerializedPayload(
       exchangeConnection.encryptedSecretKey,
+      exchangeConnection.keyIv,
+      exchangeConnection.keyTag,
+    );
+    const passphrase = decryptOptionalSerializedPayload(
+      exchangeConnection.encryptedPassphrase,
       exchangeConnection.keyIv,
       exchangeConnection.keyTag,
     );
@@ -172,6 +181,10 @@ async function processCopyTradeJob(job: {
       exchangeConnection.exchange,
       apiKey,
       secretKey,
+      {
+        passphrase,
+        bitgetAccountMode: exchangeConnection.bitgetAccountMode ?? undefined,
+      },
     );
 
     // ========== Step 5: Execute Order ==========
@@ -348,7 +361,7 @@ async function processCopyTradeJob(job: {
   }
 }
 
-export function processCopyTradeJobForTest(
+export async function processCopyTradeJobForTest(
   jobData: CopyTradeJobData,
 ): Promise<CopyTradeJobResult> {
   return processCopyTradeJob({ data: jobData, id: "test-job" });

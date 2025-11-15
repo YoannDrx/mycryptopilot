@@ -17,7 +17,11 @@ import {
   getTraderTradeBySignalId,
 } from "@/lib/trading/trader-trade.service";
 import { calculateSafeQuantity } from "@/lib/exchange/position-sizing.service";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 
 /**
  * Queue copy trades for all followers with auto-copy enabled
@@ -178,6 +182,8 @@ export async function queueAutoCopyTradesForSignal(
                 exchange: true,
                 encryptedApiKey: true,
                 encryptedSecretKey: true,
+                encryptedPassphrase: true,
+                bitgetAccountMode: true,
                 keyIv: true,
                 keyTag: true,
                 isActive: true,
@@ -193,6 +199,8 @@ export async function queueAutoCopyTradesForSignal(
                 exchange: true,
                 encryptedApiKey: true,
                 encryptedSecretKey: true,
+                encryptedPassphrase: true,
+                bitgetAccountMode: true,
                 keyIv: true,
                 keyTag: true,
                 isActive: true,
@@ -218,8 +226,13 @@ export async function queueAutoCopyTradesForSignal(
             exchangeConnection.keyIv,
             exchangeConnection.keyTag,
           );
-          const secretKey = decryptApiKey(
+          const secretKey = decryptSerializedPayload(
             exchangeConnection.encryptedSecretKey,
+            exchangeConnection.keyIv,
+            exchangeConnection.keyTag,
+          );
+          const passphrase = decryptOptionalSerializedPayload(
+            exchangeConnection.encryptedPassphrase,
             exchangeConnection.keyIv,
             exchangeConnection.keyTag,
           );
@@ -230,6 +243,9 @@ export async function queueAutoCopyTradesForSignal(
             exchange: exchangeConnection.exchange,
             apiKey,
             secretKey,
+            passphrase,
+            bitgetAccountMode:
+              exchangeConnection.bitgetAccountMode ?? undefined,
             symbol: signal.symbol,
             entryPrice: entry,
             instrumentType: payload.instrumentType ?? "SPOT",

@@ -18,8 +18,16 @@ vi.mock("@/lib/queue/circuit-breaker.service", () => ({
 }));
 
 const decryptApiKeyMock = vi.hoisted(() => vi.fn(() => "decrypted-key"));
+const decryptSerializedPayloadMock = vi.hoisted(() =>
+  vi.fn(() => "decrypted-secret"),
+);
+const decryptOptionalSerializedPayloadMock = vi.hoisted(() =>
+  vi.fn(() => null),
+);
 vi.mock("@/lib/crypto/encryption-service", () => ({
   decryptApiKey: decryptApiKeyMock,
+  decryptSerializedPayload: decryptSerializedPayloadMock,
+  decryptOptionalSerializedPayload: decryptOptionalSerializedPayloadMock,
 }));
 
 const createExchangeServiceMock = vi.hoisted(() => vi.fn());
@@ -58,6 +66,8 @@ beforeEach(() => {
   executeCopyTradeMock.mockReset();
   failCopyTradeMock.mockReset();
   decryptApiKeyMock.mockReset();
+  decryptSerializedPayloadMock.mockReset();
+  decryptOptionalSerializedPayloadMock.mockReset();
 
   prismaMock.userExchangeConnection.findUnique.mockResolvedValue({
     id: "exchange-1",

@@ -115,6 +115,7 @@ export const zConnectionStatus = z.object({
   canTrade: z.boolean().optional(),
   permissions: z.array(z.string()).optional(),
   errorMessage: z.string().optional(),
+  bitgetAccountMode: z.enum(["UTA", "CLASSIC"]).optional(),
 });
 
 export type ConnectionStatus = z.infer<typeof zConnectionStatus>;

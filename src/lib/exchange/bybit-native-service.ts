@@ -42,6 +42,36 @@ import type {
   NormalizedTrade,
 } from "./types";
 
+const ensurePermissionArray = (value: unknown): string[] => {
+  return Array.isArray(value) ? value : [];
+};
+
+type BybitApiKeyPermissions = {
+  Spot?: string[];
+  ContractTrade?: string[];
+  Derivatives?: string[];
+};
+
+type BybitApiKeyResult = {
+  permissions?: BybitApiKeyPermissions;
+  readOnly?: unknown;
+  readOnlyStatus?: unknown;
+  readOnlyFlag?: unknown;
+};
+
+const interpretReadOnlyFlag = (value: unknown): boolean => {
+  if (typeof value === "number") {
+    return value === 1;
+  }
+  if (typeof value === "string") {
+    return value === "1" || value.toLowerCase() === "true";
+  }
+  if (typeof value === "boolean") {
+    return value;
+  }
+  return false;
+};
+
 /**
  * Bybit Native Service
  *
@@ -302,7 +332,9 @@ export class BybitNativeService implements ExchangeAdapter {
           executedAt: new Date(Number(exec.execTime)),
           instrumentType: "FUTURES_USDT",
           realizedPnl: exec.closedSize ? Number(exec.closedSize) : null,
-          positionSide: exec.positionIdx ? String(exec.positionIdx) : null,
+          positionSide: this.mapPositionIdx(
+            (exec as { positionIdx?: number | string | null }).positionIdx ?? null,
+          ),
           raw: exec,
         }),
       );
@@ -342,23 +374,46 @@ export class BybitNativeService implements ExchangeAdapter {
     try {
       // Get API key information to check permissions
       const apiKeyResponse = await this.client.getQueryApiKey();
+      const apiKeyInfo =
+        (apiKeyResponse.result as BybitApiKeyResult | undefined) ?? undefined;
+      const permissions = apiKeyInfo?.permissions ?? {};
 
-      const apiKeyInfo = apiKeyResponse.result;
-      const permissions = apiKeyInfo.permissions;
+      const spotPermissions = ensurePermissionArray(permissions.Spot);
+      const contractPermissions = [
+        ...ensurePermissionArray(permissions.ContractTrade),
+        ...ensurePermissionArray(permissions.Derivatives),
+      ];
 
-      const canTrade = permissions.ContractTrade.includes("Order");
-      const isReadOnly = !canTrade;
+      const hasSpotTrading = spotPermissions.some((perm) =>
+        ["SpotTrade", "SpotConvert"].includes(perm),
+      );
+      const hasFuturesTrading = contractPermissions.some((perm) =>
+        ["Order", "Position"].includes(perm),
+      );
+
+      const rawReadOnly =
+        apiKeyInfo?.readOnly ??
+        apiKeyInfo?.readOnlyStatus ??
+        apiKeyInfo?.readOnlyFlag;
+
+      const readOnlyFlag = interpretReadOnlyFlag(rawReadOnly);
+      const hasTradingPermission = hasSpotTrading || hasFuturesTrading;
+      const isReadOnly = readOnlyFlag || !hasTradingPermission;
+      const canTrade = !isReadOnly;
 
       logger.info("Connection test successful", {
         canTrade,
         isReadOnly,
+        hasSpotTrading,
+        hasFuturesTrading,
+        readOnlyFlag,
       });
 
       return {
         isValid: true,
         isReadOnly,
-        hasSpotEnabled: permissions.Spot.includes("SpotTrade"),
-        hasFuturesEnabled: permissions.ContractTrade.includes("Order"),
+        hasSpotEnabled: hasSpotTrading,
+        hasFuturesEnabled: hasFuturesTrading,
         canTrade,
       };
     } catch (error) {
@@ -427,7 +482,9 @@ export class BybitNativeService implements ExchangeAdapter {
         ...(params.clientOrderId && {
           orderLinkId: params.clientOrderId,
         }),
-        ...(params.positionSide && { positionIdx: params.positionSide }),
+        ...(params.positionSide && {
+          positionIdx: this.mapPositionSideToIdx(params.positionSide),
+        }),
         ...(params.reduceOnly !== undefined && {
           reduceOnly: params.reduceOnly,
         }),
@@ -568,18 +625,13 @@ export class BybitNativeService implements ExchangeAdapter {
   async fetchRecentTrades(
     daysSince = 30,
     sinceDate?: Date,
+    _knownSymbols: string[] = [],
   ): Promise<
     {
       externalOrderId: string;
       symbol: string;
       side: "BUY" | "SELL";
-      type:
-        | "MARKET"
-        | "LIMIT"
-        | "STOP_LOSS"
-        | "STOP_LOSS_LIMIT"
-        | "TAKE_PROFIT"
-        | "TAKE_PROFIT_LIMIT";
+      type: NormalizedTrade["type"];
       quantity: number;
       price: number;
       quoteQuantity: number;
@@ -635,13 +687,7 @@ export class BybitNativeService implements ExchangeAdapter {
       externalOrderId: string;
       symbol: string;
       side: "BUY" | "SELL";
-      type:
-        | "MARKET"
-        | "LIMIT"
-        | "STOP_LOSS"
-        | "STOP_LOSS_LIMIT"
-        | "TAKE_PROFIT"
-        | "TAKE_PROFIT_LIMIT";
+      type: NormalizedTrade["type"];
       quantity: number;
       price: number;
       quoteQuantity: number;
@@ -689,13 +735,7 @@ export class BybitNativeService implements ExchangeAdapter {
       externalOrderId: string;
       symbol: string;
       side: "BUY" | "SELL";
-      type:
-        | "MARKET"
-        | "LIMIT"
-        | "STOP_LOSS"
-        | "STOP_LOSS_LIMIT"
-        | "TAKE_PROFIT"
-        | "TAKE_PROFIT_LIMIT";
+      type: NormalizedTrade["type"];
       quantity: number;
       price: number;
       quoteQuantity: number;
@@ -738,23 +778,44 @@ export class BybitNativeService implements ExchangeAdapter {
    * Map Bybit order type to our OrderType
    * @private
    */
-  private mapBybitOrderType(
-    bybitType: string,
-  ):
-    | "MARKET"
-    | "LIMIT"
-    | "STOP_LOSS"
-    | "STOP_LOSS_LIMIT"
-    | "TAKE_PROFIT"
-    | "TAKE_PROFIT_LIMIT" {
-    switch (bybitType) {
-      case "Market":
-        return "MARKET";
-      case "Limit":
-        return "LIMIT";
-      default:
-        return "LIMIT"; // Default to LIMIT for unknown types
+  private mapBybitOrderType(bybitType: string): NormalizedTrade["type"] {
+    return bybitType === "Market" ? "MARKET" : "LIMIT";
+  }
+
+  private mapPositionIdx(
+    positionIdx?: number | string | null,
+  ): NormalizedTrade["positionSide"] {
+    if (positionIdx === null || positionIdx === undefined) {
+      return null;
     }
+
+    const normalized = Number(positionIdx);
+    if (Number.isNaN(normalized)) {
+      return null;
+    }
+
+    if (normalized === 0) {
+      return "BOTH";
+    }
+    if (normalized === 1) {
+      return "LONG";
+    }
+    if (normalized === 2) {
+      return "SHORT";
+    }
+    return null;
+  }
+
+  private mapPositionSideToIdx(
+    side: NonNullable<CreateOrderParams["positionSide"]>,
+  ): 0 | 1 | 2 {
+    if (side === "LONG") {
+      return 1;
+    }
+    if (side === "SHORT") {
+      return 2;
+    }
+    return 0;
   }
 
   // ==========================================

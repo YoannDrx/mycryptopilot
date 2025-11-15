@@ -22,6 +22,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { dialogManager } from "@/features/dialog-manager/dialog-manager";
 import { useRouter } from "next/navigation";
+import { ExchangeConnectionPreview } from "./exchange-connection-preview";
 
 type ExchangeConnectionCardProps = {
   connection: {
@@ -38,6 +39,14 @@ type ExchangeConnectionCardProps = {
     firstTradeDate: string | null;
     lastTradeDate: string | null;
   };
+};
+
+const exchangeBadgeStyles: Partial<
+  Record<string, { bg: string; icon: string }>
+> = {
+  BINANCE: { bg: "bg-amber-500/10", icon: "🟡" },
+  BYBIT: { bg: "bg-orange-500/10", icon: "🟠" },
+  BITGET: { bg: "bg-emerald-500/10", icon: "🟢" },
 };
 
 export const ExchangeConnectionCard = ({
@@ -93,6 +102,23 @@ export const ExchangeConnectionCard = ({
     },
   });
 
+  const repairMutation = useMutation({
+    mutationFn: async () => {
+      const data = await upfetch(`/api/exchange/${connection.id}/repair`, {
+        method: "POST",
+      });
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message ?? "Connection repaired successfully!");
+      void queryClient.invalidateQueries({ queryKey: ["exchange-status", connection.id] });
+      router.refresh();
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleDisconnect = () => {
     dialogManager.confirm({
       title: "Disconnect Exchange?",
@@ -125,14 +151,10 @@ export const ExchangeConnectionCard = ({
           <div className="flex items-center gap-3">
             {/* Exchange Icon */}
             <div
-              className={`flex size-12 items-center justify-center rounded-lg ${
-                connection.exchange === "BINANCE"
-                  ? "bg-amber-500/10"
-                  : "bg-orange-500/10"
-              }`}
+              className={`flex size-12 items-center justify-center rounded-lg ${exchangeBadgeStyles[connection.exchange]?.bg ?? "bg-muted"}`}
             >
               <span className="text-2xl">
-                {connection.exchange === "BINANCE" ? "🟡" : "🟠"}
+                {exchangeBadgeStyles[connection.exchange]?.icon ?? "🔗"}
               </span>
             </div>
 
@@ -149,10 +171,15 @@ export const ExchangeConnectionCard = ({
                   <Badge variant="secondary">Inactive</Badge>
                 )}
               </CardTitle>
-              <CardDescription>
-                {connection.isActive
-                  ? `Last synced ${lastSyncedText}`
-                  : "Connection inactive"}
+              <CardDescription suppressHydrationWarning>
+                {connection.isActive ? (
+                  <>
+                    Last synced{" "}
+                    <span>{lastSyncedText}</span>
+                  </>
+                ) : (
+                  "Connection inactive"
+                )}
               </CardDescription>
             </div>
           </div>
@@ -187,11 +214,15 @@ export const ExchangeConnectionCard = ({
               <span>Next Sync</span>
             </div>
             <p className="mt-1 text-sm font-medium">
-              {connection.nextSyncAt
-                ? formatDistanceToNow(new Date(connection.nextSyncAt), {
+              {connection.nextSyncAt ? (
+                <span suppressHydrationWarning>
+                  {formatDistanceToNow(new Date(connection.nextSyncAt), {
                     addSuffix: true,
-                  })
-                : "Not scheduled"}
+                  })}
+                </span>
+              ) : (
+                "Not scheduled"
+              )}
             </p>
           </div>
         </div>
@@ -214,7 +245,19 @@ export const ExchangeConnectionCard = ({
             />
             {syncMutation.isPending ? "Syncing..." : "Manual Sync"}
           </Button>
-
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => repairMutation.mutate()}
+            disabled={
+              !connection.isActive ||
+              repairMutation.isPending ||
+              syncMutation.isPending ||
+              disconnectMutation.isPending
+            }
+          >
+            {repairMutation.isPending ? "Repairing..." : "Repair Keys"}
+          </Button>
           <Button
             variant="destructive"
             size="sm"
@@ -235,6 +278,8 @@ export const ExchangeConnectionCard = ({
             </p>
           </div>
         )}
+
+        <ExchangeConnectionPreview connectionId={connection.id} />
       </CardContent>
     </Card>
   );

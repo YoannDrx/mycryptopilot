@@ -29,10 +29,11 @@ import { logger } from "@/lib/logger";
 import { balanceCache } from "./balance-cache";
 import { createExchangeService } from "./exchange-service-factory";
 import type { ExchangeAdapter } from "./exchange-service-factory";
+import type { Exchange } from "@/generated/prisma";
 
 type Subscription = {
   traderId: string;
-  exchange: "binance" | "bybit";
+  exchange: "binance" | "bybit" | "bitget";
   adapter: ExchangeAdapter;
   interval: NodeJS.Timeout;
   pollIntervalMs: number;
@@ -49,16 +50,18 @@ export class RealtimeBalanceManager {
    * Subscribe to real-time balance updates
    *
    * @param traderId - Trader ID
-   * @param exchange - Exchange name (binance or bybit)
+   * @param exchange - Exchange name (binance, bybit, bitget)
    * @param apiKey - API key
    * @param secretKey - Secret key
    * @param pollIntervalMs - Polling interval in milliseconds (default: 10s)
    */
   async subscribe(
     traderId: string,
-    exchange: "binance" | "bybit",
+    exchange: "binance" | "bybit" | "bitget",
     apiKey: string,
     secretKey: string,
+    passphrase?: string | null,
+    bitgetAccountMode?: "UTA" | "CLASSIC" | null,
     pollIntervalMs = this.defaultPollIntervalMs,
   ): Promise<void> {
     try {
@@ -79,9 +82,13 @@ export class RealtimeBalanceManager {
 
       // Create exchange adapter
       const adapter = createExchangeService(
-        exchange.toUpperCase() as "BINANCE" | "BYBIT",
+        exchange.toUpperCase() as Exchange,
         apiKey,
         secretKey,
+        {
+          passphrase,
+          bitgetAccountMode: bitgetAccountMode ?? undefined,
+        },
       );
 
       // Test connection first
@@ -221,6 +228,7 @@ export class RealtimeBalanceManager {
       byExchange: {
         binance: subscriptions.filter((s) => s.exchange === "binance").length,
         bybit: subscriptions.filter((s) => s.exchange === "bybit").length,
+        bitget: subscriptions.filter((s) => s.exchange === "bitget").length,
       },
       withErrors: subscriptions.filter((s) => s.errorCount > 0).length,
       avgPollInterval:

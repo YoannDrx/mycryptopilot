@@ -569,6 +569,27 @@ describe("BybitNativeService", () => {
       expect(mockRestClient.getQueryApiKey).toHaveBeenCalled();
     });
 
+    it("should treat read-only keys as read-only even if permissions list trading scopes", async () => {
+      mockRestClient.getQueryApiKey.mockResolvedValue({
+        result: {
+          id: "readonly-key-id",
+          permissions: {
+            Spot: ["SpotTrade"],
+            ContractTrade: ["Order"],
+          },
+          readOnly: 1,
+        },
+      });
+
+      const result = await service.testConnection();
+
+      expect(result.isValid).toBe(true);
+      expect(result.isReadOnly).toBe(true);
+      expect(result.canTrade).toBe(false);
+      expect(result.hasSpotEnabled).toBe(true);
+      expect(result.hasFuturesEnabled).toBe(true);
+    });
+
     it("should handle invalid API keys", async () => {
       mockRestClient.getQueryApiKey.mockRejectedValue(
         new Error("Invalid API key"),

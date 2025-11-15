@@ -35,10 +35,12 @@ describe("BinanceNativeService", () => {
     getAccountTradeList: ReturnType<typeof vi.fn>;
     getExchangeInfo: ReturnType<typeof vi.fn>;
     get24hrChangeStatistics: ReturnType<typeof vi.fn>;
+    getApiKeyPermissions: ReturnType<typeof vi.fn>;
   };
   let mockUSDMClient: {
     getBalance: ReturnType<typeof vi.fn>;
     getPositions: ReturnType<typeof vi.fn>;
+    getPositionsV3: ReturnType<typeof vi.fn>;
     submitNewOrder: ReturnType<typeof vi.fn>;
     cancelOrder: ReturnType<typeof vi.fn>;
     getOrder: ReturnType<typeof vi.fn>;
@@ -60,11 +62,13 @@ describe("BinanceNativeService", () => {
       getAccountTradeList: vi.fn(),
       getExchangeInfo: vi.fn(),
       get24hrChangeStatistics: vi.fn(),
+      getApiKeyPermissions: vi.fn(),
     };
 
     mockUSDMClient = {
       getBalance: vi.fn(),
       getPositions: vi.fn(),
+      getPositionsV3: vi.fn(),
       submitNewOrder: vi.fn(),
       cancelOrder: vi.fn(),
       getOrder: vi.fn(),
@@ -83,6 +87,13 @@ describe("BinanceNativeService", () => {
 
     // Create service instance
     service = new BinanceNativeService("test-api-key", "test-secret-key");
+
+    mockMainClient.getAccountInformation.mockResolvedValue({ balances: [] });
+    mockMainClient.getApiKeyPermissions.mockResolvedValue({
+      enableSpotAndMarginTrading: false,
+      enableFutures: false,
+    });
+    mockUSDMClient.getPositionsV3.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -480,12 +491,9 @@ describe("BinanceNativeService", () => {
 
   describe("testConnection", () => {
     it("should validate API keys and permissions", async () => {
-      mockMainClient.testConnectivity.mockResolvedValue({});
-      mockMainClient.getAccountInformation.mockResolvedValue({
-        canTrade: false, // Read-only means cannot trade
-        canWithdraw: false,
-        canDeposit: false,
-        balances: [],
+      mockMainClient.getApiKeyPermissions.mockResolvedValue({
+        enableSpotAndMarginTrading: false,
+        enableFutures: false,
       });
 
       const result = await service.testConnection();
@@ -493,17 +501,13 @@ describe("BinanceNativeService", () => {
       expect(result.isValid).toBe(true);
       expect(result.isReadOnly).toBe(true); // isReadOnly = !canTrade
       expect(result.canTrade).toBe(false);
-      expect(mockMainClient.testConnectivity).toHaveBeenCalled();
-      expect(mockMainClient.getAccountInformation).toHaveBeenCalled();
+      expect(mockMainClient.getApiKeyPermissions).toHaveBeenCalled();
     });
 
     it("should detect non-read-only keys", async () => {
-      mockMainClient.testConnectivity.mockResolvedValue({});
-      mockMainClient.getAccountInformation.mockResolvedValue({
-        canTrade: true,
-        canWithdraw: true, // NOT read-only!
-        canDeposit: true,
-        balances: [],
+      mockMainClient.getApiKeyPermissions.mockResolvedValue({
+        enableSpotAndMarginTrading: true,
+        enableFutures: false,
       });
 
       const result = await service.testConnection();
@@ -513,7 +517,7 @@ describe("BinanceNativeService", () => {
     });
 
     it("should handle invalid API keys", async () => {
-      mockMainClient.testConnectivity.mockRejectedValue(
+      mockMainClient.getApiKeyPermissions.mockRejectedValue(
         new Error("Invalid API key"),
       );
 
@@ -526,17 +530,31 @@ describe("BinanceNativeService", () => {
 
   describe("fetchRecentTrades", () => {
     it("should fetch spot and futures trades", async () => {
-      // Mock exchange info
-      mockMainClient.getExchangeInfo.mockResolvedValue({
-        symbols: [
-          { symbol: "BTCUSDT", status: "TRADING" },
-          { symbol: "ETHUSDT", status: "TRADING" },
+      mockMainClient.getAccountInformation.mockResolvedValue({
+        balances: [
+          { asset: "BTC", free: "0.2", locked: "0" },
+          { asset: "ETH", free: "1", locked: "0" },
         ],
       });
-
-      mockUSDMClient.getExchangeInfo.mockResolvedValue({
-        symbols: [{ symbol: "BTCUSDT", status: "TRADING" }],
+      mockMainClient.getExchangeInfo.mockResolvedValue({
+        symbols: [
+          {
+            symbol: "BTCUSDT",
+            status: "TRADING",
+            baseAsset: "BTC",
+            quoteAsset: "USDT",
+          },
+          {
+            symbol: "ETHUSDT",
+            status: "TRADING",
+            baseAsset: "ETH",
+            quoteAsset: "USDT",
+          },
+        ],
       });
+      mockUSDMClient.getPositionsV3.mockResolvedValue([
+        { symbol: "BTCUSDT", positionAmt: "0.01" },
+      ]);
 
       // Mock spot trades
       mockMainClient.getAccountTradeList.mockResolvedValue([
@@ -587,8 +605,10 @@ describe("BinanceNativeService", () => {
     });
 
     it("should handle errors gracefully", async () => {
-      mockMainClient.getExchangeInfo.mockRejectedValue(new Error("API down"));
-      mockUSDMClient.getExchangeInfo.mockRejectedValue(new Error("API down"));
+      mockMainClient.getAccountInformation.mockRejectedValue(
+        new Error("API down"),
+      );
+      mockUSDMClient.getPositionsV3.mockRejectedValue(new Error("API down"));
 
       // The implementation returns empty array instead of throwing
       // (see fetchSpotTradesNative line 664 and fetchFuturesTradesNative line 739)

@@ -18,17 +18,25 @@ import { NextResponse } from "next/server";
 import { getRequiredUser } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
-import { encryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  encryptApiKey,
+  serializeEncryptedPayload,
+} from "@/lib/crypto/encryption-service";
 import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
 import {
   getExistingConnection,
   countTraderConnections,
+  getExchangeConnectionById,
 } from "@/features/exchange/exchange-queries";
 import {
   getExchangeConnectionLimit,
   calculateNextSyncAt,
 } from "@/features/exchange/exchange-plan-limits";
 import { ConnectExchangeSchema } from "@/features/exchange/exchange.schema";
+import {
+  syncConnectionTrades,
+  type ConnectionWithPlan,
+} from "@/lib/exchange/sync-service";
 
 export async function POST(request: Request) {
   try {
@@ -45,7 +53,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { exchange, apiKey, secretKey } = validation.data;
+    const { exchange, apiKey, secretKey, passphrase } = validation.data;
 
     logger.info("Exchange connection request", {
       userId: user.id,
@@ -137,7 +145,13 @@ export async function POST(request: Request) {
       exchange,
     });
 
-    const exchangeService = createExchangeService(exchange, apiKey, secretKey);
+    const normalizedPassphrase = passphrase?.trim().length
+      ? passphrase.trim()
+      : null;
+
+    const exchangeService = createExchangeService(exchange, apiKey, secretKey, {
+      passphrase: normalizedPassphrase,
+    });
 
     let apiValidation;
     try {
@@ -171,6 +185,10 @@ export async function POST(request: Request) {
       );
     }
 
+    // Extract Bitget account mode if applicable
+    const bitgetAccountMode =
+      exchange === "BITGET" ? (apiValidation.bitgetAccountMode ?? "UTA") : null;
+
     // Encrypt API keys
     logger.info("Encrypting API keys", {
       userId: user.id,
@@ -179,6 +197,10 @@ export async function POST(request: Request) {
 
     const encryptedApiKey = encryptApiKey(apiKey);
     const encryptedSecretKey = encryptApiKey(secretKey);
+    const secretKeyPayload = serializeEncryptedPayload(encryptedSecretKey);
+    const passphrasePayload = normalizedPassphrase
+      ? serializeEncryptedPayload(encryptApiKey(normalizedPassphrase))
+      : null;
 
     // Calculate next sync time based on plan
     const nextSyncAt = calculateNextSyncAt(planName);
@@ -193,13 +215,15 @@ export async function POST(request: Request) {
           where: { id: existingConnection.id },
           data: {
             encryptedApiKey: encryptedApiKey.encrypted,
-            encryptedSecretKey: encryptedSecretKey.encrypted,
+            encryptedSecretKey: secretKeyPayload,
+            encryptedPassphrase: passphrasePayload,
             keyIv: encryptedApiKey.iv,
             keyTag: encryptedApiKey.tag,
             isActive: true,
             nextSyncAt,
             lastSyncError: null, // Clear previous errors
             updatedAt: new Date(),
+            bitgetAccountMode,
           },
         });
 
@@ -215,11 +239,13 @@ export async function POST(request: Request) {
             traderProfileId: traderProfile.id,
             exchange,
             encryptedApiKey: encryptedApiKey.encrypted,
-            encryptedSecretKey: encryptedSecretKey.encrypted,
+            encryptedSecretKey: secretKeyPayload,
+            encryptedPassphrase: passphrasePayload,
             keyIv: encryptedApiKey.iv,
             keyTag: encryptedApiKey.tag,
             isActive: true,
             nextSyncAt,
+            bitgetAccountMode,
           },
         });
       }
@@ -252,6 +278,30 @@ export async function POST(request: Request) {
       },
     );
 
+    // Trigger immediate sync to populate stats without waiting for cron
+    try {
+      const connectionForSync = await getExchangeConnectionById(connection.id);
+
+      if (connectionForSync) {
+        await syncConnectionTrades(connectionForSync as ConnectionWithPlan);
+        logger.info("Initial sync completed after connecting exchange", {
+          connectionId: connection.id,
+          exchange,
+        });
+      } else {
+        logger.warn("Unable to load connection for initial sync", {
+          connectionId: connection.id,
+          exchange,
+        });
+      }
+    } catch (syncError) {
+      logger.error("Initial sync failed after connecting exchange", {
+        connectionId: connection.id,
+        exchange,
+        error: syncError,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       connection: {
@@ -262,8 +312,8 @@ export async function POST(request: Request) {
         nextSyncAt: connection.nextSyncAt,
       },
       message: wasReactivated
-        ? `${exchange} reconnected successfully! Sync will start soon.`
-        : `${exchange} connected successfully! First sync will start soon.`,
+        ? `${exchange} reconnected successfully! Sync running now.`
+        : `${exchange} connected successfully! Sync running now.`,
     });
   } catch (error) {
     logger.error("Exchange connection error", { error });

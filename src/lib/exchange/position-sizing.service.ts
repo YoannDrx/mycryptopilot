@@ -38,6 +38,8 @@ export type CalculateSafeQuantityInput = {
   exchange: Exchange; // "BINANCE" or "BYBIT"
   apiKey: string;
   secretKey: string;
+  passphrase?: string | null;
+  bitgetAccountMode?: "UTA" | "CLASSIC" | null;
 
   // Trade parameters
   symbol: string; // e.g., "BTCUSDT"
@@ -158,6 +160,8 @@ export async function calculateSafeQuantity(
     exchange,
     apiKey,
     secretKey,
+    passphrase,
+    bitgetAccountMode,
     symbol,
     entryPrice,
     instrumentType,
@@ -208,6 +212,10 @@ export async function calculateSafeQuantity(
         exchange,
         apiKey,
         secretKey,
+        {
+          passphrase,
+          bitgetAccountMode: bitgetAccountMode ?? undefined,
+        },
       );
 
       try {

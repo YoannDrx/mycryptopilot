@@ -31,6 +31,7 @@ import { useSidebarState } from "@/stores/sidebar-state";
 import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 /**
  * Trading Sidebar
@@ -78,6 +79,10 @@ export function TradingSidebar({
       void useSidebarState.persist.rehydrate();
     }
   }, [hasHydrated]);
+
+  if (!hasHydrated) {
+    return <SidebarLoadingState />;
+  }
 
   return (
     <Sidebar variant="inset" suppressHydrationWarning>
@@ -142,6 +147,32 @@ export function TradingSidebar({
       <SidebarFooter className="flex flex-col gap-2">
         <ContactFeedbackPopover />
         <SidebarUserButton />
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  );
+}
+
+function SidebarLoadingState() {
+  return (
+    <Sidebar variant="inset" collapsible="none">
+      <SidebarHeader className="px-6">
+        <Skeleton className="h-10 w-full rounded-lg" />
+      </SidebarHeader>
+      <SidebarContent className="gap-4 px-6 py-4">
+        {[...Array(4)].map((_, index) => (
+          <div key={index} className="space-y-3">
+            <Skeleton className="h-4 w-24 rounded" />
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-32 rounded" />
+              <Skeleton className="h-3 w-28 rounded" />
+              <Skeleton className="h-3 w-24 rounded" />
+            </div>
+          </div>
+        ))}
+      </SidebarContent>
+      <SidebarFooter className="px-6">
+        <Skeleton className="h-10 w-full rounded-lg" />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

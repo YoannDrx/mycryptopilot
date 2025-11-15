@@ -362,7 +362,7 @@ async function linkFillsToTraderTrade(
 async function findMatchingTraderTrade(
   traderProfileId: string,
   session: TradingSession,
-  source: "BINANCE" | "BYBIT" | "MANUAL", // CRITICAL: Exchange source
+  source: "BINANCE" | "BYBIT" | "BITGET" | "MANUAL", // CRITICAL: Exchange source
 ): Promise<TraderTrade | null> {
   // Look for open/partial TraderTrade with same symbol, side, and source
   const existingTrade = await prisma.traderTrade.findFirst({

@@ -1,0 +1,2 @@
+-- Legacy migration replaced by 20251115140400_bitget_passphrase_rename.
+-- Intentionally left empty to keep migration history in sync.

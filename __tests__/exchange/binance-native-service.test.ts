@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 const mainClientMock = {
   getAccountInformation: vi.fn(),
   getAccountTradeList: vi.fn(),
+  getApiKeyPermissions: vi.fn(),
   testConnectivity: vi.fn(),
   submitNewOrder: vi.fn(),
   cancelOrder: vi.fn(),
@@ -11,6 +12,7 @@ const mainClientMock = {
   getExchangeInfo: vi.fn(),
   getSymbolPriceTicker: vi.fn(),
   sapiGetMarginAccount: vi.fn(),
+  sapiGetAccountApiRestrictions: vi.fn(),
 };
 
 const usdmClientMock = {
@@ -22,9 +24,6 @@ const usdmClientMock = {
 
 vi.mock("binance", () => {
   class MainClient {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(_options?: unknown) {}
-
     getAccountInformation(...args: unknown[]) {
       return mainClientMock.getAccountInformation(...args);
     }
@@ -57,15 +56,20 @@ vi.mock("binance", () => {
       return mainClientMock.getSymbolPriceTicker(...args);
     }
 
+    getApiKeyPermissions(...args: unknown[]) {
+      return mainClientMock.getApiKeyPermissions(...args);
+    }
+
     sapiGetMarginAccount(...args: unknown[]) {
       return mainClientMock.sapiGetMarginAccount(...args);
+    }
+
+    sapiGetAccountApiRestrictions(...args: unknown[]) {
+      return mainClientMock.sapiGetAccountApiRestrictions(...args);
     }
   }
 
   class USDMClient {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(_options?: unknown) {}
-
     getBalance(...args: unknown[]) {
       return usdmClientMock.getBalance(...args);
     }
@@ -105,6 +109,10 @@ const resetMocks = () => {
 describe("BinanceNativeService", () => {
   beforeEach(() => {
     resetMocks();
+    mainClientMock.getApiKeyPermissions.mockResolvedValue({
+      enableSpotAndMarginTrading: false,
+      enableFutures: false,
+    });
   });
 
   it("combines spot and futures balances in fetchConsolidatedBalance", async () => {
@@ -266,8 +274,43 @@ describe("BinanceNativeService", () => {
     await service.close();
   });
 
-  it("testConnection returns failure when connectivity throws", async () => {
-    mainClientMock.testConnectivity.mockRejectedValue(
+  it("marks keys as read-only when trading permissions are disabled", async () => {
+    mainClientMock.getApiKeyPermissions.mockResolvedValue({
+      enableSpotAndMarginTrading: false,
+      enableFutures: false,
+    });
+
+    const service = new BinanceNativeService("api", "secret");
+    const status = await service.testConnection();
+
+    expect(mainClientMock.getApiKeyPermissions).toHaveBeenCalled();
+    expect(status.isValid).toBe(true);
+    expect(status.isReadOnly).toBe(true);
+    expect(status.hasSpotEnabled).toBe(false);
+    expect(status.hasFuturesEnabled).toBe(false);
+    expect(status.canTrade).toBe(false);
+    await service.close();
+  });
+
+  it("detects trading-enabled keys when spot or futures access is allowed", async () => {
+    mainClientMock.getApiKeyPermissions.mockResolvedValue({
+      enableSpotAndMarginTrading: true,
+      enableFutures: true,
+    });
+
+    const service = new BinanceNativeService("api", "secret");
+    const status = await service.testConnection();
+
+    expect(status.isValid).toBe(true);
+    expect(status.isReadOnly).toBe(false);
+    expect(status.hasSpotEnabled).toBe(true);
+    expect(status.hasFuturesEnabled).toBe(true);
+    expect(status.canTrade).toBe(true);
+    await service.close();
+  });
+
+  it("testConnection returns failure when API restriction endpoint fails", async () => {
+    mainClientMock.getApiKeyPermissions.mockRejectedValue(
       new Error("network down"),
     );
 

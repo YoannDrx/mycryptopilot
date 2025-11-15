@@ -12,9 +12,6 @@ const restClientMock = {
 
 vi.mock("bybit-api", () => {
   class RestClientV5 {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(_config?: unknown) {}
-
     getWalletBalance(...args: unknown[]) {
       return restClientMock.getWalletBalance(...args);
     }
