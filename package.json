@@ -3,6 +3,7 @@
   "nowts-version": "2.0.0",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "build": "next build --turbo",
     "type:generate": "next typegen .",
