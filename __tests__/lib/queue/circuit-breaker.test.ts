@@ -5,16 +5,24 @@
  *
  * Coverage:
  * - Circuit breaker creation (default limits)
- * - Daily trade limit checks
- * - Daily loss limit checks
- * - Daily reset logic (UTC midnight)
  * - Manual trip/reset
- * - Counter increments
- * - Loss recording
+ * - Status retrieval
+ * - Config updates
+ *
+ * Note: Trade counting and loss tracking are now handled by Redis.
+ * See circuit-breaker-atomic.test.ts for atomic operation tests.
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { prisma } from "@/lib/prisma";
+
+// Mock Redis functions to isolate Prisma-based tests
+vi.mock("@/lib/queue/circuit-breaker-redis", () => ({
+  checkAndIncrementTrades: vi.fn().mockResolvedValue(undefined),
+  incrementLoss: vi.fn().mockResolvedValue(undefined),
+  getCounters: vi.fn().mockResolvedValue({ trades: 0, loss: 0 }),
+}));
+
 import {
   checkCircuitBreaker,
   incrementTradeCounter,
@@ -25,12 +33,23 @@ import {
   updateCircuitBreakerConfig,
   CircuitBreakerTrippedError,
 } from "@/lib/queue/circuit-breaker.service";
+import {
+  checkAndIncrementTrades as mockCheckAndIncrementTrades,
+  getCounters as mockGetCounters,
+} from "@/lib/queue/circuit-breaker-redis";
 
 describe("Circuit Breaker Service", () => {
   const testUserId = "test-user-123";
 
   beforeEach(async () => {
+    vi.clearAllMocks();
     // Clean up test data
+    await prisma.circuitBreaker.deleteMany({
+      where: { userId: testUserId },
+    });
+  });
+
+  afterEach(async () => {
     await prisma.circuitBreaker.deleteMany({
       where: { userId: testUserId },
     });
@@ -47,24 +66,21 @@ describe("Circuit Breaker Service", () => {
       expect(breaker).toBeDefined();
       expect(breaker?.maxDailyTrades).toBe(20);
       expect(breaker?.maxLossPercent.toNumber()).toBe(5.0);
-      expect(breaker?.dailyTradesCount).toBe(0);
-      expect(breaker?.dailyLossUsd.toNumber()).toBe(0);
       expect(breaker?.isTripped).toBe(false);
     });
 
-    it("should pass if limits not exceeded", async () => {
-      // Create breaker with some usage but not exceeding limits
+    it("should pass if not tripped and Redis allows", async () => {
+      // Create breaker
       await prisma.circuitBreaker.create({
         data: {
           userId: testUserId,
           maxDailyTrades: 20,
           maxLossPercent: 5.0,
-          dailyTradesCount: 10,
-          dailyLossUsd: 100,
         },
       });
 
       await expect(checkCircuitBreaker(testUserId)).resolves.not.toThrow();
+      expect(mockCheckAndIncrementTrades).toHaveBeenCalledWith(testUserId, 20);
     });
 
     it("should throw CircuitBreakerTrippedError if already tripped", async () => {
@@ -86,144 +102,62 @@ describe("Circuit Breaker Service", () => {
       );
     });
 
-    it("should trip circuit breaker if max daily trades exceeded", async () => {
+    it("should throw CircuitBreakerTrippedError when Redis reports limit exceeded", async () => {
       await prisma.circuitBreaker.create({
         data: {
           userId: testUserId,
           maxDailyTrades: 20,
           maxLossPercent: 5.0,
-          dailyTradesCount: 20, // At limit
         },
       });
+
+      // Mock Redis to throw limit exceeded error
+      vi.mocked(mockCheckAndIncrementTrades).mockRejectedValueOnce(
+        new CircuitBreakerTrippedError(
+          "Max daily trades exceeded (20)",
+          "max_trades",
+          testUserId,
+        ),
+      );
 
       await expect(checkCircuitBreaker(testUserId)).rejects.toThrow(
         CircuitBreakerTrippedError,
       );
-
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker?.isTripped).toBe(true);
-      expect(breaker?.tripReason).toBe("max_trades");
-      expect(breaker?.lastTrippedAt).toBeDefined();
-    });
-
-    it("should trip circuit breaker if max loss amount exceeded", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          maxLossAmount: 1000,
-          dailyLossUsd: 1000, // At limit
-        },
-      });
-
-      await expect(checkCircuitBreaker(testUserId)).rejects.toThrow(
-        CircuitBreakerTrippedError,
-      );
-
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker?.isTripped).toBe(true);
-      expect(breaker?.tripReason).toBe("max_loss");
-    });
-
-    it("should reset counters on new UTC day", async () => {
-      // Create breaker with yesterday's timestamp
-      const yesterday = new Date();
-      yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          dailyTradesCount: 15,
-          dailyLossUsd: 500,
-          isTripped: true,
-          tripReason: "max_trades",
-          lastResetAt: yesterday,
-        },
-      });
-
-      await checkCircuitBreaker(testUserId);
-
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker?.dailyTradesCount).toBe(0);
-      expect(breaker?.dailyLossUsd.toNumber()).toBe(0);
-      expect(breaker?.isTripped).toBe(false);
-      expect(breaker?.tripReason).toBeNull();
     });
   });
 
   describe("incrementTradeCounter", () => {
-    it("should increment daily trades count", async () => {
+    it("should be a no-op (deprecated with atomic pattern)", async () => {
       await prisma.circuitBreaker.create({
         data: {
           userId: testUserId,
           maxDailyTrades: 20,
           maxLossPercent: 5.0,
-          dailyTradesCount: 5,
         },
       });
 
-      await incrementTradeCounter(testUserId);
-
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker?.dailyTradesCount).toBe(6);
+      // This is now a no-op - counter increment happens in checkCircuitBreaker
+      await expect(incrementTradeCounter(testUserId)).resolves.not.toThrow();
     });
   });
 
   describe("recordLoss", () => {
-    it("should increment daily loss", async () => {
+    it("should not throw when loss is recorded", async () => {
       await prisma.circuitBreaker.create({
         data: {
           userId: testUserId,
           maxDailyTrades: 20,
           maxLossPercent: 5.0,
           maxLossAmount: 1000,
-          dailyLossUsd: 100,
         },
       });
 
-      await recordLoss(testUserId, 50);
-
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker?.dailyLossUsd.toNumber()).toBe(150);
+      await expect(recordLoss(testUserId, 50)).resolves.not.toThrow();
     });
 
-    it("should trip circuit breaker if loss limit exceeded", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          maxLossAmount: 1000,
-          dailyLossUsd: 950,
-        },
-      });
-
-      await recordLoss(testUserId, 100); // Total 1050 > 1000
-
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker?.isTripped).toBe(true);
-      expect(breaker?.tripReason).toBe("max_loss");
+    it("should skip if circuit breaker not found", async () => {
+      // No circuit breaker exists for user
+      await expect(recordLoss(testUserId, 50)).resolves.not.toThrow();
     });
   });
 
@@ -271,17 +205,21 @@ describe("Circuit Breaker Service", () => {
   });
 
   describe("getCircuitBreakerStatus", () => {
-    it("should return current status", async () => {
+    it("should return current status with Redis counters", async () => {
       await prisma.circuitBreaker.create({
         data: {
           userId: testUserId,
           maxDailyTrades: 20,
           maxLossPercent: 5.0,
           maxLossAmount: 1000,
-          dailyTradesCount: 10,
-          dailyLossUsd: 250,
           isTripped: false,
         },
+      });
+
+      // Mock Redis counters
+      vi.mocked(mockGetCounters).mockResolvedValueOnce({
+        trades: 10,
+        loss: 250,
       });
 
       const status = await getCircuitBreakerStatus(testUserId);

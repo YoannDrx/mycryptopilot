@@ -186,6 +186,5 @@
   },
   "optionalDependencies": {
     "ioredis": "^5.3.2"
-  },
-  "packageManager": "pnpm@10.14.0"
+  }
 }

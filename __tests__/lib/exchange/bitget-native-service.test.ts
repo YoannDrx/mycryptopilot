@@ -6,7 +6,7 @@ const mockV3 = vi.hoisted(() => ({
   getAccountSettings: vi.fn(),
   getCurrentPosition: vi.fn(),
   getTradeFills: vi.fn(),
-  placeOrder: vi.fn(),
+  submitNewOrder: vi.fn(),
   getOrderInfo: vi.fn(),
   cancelOrder: vi.fn(),
 }));
@@ -53,9 +53,9 @@ describe("BitgetNativeService", () => {
   });
 
   it("throws if passphrase is missing", () => {
-    expect(
-      () => new BitgetNativeService("api", "secret", undefined),
-    ).toThrow("Bitget API passphrase is required");
+    expect(() => new BitgetNativeService("api", "secret", undefined)).toThrow(
+      "Bitget API passphrase is required",
+    );
   });
 
   it("fetches balance in UTA mode", async () => {
@@ -91,7 +91,7 @@ describe("BitgetNativeService", () => {
   });
 
   it("creates an order and maps order info", async () => {
-    mockV3.placeOrder.mockResolvedValue({ data: { orderId: "order-1" } });
+    mockV3.submitNewOrder.mockResolvedValue({ data: { orderId: "order-1" } });
     mockV3.getOrderInfo.mockResolvedValue({
       data: {
         orderId: "order-1",
