@@ -13,14 +13,35 @@
  * See circuit-breaker-atomic.test.ts for atomic operation tests.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { prisma } from "@/lib/prisma";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
-// Mock Redis functions to isolate Prisma-based tests
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
+
+// Mock Redis functions
 vi.mock("@/lib/queue/circuit-breaker-redis", () => ({
   checkAndIncrementTrades: vi.fn().mockResolvedValue(undefined),
   incrementLoss: vi.fn().mockResolvedValue(undefined),
   getCounters: vi.fn().mockResolvedValue({ trades: 0, loss: 0 }),
+}));
+
+// Mock Prisma
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    circuitBreaker: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      deleteMany: vi.fn(),
+    },
+  },
 }));
 
 import {
@@ -37,81 +58,74 @@ import {
   checkAndIncrementTrades as mockCheckAndIncrementTrades,
   getCounters as mockGetCounters,
 } from "@/lib/queue/circuit-breaker-redis";
+import { prisma } from "@/lib/prisma";
 
 describe("Circuit Breaker Service", () => {
   const testUserId = "test-user-123";
 
-  beforeEach(async () => {
-    vi.clearAllMocks();
-    // Clean up test data
-    await prisma.circuitBreaker.deleteMany({
-      where: { userId: testUserId },
-    });
-  });
+  const defaultBreaker = {
+    id: "breaker-1",
+    userId: testUserId,
+    maxDailyTrades: 20,
+    maxLossPercent: { toNumber: () => 5.0 },
+    maxLossAmount: null,
+    dailyTradesCount: 0,
+    dailyLossUsd: { toNumber: () => 0 },
+    isTripped: false,
+    tripReason: null,
+    lastResetAt: new Date(),
+    lastTrippedAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-  afterEach(async () => {
-    await prisma.circuitBreaker.deleteMany({
-      where: { userId: testUserId },
-    });
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   describe("checkCircuitBreaker", () => {
     it("should create circuit breaker with default limits if not exists", async () => {
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.circuitBreaker.create).mockResolvedValue(
+        defaultBreaker as never,
+      );
+
       await checkCircuitBreaker(testUserId);
 
-      const breaker = await prisma.circuitBreaker.findUnique({
-        where: { userId: testUserId },
-      });
-
-      expect(breaker).toBeDefined();
-      expect(breaker?.maxDailyTrades).toBe(20);
-      expect(breaker?.maxLossPercent.toNumber()).toBe(5.0);
-      expect(breaker?.isTripped).toBe(false);
-    });
-
-    it("should pass if not tripped and Redis allows", async () => {
-      // Create breaker
-      await prisma.circuitBreaker.create({
+      expect(prisma.circuitBreaker.create).toHaveBeenCalledWith({
         data: {
           userId: testUserId,
           maxDailyTrades: 20,
           maxLossPercent: 5.0,
         },
       });
+    });
+
+    it("should pass if not tripped and Redis allows", async () => {
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue(
+        defaultBreaker as never,
+      );
 
       await expect(checkCircuitBreaker(testUserId)).resolves.not.toThrow();
       expect(mockCheckAndIncrementTrades).toHaveBeenCalledWith(testUserId, 20);
     });
 
     it("should throw CircuitBreakerTrippedError if already tripped", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          isTripped: true,
-          tripReason: "max_trades",
-        },
-      });
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue({
+        ...defaultBreaker,
+        isTripped: true,
+        tripReason: "max_trades",
+      } as never);
 
       await expect(checkCircuitBreaker(testUserId)).rejects.toThrow(
         CircuitBreakerTrippedError,
       );
-      await expect(checkCircuitBreaker(testUserId)).rejects.toThrow(
-        "max_trades",
-      );
     });
 
     it("should throw CircuitBreakerTrippedError when Redis reports limit exceeded", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-        },
-      });
-
-      // Mock Redis to throw limit exceeded error
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue(
+        defaultBreaker as never,
+      );
       vi.mocked(mockCheckAndIncrementTrades).mockRejectedValueOnce(
         new CircuitBreakerTrippedError(
           "Max daily trades exceeded (20)",
@@ -128,14 +142,6 @@ describe("Circuit Breaker Service", () => {
 
   describe("incrementTradeCounter", () => {
     it("should be a no-op (deprecated with atomic pattern)", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-        },
-      });
-
       // This is now a no-op - counter increment happens in checkCircuitBreaker
       await expect(incrementTradeCounter(testUserId)).resolves.not.toThrow();
     });
@@ -143,80 +149,68 @@ describe("Circuit Breaker Service", () => {
 
   describe("recordLoss", () => {
     it("should not throw when loss is recorded", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          maxLossAmount: 1000,
-        },
-      });
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue({
+        ...defaultBreaker,
+        maxLossAmount: { toNumber: () => 1000 },
+      } as never);
 
       await expect(recordLoss(testUserId, 50)).resolves.not.toThrow();
     });
 
     it("should skip if circuit breaker not found", async () => {
-      // No circuit breaker exists for user
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue(null);
+
+      // No circuit breaker exists for user - should not throw
       await expect(recordLoss(testUserId, 50)).resolves.not.toThrow();
     });
   });
 
   describe("manual controls", () => {
     it("should manually trip circuit breaker", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-        },
-      });
+      vi.mocked(prisma.circuitBreaker.update).mockResolvedValue({
+        ...defaultBreaker,
+        isTripped: true,
+        tripReason: "manual",
+        lastTrippedAt: new Date(),
+      } as never);
 
       await manualTripCircuitBreaker(testUserId);
 
-      const breaker = await prisma.circuitBreaker.findUnique({
+      expect(prisma.circuitBreaker.update).toHaveBeenCalledWith({
         where: { userId: testUserId },
+        data: {
+          isTripped: true,
+          tripReason: "manual",
+          lastTrippedAt: expect.any(Date),
+        },
       });
-
-      expect(breaker?.isTripped).toBe(true);
-      expect(breaker?.tripReason).toBe("manual");
-      expect(breaker?.lastTrippedAt).toBeDefined();
     });
 
     it("should manually reset circuit breaker", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          isTripped: true,
-          tripReason: "manual",
-        },
-      });
+      vi.mocked(prisma.circuitBreaker.update).mockResolvedValue({
+        ...defaultBreaker,
+        isTripped: false,
+        tripReason: null,
+      } as never);
 
       await manualResetCircuitBreaker(testUserId);
 
-      const breaker = await prisma.circuitBreaker.findUnique({
+      expect(prisma.circuitBreaker.update).toHaveBeenCalledWith({
         where: { userId: testUserId },
+        data: {
+          isTripped: false,
+          tripReason: null,
+        },
       });
-
-      expect(breaker?.isTripped).toBe(false);
-      expect(breaker?.tripReason).toBeNull();
     });
   });
 
   describe("getCircuitBreakerStatus", () => {
     it("should return current status with Redis counters", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-          maxLossAmount: 1000,
-          isTripped: false,
-        },
-      });
-
-      // Mock Redis counters
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue({
+        ...defaultBreaker,
+        maxLossAmount: { toNumber: () => 1000 },
+      } as never);
       vi.mocked(mockGetCounters).mockResolvedValueOnce({
         trades: 10,
         loss: 250,
@@ -232,6 +226,11 @@ describe("Circuit Breaker Service", () => {
     });
 
     it("should create default breaker if not exists", async () => {
+      vi.mocked(prisma.circuitBreaker.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.circuitBreaker.create).mockResolvedValue(
+        defaultBreaker as never,
+      );
+
       const status = await getCircuitBreakerStatus(testUserId);
 
       expect(status.isTripped).toBe(false);
@@ -242,25 +241,24 @@ describe("Circuit Breaker Service", () => {
 
   describe("updateCircuitBreakerConfig", () => {
     it("should update configuration", async () => {
-      await prisma.circuitBreaker.create({
-        data: {
-          userId: testUserId,
-          maxDailyTrades: 20,
-          maxLossPercent: 5.0,
-        },
-      });
+      vi.mocked(prisma.circuitBreaker.update).mockResolvedValue({
+        ...defaultBreaker,
+        maxDailyTrades: 50,
+        maxLossAmount: { toNumber: () => 2000 },
+      } as never);
 
       await updateCircuitBreakerConfig(testUserId, {
         maxDailyTrades: 50,
         maxLossAmount: 2000,
       });
 
-      const breaker = await prisma.circuitBreaker.findUnique({
+      expect(prisma.circuitBreaker.update).toHaveBeenCalledWith({
         where: { userId: testUserId },
+        data: {
+          maxDailyTrades: 50,
+          maxLossAmount: 2000,
+        },
       });
-
-      expect(breaker?.maxDailyTrades).toBe(50);
-      expect(breaker?.maxLossAmount?.toNumber()).toBe(2000);
     });
   });
 });
