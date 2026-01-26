@@ -28,7 +28,14 @@
 
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
-import { encryptApiKey, decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  encryptApiKey,
+  decryptApiKey,
+  serializeEncryptedPayload,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
+import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
 import type {
   UserExchangeConnection,
   Exchange,
@@ -48,6 +55,9 @@ export type CreateUserExchangeConnectionInput = {
   /** API Secret (plain text - will be encrypted) */
   apiSecret: string;
 
+  /** Optional passphrase (required for Bitget) */
+  passphrase?: string;
+
   /** Copy trading mode */
   mode: CopyMode;
 };
@@ -59,6 +69,7 @@ export type UpdateUserExchangeConnectionInput = {
   /** Update API credentials (optional) */
   apiKey?: string;
   apiSecret?: string;
+  passphrase?: string | null;
 
   /** Update mode (optional) */
   mode?: CopyMode;
@@ -92,7 +103,7 @@ export type UpdateUserExchangeConnectionInput = {
 export async function createUserExchangeConnection(
   input: CreateUserExchangeConnectionInput,
 ): Promise<UserExchangeConnection> {
-  const { userId, exchange, apiKey, apiSecret, mode } = input;
+  const { userId, exchange, apiKey, apiSecret, passphrase, mode } = input;
 
   // Validation
   if (!userId) {
@@ -144,8 +155,32 @@ export async function createUserExchangeConnection(
   // 3. We're encrypting different plaintext with the same key+IV (acceptable for AES-GCM)
   const encryptedKey = encryptApiKey(apiKey);
   const encryptedSecret = encryptApiKey(apiSecret);
+  const normalizedPassphrase = passphrase?.trim();
+  const encryptedPassphrase = normalizedPassphrase
+    ? serializeEncryptedPayload(encryptApiKey(normalizedPassphrase))
+    : null;
 
   // Create connection
+  let detectedBitgetMode: "UTA" | "CLASSIC" | null = null;
+  if (exchange === "BITGET") {
+    const service = createExchangeService(exchange, apiKey, apiSecret, {
+      passphrase: normalizedPassphrase ?? null,
+    });
+
+    try {
+      const status = await service.testConnection();
+      detectedBitgetMode = status.bitgetAccountMode ?? "UTA";
+    } catch (error) {
+      logger.error("Failed to validate Bitget connection for user", {
+        userId,
+        error,
+      });
+      throw error;
+    } finally {
+      await service.close();
+    }
+  }
+
   const connection = await prisma.userExchangeConnection.create({
     data: {
       userId,
@@ -160,7 +195,9 @@ export async function createUserExchangeConnection(
 
       // Encrypted API secret (with its own IV/tag stored in the same encrypted string)
       // We'll store it as: `${encrypted}:${iv}:${tag}` format
-      encryptedSecretKey: `${encryptedSecret.encrypted}:${encryptedSecret.iv}:${encryptedSecret.tag}`,
+      encryptedSecretKey: serializeEncryptedPayload(encryptedSecret),
+      encryptedPassphrase,
+      bitgetAccountMode: detectedBitgetMode,
     },
   });
 
@@ -232,7 +269,7 @@ export async function getUserConnectionForExchange(
 export async function updateUserExchangeConnection(
   input: UpdateUserExchangeConnectionInput,
 ): Promise<UserExchangeConnection> {
-  const { connectionId, apiKey, apiSecret, mode, isActive } = input;
+  const { connectionId, apiKey, apiSecret, passphrase, mode, isActive } = input;
 
   // Check if connection exists
   const existing = await prisma.userExchangeConnection.findUnique({
@@ -259,6 +296,8 @@ export async function updateUserExchangeConnection(
     keyIv?: string;
     keyTag?: string;
     encryptedSecretKey?: string;
+    encryptedPassphrase?: string | null;
+    bitgetAccountMode?: "UTA" | "CLASSIC" | null;
     lastError?: null;
   } = {};
 
@@ -281,12 +320,58 @@ export async function updateUserExchangeConnection(
   // Update API secret if provided
   if (apiSecret) {
     const encrypted = encryptApiKey(apiSecret);
-    // Store in format: `${encrypted}:${iv}:${tag}`
-    updateData.encryptedSecretKey = `${encrypted.encrypted}:${encrypted.iv}:${encrypted.tag}`;
+    updateData.encryptedSecretKey = serializeEncryptedPayload(encrypted);
+  }
+
+  if (passphrase !== undefined) {
+    const normalized = passphrase?.trim();
+    updateData.encryptedPassphrase = normalized
+      ? serializeEncryptedPayload(encryptApiKey(normalized))
+      : null;
+  }
+
+  const credentialsChanged =
+    apiKey !== undefined ||
+    apiSecret !== undefined ||
+    passphrase !== undefined;
+
+  if (existing.exchange === "BITGET" && credentialsChanged) {
+    const resolvedApiKey =
+      apiKey ??
+      decryptApiKey(existing.encryptedApiKey, existing.keyIv, existing.keyTag);
+    const resolvedSecret =
+      apiSecret ??
+      decryptSerializedPayload(
+        existing.encryptedSecretKey,
+        existing.keyIv,
+        existing.keyTag,
+      );
+    const resolvedPassphrase =
+      passphrase !== undefined
+        ? passphrase?.trim() ?? null
+        : decryptOptionalSerializedPayload(
+            existing.encryptedPassphrase,
+            existing.keyIv,
+            existing.keyTag,
+          );
+
+    const service = createExchangeService(
+      existing.exchange,
+      resolvedApiKey,
+      resolvedSecret,
+      { passphrase: resolvedPassphrase ?? null },
+    );
+
+    try {
+      const status = await service.testConnection();
+      updateData.bitgetAccountMode = status.bitgetAccountMode ?? "UTA";
+    } finally {
+      await service.close();
+    }
   }
 
   // Clear error on update
-  if (apiKey || apiSecret) {
+  if (credentialsChanged) {
     updateData.lastError = null;
   }
 
@@ -351,6 +436,7 @@ export async function deleteUserExchangeConnection(
 export async function getDecryptedCredentials(connectionId: string): Promise<{
   apiKey: string;
   apiSecret: string;
+  passphrase: string | null;
   exchange: Exchange;
   mode: CopyMode;
 }> {
@@ -374,21 +460,21 @@ export async function getDecryptedCredentials(connectionId: string): Promise<{
       connection.keyTag,
     );
 
-    // Decrypt API secret (stored as `${encrypted}:${iv}:${tag}`)
-    const secretParts = connection.encryptedSecretKey.split(":");
-    if (secretParts.length !== 3) {
-      throw new Error("Invalid encrypted secret format");
-    }
-
-    const apiSecret = decryptApiKey(
-      secretParts[0],
-      secretParts[1],
-      secretParts[2],
+    const apiSecret = decryptSerializedPayload(
+      connection.encryptedSecretKey,
+      connection.keyIv,
+      connection.keyTag,
+    );
+    const passphrase = decryptOptionalSerializedPayload(
+      connection.encryptedPassphrase,
+      connection.keyIv,
+      connection.keyTag,
     );
 
     return {
       apiKey,
       apiSecret,
+      passphrase,
       exchange: connection.exchange,
       mode: connection.mode,
     };

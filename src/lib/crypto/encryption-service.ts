@@ -145,6 +145,68 @@ export function decryptApiKey(
 }
 
 /**
+ * Serialize encrypted payload into a single string for storage
+ */
+export function serializeEncryptedPayload(data: EncryptedData): string {
+  return `${data.encrypted}:${data.iv}:${data.tag}`;
+}
+
+/**
+ * Parse an encrypted payload stored as `${cipher}:${iv}:${tag}`
+ * Falls back to provided IV/tag for legacy records without delimiters.
+ */
+export function parseEncryptedPayload(
+  payload: string,
+  fallbackIv: string,
+  fallbackTag: string,
+): EncryptedData {
+  const segments = payload.split(":");
+  if (segments.length === 3) {
+    const [encrypted, iv, tag] = segments;
+    return { encrypted, iv, tag };
+  }
+
+  return {
+    encrypted: payload,
+    iv: fallbackIv,
+    tag: fallbackTag,
+  };
+}
+
+/**
+ * Decrypt a payload that was serialized via serializeEncryptedPayload
+ */
+export function decryptSerializedPayload(
+  payload: string,
+  fallbackIv: string,
+  fallbackTag: string,
+): string {
+  const parsed = parseEncryptedPayload(payload, fallbackIv, fallbackTag);
+  return decryptApiKey(parsed.encrypted, parsed.iv, parsed.tag);
+}
+
+/**
+ * Convenience helper that encrypts and serializes a plaintext value.
+ */
+export function encryptAndSerialize(plaintext: string): string {
+  return serializeEncryptedPayload(encryptApiKey(plaintext));
+}
+
+/**
+ * Decrypt optional serialized payloads, returning null if empty.
+ */
+export function decryptOptionalSerializedPayload(
+  payload: string | null | undefined,
+  fallbackIv: string,
+  fallbackTag: string,
+): string | null {
+  if (!payload) {
+    return null;
+  }
+  return decryptSerializedPayload(payload, fallbackIv, fallbackTag);
+}
+
+/**
  * Verify that encryption/decryption cycle works correctly
  *
  * Used for testing and health checks

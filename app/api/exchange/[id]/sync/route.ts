@@ -6,19 +6,21 @@
  * Triggers manual synchronization of exchange trades:
  * - Verifies ownership
  * - Checks rate limiting based on plan (PRO=5min, ULTRA=1min)
- * - Schedules immediate sync by setting nextSyncAt to now
- * - Cron job will pick it up in next run
+ * - Runs the sync immediately (no cron dependency)
  *
  * @see https://github.com/YoannDrx/mycryptopilot/issues/66
  */
 
 import { authRoute } from "@/lib/zod-route";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { getExchangeConnectionById } from "@/features/exchange/exchange-queries";
 import { getSyncInterval } from "@/features/exchange/exchange-plan-limits";
 import { ZodRouteError } from "@/lib/errors/zod-route-error";
+import {
+  syncConnectionTrades,
+  type ConnectionWithPlan,
+} from "@/lib/exchange/sync-service";
 
 export const POST = authRoute
   .params(
@@ -90,25 +92,36 @@ export const POST = authRoute
       }
     }
 
-    // Schedule immediate sync (cron job will pick it up)
-    await prisma.exchangeConnection.update({
-      where: { id: connectionId },
-      data: {
-        nextSyncAt: new Date(), // Now = ready for sync
-        updatedAt: new Date(),
-      },
-    });
+    // Run sync immediately instead of waiting for cron
+    const syncResult = await syncConnectionTrades(
+      connection as ConnectionWithPlan,
+    );
 
-    logger.info("Manual sync scheduled successfully", {
+    if (!syncResult.success) {
+      logger.error("Manual sync failed", {
+        userId,
+        connectionId,
+        exchange: connection.exchange,
+        error: syncResult.error,
+      });
+
+      throw new ZodRouteError(
+        syncResult.error ?? "Failed to sync trades",
+        500,
+      );
+    }
+
+    logger.info("Manual sync completed successfully", {
       userId,
       connectionId,
       exchange: connection.exchange,
+      tradesImported: syncResult.tradesImported,
     });
 
     return {
       success: true,
-      message: `${connection.exchange} sync scheduled. Trades will update shortly.`,
+      message: `${connection.exchange} synced. Imported ${syncResult.tradesImported} trade${syncResult.tradesImported === 1 ? "" : "s"}.`,
       exchange: connection.exchange,
-      scheduledAt: new Date().toISOString(),
+      lastSyncedAt: new Date().toISOString(),
     };
   });

@@ -24,7 +24,7 @@ import {
 } from "@/lib/trading/trader-trade-queries";
 
 const TradeStatusSchema = z.enum(["OPEN", "CLOSED", "PARTIAL"]);
-const TradeSourceSchema = z.enum(["BINANCE", "BYBIT", "MANUAL"]);
+const TradeSourceSchema = z.enum(["BINANCE", "BYBIT", "BITGET", "MANUAL"]);
 
 export const GET = authRoute
   .params(

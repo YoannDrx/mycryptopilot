@@ -35,10 +35,10 @@ import {
   Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { TraderTrade } from "@/generated/prisma";
+import type { SerializableTraderTrade } from "@/features/trader-trade/trader-trade-serializer";
 
 type TradeHistoryTableProps = {
-  trades: TraderTrade[];
+  trades: SerializableTraderTrade[];
   className?: string;
   pageSize?: number;
 };

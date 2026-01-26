@@ -19,12 +19,13 @@ import {
   deleteManualTrade,
 } from "@/lib/trading/manual-trade.service";
 import { aggregateTraderFills } from "@/lib/trading/fill-aggregation.service";
+import { serializeTraderTrade } from "./trader-trade-serializer";
 
 // ============= Schemas =============
 
 const GetTraderTradesSchema = z.object({
   status: z.enum(["OPEN", "CLOSED", "PARTIAL"]).optional(),
-  source: z.enum(["BINANCE", "BYBIT", "MANUAL"]).optional(),
+  source: z.enum(["BINANCE", "BYBIT", "BITGET", "MANUAL"]).optional(),
   symbol: z.string().optional(),
   limit: z.number().min(1).max(100).default(100),
 });
@@ -95,7 +96,7 @@ export const getTraderTradesAction = authAction
     const where: {
       traderProfileId: string;
       status?: "OPEN" | "CLOSED" | "PARTIAL";
-      source?: "BINANCE" | "BYBIT" | "MANUAL";
+      source?: "BINANCE" | "BYBIT" | "BITGET" | "MANUAL";
       symbol?: string;
     } = {
       traderProfileId: traderProfile.id,
@@ -143,7 +144,7 @@ export const getTraderTradesAction = authAction
       count: trades.length,
     });
 
-    return trades;
+    return trades.map((trade) => serializeTraderTrade(trade));
   });
 
 /**
@@ -197,7 +198,7 @@ export const getTraderTradeByIdAction = authAction
       tradeId: parsedInput.tradeId,
     });
 
-    return trade;
+    return serializeTraderTrade(trade);
   });
 
 /**

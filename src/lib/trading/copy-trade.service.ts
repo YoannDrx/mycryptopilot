@@ -22,7 +22,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
+import { recordLoss } from "@/lib/queue/circuit-breaker.service";
 import type { CopyTrade, TraderTrade, User } from "@/generated/prisma";
+import { invalidateCachedBalance } from "@/lib/exchange/balance-cache.service";
 
 // ============= Types =============
 
@@ -250,6 +252,34 @@ export async function executeCopyTrade(
     slippage,
   });
 
+  // Invalidate balance cache after trade execution
+  // This forces fresh balance fetch on next position sizing call
+  try {
+    const userExchange = await prisma.userExchangeConnection.findFirst({
+      where: {
+        userId: copyTrade.userId,
+        isActive: true,
+      },
+      select: {
+        exchange: true,
+      },
+    });
+
+    if (userExchange) {
+      await invalidateCachedBalance(copyTrade.userId, userExchange.exchange);
+      logger.debug("Balance cache invalidated after trade execution", {
+        userId: copyTrade.userId,
+        exchange: userExchange.exchange,
+      });
+    }
+  } catch (error) {
+    // Don't fail the whole operation if cache invalidation fails
+    logger.warn("Failed to invalidate balance cache after trade execution", {
+      userId: copyTrade.userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
   return updatedCopy;
 }
 
@@ -286,14 +316,24 @@ export async function cancelCopyTrade(copyTradeId: string): Promise<CopyTrade> {
 
 /**
  * Mark copy trade as failed
+ *
+ * Phase 2.2 - Enhanced error tracking with errorCode and errorDetails
+ *
+ * @param copyTradeId - ID of the copy trade to mark as failed
+ * @param reason - Human-readable reason for failure
+ * @param errorCode - Standardized error code (e.g., CIRCUIT_BREAKER_TRIPPED, INSUFFICIENT_BALANCE)
+ * @param errorDetails - Full error details for debugging (stack trace, etc.)
  */
 export async function failCopyTrade(
   copyTradeId: string,
   reason: string,
+  errorCode?: string,
+  errorDetails?: string,
 ): Promise<CopyTrade> {
   logger.error("Marking copy trade as failed", {
     copyTradeId,
     reason,
+    errorCode,
   });
 
   const updatedCopy = await prisma.copyTrade.update({
@@ -301,6 +341,8 @@ export async function failCopyTrade(
     data: {
       status: "FAILED",
       notes: `Failed: ${reason}`,
+      errorCode: errorCode ?? null,
+      errorDetails: errorDetails ?? null,
     },
   });
 
@@ -609,7 +651,7 @@ export async function closeOriginalTradeCopies(
     }
 
     // Update the copy trade with exit information
-    return prisma.copyTrade.update({
+    const updatedCopy = await prisma.copyTrade.update({
       where: { id: copy.id },
       data: {
         manualExit: exitPrice,
@@ -620,6 +662,28 @@ export async function closeOriginalTradeCopies(
           : `Closed at $${exitPrice.toFixed(2)} (PnL: ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} USDT)`,
       },
     });
+
+    // Record loss in circuit breaker if PnL is negative
+    if (pnl < 0 && copy.mode === "AUTO") {
+      const lossUsd = Math.abs(pnl);
+      try {
+        await recordLoss(copy.userId, lossUsd);
+        logger.info("Loss recorded in circuit breaker", {
+          userId: copy.userId,
+          copyTradeId: copy.id,
+          lossUsd,
+        });
+      } catch (error) {
+        logger.error("Failed to record loss in circuit breaker", {
+          userId: copy.userId,
+          copyTradeId: copy.id,
+          lossUsd,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    return updatedCopy;
   });
 
   // Execute all updates in parallel

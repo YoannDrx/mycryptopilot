@@ -32,8 +32,16 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 const decryptMock = vi.hoisted(() => vi.fn().mockReturnValue("decrypted-key"));
+const decryptSerializedPayloadMock = vi.hoisted(() =>
+  vi.fn().mockReturnValue("decrypted-secret"),
+);
+const decryptOptionalSerializedPayloadMock = vi.hoisted(() =>
+  vi.fn().mockReturnValue(null),
+);
 vi.mock("@/lib/crypto/encryption-service", () => ({
   decryptApiKey: decryptMock,
+  decryptSerializedPayload: decryptSerializedPayloadMock,
+  decryptOptionalSerializedPayload: decryptOptionalSerializedPayloadMock,
 }));
 
 const exchangeServiceMocks = vi.hoisted(() => ({
@@ -119,6 +127,8 @@ describe("syncConnectionTrades", () => {
     planLimitMocks.calculateNextSyncAt.mockReturnValue(
       new Date("2025-12-11T00:00:00Z"),
     );
+    decryptSerializedPayloadMock.mockReset();
+    decryptOptionalSerializedPayloadMock.mockReset();
     sendSyncFailureNotificationMock.mockReset();
   });
 
@@ -155,7 +165,9 @@ describe("syncConnectionTrades", () => {
 
     mockExchangeService.fetchRecentTrades.mockResolvedValue(trades);
     prismaMocks.upsert.mockResolvedValue({ success: true });
-    prismaMocks.findMany.mockResolvedValue(trades);
+    prismaMocks.findMany
+      .mockResolvedValueOnce([{ symbol: "BTCUSDT" }, { symbol: "ETHUSDT" }])
+      .mockResolvedValueOnce(trades);
 
     const result = await syncConnectionTrades(
       connection as unknown as Parameters<typeof syncConnectionTrades>[0],
@@ -193,6 +205,7 @@ describe("syncConnectionTrades", () => {
     mockExchangeService.fetchRecentTrades.mockRejectedValue(
       new Error("RPC down"),
     );
+    prismaMocks.findMany.mockResolvedValue([]);
 
     const result = await syncConnectionTrades(
       connection as unknown as Parameters<typeof syncConnectionTrades>[0],

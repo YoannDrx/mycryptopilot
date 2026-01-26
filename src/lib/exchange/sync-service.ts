@@ -27,11 +27,16 @@
 
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
-import { decryptApiKey } from "@/lib/crypto/encryption-service";
+import {
+  decryptApiKey,
+  decryptSerializedPayload,
+  decryptOptionalSerializedPayload,
+} from "@/lib/crypto/encryption-service";
 import {
   createExchangeService,
   type ExchangeService,
 } from "@/lib/exchange/exchange-service-factory";
+import { mapNormalizedOrderTypeToPrisma } from "@/lib/exchange/order-type.utils";
 import type { ExchangeConnection } from "@/generated/prisma";
 import { calculateNextSyncAt } from "@/features/exchange/exchange-plan-limits";
 import { sendSyncFailureNotification } from "@/lib/exchange/email-notifications";
@@ -50,6 +55,7 @@ type ConnectionWithPlan = ExchangeConnection & {
     };
   };
 };
+export type { ConnectionWithPlan };
 
 /**
  * Sync trades for a single exchange connection
@@ -77,8 +83,13 @@ export async function syncConnectionTrades(
       connection.keyIv,
       connection.keyTag,
     );
-    const secretKey = decryptApiKey(
+    const secretKey = decryptSerializedPayload(
       connection.encryptedSecretKey,
+      connection.keyIv,
+      connection.keyTag,
+    );
+    const passphrase = decryptOptionalSerializedPayload(
+      connection.encryptedPassphrase,
       connection.keyIv,
       connection.keyTag,
     );
@@ -88,7 +99,19 @@ export async function syncConnectionTrades(
       connection.exchange,
       apiKey,
       secretKey,
+      {
+        passphrase,
+        bitgetAccountMode: connection.bitgetAccountMode ?? undefined,
+      },
     );
+
+    // Determine symbols already stored for this connection
+    const existingSymbols = await prisma.exchangeTrade.findMany({
+      where: { connectionId: connection.id },
+      distinct: ["symbol"],
+      select: { symbol: true },
+    });
+    const knownSymbols = existingSymbols.map((record) => record.symbol);
 
     // 3. Determine sync period
     // First sync: get last 30 days
@@ -113,6 +136,7 @@ export async function syncConnectionTrades(
     const trades = await exchangeService.fetchRecentTrades(
       daysSince,
       sinceDate,
+      knownSymbols,
     );
 
     logger.info("Trades fetched from exchange", {
@@ -123,8 +147,10 @@ export async function syncConnectionTrades(
 
     // 5. Upsert trades to database (idempotent via externalOrderId)
     // Use Promise.all to parallelize inserts (faster than sequential)
-    const upsertPromises = trades.map(async (trade) =>
-      prisma.exchangeTrade
+    const upsertPromises = trades.map(async (trade) => {
+      const orderType = mapNormalizedOrderTypeToPrisma(trade.type);
+
+      return prisma.exchangeTrade
         .upsert({
           where: {
             externalOrderId: trade.externalOrderId,
@@ -133,16 +159,16 @@ export async function syncConnectionTrades(
             // Update fields that might change (e.g., realized PnL for futures)
             realizedPnl: trade.realizedPnl,
           },
-          create: {
-            connectionId: connection.id,
-            externalOrderId: trade.externalOrderId,
-            symbol: trade.symbol,
-            side: trade.side,
-            type: trade.type,
-            quantity: trade.quantity,
-            price: trade.price,
-            quoteQuantity: trade.quoteQuantity,
-            fee: trade.fee,
+            create: {
+              connectionId: connection.id,
+              externalOrderId: trade.externalOrderId,
+              symbol: trade.symbol,
+              side: trade.side,
+              type: orderType,
+              quantity: trade.quantity,
+              price: trade.price,
+              quoteQuantity: trade.quoteQuantity,
+              fee: trade.fee,
             feeAsset: trade.feeAsset,
             realizedPnl: trade.realizedPnl,
             executedAt: trade.executedAt,
@@ -157,8 +183,8 @@ export async function syncConnectionTrades(
             error,
           });
           return { success: false };
-        }),
-    );
+        });
+    });
 
     const upsertResults = await Promise.all(upsertPromises);
     const importedCount = upsertResults.filter((r) => r.success).length;
@@ -178,7 +204,21 @@ export async function syncConnectionTrades(
     });
 
     // 7. Aggregate new fills into TraderTrade positions
-    if (importedCount > 0) {
+    let shouldAggregate = importedCount > 0;
+
+    if (!shouldAggregate) {
+      const pendingFill = await prisma.exchangeTrade.findFirst({
+        where: {
+          connectionId: connection.id,
+          traderTradeId: null,
+        },
+        select: { id: true },
+      });
+
+      shouldAggregate = Boolean(pendingFill);
+    }
+
+    if (shouldAggregate) {
       logger.info("Aggregating new fills into trading positions", {
         connectionId: connection.id,
         traderProfileId: connection.traderProfileId,

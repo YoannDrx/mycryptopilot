@@ -12,10 +12,13 @@ import { Search } from "lucide-react";
 import { useQueryStates, parseAsString } from "nuqs";
 
 export function TraderFilters() {
-  const [filters, setFilters] = useQueryStates({
-    q: parseAsString.withDefault(""),
-    verified: parseAsString.withDefault("all"),
-  });
+  const [filters, setFilters] = useQueryStates(
+    {
+      q: parseAsString.withDefault(""),
+      verified: parseAsString.withDefault("all"),
+    },
+    { shallow: false },
+  );
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row">

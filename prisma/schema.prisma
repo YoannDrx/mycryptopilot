@@ -21,19 +21,20 @@ model Feedback {
 }
 
 model TraderProfile {
-  id                    String                       @id @default(cuid())
-  userId                String                       @unique
-  displayName           String
-  bio                   String?
-  statsJson             Json?
-  verified              Boolean                      @default(false)
-  verifiedAt            DateTime?
-  createdAt             DateTime                     @default(now())
-  updatedAt             DateTime                     @updatedAt
-  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exchangeConnections   ExchangeConnection[]
-  performanceSnapshots  TraderPerformanceSnapshot[]
-  traderTrades          TraderTrade[]
+  id                   String                      @id @default(cuid())
+  userId               String                      @unique
+  displayName          String
+  bio                  String?
+  statsJson            Json?
+  verified             Boolean                     @default(false)
+  verifiedAt           DateTime?
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+  user                 User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchangeConnections  ExchangeConnection[]
+  performanceSnapshots TraderPerformanceSnapshot[]
+  traderTrades         TraderTrade[]
+  autoCopyPreferences  AutoCopyPreference[] // Users who auto-copy this trader
 
   @@map("trader_profile")
 }
@@ -43,14 +44,16 @@ model ExchangeConnection {
   traderProfileId    String
   trader             TraderProfile   @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
   exchange           Exchange
+  bitgetAccountMode  BitgetAccountMode?
   encryptedApiKey    String          @db.Text
   encryptedSecretKey String          @db.Text
+  encryptedPassphrase String?        @db.Text
   keyIv              String
   keyTag             String
   isActive           Boolean         @default(true)
   lastSyncedAt       DateTime?
   lastSyncError      String?         @db.Text
-  lastEmailSentAt    DateTime?       // Email rate limiting (max 1/day)
+  lastEmailSentAt    DateTime? // Email rate limiting (max 1/day)
   nextSyncAt         DateTime?
   trades             ExchangeTrade[]
   createdAt          DateTime        @default(now())
@@ -66,7 +69,7 @@ model ExchangeTrade {
   id              String             @id @default(cuid())
   connectionId    String
   connection      ExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
-  traderTradeId   String?            // NOUVEAU: Lien vers TraderTrade agrégé
+  traderTradeId   String? // NOUVEAU: Lien vers TraderTrade agrégé
   traderTrade     TraderTrade?       @relation(fields: [traderTradeId], references: [id])
   externalOrderId String             @unique
   symbol          String
@@ -125,8 +128,8 @@ model CryptoAddress {
   address        String          @unique
   derivationPath String?
   isActive       Boolean         @default(true)
-  sweptAt        DateTime?       // Timestamp when funds were swept to Binance
-  sweptTxHash    String?         // Transaction hash of the sweep transaction
+  sweptAt        DateTime? // Timestamp when funds were swept to Binance
+  sweptTxHash    String? // Transaction hash of the sweep transaction
   createdAt      DateTime        @default(now())
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   payments       CryptoPayment[]
@@ -181,17 +184,17 @@ model CryptoPayment {
 }
 
 model Signal {
-  id            String        @id @default(cuid())
+  id            String       @id @default(cuid())
   traderId      String
   symbol        String
   payloadJson   Json
   ttlSec        Int
-  hash          String        @unique
-  linkedTradeId String?       // NOUVEAU: Lien vers TraderTrade
-  createdAt     DateTime      @default(now())
+  hash          String       @unique
+  linkedTradeId String? // NOUVEAU: Lien vers TraderTrade
+  createdAt     DateTime     @default(now())
   expiresAt     DateTime
-  trader        User          @relation(fields: [traderId], references: [id], onDelete: Cascade)
-  linkedTrade   TraderTrade?  @relation(fields: [linkedTradeId], references: [id])
+  trader        User         @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  linkedTrade   TraderTrade? @relation(fields: [linkedTradeId], references: [id])
 
   @@index([traderId])
   @@index([createdAt])
@@ -200,36 +203,36 @@ model Signal {
 }
 
 model TraderInvitation {
-  id                  String           @id @default(cuid())
-  traderId            String
-  email               String
-  token               String           @unique
-  status              InvitationStatus @default(PENDING)
-  expiresAt           DateTime
-  acceptedAt          DateTime?
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
+  id         String           @id @default(cuid())
+  traderId   String
+  email      String
+  token      String           @unique
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 
   // Nouveaux champs pour système de referral avancé
   source              InvitationSource @default(EMAIL)
   customMessage       String?
   landingViews        Int              @default(0)
-  clickedAt           DateTime?        // Première visite landing page
+  clickedAt           DateTime? // Première visite landing page
   creditsAwarded      Int              @default(0) // Total credits donnés pour cette invite
   inviteeActive       Boolean          @default(false) // 30+ jours actif
   inviteeUpgraded     Boolean          @default(false)
-  inviteeUpgradedPlan String?          // "pro" ou "ultra"
+  inviteeUpgradedPlan String? // "pro" ou "ultra"
   inviteeUpgradedAt   DateTime?
-  personalMessage     String?          // Message personnalisé du trader (optionnel)
+  personalMessage     String? // Message personnalisé du trader (optionnel)
 
   // Anti-gaming & fraud detection
-  signupIp            String?          // IP address du signup (détection same IP)
-  isSuspicious        Boolean          @default(false) // Flagged for review
-  suspiciousReason    String?          // Reason for flagging
-  reviewedAt          DateTime?        // When admin reviewed
-  reviewedBy          String?          // Admin user ID who reviewed
+  signupIp         String? // IP address du signup (détection same IP)
+  isSuspicious     Boolean   @default(false) // Flagged for review
+  suspiciousReason String? // Reason for flagging
+  reviewedAt       DateTime? // When admin reviewed
+  reviewedBy       String? // Admin user ID who reviewed
 
-  trader              User             @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  trader User @relation(fields: [traderId], references: [id], onDelete: Cascade)
 
   @@unique([traderId, email])
   @@index([token])
@@ -242,10 +245,10 @@ model TraderInvitation {
 model ReferralCredit {
   id        String     @id @default(cuid())
   traderId  String
-  amount    Int        // Peut être négatif (dépense)
+  amount    Int // Peut être négatif (dépense)
   type      CreditType
   reason    String?
-  metadata  Json?      // { inviteeId, plan, etc. }
+  metadata  Json? // { inviteeId, plan, etc. }
   createdAt DateTime   @default(now())
   trader    User       @relation(fields: [traderId], references: [id], onDelete: Cascade)
 
@@ -259,7 +262,7 @@ model ReferralReward {
   id             String   @id @default(cuid())
   traderId       String
   inviteeId      String?
-  action         String   // "signup", "active_30d", "upgrade_pro", etc.
+  action         String // "signup", "active_30d", "upgrade_pro", etc.
   creditsAwarded Int
   metadata       Json?
   createdAt      DateTime @default(now())
@@ -287,17 +290,17 @@ model ReferralTier {
 }
 
 model FraudLog {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   traderId    String?
   userId      String?
-  type        String   // "SAME_IP", "DISPOSABLE_EMAIL", "RAPID_SIGNUPS", "INACTIVE_USER", etc.
+  type        String // "SAME_IP", "DISPOSABLE_EMAIL", "RAPID_SIGNUPS", "INACTIVE_USER", etc.
   description String
-  metadata    Json?    // Additional context (IP, email, etc.)
-  severity    String   // "LOW", "MEDIUM", "HIGH", "CRITICAL"
-  resolved    Boolean  @default(false)
+  metadata    Json? // Additional context (IP, email, etc.)
+  severity    String // "LOW", "MEDIUM", "HIGH", "CRITICAL"
+  resolved    Boolean   @default(false)
   resolvedAt  DateTime?
-  resolvedBy  String?  // Admin user ID
-  createdAt   DateTime @default(now())
+  resolvedBy  String? // Admin user ID
+  createdAt   DateTime  @default(now())
 
   @@index([traderId])
   @@index([userId])
@@ -313,50 +316,50 @@ model FraudLog {
 // ============================================================================
 
 model TraderTrade {
-  id               String             @id @default(cuid())
-  traderProfileId  String
-  trader           TraderProfile      @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+  id              String        @id @default(cuid())
+  traderProfileId String
+  trader          TraderProfile @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
 
   // Source & Type
-  source           TradeSource        // BINANCE, BYBIT, MANUAL
-  instrumentType   InstrumentType     // SPOT, FUTURES
-  symbol           String             // e.g., "BTC/USDT"
+  source         TradeSource // BINANCE, BYBIT, MANUAL
+  instrumentType InstrumentType // SPOT, FUTURES
+  symbol         String // e.g., "BTC/USDT"
 
   // Position Data
-  status           TradeStatus        // OPEN, CLOSED, PARTIAL
-  side             TradeSide          // BUY, SELL (LONG, SHORT for Futures)
+  status TradeStatus // OPEN, CLOSED, PARTIAL
+  side   TradeSide // BUY, SELL (LONG, SHORT for Futures)
 
   // Quantities & Prices
-  totalQuantity    Decimal            @db.Decimal(20, 8)  // DEPRECATED: kept for backward compatibility
-  entryQuantity    Decimal            @default(0) @db.Decimal(20, 8)  // Total quantity bought/longed
-  exitQuantity     Decimal            @default(0) @db.Decimal(20, 8)  // Total quantity sold/shorted
-  netQuantity      Decimal            @default(0) @db.Decimal(20, 8)  // entryQuantity - exitQuantity (current position)
-  averageEntry     Decimal            @db.Decimal(20, 8)  // Average entry price
-  averageExit      Decimal?           @db.Decimal(20, 8)  // Average exit price (if closed)
+  totalQuantity Decimal  @db.Decimal(20, 8) // DEPRECATED: kept for backward compatibility
+  entryQuantity Decimal  @default(0) @db.Decimal(20, 8) // Total quantity bought/longed
+  exitQuantity  Decimal  @default(0) @db.Decimal(20, 8) // Total quantity sold/shorted
+  netQuantity   Decimal  @default(0) @db.Decimal(20, 8) // entryQuantity - exitQuantity (current position)
+  averageEntry  Decimal  @db.Decimal(20, 8) // Average entry price
+  averageExit   Decimal? @db.Decimal(20, 8) // Average exit price (if closed)
 
   // Risk Management
-  stopLoss         Decimal?           @db.Decimal(20, 8)  // NULL for exchange trades (Phase 1)
-  takeProfit       Json?              // Array of TPs, NULL for exchange trades
+  stopLoss   Decimal? @db.Decimal(20, 8) // NULL for exchange trades (Phase 1)
+  takeProfit Json? // Array of TPs, NULL for exchange trades
 
   // Performance
-  realizedPnl      Decimal?           @db.Decimal(20, 8)  // PnL if closed
-  fees             Decimal            @db.Decimal(20, 8)  // Total fees
+  realizedPnl Decimal? @db.Decimal(20, 8) // PnL if closed
+  fees        Decimal  @db.Decimal(20, 8) // Total fees
 
   // Metadata
-  notes            String?            @db.Text            // Optional notes for manual trades
+  notes String? @db.Text // Optional notes for manual trades
 
   // Timestamps
-  openedAt         DateTime           // First entry
-  closedAt         DateTime?          // Last exit (if closed)
-  lastActivityAt   DateTime           // Last modification
+  openedAt       DateTime // First entry
+  closedAt       DateTime? // Last exit (if closed)
+  lastActivityAt DateTime // Last modification
 
   // Relations
-  fills            ExchangeTrade[]    // Raw fills from exchange (if source != MANUAL)
-  signals          Signal[]           // Signals created from this trade
-  copies           CopyTrade[]        // Copies by users
+  fills   ExchangeTrade[] // Raw fills from exchange (if source != MANUAL)
+  signals Signal[] // Signals created from this trade
+  copies  CopyTrade[] // Copies by users
 
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([traderProfileId, status])
   @@index([symbol])
@@ -365,69 +368,100 @@ model TraderTrade {
 }
 
 model UserExchangeConnection {
-  id                 String        @id @default(cuid())
-  userId             String
-  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exchange           Exchange      // BINANCE, BYBIT
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchange Exchange // BINANCE, BYBIT
+  bitgetAccountMode BitgetAccountMode?
 
   // Encrypted API credentials
-  encryptedApiKey    String        @db.Text
-  encryptedSecretKey String        @db.Text
+  encryptedApiKey    String @db.Text
+  encryptedSecretKey String @db.Text
+  encryptedPassphrase String? @db.Text
   keyIv              String
   keyTag             String
 
   // Configuration
-  mode               CopyMode      // MANUAL, AUTO
-  isActive           Boolean       @default(true)
+  mode     CopyMode // MANUAL, AUTO
+  isActive Boolean  @default(true)
 
   // Metadata
-  lastSyncedAt       DateTime?
-  lastError          String?       @db.Text
+  lastSyncedAt DateTime?
+  lastError    String?   @db.Text
+  lastHealthCheckAt DateTime?
+  balanceSnapshots   UserExchangeBalanceSnapshot[]
 
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, exchange])
   @@index([userId])
   @@map("user_exchange_connection")
 }
 
+model UserExchangeBalanceSnapshot {
+  id             String   @id @default(cuid())
+  connectionId   String
+  connection     UserExchangeConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchange       Exchange
+  totalEquityUsd Decimal  @db.Decimal(32, 8)
+  availableUsd   Decimal  @db.Decimal(32, 8)
+  lockedUsd      Decimal  @db.Decimal(32, 8)
+  spotEquityUsd     Decimal? @db.Decimal(32, 8)
+  futuresEquityUsd  Decimal? @db.Decimal(32, 8)
+  marginEquityUsd   Decimal? @db.Decimal(32, 8)
+  payloadJson     Json?
+  capturedAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([connectionId, capturedAt])
+  @@index([userId, capturedAt])
+  @@map("user_exchange_balance_snapshot")
+}
+
 model CopyTrade {
-  id                String        @id @default(cuid())
-  userId            String
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Source
-  originalTradeId   String        // TraderTrade.id
-  originalTrade     TraderTrade   @relation(fields: [originalTradeId], references: [id], onDelete: Cascade)
+  originalTradeId String // TraderTrade.id
+  originalTrade   TraderTrade @relation(fields: [originalTradeId], references: [id], onDelete: Cascade)
 
   // Copy Configuration
-  mode              CopyMode      // MANUAL, AUTO
-  status            CopyStatus    // PENDING, EXECUTED, FAILED, CANCELLED
+  mode   CopyMode // MANUAL, AUTO
+  status CopyStatus // PENDING, EXECUTED, FAILED, CANCELLED
 
   // Execution (if AUTO)
-  exchangeOrderId   String?       // Order ID on user's exchange
-  executedPrice     Decimal?      @db.Decimal(20, 8)  // Actual execution price
-  executedQuantity  Decimal?      @db.Decimal(20, 8)  // Actual executed quantity
-  slippage          Decimal?      @db.Decimal(10, 4)  // Price difference percentage
+  exchangeOrderId  String? // Order ID on user's exchange
+  executedPrice    Decimal? @db.Decimal(20, 8) // Actual execution price
+  executedQuantity Decimal? @db.Decimal(20, 8) // Actual executed quantity
+  slippage         Decimal? @db.Decimal(10, 4) // Price difference percentage
 
   // Manual tracking (if MANUAL)
-  manualEntry       Decimal?      @db.Decimal(20, 8)  // Manual entry price
-  manualExit        Decimal?      @db.Decimal(20, 8)  // Manual exit price
-  manualPnl         Decimal?      @db.Decimal(20, 8)  // Manual PnL calculation
-  notes             String?       @db.Text            // Personal notes
+  manualEntry Decimal? @db.Decimal(20, 8) // Manual entry price
+  manualExit  Decimal? @db.Decimal(20, 8) // Manual exit price
+  manualPnl   Decimal? @db.Decimal(20, 8) // Manual PnL calculation
+  notes       String?  @db.Text // Personal notes
+
+  // Error Tracking (Phase 2.2)
+  errorCode    String? // Standardized error code (e.g., CIRCUIT_BREAKER_TRIPPED, INSUFFICIENT_BALANCE)
+  errorDetails String? @db.Text // Full error details for debugging
 
   // Risk Management
-  stopLoss          Decimal?      @db.Decimal(20, 8)  // Custom SL
-  takeProfit        Json?         // Custom TPs
+  stopLoss   Decimal? @db.Decimal(20, 8) // Custom SL
+  takeProfit Json? // Custom TPs
 
   // Timestamps
-  copiedAt          DateTime      @default(now())
-  executedAt        DateTime?     // When executed (if AUTO)
-  closedAt          DateTime?     // When closed
+  copiedAt   DateTime  @default(now())
+  executedAt DateTime? // When executed (if AUTO)
+  closedAt   DateTime? // When closed
 
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, status])
   @@index([originalTradeId])
@@ -435,33 +469,33 @@ model CopyTrade {
 }
 
 model RiskCalculation {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Inputs
-  capital     Decimal  @db.Decimal(20, 2)
-  riskPercent Decimal  @db.Decimal(5, 2)
-  entryPrice  Decimal  @db.Decimal(20, 8)
-  stopLoss    Decimal  @db.Decimal(20, 8)
-  positionType String  // LONG, SHORT
+  capital      Decimal @db.Decimal(20, 2)
+  riskPercent  Decimal @db.Decimal(5, 2)
+  entryPrice   Decimal @db.Decimal(20, 8)
+  stopLoss     Decimal @db.Decimal(20, 8)
+  positionType String // LONG, SHORT
 
   // Take Profit Targets (JSON array)
-  takeProfits Json     // [{ price: number, allocation: number, label?: string }]
+  takeProfits Json // [{ price: number, allocation: number, label?: string }]
 
   // Outputs (pre-calculated for performance)
-  riskAmount       Decimal  @db.Decimal(20, 8)
-  positionSize     Decimal  @db.Decimal(20, 8)
-  contracts        Decimal  @db.Decimal(20, 8)
-  rrRatio          Decimal  @db.Decimal(10, 4)
+  riskAmount   Decimal @db.Decimal(20, 8)
+  positionSize Decimal @db.Decimal(20, 8)
+  contracts    Decimal @db.Decimal(20, 8)
+  rrRatio      Decimal @db.Decimal(10, 4)
 
   // Metadata
-  symbol      String?  // BTC-USDT, ETH-USDT (optional)
-  notes       String?  @db.Text
-  isPreset    Boolean  @default(false) // True if saved as preset
-  presetName  String?  // Name of preset (e.g., "BTC Conservative")
+  symbol     String? // BTC-USDT, ETH-USDT (optional)
+  notes      String? @db.Text
+  isPreset   Boolean @default(false) // True if saved as preset
+  presetName String? // Name of preset (e.g., "BTC Conservative")
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, isPreset])
@@ -512,43 +546,49 @@ enum InvitationStatus {
 }
 
 enum InvitationSource {
-  EMAIL             // Invitation par email (60d trial + 25 credits)
-  LINK              // Referral link public (30d trial)
-  SOCIAL_TWITTER    // Via partage Twitter
-  SOCIAL_TELEGRAM   // Via partage Telegram
-  SOCIAL_WHATSAPP   // Via partage WhatsApp
+  EMAIL // Invitation par email (60d trial + 25 credits)
+  LINK // Referral link public (30d trial)
+  SOCIAL_TWITTER // Via partage Twitter
+  SOCIAL_TELEGRAM // Via partage Telegram
+  SOCIAL_WHATSAPP // Via partage WhatsApp
 }
 
 enum CreditType {
   // Credits earned
-  EARNED_SIGNUP           // +5 credits (invitation acceptée)
-  EARNED_ACTIVE           // +10 credits (30+ jours actif)
-  EARNED_UPGRADE_PRO      // +50 credits (upgrade Pro)
-  EARNED_UPGRADE_ULTRA    // +100 credits (upgrade Ultra)
-  EARNED_RETENTION_3M     // +25 credits (reste 3 mois)
+  EARNED_SIGNUP // +5 credits (invitation acceptée)
+  EARNED_ACTIVE // +10 credits (30+ jours actif)
+  EARNED_UPGRADE_PRO // +50 credits (upgrade Pro)
+  EARNED_UPGRADE_ULTRA // +100 credits (upgrade Ultra)
+  EARNED_RETENTION_3M // +25 credits (reste 3 mois)
 
   // Credits spent
-  SPENT_PRO_MONTH         // -100 credits (1 mois Pro gratuit)
-  SPENT_ULTRA_MONTH       // -200 credits (1 mois Ultra gratuit)
-  SPENT_FEATURED          // -50 credits (Featured placement 1 semaine)
-  SPENT_ANALYTICS         // -30 credits (Analytics premium)
-  SPENT_PROFILE_BOOST     // -75 credits (Profile boost 2x visibility)
-  SPENT_CUSTOM_BADGE      // -150 credits (Custom badge)
+  SPENT_PRO_MONTH // -100 credits (1 mois Pro gratuit)
+  SPENT_ULTRA_MONTH // -200 credits (1 mois Ultra gratuit)
+  SPENT_FEATURED // -50 credits (Featured placement 1 semaine)
+  SPENT_ANALYTICS // -30 credits (Analytics premium)
+  SPENT_PROFILE_BOOST // -75 credits (Profile boost 2x visibility)
+  SPENT_CUSTOM_BADGE // -150 credits (Custom badge)
 
   // Clawback
-  CLAWBACK_FRAUD          // Retrait en cas de fraude détectée
+  CLAWBACK_FRAUD // Retrait en cas de fraude détectée
 }
 
 enum TierLevel {
-  BRONZE                  // 0-9 invités actifs
-  SILVER                  // 10-49 invités actifs
-  GOLD                    // 50-99 invités actifs
-  DIAMOND                 // 100+ invités actifs
+  BRONZE // 0-9 invités actifs
+  SILVER // 10-49 invités actifs
+  GOLD // 50-99 invités actifs
+  DIAMOND // 100+ invités actifs
 }
 
 enum Exchange {
   BINANCE
   BYBIT
+  BITGET
+}
+
+enum BitgetAccountMode {
+  UTA
+  CLASSIC
 }
 
 enum TradeSide {
@@ -579,6 +619,7 @@ enum PerformancePeriod {
 enum TradeSource {
   BINANCE
   BYBIT
+  BITGET
   MANUAL
 }
 
@@ -590,20 +631,20 @@ enum InstrumentType {
 enum TradeStatus {
   OPEN
   CLOSED
-  PARTIAL    // Partially closed
+  PARTIAL // Partially closed
 }
 
 enum CopyMode {
-  MANUAL     // User journal, no execution
-  AUTO       // Automatic execution via API
+  MANUAL // User journal, no execution
+  AUTO // Automatic execution via API
 }
 
 enum CopyStatus {
-  PENDING    // Waiting for execution
-  EXECUTED   // Successfully executed
-  CLOSED     // Position closed
-  FAILED     // Execution failed
-  CANCELLED  // Cancelled by user
+  PENDING // Waiting for execution
+  EXECUTED // Successfully executed
+  CLOSED // Position closed
+  FAILED // Execution failed
+  CANCELLED // Cancelled by user
 }
 
 // ============================================================================
@@ -616,25 +657,92 @@ enum CopyStatus {
 /// Replaces the legacy Organization.Subscription model
 /// Coexists with legacy during Phases 1-7, becomes primary in Phase 8
 model UserSubscription {
-  id                String    @id @default(cuid())
-  userId            String    @unique @map("user_id")
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Plan information
-  plan              String    // "free" | "pro" | "ultra"
-  status            String    // "active" | "trialing" | "expired"
-  periodStart       DateTime? @map("period_start")
-  periodEnd         DateTime? @map("period_end")
-  paymentMethod     String?   @map("payment_method") // "crypto" | "stripe_legacy"
+  plan          String // "free" | "pro" | "ultra"
+  status        String // "active" | "trialing" | "expired"
+  periodStart   DateTime? @map("period_start")
+  periodEnd     DateTime? @map("period_end")
+  paymentMethod String?   @map("payment_method") // "crypto" | "stripe_legacy"
 
   // Audit trail (for migration traceability)
-  migratedFromOrgId String?   @map("migrated_from_org_id")
+  migratedFromOrgId String? @map("migrated_from_org_id")
 
   // Timestamps
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("user_subscriptions")
 }
 
 // LegacyOrgSlug removed - Not needed in Big Bang approach (Issue #77 Phase 1)
+
+// ============================================================================
+// CIRCUIT BREAKER FOR COPY-TRADING (Issue #84 Phase 5)
+// ============================================================================
+
+/// CircuitBreaker: Automatic risk management for copy-trading
+/// Prevents excessive losses and trades per user
+/// Resets daily at midnight UTC
+model CircuitBreaker {
+  id     String @id @default(cuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Daily limits configuration
+  maxDailyTrades Int      @default(20) @map("max_daily_trades") // Max trades per day
+  maxLossPercent Decimal  @default(5.0) @map("max_loss_percent") @db.Decimal(5, 2) // Max loss % of portfolio
+  maxLossAmount  Decimal? @map("max_loss_amount") @db.Decimal(20, 8) // Optional: max loss in USDT
+
+  // Current state (reset daily)
+  dailyTradesCount Int     @default(0) @map("daily_trades_count")
+  dailyLossUsd     Decimal @default(0) @map("daily_loss_usd") @db.Decimal(20, 8)
+  isTripped        Boolean @default(false) @map("is_tripped") // True if circuit breaker activated
+
+  // Metadata
+  tripReason    String?   @map("trip_reason") // Reason for trip: "max_trades" | "max_loss" | "manual"
+  lastTrippedAt DateTime? @map("last_tripped_at")
+  lastResetAt   DateTime  @default(now()) @map("last_reset_at") // Last daily reset
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, isTripped])
+  @@index([lastResetAt])
+  @@map("circuit_breakers")
+}
+
+/// AutoCopyPreference: User preferences for automatic copy-trading
+/// Stores which traders a user wants to auto-copy and with what settings
+/// When a signal is created, all followers with auto-copy enabled will get jobs queued
+model AutoCopyPreference {
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  traderProfileId String        @map("trader_profile_id")
+  traderProfile   TraderProfile @relation(fields: [traderProfileId], references: [id], onDelete: Cascade)
+
+  // Copy settings
+  copyRatio            Float    @default(1.0) @map("copy_ratio") @db.DoublePrecision // Percentage of trader's position size (0.01 to 1.0)
+  maxAmountPerTrade    Decimal? @map("max_amount_per_trade") @db.Decimal(20, 8) // Max USDT amount per trade
+  exchangeConnectionId String?  @map("exchange_connection_id") // Which exchange to use for execution
+
+  // Status
+  isEnabled Boolean @default(true) @map("is_enabled")
+
+  // Stats (for monitoring)
+  totalCopiesMade Int       @default(0) @map("total_copies_made")
+  lastCopiedAt    DateTime? @map("last_copied_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, traderProfileId])
+  @@index([userId, isEnabled])
+  @@index([traderProfileId, isEnabled])
+  @@map("auto_copy_preferences")
+}

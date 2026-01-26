@@ -1,6 +1,24 @@
 import ccxt from "ccxt";
 import { logger } from "@/lib/logger";
 import type { TradeSide, OrderType } from "@/generated/prisma";
+import type {
+  ExchangeAdapter,
+  PaginationOptions,
+  FetchTradesResult,
+} from "./exchange-service-factory";
+import type {
+  ConsolidatedBalance,
+  PositionSnapshot,
+  ConnectionStatus,
+  RateLimitInfo,
+  CreateOrderParams,
+  OrderResult,
+  CancelOrderParams,
+  OrderStatus,
+  NormalizedTrade,
+} from "./types";
+import { createRetryWrapper } from "./retry-logic";
+import { mapCCXTError } from "./errors";
 
 /**
  * Bybit Service
@@ -41,8 +59,9 @@ type ValidationResult = {
   errorMessage?: string;
 };
 
-export class BybitService {
+export class BybitService implements ExchangeAdapter {
   private readonly exchange: InstanceType<typeof ccxt.bybit>;
+  private readonly retry = createRetryWrapper("bybit");
 
   constructor(apiKey: string, secretKey: string) {
     this.exchange = new ccxt.bybit({
@@ -137,10 +156,13 @@ export class BybitService {
   async fetchBalance() {
     try {
       logger.info("Fetching Bybit balance");
-      return await this.exchange.fetchBalance();
+      return await this.retry(
+        async () => this.exchange.fetchBalance(),
+        "fetchBalance",
+      );
     } catch (error) {
-      logger.error("Failed to fetch Bybit balance", { error });
-      throw error;
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "bybit");
     }
   }
 
@@ -155,6 +177,7 @@ export class BybitService {
   async fetchRecentTrades(
     daysSince = 30,
     sinceDate?: Date,
+    _knownSymbols: string[] = [],
   ): Promise<BybitTrade[]> {
     try {
       logger.info("Fetching Bybit trades", {
@@ -197,6 +220,600 @@ export class BybitService {
    */
   async close(): Promise<void> {
     await this.exchange.close();
+  }
+
+  // ==========================================
+  // ExchangeAdapter Interface Implementation
+  // ==========================================
+
+  /**
+   * Fetch consolidated balance (spot + futures + margin)
+   * @implements ExchangeAdapter.fetchConsolidatedBalance
+   */
+  async fetchConsolidatedBalance(): Promise<ConsolidatedBalance> {
+    try {
+      const timestamp = new Date();
+
+      // Fetch spot balance
+      const spotBalance = await this.exchange.fetchBalance();
+
+      // Build spot assets
+      const spotAssets: Record<
+        string,
+        {
+          asset: string;
+          free: number;
+          locked: number;
+          total: number;
+          usdValue?: number;
+        }
+      > = {};
+      const spotTotalUsd = 0;
+
+      for (const [asset, data] of Object.entries(spotBalance)) {
+        if (
+          asset === "info" ||
+          asset === "free" ||
+          asset === "used" ||
+          asset === "total" ||
+          asset === "timestamp" ||
+          asset === "datetime"
+        ) {
+          continue;
+        }
+
+        const balanceData = data as {
+          free?: number;
+          used?: number;
+          total?: number;
+        };
+        if (balanceData.total && balanceData.total > 0) {
+          spotAssets[asset] = {
+            asset,
+            free: balanceData.free ?? 0,
+            locked: balanceData.used ?? 0,
+            total: balanceData.total,
+            usdValue: undefined, // TODO: Add price conversion
+          };
+        }
+      }
+
+      // Fetch futures balance if enabled
+      let futuresBalance = null;
+      try {
+        const futuresData = await this.exchange.fetchBalance({
+          type: "future",
+        });
+        const futuresAssets: Record<
+          string,
+          {
+            asset: string;
+            free: number;
+            locked: number;
+            total: number;
+            usdValue?: number;
+          }
+        > = {};
+        let futuresTotalUsd = 0;
+
+        for (const [asset, data] of Object.entries(futuresData)) {
+          if (
+            asset === "info" ||
+            asset === "free" ||
+            asset === "used" ||
+            asset === "total" ||
+            asset === "timestamp" ||
+            asset === "datetime"
+          ) {
+            continue;
+          }
+
+          const balanceData = data as {
+            free?: number;
+            used?: number;
+            total?: number;
+          };
+          if (balanceData.total && balanceData.total > 0) {
+            futuresAssets[asset] = {
+              asset,
+              free: balanceData.free ?? 0,
+              locked: balanceData.used ?? 0,
+              total: balanceData.total,
+              usdValue: undefined,
+            };
+          }
+        }
+
+        // Extract Bybit futures-specific info
+        const futuresInfo = futuresData.info as {
+          totalWalletBalance?: string;
+          totalMarginBalance?: string;
+          totalUnrealizedProfit?: string;
+          availableBalance?: string;
+        };
+
+        const totalWalletBalance = Number(
+          futuresInfo.totalWalletBalance ?? "0",
+        );
+        const totalMarginBalance = Number(
+          futuresInfo.totalMarginBalance ?? "0",
+        );
+        const unrealizedPnl = Number(futuresInfo.totalUnrealizedProfit ?? "0");
+        const availableBalance = Number(futuresInfo.availableBalance ?? "0");
+
+        futuresTotalUsd = totalWalletBalance;
+
+        futuresBalance = {
+          totalUsd: futuresTotalUsd,
+          assets: futuresAssets,
+          marginUsed: totalMarginBalance - availableBalance,
+          marginAvailable: availableBalance,
+          unrealizedPnl,
+          leverage: null, // Not available at account level for Bybit
+          raw: futuresData.info,
+        };
+      } catch (error) {
+        logger.warn("Failed to fetch futures balance, skipping", { error });
+      }
+
+      // Fetch margin balance if enabled
+      let marginBalance = null;
+      try {
+        const marginData = await this.exchange.fetchBalance({ type: "margin" });
+        const marginAssets: Record<
+          string,
+          {
+            asset: string;
+            free: number;
+            locked: number;
+            total: number;
+            usdValue?: number;
+          }
+        > = {};
+        let marginTotalUsd = 0;
+
+        for (const [asset, data] of Object.entries(marginData)) {
+          if (
+            asset === "info" ||
+            asset === "free" ||
+            asset === "used" ||
+            asset === "total" ||
+            asset === "timestamp" ||
+            asset === "datetime"
+          ) {
+            continue;
+          }
+
+          const balanceData = data as {
+            free?: number;
+            used?: number;
+            total?: number;
+          };
+          if (balanceData.total && balanceData.total > 0) {
+            marginAssets[asset] = {
+              asset,
+              free: balanceData.free ?? 0,
+              locked: balanceData.used ?? 0,
+              total: balanceData.total,
+              usdValue: undefined,
+            };
+          }
+        }
+
+        // Extract Bybit margin-specific info
+        const marginInfo = marginData.info as {
+          totalEquity?: string;
+          totalLiability?: string;
+        };
+
+        const borrowed = Number(marginInfo.totalLiability ?? "0");
+        marginTotalUsd = Number(marginInfo.totalEquity ?? "0");
+
+        marginBalance = {
+          totalUsd: marginTotalUsd,
+          assets: marginAssets,
+          borrowed,
+          interest: 0, // Not directly available in balance endpoint
+          raw: marginData.info,
+        };
+      } catch (error) {
+        logger.warn("Failed to fetch margin balance, skipping", { error });
+      }
+
+      // Calculate total equity
+      const totalEquityUsd =
+        spotTotalUsd +
+        (futuresBalance?.totalUsd ?? 0) +
+        (marginBalance?.totalUsd ?? 0);
+
+      const consolidatedBalance: ConsolidatedBalance = {
+        timestamp,
+        spot: {
+          totalUsd: spotTotalUsd,
+          assets: spotAssets,
+          raw: spotBalance.info,
+        },
+        futures: futuresBalance ?? undefined,
+        margin: marginBalance ?? undefined,
+        totalEquityUsd,
+      };
+
+      return consolidatedBalance;
+    } catch (error) {
+      logger.error("Failed to fetch consolidated balance", { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch open positions
+   * @implements ExchangeAdapter.fetchOpenPositions
+   */
+  async fetchOpenPositions(): Promise<PositionSnapshot[]> {
+    try {
+      // CCXT fetchPositions() returns all open positions
+      const ccxtPositions = await this.exchange.fetchPositions();
+
+      // Filter out positions with zero amount (closed positions)
+      const activePositions = ccxtPositions.filter(
+        (pos) => pos.contracts && Number(pos.contracts) > 0,
+      );
+
+      // Convert to PositionSnapshot format
+      const positions: PositionSnapshot[] = activePositions.map(
+        (pos): PositionSnapshot => {
+          const symbol = String(pos.symbol);
+          const side = String(pos.side).toUpperCase() as "LONG" | "SHORT";
+          const quantity = Number(pos.contracts ?? 0);
+          const entryPrice = Number(pos.entryPrice ?? 0);
+          const markPrice = Number(pos.markPrice ?? pos.entryPrice ?? 0);
+          const leverage = pos.leverage ? Number(pos.leverage) : null;
+          const margin = Number(pos.collateral ?? pos.initialMargin ?? 0);
+          const unrealizedPnl = Number(pos.unrealizedPnl ?? 0);
+          const liquidationPrice = pos.liquidationPrice
+            ? Number(pos.liquidationPrice)
+            : null;
+
+          // Determine position type based on symbol and margin mode
+          const marginMode = pos.marginMode as string | undefined;
+          const type = this.determinePositionType(symbol, marginMode);
+
+          const timestamp = pos.timestamp
+            ? new Date(pos.timestamp)
+            : new Date();
+
+          return {
+            symbol,
+            side,
+            quantity,
+            entryPrice,
+            markPrice,
+            leverage,
+            margin,
+            unrealizedPnl,
+            liquidationPrice,
+            type,
+            openedAt: timestamp,
+            lastUpdatedAt: timestamp,
+            metadata: {
+              marginMode: marginMode ?? "unknown",
+              notional: Number(pos.notional ?? 0),
+              percentage: Number(pos.percentage ?? 0),
+            },
+            raw: pos.info as unknown,
+          };
+        },
+      );
+
+      logger.info("Fetched open positions", {
+        count: positions.length,
+      });
+
+      return positions;
+    } catch (error) {
+      logger.error("Failed to fetch open positions", { error });
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch trades with pagination
+   * @implements ExchangeAdapter.fetchTradesPaginated
+   */
+  async fetchTradesPaginated(
+    symbol: string,
+    options?: PaginationOptions,
+  ): Promise<FetchTradesResult> {
+    try {
+      const limit = options?.limit ?? 500;
+      const since = options?.since;
+
+      // Fetch trades from ccxt
+      const ccxtTrades = await this.exchange.fetchMyTrades(
+        symbol,
+        since,
+        limit,
+      );
+
+      // Convert to NormalizedTrade format
+      const trades: NormalizedTrade[] = ccxtTrades.map(
+        (trade): NormalizedTrade => ({
+          id: String(trade.id),
+          orderId: String(trade.order),
+          symbol: String(trade.symbol),
+          side: trade.side === "buy" ? "BUY" : "SELL",
+          type: this.mapTradeType(trade.type ?? "market"),
+          quantity: Number(trade.amount),
+          price: Number(trade.price),
+          quoteQuantity: Number(trade.cost),
+          fee: Number(trade.fee?.cost ?? 0),
+          feeCurrency: trade.fee?.currency ?? "USDT",
+          executedAt: new Date(trade.timestamp ?? Date.now()),
+          instrumentType: "SPOT", // TODO: Detect futures
+          realizedPnl: null,
+          positionSide: null,
+          raw: trade.info as unknown,
+        }),
+      );
+
+      // Build cursor for pagination
+      const lastTrade = trades.length > 0 ? trades[trades.length - 1] : null;
+      const cursor = {
+        nextId: lastTrade ? lastTrade.id : null,
+        nextTimestamp: lastTrade ? lastTrade.executedAt.getTime() : null,
+        hasMore: trades.length === limit,
+      };
+
+      return { trades, cursor };
+    } catch (error) {
+      logger.error("Failed to fetch paginated trades", { error, symbol });
+      throw error;
+    }
+  }
+
+  /**
+   * Test connection and return status
+   * @implements ExchangeAdapter.testConnection
+   */
+  async testConnection(): Promise<ConnectionStatus> {
+    const validation = await this.validateApiKeys();
+    return {
+      isValid: validation.isValid,
+      isReadOnly: validation.isReadOnly,
+      hasSpotEnabled: validation.hasSpotEnabled,
+      hasFuturesEnabled: validation.hasFuturesEnabled,
+      canTrade: !validation.isReadOnly,
+      errorMessage: validation.errorMessage,
+    };
+  }
+
+  /**
+   * Get current rate limit info
+   * @implements ExchangeAdapter.getRateLimitInfo
+   */
+  getRateLimitInfo(): RateLimitInfo | null {
+    // ccxt doesn't expose rate limit info easily
+    // This will be available when we migrate to native SDK
+    logger.warn("getRateLimitInfo not available with ccxt");
+    return null;
+  }
+
+  /**
+   * Create order (for copy-trading)
+   * @implements ExchangeAdapter.createOrder
+   */
+  async createOrder(params: CreateOrderParams): Promise<OrderResult> {
+    try {
+      const {
+        symbol,
+        side,
+        type,
+        quantity,
+        price,
+        timeInForce,
+        clientOrderId,
+        instrumentType,
+        positionSide,
+        reduceOnly,
+      } = params;
+
+      // Convert our side to CCXT format
+      const ccxtSide = side === "BUY" ? "buy" : "sell";
+
+      // Convert our type to CCXT format
+      const ccxtType = this.mapOrderTypeToCCXT(type);
+
+      // Build CCXT params
+      const ccxtParams: Record<string, unknown> = {};
+
+      // Set market type based on instrumentType
+      if (
+        instrumentType === "FUTURES_USDT" ||
+        instrumentType === "FUTURES_COIN"
+      ) {
+        ccxtParams.type = "future";
+      } else if (instrumentType === "MARGIN") {
+        ccxtParams.type = "margin";
+      }
+
+      // Add optional parameters
+      if (timeInForce) ccxtParams.timeInForce = timeInForce;
+      if (clientOrderId) ccxtParams.clientOrderId = clientOrderId;
+      if (positionSide) ccxtParams.positionSide = positionSide;
+      if (reduceOnly !== undefined) ccxtParams.reduceOnly = reduceOnly;
+
+      // Create order via CCXT with retry logic
+      const ccxtOrder = await this.retry(
+        async () =>
+          this.exchange.createOrder(
+            symbol,
+            ccxtType,
+            ccxtSide,
+            quantity,
+            price,
+            ccxtParams,
+          ),
+        "createOrder",
+      );
+
+      // Convert CCXT response to OrderResult
+      const orderResult: OrderResult = {
+        orderId: String(ccxtOrder.id),
+        clientOrderId: ccxtOrder.clientOrderId
+          ? String(ccxtOrder.clientOrderId)
+          : null,
+        symbol: String(ccxtOrder.symbol),
+        status: this.mapCCXTOrderStatus(ccxtOrder.status ?? "open"),
+        executedQty: Number(ccxtOrder.filled),
+        executedPrice: Number(ccxtOrder.average),
+        cummulativeQuoteQty: Number(ccxtOrder.cost),
+        fills: ccxtOrder.trades.map((trade) => ({
+          price: Number(trade.price),
+          quantity: Number(trade.amount),
+          fee: Number(trade.fee?.cost ?? 0),
+          feeCurrency: String(trade.fee?.currency ?? "USDT"),
+        })),
+        transactTime: ccxtOrder.timestamp
+          ? new Date(ccxtOrder.timestamp)
+          : new Date(),
+        raw: ccxtOrder.info as unknown,
+      };
+
+      logger.info("Order created successfully", {
+        orderId: orderResult.orderId,
+        symbol,
+        side,
+        type,
+      });
+
+      return orderResult;
+    } catch (error) {
+      logger.error("Failed to create order", { error, params });
+      throw error;
+    }
+  }
+
+  /**
+   * Cancel order
+   * @implements ExchangeAdapter.cancelOrder
+   */
+  async cancelOrder(params: CancelOrderParams): Promise<void> {
+    try {
+      const { symbol, orderId, clientOrderId } = params;
+
+      // CCXT cancelOrder requires orderId or clientOrderId
+      if (!orderId && !clientOrderId) {
+        throw new Error("Either orderId or clientOrderId must be provided");
+      }
+
+      const ccxtParams: Record<string, unknown> = {};
+      if (clientOrderId) {
+        ccxtParams.clientOrderId = clientOrderId;
+      }
+
+      // Cancel order via CCXT with retry logic
+      const orderIdToCancel = orderId ?? clientOrderId ?? "";
+      await this.retry(
+        async () =>
+          this.exchange.cancelOrder(orderIdToCancel, symbol, ccxtParams),
+        "cancelOrder",
+      );
+
+      logger.info("Order canceled successfully", {
+        orderId,
+        clientOrderId,
+        symbol,
+      });
+    } catch (error) {
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "bybit");
+    }
+  }
+
+  /**
+   * Get order status
+   * @implements ExchangeAdapter.getOrderStatus
+   */
+  async getOrderStatus(params: CancelOrderParams): Promise<OrderStatus> {
+    try {
+      const { symbol, orderId, clientOrderId } = params;
+
+      // CCXT fetchOrder requires orderId or clientOrderId
+      if (!orderId && !clientOrderId) {
+        throw new Error("Either orderId or clientOrderId must be provided");
+      }
+
+      const ccxtParams: Record<string, unknown> = {};
+      if (clientOrderId) {
+        ccxtParams.clientOrderId = clientOrderId;
+      }
+
+      // Fetch order via CCXT with retry logic
+      const orderIdToFetch = orderId ?? clientOrderId ?? "";
+      const ccxtOrder = await this.retry(
+        async () =>
+          this.exchange.fetchOrder(orderIdToFetch, symbol, ccxtParams),
+        "getOrderStatus",
+      );
+
+      // Convert CCXT response to OrderStatus
+      const orderStatus: OrderStatus = {
+        orderId: String(ccxtOrder.id),
+        status: this.mapCCXTOrderStatus(ccxtOrder.status ?? "open"),
+        executedQty: Number(ccxtOrder.filled),
+        price: Number(ccxtOrder.price),
+        stopPrice: ccxtOrder.stopPrice ? Number(ccxtOrder.stopPrice) : null,
+        updatedAt: ccxtOrder.timestamp
+          ? new Date(ccxtOrder.timestamp)
+          : new Date(),
+        raw: ccxtOrder.info as unknown,
+      };
+
+      return orderStatus;
+    } catch (error) {
+      // Error already logged by retry logic
+      throw mapCCXTError(error, "bybit");
+    }
+  }
+
+  /**
+   * Map ccxt trade type to NormalizedTrade type
+   */
+  private mapTradeType(
+    ccxtType: string,
+  ):
+    | "MARKET"
+    | "LIMIT"
+    | "STOP"
+    | "STOP_MARKET"
+    | "STOP_LIMIT"
+    | "TAKE_PROFIT"
+    | "TAKE_PROFIT_MARKET"
+    | "TRAILING_STOP" {
+    switch (ccxtType.toLowerCase()) {
+      case "market":
+        return "MARKET";
+      case "limit":
+        return "LIMIT";
+      case "stop":
+      case "stop_loss":
+        return "STOP";
+      case "stop_market":
+      case "stop_loss_market":
+        return "STOP_MARKET";
+      case "stop_limit":
+      case "stop_loss_limit":
+        return "STOP_LIMIT";
+      case "take_profit":
+        return "TAKE_PROFIT";
+      case "take_profit_market":
+        return "TAKE_PROFIT_MARKET";
+      case "trailing_stop":
+      case "trailing_stop_market":
+        return "TRAILING_STOP";
+      default:
+        return "MARKET";
+    }
   }
 
   /**
@@ -427,6 +1044,107 @@ export class BybitService {
         return "TAKE_PROFIT_LIMIT";
       default:
         return "MARKET"; // Default fallback
+    }
+  }
+
+  /**
+   * Determine position type based on symbol and margin mode
+   * Helper for fetchOpenPositions()
+   */
+  private determinePositionType(
+    symbol: string,
+    marginMode?: string,
+  ):
+    | "SPOT"
+    | "MARGIN_CROSS"
+    | "MARGIN_ISOLATED"
+    | "FUTURES_USDT"
+    | "FUTURES_COIN" {
+    // Bybit futures symbols contain ":"
+    // Examples:
+    // - BTC/USDT:USDT -> USDT-margined futures (linear)
+    // - BTC/USD:BTC -> Coin-margined futures (inverse)
+    // - BTC/USDT -> Spot
+
+    if (!symbol.includes(":")) {
+      // Spot or margin
+      if (marginMode === "cross") {
+        return "MARGIN_CROSS";
+      } else if (marginMode === "isolated") {
+        return "MARGIN_ISOLATED";
+      }
+      return "SPOT";
+    }
+
+    // Futures: check settlement currency
+    const parts = symbol.split(":");
+    const settlementCurrency = parts[1];
+
+    // USDT-margined futures (linear)
+    if (settlementCurrency === "USDT" || settlementCurrency === "USDC") {
+      return "FUTURES_USDT";
+    }
+
+    // Coin-margined futures (inverse)
+    return "FUTURES_COIN";
+  }
+
+  /**
+   * Map our order type to CCXT order type
+   * Helper for createOrder()
+   */
+  private mapOrderTypeToCCXT(
+    orderType: string,
+  ):
+    | "market"
+    | "limit"
+    | "stop_loss"
+    | "stop_loss_limit"
+    | "take_profit"
+    | "take_profit_limit" {
+    switch (orderType.toUpperCase()) {
+      case "MARKET":
+        return "market";
+      case "LIMIT":
+        return "limit";
+      case "STOP_LOSS":
+        return "stop_loss";
+      case "STOP_LOSS_LIMIT":
+        return "stop_loss_limit";
+      case "TAKE_PROFIT":
+        return "take_profit";
+      case "TAKE_PROFIT_LIMIT":
+        return "take_profit_limit";
+      default:
+        return "market"; // Default fallback
+    }
+  }
+
+  /**
+   * Map CCXT order status to our OrderStatus enum
+   * Helper for createOrder() and getOrderStatus()
+   */
+  private mapCCXTOrderStatus(
+    ccxtStatus: string,
+  ): "NEW" | "PARTIALLY_FILLED" | "FILLED" | "CANCELED" | "REJECTED" {
+    switch (ccxtStatus.toLowerCase()) {
+      case "open":
+      case "new":
+        return "NEW";
+      case "partially_filled":
+      case "partial":
+        return "PARTIALLY_FILLED";
+      case "filled":
+      case "closed":
+        return "FILLED";
+      case "canceled":
+      case "cancelled":
+        return "CANCELED";
+      case "rejected":
+      case "expired":
+        return "REJECTED";
+      default:
+        return "NEW"; // Default fallback
     }
   }
 }

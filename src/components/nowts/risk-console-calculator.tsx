@@ -53,6 +53,12 @@ const HARDCODED_PRESETS = {
   aggressive: { name: "Aggressive (3%)", riskPercent: 3 },
 } as const;
 
+const EXCHANGE_ICONS: Record<ExchangeBalance["exchange"], string> = {
+  BINANCE: "🟡",
+  BYBIT: "🟠",
+  BITGET: "🟢",
+};
+
 type TakeProfitConfig = {
   id: string;
   label: string;
@@ -882,8 +888,7 @@ export function RiskConsoleCalculator({
                   <SelectItem key={balance.exchange} value={balance.exchange}>
                     <span className="flex items-center gap-2">
                       <span>
-                        {balance.exchange === "BINANCE" ? "🟡" : "🔷"}{" "}
-                        {balance.exchange}
+                        {EXCHANGE_ICONS[balance.exchange]} {balance.exchange}
                       </span>
                       {balance.isActive ? (
                         <Badge
@@ -906,17 +911,22 @@ export function RiskConsoleCalculator({
               <Typography variant="muted" className="text-xs">
                 <TrendingUp className="mr-1 inline size-3" />
                 Live balance from {capitalSource}
-                {exchangeBalances.find((b) => b.exchange === capitalSource)
-                  ?.lastSync && (
-                  <span className="ml-1">
-                    (Updated:{" "}
-                    {new Date(
-                      exchangeBalances.find((b) => b.exchange === capitalSource)
-                        ?.lastSync ?? "",
-                    ).toLocaleTimeString()}
-                    )
-                  </span>
-                )}
+                {(() => {
+                  const selected = exchangeBalances.find(
+                    (b) => b.exchange === capitalSource,
+                  );
+                  const timestamp =
+                    selected?.capturedAt ?? selected?.lastSync ?? null;
+                  if (!selected || !timestamp) {
+                    return null;
+                  }
+                  return (
+                    <span className="ml-1">
+                      ({selected.source === "snapshot" ? "Cached" : "Updated"}:{" "}
+                      {new Date(timestamp).toLocaleTimeString()})
+                    </span>
+                  );
+                })()}
               </Typography>
             )}
           </div>

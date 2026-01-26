@@ -197,6 +197,25 @@ model TraderPerformanceSnapshot {
   @@index([calculatedAt])
   @@map("trader_performance_snapshot")
 }
+
+## Modèle de données Exchange (Phase 1 – Refactor)
+
+Pour préparer l’arrivée des adapters Binance/Bybit natifs, on introduit un ensemble de types
+normalisés (`src/lib/exchange/types.ts`) et leurs schémas `zod`. Ils servent d’interface unique
+entre les futures intégrations SDK et les services métiers (sync, console risque, copy‑trading).
+
+| Type                       | Rôle                                                                                         |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| `ConsolidatedBalance`      | Bilan horodaté spot + futures (+ margin) avec valorisation USD unifiée                       |
+| `PositionSnapshot`         | Position ouverte (spot/margin/futures) avec PnL latent, levier, prix liquidation             |
+| `NormalizedTrade`          | Fill unique issu d’un exchange avec pagination (`PaginationCursor`)                          |
+| `ConnectionStatus`         | Résultat de validation API (read-only, permissions, activation futures)                      |
+| `RateLimitInfo`            | Dernier état du quota (used, limit, % et scope) exposé par l’adapter                         |
+| `CreateOrderParams/Result` | Contrat d’exécution pour le copy-trading AUTO (ordre, fills, statut, timestamps)             |
+
+Chaque type possède un schéma `zod` (ex: `zConsolidatedBalance`) et des helpers `validate*`.
+Les adapters devront systématiquement renvoyer ces objets afin de garantir une ingestion homogène
+quel que soit l’exchange sous-jacent. Cette étape constitue la Phase 1 de l’issue #84.
 ```
 
 **Pourquoi un cache ?**

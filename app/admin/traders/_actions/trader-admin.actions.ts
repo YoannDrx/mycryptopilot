@@ -4,6 +4,8 @@ import { getRequiredAdmin } from "@/lib/auth/auth-user";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma";
 import { z } from "zod";
+import { backfillTraderTrades } from "@/lib/exchange/trade-backfill.service";
+import { unstable_noStore as noStore } from "next/cache";
 
 const verifyTraderSchema = z.object({
   traderId: z.string(),
@@ -12,6 +14,12 @@ const verifyTraderSchema = z.object({
 const rejectTraderSchema = z.object({
   traderId: z.string(),
   reason: z.string().optional(),
+});
+
+const backfillSchema = z.object({
+  traderId: z.string(),
+  days: z.number().min(1).max(3650).default(365),
+  dryRun: z.boolean().optional(),
 });
 
 /**
@@ -28,6 +36,7 @@ export const getTradersWithStats = async ({
   search?: string;
   verified?: "all" | "verified" | "pending";
 }) => {
+  noStore();
   await getRequiredAdmin();
 
   const whereClause: Prisma.TraderProfileWhereInput = {};
@@ -169,5 +178,23 @@ export async function deleteTraderAction(traderId: string) {
 
   return {
     success: true,
+  };
+}
+
+export async function backfillTraderTradesAction(
+  data: z.infer<typeof backfillSchema>,
+) {
+  await getRequiredAdmin();
+
+  const { traderId, days, dryRun } = backfillSchema.parse(data);
+
+  const summary = await backfillTraderTrades(traderId, {
+    days,
+    dryRun: dryRun ?? false,
+  });
+
+  return {
+    success: true,
+    summary,
   };
 }

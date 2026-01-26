@@ -27,6 +27,12 @@ type ConnectExchangeFormProps = {
   onSuccess?: () => void;
 };
 
+const exchangeDisplayName: Record<"BINANCE" | "BYBIT" | "BITGET", string> = {
+  BINANCE: "Binance",
+  BYBIT: "Bybit",
+  BITGET: "Bitget",
+};
+
 export const ConnectExchangeForm = ({
   onSuccess,
 }: ConnectExchangeFormProps) => {
@@ -39,6 +45,7 @@ export const ConnectExchangeForm = ({
       exchange: "BINANCE",
       apiKey: "",
       secretKey: "",
+      passphrase: "",
     },
   });
 
@@ -57,17 +64,15 @@ export const ConnectExchangeForm = ({
         data.message ?? "Exchange connected successfully! Syncing trades...",
       );
       form.reset();
-      // Invalidate both connections list and all connection stats
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["exchange-connections"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["exchange-status"],
-        }),
-      ]);
-      // Refresh Server Component data to update connection count
+
+      // Invalidate connection stats (will be fetched for new connection)
+      await queryClient.invalidateQueries({
+        queryKey: ["exchange-status"],
+      });
+
+      // Refresh Server Component to show new connection in list
       router.refresh();
+
       onSuccess?.();
     },
     onError: (error: Error) => {
@@ -143,12 +148,54 @@ export const ConnectExchangeForm = ({
                         </div>
                       </Label>
                     </div>
+
+                    {/* Bitget Option */}
+                    <div className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors">
+                      <RadioGroupItem value="BITGET" id="bitget" />
+                      <Label
+                        htmlFor="bitget"
+                        className="flex flex-1 cursor-pointer items-center gap-3"
+                      >
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-emerald-500/10">
+                          <span className="text-2xl">🟢</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold">Bitget</p>
+                          <p className="text-muted-foreground text-sm">
+                            Spot & Unified Trading Account data
+                          </p>
+                        </div>
+                      </Label>
+                    </div>
                   </RadioGroup>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {form.watch("exchange") === "BITGET" && (
+            <FormField
+              control={form.control}
+              name="passphrase"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>API Passphrase *</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter your Bitget passphrase"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    The passphrase defined when the Bitget API key was created.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           {/* Instructions Binance */}
           {form.watch("exchange") === "BINANCE" && (
@@ -210,25 +257,55 @@ export const ConnectExchangeForm = ({
             </Alert>
           )}
 
+          {/* Instructions Bitget */}
+          {form.watch("exchange") === "BITGET" && (
+            <Alert>
+              <Link2 className="size-4" />
+              <AlertDescription>
+                <strong>How to get Bitget API keys:</strong>
+                <ol className="mt-2 ml-4 list-decimal space-y-1 text-sm">
+                  <li>
+                    Go to{" "}
+                    <a
+                      href="https://www.bitget.com/en/support/articles/360011132814-How-to-create-API"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      Bitget API Management
+                    </a>
+                  </li>
+                  <li>Create a new API key with read-only permissions</li>
+                  <li>
+                    <strong>Save the API Key, Secret Key and Passphrase</strong>
+                    . The passphrase is required to authenticate requests.
+                  </li>
+                </ol>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* API Key */}
           <FormField
             control={form.control}
             name="apiKey"
             render={({ field }) => {
-              const exchange = form.watch("exchange");
+              const exchangeValue = form.watch(
+                "exchange",
+              ) as keyof typeof exchangeDisplayName;
+              const exchangeLabel = exchangeDisplayName[exchangeValue];
               return (
                 <FormItem>
                   <FormLabel>API Key *</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder={`Enter your ${exchange === "BINANCE" ? "Binance" : "Bybit"} API Key`}
+                      placeholder={`Enter your ${exchangeLabel} API Key`}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    Your read-only API key from{" "}
-                    {exchange === "BINANCE" ? "Binance" : "Bybit"}
+                    Your read-only API key from {exchangeLabel}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -241,14 +318,17 @@ export const ConnectExchangeForm = ({
             control={form.control}
             name="secretKey"
             render={({ field }) => {
-              const exchange = form.watch("exchange");
+              const exchangeValue = form.watch(
+                "exchange",
+              ) as keyof typeof exchangeDisplayName;
+              const exchangeLabel = exchangeDisplayName[exchangeValue];
               return (
                 <FormItem>
                   <FormLabel>Secret Key *</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder={`Enter your ${exchange === "BINANCE" ? "Binance" : "Bybit"} Secret Key`}
+                      placeholder={`Enter your ${exchangeLabel} Secret Key`}
                       {...field}
                     />
                   </FormControl>
