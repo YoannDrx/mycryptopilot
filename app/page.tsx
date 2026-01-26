@@ -4,6 +4,7 @@ import { ComparisonTable } from "@/features/landing/comparison-table";
 
 // Force dynamic rendering to avoid Prisma calls during build
 export const dynamic = "force-dynamic";
+
 import { CTASectionCard } from "@/features/landing/cta/cta-card-section";
 import { CTAImageSection } from "@/features/landing/cta/cta-image-section";
 import { CtaSection } from "@/features/landing/cta/cta-section";
