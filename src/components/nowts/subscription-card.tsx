@@ -44,33 +44,35 @@ export const SubscriptionCard = ({
   const isExpired = timeLeft !== null && timeLeft <= 0;
   const isExpiringSoon = daysLeft !== null && daysLeft <= 7 && daysLeft > 0;
 
-  // Plan colors
+  // Plan colors - Cyber Fintech theme
   const planColor = isUltra
-    ? "text-purple-600"
+    ? "text-[#a855f7]"
     : isPro
-      ? "text-amber-600"
-      : "text-gray-600";
-  const planBgColor = isUltra
-    ? "bg-purple-50"
-    : isPro
-      ? "bg-amber-50"
-      : "bg-gray-50";
+      ? "text-[#00ffaa]"
+      : "text-[var(--text-secondary)]";
   const planBorderColor = isUltra
-    ? "border-purple-200"
+    ? "border-[#a855f7]/40 hover:border-[#a855f7]/60"
     : isPro
-      ? "border-amber-200"
-      : "border-gray-200";
+      ? "border-[#00ffaa]/40 hover:border-[#00ffaa]/60"
+      : "border-[var(--glass-border)] hover:border-[var(--glass-border-hover)]";
+  const planGlow = isUltra
+    ? "hover:shadow-[0_0_20px_rgba(168,85,247,0.15)]"
+    : isPro
+      ? "hover:shadow-[0_0_20px_rgba(0,255,170,0.15)]"
+      : "";
 
   return (
     <Card
+      variant="hyper"
       className={cn(
-        "border-2 transition-all hover:shadow-md",
+        "border transition-all",
         planBorderColor,
+        planGlow,
         isExpired && "opacity-60",
         className,
       )}
     >
-      <CardHeader className={cn("pb-3", planBgColor)}>
+      <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           {/* Plan Name & Icon */}
           <div className="flex items-center gap-2">
@@ -89,18 +91,18 @@ export const SubscriptionCard = ({
           {/* Status Badge */}
           <div>
             {isExpired ? (
-              <Badge variant="destructive">Expired</Badge>
+              <Badge variant="crimson">Expired</Badge>
             ) : isExpiringSoon ? (
               <Badge
-                variant="outline"
-                className="border-amber-500 text-amber-700"
+                variant="glass"
+                className="border-[#f59e0b]/40 text-[#f59e0b]"
               >
                 Expiring Soon
               </Badge>
             ) : isFreePlan ? (
-              <Badge variant="secondary">Active</Badge>
+              <Badge variant="glass">Active</Badge>
             ) : (
-              <Badge variant="default">Active</Badge>
+              <Badge variant="emerald">Active</Badge>
             )}
           </div>
         </div>
@@ -118,10 +120,10 @@ export const SubscriptionCard = ({
       <CardContent className="space-y-4">
         {/* Expiration Info */}
         {!isFreePlan && planExpiresAt && (
-          <div className="bg-muted flex items-center justify-between rounded-lg p-3">
+          <div className="flex items-center justify-between rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-3">
             <div className="flex items-center gap-2 text-sm">
-              <Calendar className="text-muted-foreground size-4" />
-              <span className="text-muted-foreground">
+              <Calendar className="size-4 text-[var(--text-muted)]" />
+              <span className="text-[var(--text-muted)]">
                 {isExpired ? "Expired on" : "Valid until"}
               </span>
             </div>
@@ -137,7 +139,7 @@ export const SubscriptionCard = ({
 
         {/* Days Left (for non-free plans) */}
         {!isFreePlan && daysLeft !== null && !isExpired && (
-          <div className="text-muted-foreground text-center text-sm">
+          <div className="text-center text-sm text-[var(--text-secondary)]">
             {daysLeft} {daysLeft === 1 ? "day" : "days"} remaining
           </div>
         )}
@@ -145,27 +147,36 @@ export const SubscriptionCard = ({
         {/* Features List */}
         <div className="space-y-2">
           <p className="text-sm font-semibold">Plan Features:</p>
-          <ul className="text-muted-foreground space-y-1 text-sm">
+          <ul className="space-y-1 text-sm text-[var(--text-secondary)]">
             <li>
-              •{" "}
+              <span className="text-[#00ffaa]">•</span>{" "}
               {planData.limits.activeSignalsLimit === 999
                 ? "Unlimited"
                 : planData.limits.activeSignalsLimit}{" "}
               active signals tracked
             </li>
             <li>
-              • Follow up to{" "}
+              <span className="text-[#00ffaa]">•</span> Follow up to{" "}
               {planData.limits.tradersFollow === -1
                 ? "unlimited"
                 : planData.limits.tradersFollow}{" "}
               {planData.limits.tradersFollow === 1 ? "trader" : "traders"}
             </li>
-            <li>• Screener refresh: {planData.limits.screenerRefreshSec}s</li>
+            <li>
+              <span className="text-[#00ffaa]">•</span> Screener refresh:{" "}
+              {planData.limits.screenerRefreshSec}s
+            </li>
             {planData.limits.riskConsole && (
-              <li>• Risk Console & Trading Journal</li>
+              <li>
+                <span className="text-[#00ffaa]">•</span> Risk Console & Trading
+                Journal
+              </li>
             )}
             {planData.limits.customAlerts && (
-              <li>• Custom Alerts & Advanced Filters</li>
+              <li>
+                <span className="text-[#00ffaa]">•</span> Custom Alerts &
+                Advanced Filters
+              </li>
             )}
           </ul>
         </div>
@@ -177,14 +188,14 @@ export const SubscriptionCard = ({
               <Link href="/pricing" className="w-full">
                 <Button
                   className="w-full"
-                  variant={isExpired ? "default" : "outline"}
+                  variant={isExpired ? "crimson" : "emerald"}
                 >
                   {isExpired ? "Renew Subscription" : "Upgrade Plan"}
                 </Button>
               </Link>
             ) : isExpiringSoon ? (
               <Link href="/pricing" className="w-full">
-                <Button className="w-full" variant="outline">
+                <Button className="w-full" variant="glass">
                   Extend Subscription
                 </Button>
               </Link>
@@ -194,8 +205,8 @@ export const SubscriptionCard = ({
 
         {/* Free Plan CTA */}
         {isFreePlan && showUpgradeButton && (
-          <div className="rounded-lg bg-gradient-to-r from-amber-50 to-purple-50 p-3 text-center">
-            <p className="text-sm font-medium text-gray-700">
+          <div className="rounded-lg border border-[var(--glass-border)] bg-gradient-to-r from-[#00ffaa]/5 to-[#a855f7]/5 p-3 text-center">
+            <p className="text-sm font-medium text-[var(--text-secondary)]">
               Upgrade to unlock unlimited signals & advanced features
             </p>
           </div>

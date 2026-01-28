@@ -1,10 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { ProviderButton } from "./provider-button";
-import { SignInCredentialsAndMagicLinkForm } from "./sign-in-credentials-and-magic-link-form";
+import { ProviderButton } from "../signin/provider-button";
+import { SignUpCredentialsForm } from "./sign-up-credentials-form";
 
-export const SignInProviders = ({
+export const SignUpProviders = ({
   providers,
   callbackUrl,
 }: {
@@ -42,14 +42,14 @@ export const SignInProviders = ({
           <div className="relative flex items-center justify-center">
             <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-[var(--glass-border)] to-transparent" />
             <span className="relative z-10 bg-[var(--bg-onyx)] px-4">
-              <span className="terminal-text text-xs">OU EMAIL MAGIQUE</span>
+              <span className="terminal-text text-xs">OU CRÉER UN COMPTE</span>
             </span>
           </div>
         </>
       )}
 
-      {/* Email/Magic Link Form */}
-      <SignInCredentialsAndMagicLinkForm callbackUrl={callbackUrl} />
+      {/* Credentials Form */}
+      <SignUpCredentialsForm />
     </div>
   );
 };

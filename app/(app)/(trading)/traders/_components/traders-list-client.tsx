@@ -312,15 +312,34 @@ function TraderCard({ trader, userId }: TraderCardProps) {
     {};
 
   return (
-    <Card className="flex flex-col">
+    <Card
+      variant="hyper"
+      className={`flex flex-col transition-all duration-300 ${
+        trader.verified
+          ? "hover:border-[#00ffaa]/40 hover:shadow-[0_0_25px_rgba(0,255,170,0.1)]"
+          : "hover:border-[var(--glass-border-hover)]"
+      }`}
+    >
       <CardHeader>
         <div className="flex items-start gap-4">
-          <Avatar className="size-16">
+          <Avatar
+            className={`size-16 border-2 ${
+              trader.verified
+                ? "border-[#00ffaa]/30"
+                : "border-[var(--glass-border)]"
+            }`}
+          >
             <AvatarImage
               src={trader.user.image ?? undefined}
               alt={trader.user.name}
             />
-            <AvatarFallback>
+            <AvatarFallback
+              className={
+                trader.verified
+                  ? "bg-[#00ffaa]/10 text-[#00ffaa]"
+                  : "bg-[var(--bg-graphite)]"
+              }
+            >
               {trader.displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -328,7 +347,7 @@ function TraderCard({ trader, userId }: TraderCardProps) {
             <div className="flex items-center gap-2">
               <CardTitle className="text-lg">{trader.displayName}</CardTitle>
               {trader.verified && (
-                <Badge variant="default" className="gap-1">
+                <Badge variant="emerald" className="gap-1">
                   <CheckCircle2 className="size-3" />
                   Verified
                 </Badge>
@@ -348,30 +367,38 @@ function TraderCard({ trader, userId }: TraderCardProps) {
           </p>
         )}
 
-        <div className="grid grid-cols-2 gap-4 border-t pt-4">
-          <div>
-            <p className="text-muted-foreground text-xs">Win Rate</p>
-            <p className="text-xl font-bold">
+        <div className="grid grid-cols-2 gap-4 rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-4">
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs tracking-wider uppercase">
+              Win Rate
+            </p>
+            <p className="mt-1 text-xl font-bold text-[#00ffaa]">
               {typeof stats.winrate === "number"
                 ? `${stats.winrate.toFixed(1)}%`
                 : "--%"}
             </p>
           </div>
-          <div>
-            <p className="text-muted-foreground text-xs">Payoff</p>
-            <p className="text-xl font-bold">
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs tracking-wider uppercase">
+              Payoff
+            </p>
+            <p className="mt-1 text-xl font-bold text-[#00d4ff]">
               {typeof stats.payoff === "number"
                 ? stats.payoff.toFixed(1)
                 : "--"}
             </p>
           </div>
-          <div>
-            <p className="text-muted-foreground text-xs">Followers</p>
-            <p className="text-xl font-bold">{followersCount}</p>
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs tracking-wider uppercase">
+              Followers
+            </p>
+            <p className="mt-1 text-xl font-bold">{followersCount}</p>
           </div>
-          <div>
-            <p className="text-muted-foreground text-xs">Signals</p>
-            <p className="text-xl font-bold">{signalsCount}</p>
+          <div className="text-center">
+            <p className="text-muted-foreground text-xs tracking-wider uppercase">
+              Signals
+            </p>
+            <p className="mt-1 text-xl font-bold">{signalsCount}</p>
           </div>
         </div>
       </CardContent>
@@ -382,9 +409,14 @@ function TraderCard({ trader, userId }: TraderCardProps) {
           traderName={trader.displayName}
           isFollowing={isFollowing}
           userId={userId}
-          variant="default"
+          variant={isFollowing ? "outline" : "default"}
+          className={
+            !isFollowing
+              ? "bg-[#00ffaa] text-[#05070a] hover:bg-[#00ffaa]/90"
+              : ""
+          }
         />
-        <Button variant="outline" asChild>
+        <Button variant="glass" asChild>
           <Link href={`/traders/${trader.userId}`}>View Profile</Link>
         </Button>
       </CardFooter>

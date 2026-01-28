@@ -31,13 +31,13 @@ export async function BaseSidebarLayout({
   return (
     <SidebarProvider>
       {sidebar}
-      <SidebarInset className="border-accent border">
+      <SidebarInset className="border border-[var(--glass-border)] bg-[var(--bg-obsidian)]">
         {/* Breadcrumb Header */}
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--glass-border)]">
           <Layout size="lg" className="flex items-center gap-2">
             <SidebarTrigger
               size="lg"
-              variant="outline"
+              variant="glass"
               className="size-9 cursor-pointer"
             />
             <PageBreadcrumb />

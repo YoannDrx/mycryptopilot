@@ -1,6 +1,4 @@
 import { Loader } from "@/components/nowts/loader";
-import { Typography } from "@/components/nowts/typography";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -8,52 +6,66 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SocialProviders } from "@/lib/auth";
 import { getUser } from "@/lib/auth/auth-user";
 import { SiteConfig } from "@/site-config";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { SignUpCredentialsForm } from "./sign-up-credentials-form";
+import { SignUpProviders } from "./sign-up-providers";
 
 export const metadata: Metadata = {
   title: `Sign Up | ${SiteConfig.title}`,
   description:
-    "Create your account to start collecting powerful testimonials for your projects.",
+    "Create your account to access trading signals and risk console.",
 };
 
-export default async function AuthSignInPage() {
+export default async function AuthSignUpPage() {
   const user = await getUser();
 
   if (user) {
     redirect("/");
   }
 
+  const providers = Object.keys(SocialProviders ?? {});
+
   return (
-    <Card className="mx-auto w-full max-w-md lg:max-w-lg lg:p-6">
-      <CardHeader className="flex flex-col items-center justify-center gap-1">
-        <Avatar className="mb-4 rounded-sm">
-          <AvatarImage src={SiteConfig.appIcon} alt="app logo" />
-          <AvatarFallback>
-            {SiteConfig.title.substring(0, 1).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <CardTitle>Sign up to {SiteConfig.title}</CardTitle>
-        <CardDescription>
-          We just need a few details to get you started.
+    <Card
+      variant="terminal"
+      className="mx-auto w-full max-w-md border-[#00ffaa]/20 shadow-[0_0_30px_rgba(0,255,170,0.1)]"
+    >
+      <CardHeader className="space-y-1 pb-4 text-center">
+        {/* Terminal Header */}
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <div className="size-3 rounded-full bg-[#ff3366]" />
+          <div className="size-3 rounded-full bg-[#f59e0b]" />
+          <div className="size-3 rounded-full bg-[#00ffaa]" />
+        </div>
+
+        <CardTitle className="text-2xl font-bold tracking-tight">
+          <span className="terminal-text text-sm">INSCRIPTION</span>
+        </CardTitle>
+        <CardDescription className="text-[var(--text-secondary)]">
+          Créez votre compte pour commencer à trader
         </CardDescription>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="space-y-4">
         <Suspense fallback={<Loader />}>
-          <SignUpCredentialsForm />
+          <SignUpProviders providers={providers} />
         </Suspense>
 
-        <Typography variant="muted" className="mt-4 text-xs">
-          You already have an account?{" "}
-          <Typography variant="link" as={Link} href="/auth/signin">
-            Sign in
-          </Typography>
-        </Typography>
+        {/* Sign in link */}
+        <div className="pt-4 text-center text-sm text-[var(--text-muted)]">
+          Déjà un compte?{" "}
+          <Link
+            href="/auth/signin"
+            className="font-medium text-[#00ffaa] transition-colors hover:text-[#00ffaa]/80"
+          >
+            Se connecter
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

@@ -21,6 +21,7 @@ import { ReviewTriple } from "@/features/landing/review/review-triple";
 import { RiskConsoleDemo } from "@/features/landing/risk-console-demo";
 import { SectionDivider } from "@/features/landing/section-divider";
 import { StatsSection } from "@/features/landing/stats-section";
+import { TradersPreviewSection } from "@/features/landing/traders-preview";
 import { Footer } from "@/features/layout/footer";
 import { Pricing } from "@/features/plans/pricing-section";
 import Image from "next/image";
@@ -28,11 +29,14 @@ import Image from "next/image";
 export default function HomePage() {
   return (
     <div
-      className="bg-background text-foreground relative flex h-fit flex-col"
+      className="text-foreground relative flex h-fit flex-col bg-[var(--bg-obsidian)]"
       suppressHydrationWarning
     >
+      {/* Global mesh gradient */}
+      <div className="mesh-gradient-subtle pointer-events-none fixed inset-0 z-0" />
+
       {/* Spacer for fixed header */}
-      <div className="h-16" aria-hidden="true" />
+      <div className="relative z-10 h-16" aria-hidden="true" />
 
       <LandingHeader />
 
@@ -41,6 +45,8 @@ export default function HomePage() {
       <RiskConsoleDemo />
 
       <StatsSection />
+
+      <TradersPreviewSection />
 
       <EcosystemCycleSection />
 

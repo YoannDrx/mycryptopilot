@@ -55,10 +55,10 @@ export default async function SignalsPage({ searchParams }: SignalsPageProps) {
 
       <LayoutContent className="space-y-6">
         {/* Filters */}
-        <Card>
+        <Card variant="hyper">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Filters</CardTitle>
+              <CardTitle className="terminal-text text-sm">Filtres</CardTitle>
               <ViewToggle />
             </div>
           </CardHeader>
