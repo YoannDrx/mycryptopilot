@@ -5,6 +5,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Layout } from "@/features/page/layout";
 import { PageBreadcrumb } from "@/components/nowts/page-breadcrumb";
+import { ThemeToggle } from "@/features/theme/theme-toggle";
+import { LocaleToggle } from "@/components/navbar/locale-toggle";
 import type { PropsWithChildren } from "react";
 
 /**
@@ -34,13 +36,19 @@ export async function BaseSidebarLayout({
       <SidebarInset className="border border-[var(--glass-border)] bg-[var(--bg-obsidian)]">
         {/* Breadcrumb Header */}
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-[var(--glass-border)]">
-          <Layout size="lg" className="flex items-center gap-2">
-            <SidebarTrigger
-              size="lg"
-              variant="glass"
-              className="size-9 cursor-pointer"
-            />
-            <PageBreadcrumb />
+          <Layout size="lg" className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger
+                size="lg"
+                variant="glass"
+                className="size-9 cursor-pointer"
+              />
+              <PageBreadcrumb />
+            </div>
+            <div className="flex items-center gap-1">
+              <LocaleToggle />
+              <ThemeToggle />
+            </div>
           </Layout>
         </header>
 

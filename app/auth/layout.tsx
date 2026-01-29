@@ -1,4 +1,5 @@
-import { SiteConfig } from "@/site-config";
+import { Logo } from "@/components/brand";
+import { GrainOverlay, MeshGradient } from "@/components/design-system";
 import { Shield, TrendingUp, Zap, Lock } from "lucide-react";
 import Link from "next/link";
 import type { PropsWithChildren } from "react";
@@ -30,7 +31,10 @@ export default function RouteLayout(props: PropsWithChildren) {
   return (
     <div className="relative flex min-h-screen bg-[var(--bg-obsidian)]">
       {/* Mesh gradient background */}
-      <div className="mesh-gradient pointer-events-none absolute inset-0" />
+      <MeshGradient variant="default" />
+
+      {/* Grain overlay */}
+      <GrainOverlay opacity={0.03} />
 
       {/* Grid overlay */}
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-20" />
@@ -40,13 +44,8 @@ export default function RouteLayout(props: PropsWithChildren) {
         {/* Left Column - Branding (hidden on mobile) */}
         <div className="hidden flex-col justify-between border-r border-[var(--glass-border)] bg-[var(--bg-onyx)]/50 p-8 lg:flex lg:w-1/2 lg:p-12">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg border border-[#00ffaa]/30 bg-[#00ffaa]/10">
-              <span className="text-lg font-bold text-[#00ffaa]">M</span>
-            </div>
-            <span className="text-xl font-bold tracking-wider uppercase">
-              {SiteConfig.title}
-            </span>
+          <Link href="/">
+            <Logo variant="full" size="lg" />
           </Link>
 
           {/* Center Content - Radar Animation */}
@@ -112,13 +111,8 @@ export default function RouteLayout(props: PropsWithChildren) {
         {/* Right Column - Form */}
         <div className="flex min-h-screen w-full flex-col items-center justify-center px-4 py-8 lg:w-1/2 lg:px-12">
           {/* Mobile Logo */}
-          <Link href="/" className="mb-8 flex items-center gap-3 lg:hidden">
-            <div className="flex size-10 items-center justify-center rounded-lg border border-[#00ffaa]/30 bg-[#00ffaa]/10">
-              <span className="text-lg font-bold text-[#00ffaa]">M</span>
-            </div>
-            <span className="text-xl font-bold tracking-wider uppercase">
-              {SiteConfig.title}
-            </span>
+          <Link href="/" className="mb-8 lg:hidden">
+            <Logo variant="full" size="md" />
           </Link>
 
           {/* Form Container */}

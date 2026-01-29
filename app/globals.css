@@ -69,7 +69,7 @@
 }
 
 :root {
-  /* Cyber-Fintech Backgrounds */
+  /* Cyber-Fintech Backgrounds - Dark (default) */
   --bg-obsidian: #05070a;
   --bg-onyx: #0a0d12;
   --bg-graphite: #12161d;
@@ -89,7 +89,7 @@
   --glass-border-hover: rgba(255, 255, 255, 0.2);
   --glass-bg: rgba(255, 255, 255, 0.02);
 
-  /* Dark-only theme - Cyber Fintech */
+  /* Dark theme - Cyber Fintech (default) */
   --background: #05070a;
   --foreground: #ffffff;
   --card: #0a0d12;
@@ -132,6 +132,73 @@
 
   --info: #00d4ff;
   --info-foreground: #05070a;
+}
+
+/* Light Theme */
+.light,
+[data-theme="light"] {
+  /* Cyber-Fintech Backgrounds - Light */
+  --bg-obsidian: #f8f9fa;
+  --bg-onyx: #ffffff;
+  --bg-graphite: #f1f3f5;
+  --bg-slate: #e9ecef;
+
+  /* Accents - Slightly darker for light mode readability */
+  --accent-emerald: #00c77a;
+  --accent-crimson: #e62e5c;
+
+  /* Text */
+  --text-primary: #0a0d12;
+  --text-secondary: rgba(10, 13, 18, 0.7);
+  --text-muted: rgba(10, 13, 18, 0.5);
+
+  /* Glass - Inverted for light mode */
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-hover: rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(0, 0, 0, 0.02);
+
+  /* Light theme - Clean Fintech */
+  --background: #f8f9fa;
+  --foreground: #0a0d12;
+  --card: #ffffff;
+  --card-foreground: #0a0d12;
+  --popover: #ffffff;
+  --popover-foreground: #0a0d12;
+  --primary: #00c77a;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f3f5;
+  --secondary-foreground: #0a0d12;
+  --muted: #f1f3f5;
+  --muted-foreground: rgba(10, 13, 18, 0.6);
+  --accent: #f1f3f5;
+  --accent-foreground: #0a0d12;
+  --destructive: #e62e5c;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: rgba(0, 0, 0, 0.08);
+  --ring: #00c77a;
+  --chart-1: #00c77a;
+  --chart-2: #00a5cc;
+  --chart-3: #8b5cf6;
+  --chart-4: #e62e5c;
+  --chart-5: #d97706;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a0d12;
+  --sidebar-primary: #00c77a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(0, 0, 0, 0.03);
+  --sidebar-accent-foreground: #0a0d12;
+  --sidebar-border: rgba(0, 0, 0, 0.1);
+  --sidebar-ring: #00c77a;
+
+  --success: #00c77a;
+  --success-foreground: #ffffff;
+
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+
+  --info: #00a5cc;
+  --info-foreground: #ffffff;
 }
 
 @layer base {
@@ -738,4 +805,20 @@
   & pre {
     margin: 0 !important;
   }
+}
+
+/* Landing Pages Custom Fonts */
+
+/* Landing 2 - Luxe */
+.font-playfair {
+  font-family: var(--font-playfair), serif;
+}
+
+/* Landing 5 - Arcade */
+.font-arcade {
+  font-family: var(--font-arcade), monospace;
+}
+
+.font-vt323 {
+  font-family: var(--font-vt323), monospace;
 }

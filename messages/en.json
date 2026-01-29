@@ -1,0 +1,176 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "viewAll": "View all",
+    "learnMore": "Learn more",
+    "getStarted": "Get Started"
+  },
+  "nav": {
+    "home": "Home",
+    "marketplace": "Marketplace",
+    "signals": "Signals",
+    "console": "Console",
+    "pricing": "Pricing",
+    "dashboard": "Dashboard",
+    "account": "Account",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "settings": "Settings"
+  },
+  "theme": {
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "system": "System"
+  },
+  "locale": {
+    "switchTo": "Switch language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "hero": {
+    "headline": "Don't Trade Without Radar",
+    "subheadline": "Follow verified traders. Get real-time signals. Manage your risk like a pro.",
+    "cta": {
+      "primary": "View Traders",
+      "secondary": "How it works"
+    },
+    "stats": {
+      "traders": "Verified traders",
+      "signals": "Signals per day",
+      "winrate": "Avg. winrate"
+    }
+  },
+  "features": {
+    "title": "Everything you need to trade with confidence",
+    "signals": {
+      "title": "Real-Time Signals",
+      "description": "Get signals from verified traders instantly on Discord and in the app."
+    },
+    "risk": {
+      "title": "Risk Console",
+      "description": "Calculate your position size, set your SL/TP, and stick to your trading plan."
+    },
+    "journal": {
+      "title": "Trading Journal",
+      "description": "Track all your positions, analyze your performance, identify your mistakes."
+    },
+    "verified": {
+      "title": "Verified Traders",
+      "description": "Connect to traders' APIs to see their real performance, not screenshots."
+    }
+  },
+  "pricing": {
+    "title": "Plans for every level",
+    "subtitle": "Start free, upgrade when you're ready.",
+    "monthly": "Per month",
+    "popular": "Popular",
+    "free": {
+      "name": "Free",
+      "description": "To discover the platform",
+      "features": [
+        "5 signals per day",
+        "1 trader to follow",
+        "5 min delay screener",
+        "Blurred previews"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "For serious traders",
+      "features": [
+        "50 signals per day",
+        "5 traders to follow",
+        "Real-time screener",
+        "Risk console",
+        "Trading journal"
+      ]
+    },
+    "ultra": {
+      "name": "Ultra",
+      "description": "For professional traders",
+      "features": [
+        "Unlimited signals",
+        "Unlimited traders",
+        "5 sec screener",
+        "Custom alerts",
+        "Priority support"
+      ]
+    },
+    "cta": "Choose this plan"
+  },
+  "mobileApp": {
+    "title": "Mobile App",
+    "subtitle": "Coming soon on iOS and Android",
+    "description": "Get your signals and manage your positions wherever you are.",
+    "notify": "Notify me at launch",
+    "placeholder": "Enter your email",
+    "comingSoon": "Coming Soon"
+  },
+  "footer": {
+    "description": "The crypto trading platform to follow verified traders and receive real-time signals.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "links": {
+      "marketplace": "Marketplace",
+      "pricing": "Pricing",
+      "docs": "Documentation",
+      "about": "About",
+      "contact": "Contact",
+      "blog": "Blog",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    },
+    "copyright": "© {year} MyCryptoPilot. All rights reserved."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with",
+    "termsAgreement": "By creating an account, you agree to our {terms} and {privacy}."
+  },
+  "traders": {
+    "title": "Traders Marketplace",
+    "subtitle": "Discover and follow the best verified crypto traders.",
+    "filters": {
+      "all": "All",
+      "verified": "Verified",
+      "topPerformers": "Top Performers",
+      "speciality": "Speciality",
+      "timeframe": "Timeframe"
+    },
+    "card": {
+      "followers": "Followers",
+      "winrate": "Winrate",
+      "signals": "Signals",
+      "follow": "Follow",
+      "following": "Following"
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome, {name}",
+    "overview": "Overview",
+    "recentSignals": "Recent signals",
+    "myTraders": "My traders",
+    "performance": "Performance",
+    "noSignals": "No signals yet",
+    "noTraders": "You're not following any trader"
+  }
+}

@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 export const Providers = ({ children }: PropsWithChildren) => {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <QueryClientProvider client={queryClient}>
         <Toaster />
         <DialogManagerRenderer />
