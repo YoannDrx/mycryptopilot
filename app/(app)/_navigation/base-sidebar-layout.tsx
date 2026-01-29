@@ -6,7 +6,6 @@ import {
 import { Layout } from "@/features/page/layout";
 import { PageBreadcrumb } from "@/components/nowts/page-breadcrumb";
 import { ThemeToggle } from "@/features/theme/theme-toggle";
-import { LocaleToggle } from "@/components/navbar/locale-toggle";
 import type { PropsWithChildren } from "react";
 
 /**
@@ -46,7 +45,6 @@ export async function BaseSidebarLayout({
               <PageBreadcrumb />
             </div>
             <div className="flex items-center gap-1">
-              <LocaleToggle />
               <ThemeToggle />
             </div>
           </Layout>
