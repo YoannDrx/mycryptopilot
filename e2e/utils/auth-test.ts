@@ -101,11 +101,8 @@ export async function signInAccount(options: {
   await page.getByLabel("Email").fill(userData.email);
   await page.locator('input[name="password"]').fill(userData.password);
 
-  // Submit the form
-  await page
-    .getByRole("button", { name: /sign in/i })
-    .first()
-    .click();
+  // Submit the form (exact match to avoid OAuth buttons like "Sign in with Google")
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
   // Wait for navigation to complete if a callback URL is provided
   if (callbackURL) {

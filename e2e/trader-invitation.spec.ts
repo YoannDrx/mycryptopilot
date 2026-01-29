@@ -132,10 +132,7 @@ test.describe("Trader Invitation System", () => {
     await page.getByRole("button", { name: /use password/i }).click();
     await page.getByLabel("Email").fill(traderData.email);
     await page.locator('input[name="password"]').fill(traderData.password);
-    await page
-      .getByRole("button", { name: /sign in/i })
-      .first()
-      .click();
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
     await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
