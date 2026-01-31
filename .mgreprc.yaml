@@ -1,8 +1,0 @@
-# Configuration mgrep pour mycryptopilot
-# Le store utilise automatiquement le nom du dossier: mycryptopilot
-
-# Taille maximale des fichiers (hérite de la config globale si non spécifié)
-# maxFileSize: 10485760
-
-# Nombre maximum de fichiers
-# maxFileCount: 10000
