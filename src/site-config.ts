@@ -12,7 +12,7 @@ export const SiteConfig = {
     address: "123 Avenue des Champs-Élysées, 75008 Paris, France",
   },
   brand: {
-    primary: "#F59E0B", // Amber color for crypto theme
+    primary: "#00ffaa", // Emerald color for crypto theme
   },
   team: {
     image: "/images/team.jpg",
