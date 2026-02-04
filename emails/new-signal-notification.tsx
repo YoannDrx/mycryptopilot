@@ -156,7 +156,7 @@ export function NewSignalNotificationEmail({
             <Text className="mb-2 text-xs font-semibold text-blue-900 uppercase">
               📝 Rationales
             </Text>
-            <ul className="list-disc space-y-1 pl-5">
+            <ul className="list-disc pl-5">
               {signal.rationales.slice(0, 3).map((rationale, idx) => (
                 <li key={idx} className="text-sm text-blue-900">
                   {rationale}
@@ -171,7 +171,7 @@ export function NewSignalNotificationEmail({
       <Section className="my-6 text-center">
         <Button
           href={signalUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           📊 View Full Signal
         </Button>
@@ -188,7 +188,8 @@ export function NewSignalNotificationEmail({
         follow. You can manage your preferences in{" "}
         <a
           href={`${SiteConfig.prodUrl}/account/email`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           email settings
         </a>
@@ -309,7 +310,7 @@ export function NewSignalNotificationEmail({
             <Text className="mb-2 text-xs font-semibold text-blue-900 uppercase">
               📝 Rationales
             </Text>
-            <ul className="list-disc space-y-1 pl-5">
+            <ul className="list-disc pl-5">
               {signal.rationales.slice(0, 3).map((rationale, idx) => (
                 <li key={idx} className="text-sm text-blue-900">
                   {rationale}
@@ -324,7 +325,7 @@ export function NewSignalNotificationEmail({
       <Section className="my-6 text-center">
         <Button
           href={signalUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           📊 Voir le signal complet
         </Button>
@@ -341,7 +342,8 @@ export function NewSignalNotificationEmail({
         tu suis. Tu peux gérer tes préférences dans{" "}
         <a
           href={`${SiteConfig.prodUrl}/account/email`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           les paramètres email
         </a>

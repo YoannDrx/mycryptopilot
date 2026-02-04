@@ -71,7 +71,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
           <li>
             <a
               href={`${SiteConfig.prodUrl}/marketplace`}
-              className="text-indigo-600 no-underline"
+              style={{ color: "#10b981" }}
+              className="no-underline"
             >
               Explore the Trader Marketplace
             </a>
@@ -79,7 +80,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
           <li>
             <a
               href={`${SiteConfig.prodUrl}/orgs/pricing`}
-              className="text-indigo-600 no-underline"
+              style={{ color: "#10b981" }}
+              className="no-underline"
             >
               View subscription plans
             </a>
@@ -87,7 +89,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
           <li>
             <a
               href={`${SiteConfig.prodUrl}/account/integrations`}
-              className="text-indigo-600 no-underline"
+              style={{ color: "#10b981" }}
+              className="no-underline"
             >
               Connect your Discord
             </a>
@@ -109,7 +112,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
         trader, public marketplace access. Upgrade to{" "}
         <a
           href={`${SiteConfig.prodUrl}/orgs/pricing`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           Pro or Ultra
         </a>{" "}
@@ -120,7 +124,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
         Questions? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>
@@ -180,7 +185,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
           <li>
             <a
               href={`${SiteConfig.prodUrl}/marketplace`}
-              className="text-indigo-600 no-underline"
+              style={{ color: "#10b981" }}
+              className="no-underline"
             >
               Explorer la Marketplace des Traders
             </a>
@@ -188,7 +194,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
           <li>
             <a
               href={`${SiteConfig.prodUrl}/orgs/pricing`}
-              className="text-indigo-600 no-underline"
+              style={{ color: "#10b981" }}
+              className="no-underline"
             >
               Voir les plans d'abonnement
             </a>
@@ -196,7 +203,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
           <li>
             <a
               href={`${SiteConfig.prodUrl}/account/integrations`}
-              className="text-indigo-600 no-underline"
+              style={{ color: "#10b981" }}
+              className="no-underline"
             >
               Connecter ton Discord
             </a>
@@ -218,7 +226,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
         trader suivi, accès à la marketplace publique. Passe à{" "}
         <a
           href={`${SiteConfig.prodUrl}/orgs/pricing`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           Pro ou Ultra
         </a>{" "}
@@ -229,7 +238,8 @@ export function WelcomeEmail({ userName }: WelcomeEmailProps) {
         Questions ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>

@@ -75,10 +75,10 @@ function getPlanFeatures(plan: MyCryptoPilotPlanName): {
 }
 
 export function SubscriptionActivationEmail({
-  userName,
-  plan,
-  periodEnd,
-  isExtension,
+  userName = "User",
+  plan = "pro",
+  periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  isExtension = false,
 }: SubscriptionActivationEmailProps) {
   const planDisplayName =
     plan === "free" ? "Free" : plan === "pro" ? "Pro" : "Ultra";
@@ -115,29 +115,31 @@ export function SubscriptionActivationEmail({
       </Text>
 
       {/* Plan Details Card */}
-      <Section className="my-6 rounded-lg border border-indigo-200 bg-indigo-50 p-6">
-        <Text className="mb-4 text-lg font-semibold text-indigo-900">
+      <Section className="my-6 rounded-lg border border-emerald-200 bg-emerald-50 p-6">
+        <Text className="mb-4 text-lg font-semibold text-emerald-900">
           📋 Plan Details
         </Text>
         <table>
           <tr>
             <td style={{ paddingRight: "12px", paddingBottom: "8px" }}>
-              <Text className="text-sm font-medium text-indigo-900">Plan:</Text>
+              <Text className="text-sm font-medium text-emerald-900">
+                Plan:
+              </Text>
             </td>
             <td style={{ paddingBottom: "8px" }}>
-              <Text className="text-base font-bold text-indigo-900">
+              <Text className="text-base font-bold text-emerald-900">
                 {planDisplayName}
               </Text>
             </td>
           </tr>
           <tr>
             <td style={{ paddingRight: "12px" }}>
-              <Text className="text-sm font-medium text-indigo-900">
+              <Text className="text-sm font-medium text-emerald-900">
                 Valid until:
               </Text>
             </td>
             <td>
-              <Text className="text-base font-bold text-indigo-900">
+              <Text className="text-base font-bold text-emerald-900">
                 {periodEnd.toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
@@ -165,7 +167,7 @@ export function SubscriptionActivationEmail({
       <Section className="my-6 text-center">
         <Button
           href={`${SiteConfig.prodUrl}/orgs/dashboard`}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           🚀 Access your dashboard
         </Button>
@@ -173,7 +175,10 @@ export function SubscriptionActivationEmail({
 
       <Text className="text-sm text-gray-500">
         You can now access all {planDisplayName} features on{" "}
-        <a href={SiteConfig.prodUrl} className="text-indigo-600 underline">
+        <a
+          href={SiteConfig.prodUrl}
+          style={{ color: "#10b981", textDecoration: "underline" }}
+        >
           {SiteConfig.title}
         </a>
         . If you have any questions, feel free to reply to this email.
@@ -201,31 +206,31 @@ export function SubscriptionActivationEmail({
       </Text>
 
       {/* Plan Details Card - French */}
-      <Section className="my-6 rounded-lg border border-indigo-200 bg-indigo-50 p-6">
-        <Text className="mb-4 text-lg font-semibold text-indigo-900">
+      <Section className="my-6 rounded-lg border border-emerald-200 bg-emerald-50 p-6">
+        <Text className="mb-4 text-lg font-semibold text-emerald-900">
           📋 Détails du plan
         </Text>
         <table>
           <tr>
             <td style={{ paddingRight: "12px", paddingBottom: "8px" }}>
-              <Text className="text-sm font-medium text-indigo-900">
+              <Text className="text-sm font-medium text-emerald-900">
                 Plan :
               </Text>
             </td>
             <td style={{ paddingBottom: "8px" }}>
-              <Text className="text-base font-bold text-indigo-900">
+              <Text className="text-base font-bold text-emerald-900">
                 {planDisplayName}
               </Text>
             </td>
           </tr>
           <tr>
             <td style={{ paddingRight: "12px" }}>
-              <Text className="text-sm font-medium text-indigo-900">
+              <Text className="text-sm font-medium text-emerald-900">
                 Valable jusqu'au :
               </Text>
             </td>
             <td>
-              <Text className="text-base font-bold text-indigo-900">
+              <Text className="text-base font-bold text-emerald-900">
                 {periodEnd.toLocaleDateString("fr-FR", {
                   year: "numeric",
                   month: "long",
@@ -253,7 +258,7 @@ export function SubscriptionActivationEmail({
       <Section className="my-6 text-center">
         <Button
           href={`${SiteConfig.prodUrl}/orgs/dashboard`}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           🚀 Accéder à ton tableau de bord
         </Button>
@@ -262,7 +267,10 @@ export function SubscriptionActivationEmail({
       <Text className="text-sm text-gray-500">
         Tu peux maintenant accéder à toutes les fonctionnalités{" "}
         {planDisplayName} sur{" "}
-        <a href={SiteConfig.prodUrl} className="text-indigo-600 underline">
+        <a
+          href={SiteConfig.prodUrl}
+          style={{ color: "#10b981", textDecoration: "underline" }}
+        >
           {SiteConfig.title}
         </a>
         . Si tu as des questions, n'hésite pas à répondre à cet email.

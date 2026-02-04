@@ -56,7 +56,7 @@ export function DiscordInviteEmail({
       <Section className="my-6 text-center">
         <Button
           href={inviteUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           Join Discord
         </Button>
@@ -109,7 +109,7 @@ export function DiscordInviteEmail({
       <Section className="my-6 text-center">
         <Button
           href={inviteUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           Rejoindre Discord
         </Button>

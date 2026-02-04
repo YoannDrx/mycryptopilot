@@ -53,7 +53,7 @@ export function TraderInvitationEmail({
       <Section className="my-6 text-center">
         <Button
           href={invitationUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           Follow {traderName}
         </Button>
@@ -68,7 +68,8 @@ export function TraderInvitationEmail({
         Questions? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>
@@ -108,7 +109,7 @@ export function TraderInvitationEmail({
       <Section className="my-6 text-center">
         <Button
           href={invitationUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           Suivre {traderName}
         </Button>
@@ -123,7 +124,8 @@ export function TraderInvitationEmail({
         Questions ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>

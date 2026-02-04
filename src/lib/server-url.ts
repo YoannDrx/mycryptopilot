@@ -1,9 +1,15 @@
 // Import env only in non-test environment to avoid ES Module issues with Playwright
+// Also skip in React Email environment to avoid validation errors
 type EnvType = { BETTER_AUTH_URL?: string };
 let env: EnvType | undefined;
 if (process.env.NODE_ENV !== "test") {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  env = require("./env").env;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    env = require("./env").env;
+  } catch {
+    // Silently fail in environments where env validation fails (e.g., React Email dev server)
+    env = undefined;
+  }
 }
 
 /**

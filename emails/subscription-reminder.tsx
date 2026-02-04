@@ -17,10 +17,10 @@ type SubscriptionReminderEmailProps = {
 };
 
 export function SubscriptionReminderEmail({
-  userName,
-  planName,
-  expiresAt,
-  daysRemaining,
+  userName = "User",
+  planName = "pro",
+  expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+  daysRemaining = 3,
 }: SubscriptionReminderEmailProps) {
   const urgencyLevel =
     daysRemaining <= 1 ? "high" : daysRemaining <= 3 ? "medium" : "low";
@@ -103,7 +103,7 @@ export function SubscriptionReminderEmail({
       <Section className="my-6 text-center">
         <Button
           href={`${SiteConfig.prodUrl}/orgs/pricing`}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           🔄 Renew my subscription
         </Button>
@@ -171,7 +171,7 @@ export function SubscriptionReminderEmail({
       <Section className="my-6 text-center">
         <Button
           href={`${SiteConfig.prodUrl}/orgs/pricing`}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           🔄 Renouveler mon abonnement
         </Button>

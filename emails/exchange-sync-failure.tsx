@@ -19,12 +19,12 @@ type ExchangeSyncFailureEmailProps = {
 };
 
 export function ExchangeSyncFailureEmail({
-  userName,
-  exchange,
-  errorMessage,
+  userName = "User",
+  exchange = "Binance",
+  errorMessage = "Connection timeout",
   lastSuccessfulSync,
-  connectionId,
-  exchangesUrl,
+  connectionId = "conn_123",
+  exchangesUrl = "https://mycryptopilot.app/account/exchanges",
 }: ExchangeSyncFailureEmailProps) {
   const isKeyError =
     errorMessage.includes("Invalid API") ||
@@ -106,7 +106,7 @@ export function ExchangeSyncFailureEmail({
           <Section className="my-6 text-center">
             <Button
               href={exchangesUrl}
-              className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+              className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
             >
               🔑 Reconnect my exchange
             </Button>
@@ -138,7 +138,7 @@ export function ExchangeSyncFailureEmail({
           <Section className="my-6 text-center">
             <Button
               href={exchangesUrl}
-              className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+              className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
             >
               📊 View my exchanges
             </Button>
@@ -165,7 +165,8 @@ export function ExchangeSyncFailureEmail({
         Questions? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>
@@ -247,7 +248,7 @@ export function ExchangeSyncFailureEmail({
           <Section className="my-6 text-center">
             <Button
               href={exchangesUrl}
-              className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+              className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
             >
               🔑 Reconnecter mon exchange
             </Button>
@@ -280,7 +281,7 @@ export function ExchangeSyncFailureEmail({
           <Section className="my-6 text-center">
             <Button
               href={exchangesUrl}
-              className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+              className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
             >
               📊 Voir mes exchanges
             </Button>
@@ -307,7 +308,8 @@ export function ExchangeSyncFailureEmail({
         Questions ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>

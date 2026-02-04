@@ -19,12 +19,12 @@ type TestPaymentSuccessEmailProps = {
 };
 
 export function TestPaymentSuccessEmail({
-  userName,
-  txHash,
-  network,
-  amountUSD,
-  confirmedAt,
-  pricingUrl,
+  userName = "User",
+  txHash = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  network = "BASE",
+  amountUSD = 1,
+  confirmedAt = new Date(),
+  pricingUrl = "https://mycryptopilot.app/orgs/pricing",
 }: TestPaymentSuccessEmailProps) {
   const explorerUrl =
     network === "BASE"
@@ -57,18 +57,18 @@ export function TestPaymentSuccessEmail({
         <Text className="mb-2 text-sm font-semibold text-green-900">
           ✓ Payment Details
         </Text>
-        <ul className="list-none space-y-1 pl-0 text-sm text-green-800">
+        <ul className="list-none pl-0 text-sm text-green-800">
           <li>
             <strong>Amount:</strong> ${amountUSD} USD
           </li>
-          <li>
+          <li style={{ marginTop: "4px" }}>
             <strong>Network:</strong>{" "}
             {network === "BASE" ? "Base (USDC)" : "Tron (USDT)"}
           </li>
-          <li>
+          <li style={{ marginTop: "4px" }}>
             <strong>Status:</strong> Confirmed
           </li>
-          <li>
+          <li style={{ marginTop: "4px" }}>
             <strong>Time:</strong> {confirmedAt.toLocaleString()}
           </li>
         </ul>
@@ -110,7 +110,7 @@ export function TestPaymentSuccessEmail({
       <Section className="my-6 text-center">
         <Button
           href={pricingUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           View Plans & Subscribe
         </Button>
@@ -120,7 +120,8 @@ export function TestPaymentSuccessEmail({
         Questions about crypto payments? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>
@@ -151,18 +152,18 @@ export function TestPaymentSuccessEmail({
         <Text className="mb-2 text-sm font-semibold text-green-900">
           ✓ Détails du paiement
         </Text>
-        <ul className="list-none space-y-1 pl-0 text-sm text-green-800">
+        <ul className="list-none pl-0 text-sm text-green-800">
           <li>
             <strong>Montant :</strong> ${amountUSD} USD
           </li>
-          <li>
+          <li style={{ marginTop: "4px" }}>
             <strong>Réseau :</strong>{" "}
             {network === "BASE" ? "Base (USDC)" : "Tron (USDT)"}
           </li>
-          <li>
+          <li style={{ marginTop: "4px" }}>
             <strong>Statut :</strong> Confirmé
           </li>
-          <li>
+          <li style={{ marginTop: "4px" }}>
             <strong>Heure :</strong> {confirmedAt.toLocaleString("fr-FR")}
           </li>
         </ul>
@@ -204,7 +205,7 @@ export function TestPaymentSuccessEmail({
       <Section className="my-6 text-center">
         <Button
           href={pricingUrl}
-          className="rounded-lg bg-indigo-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
+          className="rounded-lg bg-emerald-600 px-6 py-3 text-center text-base font-semibold text-white no-underline"
         >
           Voir les plans & S'abonner
         </Button>
@@ -214,7 +215,8 @@ export function TestPaymentSuccessEmail({
         Questions sur les paiements crypto ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>

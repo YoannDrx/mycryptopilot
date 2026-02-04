@@ -3,12 +3,16 @@ import { Markdown, Preview } from "@react-email/components";
 import { EmailLayout } from "./utils/email-layout";
 
 export default function MarkdownEmail(props: {
-  markdown: string;
+  markdown?: string;
   preview?: string;
   disabledSignature?: boolean;
 }) {
+  // Create a local copy to avoid mutating frozen props
+  let markdown =
+    props.markdown ?? "# Hello\n\nThis is a sample markdown email.";
+
   if (!props.disabledSignature) {
-    props.markdown += `
+    markdown += `
 
 Best,\n
 ${SiteConfig.team.name} from ${SiteConfig.title}
@@ -16,7 +20,7 @@ ${SiteConfig.team.name} from ${SiteConfig.title}
   }
 
   // Normalize markdown by removing leading/trailing spaces from each line
-  props.markdown = props.markdown
+  markdown = markdown
     .split("\n")
     .map((line) => line.trim())
     .join("\n");
@@ -35,11 +39,11 @@ ${SiteConfig.team.name} from ${SiteConfig.title}
             lineHeight: "1.5rem",
           },
           link: {
-            color: "#6366f1",
+            color: "#10b981",
           },
         }}
       >
-        {props.markdown}
+        {markdown}
       </Markdown>
     </EmailLayout>
   );

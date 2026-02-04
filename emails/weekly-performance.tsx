@@ -35,11 +35,21 @@ type WeeklyPerformanceEmailProps = {
 };
 
 export function WeeklyPerformanceEmail({
-  userName,
-  weekStartDate,
-  weekEndDate,
-  stats,
-  topTraders,
+  userName = "User",
+  weekStartDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+  weekEndDate = new Date(),
+  stats = {
+    totalSignals: 12,
+    signalsFollowed: 8,
+    winRate: 62.5,
+    totalPnlPercent: 4.25,
+    bestTrade: { asset: "BTC", pnlPercent: 8.5 },
+    worstTrade: { asset: "ETH", pnlPercent: -2.1 },
+  },
+  topTraders = [
+    { name: "CryptoMaster", winRate: 75, signalsCount: 5 },
+    { name: "TradingPro", winRate: 68, signalsCount: 4 },
+  ],
 }: WeeklyPerformanceEmailProps) {
   const isProfitable = stats.totalPnlPercent >= 0;
   const performanceEmoji = isProfitable ? "📈" : "📉";
@@ -183,20 +193,20 @@ export function WeeklyPerformanceEmail({
 
       {/* Top Traders */}
       {topTraders.length > 0 && (
-        <Section className="my-6 rounded-lg border border-indigo-200 bg-indigo-50 p-6">
-          <Text className="mb-4 text-lg font-semibold text-indigo-900">
+        <Section className="my-6 rounded-lg border border-emerald-200 bg-emerald-50 p-6">
+          <Text className="mb-4 text-lg font-semibold text-emerald-900">
             ⭐ Your Top Performers This Week
           </Text>
           <table style={{ width: "100%" }}>
             {topTraders.slice(0, 3).map((trader, idx) => (
               <tr key={idx}>
                 <td style={{ padding: "4px 0" }}>
-                  <Text className="text-base font-semibold text-indigo-900">
+                  <Text className="text-base font-semibold text-emerald-900">
                     {idx + 1}. {trader.name}
                   </Text>
                 </td>
                 <td style={{ padding: "4px 0", textAlign: "right" }}>
-                  <Text className="text-sm text-indigo-700">
+                  <Text className="text-sm text-emerald-700">
                     {trader.winRate.toFixed(0)}% WR ({trader.signalsCount}{" "}
                     signals)
                   </Text>
@@ -221,7 +231,8 @@ export function WeeklyPerformanceEmail({
         traders on the{" "}
         <a
           href={`${SiteConfig.prodUrl}/marketplace`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           marketplace
         </a>
@@ -362,20 +373,20 @@ export function WeeklyPerformanceEmail({
 
       {/* Top Traders - French */}
       {topTraders.length > 0 && (
-        <Section className="my-6 rounded-lg border border-indigo-200 bg-indigo-50 p-6">
-          <Text className="mb-4 text-lg font-semibold text-indigo-900">
+        <Section className="my-6 rounded-lg border border-emerald-200 bg-emerald-50 p-6">
+          <Text className="mb-4 text-lg font-semibold text-emerald-900">
             ⭐ Tes meilleurs performers cette semaine
           </Text>
           <table style={{ width: "100%" }}>
             {topTraders.slice(0, 3).map((trader, idx) => (
               <tr key={idx}>
                 <td style={{ padding: "4px 0" }}>
-                  <Text className="text-base font-semibold text-indigo-900">
+                  <Text className="text-base font-semibold text-emerald-900">
                     {idx + 1}. {trader.name}
                   </Text>
                 </td>
                 <td style={{ padding: "4px 0", textAlign: "right" }}>
-                  <Text className="text-sm text-indigo-700">
+                  <Text className="text-sm text-emerald-700">
                     {trader.winRate.toFixed(0)}% WR ({trader.signalsCount}{" "}
                     signaux)
                   </Text>
@@ -400,7 +411,8 @@ export function WeeklyPerformanceEmail({
         performants sur la{" "}
         <a
           href={`${SiteConfig.prodUrl}/marketplace`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           marketplace
         </a>

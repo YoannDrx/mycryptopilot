@@ -19,12 +19,12 @@ type ReferralRewardEmailProps = {
 };
 
 export function ReferralRewardEmail({
-  userName,
-  referredUserName,
-  rewardAmountUSD,
-  totalEarnedUSD,
-  referralCount,
-  creditedAt,
+  userName = "User",
+  referredUserName = "New User",
+  rewardAmountUSD = 10,
+  totalEarnedUSD = 50,
+  referralCount = 5,
+  creditedAt = new Date(),
 }: ReferralRewardEmailProps) {
   return (
     <EmailLayout>

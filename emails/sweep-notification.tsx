@@ -30,9 +30,9 @@ type SweepNotificationEmailProps = {
 };
 
 export const SweepNotificationEmail = ({
-  transactions,
-  totalAmountUSD,
-  binanceWallets,
+  transactions = [],
+  totalAmountUSD = 0,
+  binanceWallets = {},
 }: SweepNotificationEmailProps) => {
   const baseTransactions = transactions.filter((tx) => tx.network === "BASE");
   const tronTransactions = transactions.filter((tx) => tx.network === "TRON");
@@ -245,7 +245,7 @@ const codeSmall = {
 };
 
 const link = {
-  color: "#3b82f6",
+  color: "#10b981",
   fontSize: "14px",
   textDecoration: "underline",
 };

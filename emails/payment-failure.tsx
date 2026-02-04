@@ -60,12 +60,12 @@ function getFailureMessageFR(
 }
 
 export function PaymentFailureEmail({
-  userName,
+  userName = "User",
   txHash,
-  network,
-  amountUSD,
-  failureReason,
-  attemptedAt,
+  network = "BASE",
+  amountUSD = 49,
+  failureReason = "unknown",
+  attemptedAt = new Date(),
 }: PaymentFailureEmailProps) {
   const explorerUrl = txHash
     ? network === "BASE"
@@ -198,7 +198,8 @@ export function PaymentFailureEmail({
         Need help? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>{" "}
@@ -328,7 +329,8 @@ export function PaymentFailureEmail({
         Besoin d'aide ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>{" "}

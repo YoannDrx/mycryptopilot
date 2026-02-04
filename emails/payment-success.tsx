@@ -21,13 +21,13 @@ type PaymentSuccessEmailProps = {
 };
 
 export function PaymentSuccessEmail({
-  userName,
-  txHash,
-  network,
-  amountUSD,
-  confirmedAt,
-  plan,
-  periodEnd,
+  userName = "User",
+  txHash = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  network = "BASE",
+  amountUSD = 49,
+  confirmedAt = new Date(),
+  plan = "pro",
+  periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
 }: PaymentSuccessEmailProps) {
   const explorerUrl =
     network === "BASE"
@@ -164,7 +164,8 @@ export function PaymentSuccessEmail({
         Questions about your payment? Contact us at{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>
@@ -293,7 +294,8 @@ export function PaymentSuccessEmail({
         Questions sur ton paiement ? Contacte-nous à{" "}
         <a
           href={`mailto:${SiteConfig.email.contact}`}
-          className="text-indigo-600 no-underline"
+          style={{ color: "#10b981" }}
+          className="no-underline"
         >
           {SiteConfig.email.contact}
         </a>
