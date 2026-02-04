@@ -27,11 +27,11 @@ type WeeklyPerformanceEmailProps = {
       pnlPercent: number;
     } | null;
   };
-  topTraders: Array<{
+  topTraders: {
     name: string;
     winRate: number;
     signalsCount: number;
-  }>;
+  }[];
 };
 
 export function WeeklyPerformanceEmail({
@@ -142,7 +142,7 @@ export function WeeklyPerformanceEmail({
       </Section>
 
       {/* Best & Worst Trades */}
-      {(stats.bestTrade || stats.worstTrade) && (
+      {(stats.bestTrade ?? stats.worstTrade) && (
         <Section className="my-6">
           <Text className="mb-3 text-base font-semibold text-gray-900">
             🏆 Notable Trades
@@ -321,7 +321,7 @@ export function WeeklyPerformanceEmail({
       </Section>
 
       {/* Best & Worst Trades - French */}
-      {(stats.bestTrade || stats.worstTrade) && (
+      {(stats.bestTrade ?? stats.worstTrade) && (
         <Section className="my-6">
           <Text className="mb-3 text-base font-semibold text-gray-900">
             🏆 Trades remarquables
