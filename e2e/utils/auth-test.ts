@@ -27,16 +27,16 @@ export async function createTestAccount(options: {
   // Navigate to signup page
   await options.page.goto(`/auth/signup?callbackUrl=${options.callbackURL}`);
 
-  // Fill out the form
-  await options.page.getByLabel("Name").fill(userData.name);
+  // Fill out the form (French labels)
+  await options.page.getByLabel("Nom").fill(userData.name);
   await options.page.getByLabel("Email").fill(userData.email);
   await options.page.locator('input[name="password"]').fill(userData.password);
   await options.page
     .locator('input[name="verifyPassword"]')
     .fill(userData.password);
 
-  // Submit the form
-  await options.page.getByRole("button", { name: /sign up/i }).click();
+  // Submit the form (French button)
+  await options.page.getByRole("button", { name: /créer mon compte/i }).click();
 
   // Wait for navigation to complete - we should be redirected to the callback URL
   if (options.callbackURL) {
@@ -101,11 +101,8 @@ export async function signInAccount(options: {
   await page.getByLabel("Email").fill(userData.email);
   await page.locator('input[name="password"]').fill(userData.password);
 
-  // Submit the form
-  await page
-    .getByRole("button", { name: /sign in/i })
-    .first()
-    .click();
+  // Submit the form (exact match to avoid OAuth buttons like "Sign in with Google")
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
   // Wait for navigation to complete if a callback URL is provided
   if (callbackURL) {

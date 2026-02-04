@@ -1,8 +1,5 @@
 "use client";
 
-import { Divider } from "@/components/nowts/divider";
-import { Typography } from "@/components/nowts/typography";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ProviderButton } from "./provider-button";
 import { SignInCredentialsAndMagicLinkForm } from "./sign-in-credentials-and-magic-link-form";
@@ -21,37 +18,38 @@ export const SignInProviders = ({
 
   const gridClassName =
     providers.length <= 2
-      ? "grid grid-cols-1 gap-2 lg:grid-cols-2 lg:gap-4"
-      : "grid grid-cols-1 gap-2 lg:gap-4";
+      ? "grid grid-cols-1 gap-3 lg:grid-cols-2"
+      : "grid grid-cols-1 gap-3";
 
   return (
-    <div className="flex flex-col gap-4 lg:gap-6">
+    <div className="flex flex-col gap-5">
+      {/* Social Providers First */}
+      {providers.length > 0 && (
+        <>
+          <div className={gridClassName}>
+            {providers.includes("discord") && (
+              <ProviderButton providerId="discord" callbackUrl={callbackUrl} />
+            )}
+            {providers.includes("google") && (
+              <ProviderButton providerId="google" callbackUrl={callbackUrl} />
+            )}
+            {providers.includes("github") && (
+              <ProviderButton providerId="github" callbackUrl={callbackUrl} />
+            )}
+          </div>
+
+          {/* Terminal Style Separator */}
+          <div className="relative flex items-center justify-center">
+            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-[var(--glass-border)] to-transparent" />
+            <span className="relative z-10 bg-[var(--bg-onyx)] px-4">
+              <span className="terminal-text text-xs">OU EMAIL MAGIQUE</span>
+            </span>
+          </div>
+        </>
+      )}
+
+      {/* Email/Magic Link Form */}
       <SignInCredentialsAndMagicLinkForm callbackUrl={callbackUrl} />
-      {providers.length > 0 && <Divider>or</Divider>}
-
-      <div className={gridClassName}>
-        {/* ℹ️ Add provider you want to support here */}
-        {providers.includes("github") && (
-          <ProviderButton providerId="github" callbackUrl={callbackUrl} />
-        )}
-        {providers.includes("google") && (
-          <ProviderButton providerId="google" callbackUrl={callbackUrl} />
-        )}
-        {providers.includes("discord") && (
-          <ProviderButton providerId="discord" callbackUrl={callbackUrl} />
-        )}
-      </div>
-
-      <Typography variant="muted" className="text-xs">
-        You don't have an account?{" "}
-        <Typography
-          variant="link"
-          as={Link}
-          href={`/auth/signup?callbackUrl=${callbackUrl}`}
-        >
-          Sign up
-        </Typography>
-      </Typography>
     </div>
   );
 };

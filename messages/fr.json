@@ -1,0 +1,176 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Envoyer",
+    "search": "Rechercher",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer"
+  },
+  "nav": {
+    "home": "Accueil",
+    "marketplace": "Marketplace",
+    "signals": "Signaux",
+    "console": "Console",
+    "pricing": "Tarifs",
+    "dashboard": "Tableau de bord",
+    "account": "Compte",
+    "signIn": "Connexion",
+    "signOut": "Déconnexion",
+    "settings": "Paramètres"
+  },
+  "theme": {
+    "light": "Mode clair",
+    "dark": "Mode sombre",
+    "system": "Système"
+  },
+  "locale": {
+    "switchTo": "Changer la langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "hero": {
+    "headline": "Ne Tradez Pas Sans Radar",
+    "subheadline": "Suivez des traders vérifiés. Recevez leurs signaux en temps réel. Gérez votre risque comme un pro.",
+    "cta": {
+      "primary": "Voir les Traders",
+      "secondary": "Comment ça marche"
+    },
+    "stats": {
+      "traders": "Traders vérifiés",
+      "signals": "Signaux par jour",
+      "winrate": "Winrate moyen"
+    }
+  },
+  "features": {
+    "title": "Tout ce dont vous avez besoin pour trader sereinement",
+    "signals": {
+      "title": "Signaux en Temps Réel",
+      "description": "Recevez les signaux de traders vérifiés instantanément sur Discord et dans l'app."
+    },
+    "risk": {
+      "title": "Console de Risque",
+      "description": "Calculez votre position size, définissez vos SL/TP, et respectez votre plan de trading."
+    },
+    "journal": {
+      "title": "Journal de Trading",
+      "description": "Trackez toutes vos positions, analysez vos performances, identifiez vos erreurs."
+    },
+    "verified": {
+      "title": "Traders Vérifiés",
+      "description": "Connectez-vous aux APIs des traders pour voir leurs vraies performances, pas des screenshots."
+    }
+  },
+  "pricing": {
+    "title": "Des plans adaptés à votre niveau",
+    "subtitle": "Commencez gratuitement, upgradez quand vous êtes prêt.",
+    "monthly": "Par mois",
+    "popular": "Populaire",
+    "free": {
+      "name": "Free",
+      "description": "Pour découvrir la plateforme",
+      "features": [
+        "5 signaux par jour",
+        "1 trader à suivre",
+        "Screener 5 min delay",
+        "Aperçus floutés"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Pour les traders sérieux",
+      "features": [
+        "50 signaux par jour",
+        "5 traders à suivre",
+        "Screener temps réel",
+        "Console de risque",
+        "Journal de trading"
+      ]
+    },
+    "ultra": {
+      "name": "Ultra",
+      "description": "Pour les traders professionnels",
+      "features": [
+        "Signaux illimités",
+        "Traders illimités",
+        "Screener 5 sec",
+        "Alertes personnalisées",
+        "Support prioritaire"
+      ]
+    },
+    "cta": "Choisir ce plan"
+  },
+  "mobileApp": {
+    "title": "Application Mobile",
+    "subtitle": "Bientôt disponible sur iOS et Android",
+    "description": "Recevez vos signaux et gérez vos positions où que vous soyez.",
+    "notify": "Me notifier au lancement",
+    "placeholder": "Entrez votre email",
+    "comingSoon": "Bientôt"
+  },
+  "footer": {
+    "description": "La plateforme de trading crypto pour suivre des traders vérifiés et recevoir des signaux en temps réel.",
+    "product": "Produit",
+    "company": "Entreprise",
+    "legal": "Légal",
+    "links": {
+      "marketplace": "Marketplace",
+      "pricing": "Tarifs",
+      "docs": "Documentation",
+      "about": "À propos",
+      "contact": "Contact",
+      "blog": "Blog",
+      "terms": "CGU",
+      "privacy": "Confidentialité"
+    },
+    "copyright": "© {year} MyCryptoPilot. Tous droits réservés."
+  },
+  "auth": {
+    "signIn": "Connexion",
+    "signUp": "Créer un compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "orContinueWith": "Ou continuer avec",
+    "termsAgreement": "En créant un compte, vous acceptez nos {terms} et notre {privacy}."
+  },
+  "traders": {
+    "title": "Marketplace des Traders",
+    "subtitle": "Découvrez et suivez les meilleurs traders crypto vérifiés.",
+    "filters": {
+      "all": "Tous",
+      "verified": "Vérifiés",
+      "topPerformers": "Top Performers",
+      "speciality": "Spécialité",
+      "timeframe": "Timeframe"
+    },
+    "card": {
+      "followers": "Followers",
+      "winrate": "Winrate",
+      "signals": "Signaux",
+      "follow": "Suivre",
+      "following": "Suivi"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenue, {name}",
+    "overview": "Vue d'ensemble",
+    "recentSignals": "Signaux récents",
+    "myTraders": "Mes traders",
+    "performance": "Performance",
+    "noSignals": "Aucun signal pour le moment",
+    "noTraders": "Vous ne suivez aucun trader"
+  }
+}

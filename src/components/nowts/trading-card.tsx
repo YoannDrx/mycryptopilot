@@ -46,7 +46,7 @@ export const TradingCard = ({
 }: TradingCardProps) => {
   const [isExpanded, setIsExpanded] = useState(!compact);
   const isLong = payload.bias === "LONG";
-  const biasColor = isLong ? "text-green-500" : "text-red-500";
+  const biasColor = isLong ? "text-[#00ffaa]" : "text-[#ff3366]";
 
   // Calculate time to expiry
   const now = new Date();
@@ -57,11 +57,12 @@ export const TradingCard = ({
   return (
     <div className={cn("relative", className)} data-testid="trading-card">
       <Card
+        variant="hyper"
         className={cn(
-          "bg-background relative overflow-hidden rounded-lg border-2 transition-colors duration-200",
+          "relative overflow-hidden rounded-xl transition-all duration-200",
           isLong
-            ? "border-green-500/60 shadow-sm shadow-green-500/10"
-            : "border-red-500/60 shadow-sm shadow-red-500/10",
+            ? "border-[#00ffaa]/40 shadow-[0_0_20px_rgba(0,255,170,0.1)] hover:border-[#00ffaa]/60 hover:shadow-[0_0_30px_rgba(0,255,170,0.15)]"
+            : "border-[#ff3366]/40 shadow-[0_0_20px_rgba(255,51,102,0.1)] hover:border-[#ff3366]/60 hover:shadow-[0_0_30px_rgba(255,51,102,0.15)]",
           isExpired && "opacity-50",
         )}
       >
@@ -142,10 +143,10 @@ export const TradingCard = ({
 
               {/* Type & Leverage - badges */}
               <div className="flex flex-col items-end gap-2">
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="glass" className="text-xs">
                   {payload.instrumentType}
                 </Badge>
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="glass" className="text-xs">
                   {payload.leverageBand}
                 </Badge>
               </div>
@@ -164,7 +165,7 @@ export const TradingCard = ({
           <CardContent className="relative z-10 pt-4 pb-6">
             {/* Entry & Invalidation */}
             <div className="mb-6 grid grid-cols-2 gap-4">
-              <div className="rounded-lg border p-3">
+              <div className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-3">
                 <div className="text-muted-foreground mb-2 flex items-center gap-1 text-xs">
                   <ArrowUp className="size-3" />
                   <span className="font-medium">Entry</span>
@@ -173,12 +174,12 @@ export const TradingCard = ({
                   ${Number(payload.entry).toFixed(2)}
                 </div>
               </div>
-              <div className="rounded-lg border p-3">
+              <div className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-3">
                 <div className="text-muted-foreground mb-2 flex items-center gap-1 text-xs">
                   <ArrowDown className="size-3" />
                   <span className="font-medium">Invalidation</span>
                 </div>
-                <div className="text-destructive text-xl font-bold">
+                <div className="text-xl font-bold text-[#ff3366]">
                   ${Number(payload.invalidation).toFixed(2)}
                 </div>
               </div>
@@ -192,7 +193,7 @@ export const TradingCard = ({
               </div>
               <div className="flex flex-wrap gap-2">
                 {payload.tps.map((tp, idx) => (
-                  <Badge key={idx} variant="outline" className="font-mono">
+                  <Badge key={idx} variant="emerald" className="font-mono">
                     TP{idx + 1}: ${Number(tp).toFixed(2)}
                   </Badge>
                 ))}
@@ -201,7 +202,7 @@ export const TradingCard = ({
 
             {/* Risk & Confidence */}
             <div className="mb-6 grid grid-cols-2 gap-4">
-              <div className="rounded-lg border p-3">
+              <div className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-3">
                 <div className="text-muted-foreground mb-2 text-xs">
                   Risk Level
                 </div>
@@ -211,17 +212,21 @@ export const TradingCard = ({
                       key={level}
                       className={cn(
                         "h-2 flex-1 rounded-full",
-                        level <= payload.risk ? "bg-destructive" : "bg-muted",
+                        level <= payload.risk
+                          ? "bg-[#ff3366]"
+                          : "bg-[var(--bg-slate)]",
                       )}
                     />
                   ))}
                 </div>
               </div>
-              <div className="rounded-lg border p-3">
+              <div className="rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-3">
                 <div className="text-muted-foreground mb-2 text-xs">
                   Confidence
                 </div>
-                <div className="text-2xl font-bold">{payload.confidence}%</div>
+                <div className="text-2xl font-bold text-[#00ffaa]">
+                  {payload.confidence}%
+                </div>
               </div>
             </div>
 
@@ -234,14 +239,14 @@ export const TradingCard = ({
             )}
 
             {/* Rationales */}
-            <div className="mb-6 rounded-lg border p-4">
+            <div className="mb-6 rounded-lg border border-[var(--glass-border)] bg-[var(--bg-graphite)] p-4">
               <div className="text-muted-foreground mb-3 text-xs font-medium">
                 Analysis
               </div>
               <ul className="space-y-2">
                 {payload.rationales.map((rationale, idx) => (
                   <li key={idx} className="flex items-start gap-2 text-sm">
-                    <span className="text-muted-foreground">•</span>
+                    <span className="text-[#00ffaa]">•</span>
                     <span>{rationale}</span>
                   </li>
                 ))}
@@ -249,15 +254,15 @@ export const TradingCard = ({
             </div>
 
             {/* Regime & Metadata */}
-            <div className="flex flex-wrap items-center gap-2 border-t pt-4">
-              <Badge variant="outline">{payload.regime}</Badge>
-              <Badge variant="outline">
+            <div className="flex flex-wrap items-center gap-2 border-t border-[var(--glass-border)] pt-4">
+              <Badge variant="glass">{payload.regime}</Badge>
+              <Badge variant="glass">
                 {payload.managedBy === "AI" ? "🤖 AI" : "👤 Human"}
               </Badge>
               {hoursLeft !== null && !isExpired && (
-                <Badge variant="outline">⏱ {hoursLeft}h left</Badge>
+                <Badge variant="glass">⏱ {hoursLeft}h left</Badge>
               )}
-              {isExpired && <Badge variant="outline">❌ Expired</Badge>}
+              {isExpired && <Badge variant="crimson">❌ Expired</Badge>}
             </div>
 
             {/* Copy Trade Button */}

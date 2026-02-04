@@ -102,7 +102,7 @@ export function TradingSidebar({
             >
               <SidebarGroup suppressHydrationWarning>
                 <CollapsibleTrigger className="w-full [&[data-state=open]>div>svg]:rotate-180">
-                  <SidebarGroupLabel className="text-muted-foreground group/label hover:text-foreground flex w-full cursor-pointer items-center justify-between text-xs font-semibold tracking-wider uppercase transition-colors">
+                  <SidebarGroupLabel className="group/label flex w-full cursor-pointer items-center justify-between text-xs font-semibold tracking-wider text-[var(--text-muted)] uppercase transition-colors hover:text-[#00ffaa]">
                     <span className="flex items-center gap-2">
                       {group.icon && <group.icon className="h-4 w-4" />}
                       {group.title}

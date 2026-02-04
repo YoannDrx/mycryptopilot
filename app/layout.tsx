@@ -7,7 +7,7 @@ import { getServerUrl } from "@/lib/server-url";
 import { cn } from "@/lib/utils";
 import { SiteConfig } from "@/site-config";
 import type { Metadata } from "next";
-import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
+import { Geist_Mono, Sora, Space_Grotesk } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
 import "./globals.css";
@@ -83,9 +83,10 @@ const CaptionFont = Space_Grotesk({
   variable: "--font-caption",
 });
 
-const GeistSans = Inter({
+const SoraFont = Sora({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  weight: ["300", "400", "600", "800"],
+  variable: "--font-sora",
 });
 
 const GeistMono = Geist_Mono({
@@ -95,13 +96,13 @@ const GeistMono = Geist_Mono({
 
 export default function RootLayout({ children, modal }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
+    <html lang="en" className="dark h-full" suppressHydrationWarning>
       <body
         suppressHydrationWarning
         className={cn(
           "bg-background h-full font-sans antialiased",
           GeistMono.variable,
-          GeistSans.variable,
+          SoraFont.variable,
           CaptionFont.variable,
         )}
       >

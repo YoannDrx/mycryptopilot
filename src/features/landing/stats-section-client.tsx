@@ -12,11 +12,11 @@ type StatProps = {
 export function StatsClient({ stat }: { stat: StatProps }) {
   return (
     <div className="relative text-center md:px-5">
-      <h4 className="mb-2 text-2xl font-bold tabular-nums md:text-3xl">
+      <h4 className="mb-2 text-3xl font-extrabold text-[#00ffaa] tabular-nums md:text-4xl">
         <Counter from={0} to={stat.number} />
         {stat.suffix}
       </h4>
-      <p className="text-muted-foreground text-sm">{stat.text}</p>
+      <p className="text-sm text-[var(--text-secondary)]">{stat.text}</p>
     </div>
   );
 }

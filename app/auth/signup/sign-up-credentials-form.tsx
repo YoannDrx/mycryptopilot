@@ -76,9 +76,13 @@ export const SignUpCredentialsForm = () => {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Name</FormLabel>
+            <FormLabel className="text-[var(--text-secondary)]">Nom</FormLabel>
             <FormControl>
-              <Input placeholder="John Doe" {...field} />
+              <Input
+                placeholder="John Doe"
+                className="border-[var(--glass-border)] bg-[var(--bg-graphite)] focus:border-[#00ffaa]/50 focus:ring-[#00ffaa]/20"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -89,9 +93,15 @@ export const SignUpCredentialsForm = () => {
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel className="text-[var(--text-secondary)]">
+              Email
+            </FormLabel>
             <FormControl>
-              <Input placeholder="john@doe.com" {...field} />
+              <Input
+                placeholder="john@doe.com"
+                className="border-[var(--glass-border)] bg-[var(--bg-graphite)] focus:border-[#00ffaa]/50 focus:ring-[#00ffaa]/20"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -102,9 +112,15 @@ export const SignUpCredentialsForm = () => {
         name="password"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Password</FormLabel>
+            <FormLabel className="text-[var(--text-secondary)]">
+              Mot de passe
+            </FormLabel>
             <FormControl>
-              <Input type="password" {...field} />
+              <Input
+                type="password"
+                className="border-[var(--glass-border)] bg-[var(--bg-graphite)] focus:border-[#00ffaa]/50 focus:ring-[#00ffaa]/20"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -115,17 +131,28 @@ export const SignUpCredentialsForm = () => {
         name="verifyPassword"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Verify Password</FormLabel>
+            <FormLabel className="text-[var(--text-secondary)]">
+              Confirmer le mot de passe
+            </FormLabel>
             <FormControl>
-              <Input type="password" {...field} />
+              <Input
+                type="password"
+                className="border-[var(--glass-border)] bg-[var(--bg-graphite)] focus:border-[#00ffaa]/50 focus:ring-[#00ffaa]/20"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
 
-      <Button type="submit" className="w-full">
-        Sign up
+      <Button
+        type="submit"
+        variant="emerald"
+        className="w-full"
+        disabled={submitMutation.isPending}
+      >
+        {submitMutation.isPending ? "Création..." : "Créer mon compte"}
       </Button>
     </Form>
   );

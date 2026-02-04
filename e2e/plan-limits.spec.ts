@@ -114,10 +114,7 @@ test.describe("Plan Limits", () => {
     await page.getByRole("button", { name: /use password/i }).click();
     await page.getByLabel("Email").fill(userData.email);
     await page.locator('input[name="password"]').fill(userData.password);
-    await page
-      .getByRole("button", { name: /sign in/i })
-      .first()
-      .click();
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
     await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 
@@ -199,10 +196,7 @@ test.describe("Plan Limits", () => {
     await page.getByRole("button", { name: /use password/i }).click();
     await page.getByLabel("Email").fill(userData.email);
     await page.locator('input[name="password"]').fill(userData.password);
-    await page
-      .getByRole("button", { name: /sign in/i })
-      .first()
-      .click();
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
 
     await page.waitForURL(/\/dashboard$/, { timeout: 10000 });
 

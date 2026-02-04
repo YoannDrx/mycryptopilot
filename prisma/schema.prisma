@@ -715,6 +715,24 @@ model CircuitBreaker {
   @@map("circuit_breakers")
 }
 
+/// EmailSubscription: Email waitlist and newsletter subscriptions
+/// Used for mobile app waitlist, newsletter signups, etc.
+model EmailSubscription {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  source         String    @default("mobile_app_waitlist") // mobile_app_waitlist, newsletter, etc.
+  locale         String    @default("fr") // fr, en
+  subscribedAt   DateTime  @default(now())
+  confirmedAt    DateTime?
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([source])
+  @@index([subscribedAt])
+  @@map("email_subscriptions")
+}
+
 /// AutoCopyPreference: User preferences for automatic copy-trading
 /// Stores which traders a user wants to auto-copy and with what settings
 /// When a signal is created, all followers with auto-copy enabled will get jobs queued
