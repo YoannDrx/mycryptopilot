@@ -137,10 +137,10 @@ jobs:
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       RESEND_API_KEY: "test-resend-key"
-      EMAIL_FROM: "test@example.com"
+      EMAIL_FROM: "MyCryptoPilot <noreply@do-not-reply.app>"
       STRIPE_SECRET_KEY: "sk_test_dummy_key_for_ci"
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_dummy_key_for_ci"
-      NEXT_PUBLIC_EMAIL_CONTACT: "contact@example.com"
+      NEXT_PUBLIC_EMAIL_CONTACT: "hello@mycryptopilot.app"
 
     services:
       postgres:
@@ -210,8 +210,8 @@ jobs:
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       # Email
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      EMAIL_FROM: "MyCryptoPilot <contact@mycryptopilot.app>"
-      NEXT_PUBLIC_EMAIL_CONTACT: "contact@mycryptopilot.app"
+      EMAIL_FROM: "MyCryptoPilot <noreply@do-not-reply.app>"
+      NEXT_PUBLIC_EMAIL_CONTACT: "hello@mycryptopilot.app"
       # Stripe
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}

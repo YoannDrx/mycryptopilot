@@ -91,7 +91,7 @@ export const sendEmail = async (params: SendEmailParams) => {
 
   const result = await mailAdapter.send({
     ...params,
-    from: params.from ?? SiteConfig.email.from,
+    from: params.from ?? env.EMAIL_FROM,
     html,
   });
 

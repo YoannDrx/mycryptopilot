@@ -11,7 +11,7 @@
     "dev": "next dev --turbopack",
     "email": "email dev",
     "format": "prettier --write .",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && pnpm type:generate",
     "knip": "knip-bun --config knip.json",
     "lint": "eslint . --fix",
     "start": "next start",

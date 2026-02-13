@@ -72,7 +72,7 @@ export default function ContactPage() {
                 </dt>
                 <dd>
                   <a
-                    href="mailto:melvyn@nowts.com"
+                    href={`mailto:${env.NEXT_PUBLIC_EMAIL_CONTACT}`}
                     className="hover:text-foreground transition-colors"
                   >
                     {env.NEXT_PUBLIC_EMAIL_CONTACT}
