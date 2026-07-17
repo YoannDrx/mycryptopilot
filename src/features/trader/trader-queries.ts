@@ -20,6 +20,29 @@ export const getTraderProfileByUserId = async (userId: string) => {
 };
 
 /**
+ * Creates the internal data owner required by the legacy exchange schema.
+ * This profile is private, does not grant the trader role and must never be
+ * surfaced in the public trader directory without an explicit opt-in flow.
+ */
+export const getOrCreateReadOnlyPortfolioProfile = async (user: {
+  id: string;
+  name: string;
+}) =>
+  prisma.traderProfile.upsert({
+    where: { userId: user.id },
+    update: {},
+    create: {
+      userId: user.id,
+      displayName: user.name,
+      bio: "Private read-only portfolio",
+      statsJson: {
+        visibility: "PRIVATE",
+        purpose: "READ_ONLY_PORTFOLIO",
+      },
+    },
+  });
+
+/**
  * Récupère un profil trader par son ID
  */
 export const getTraderProfileById = async (id: string) => {

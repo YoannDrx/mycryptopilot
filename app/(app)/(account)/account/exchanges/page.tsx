@@ -1,7 +1,6 @@
 import { getRequiredUser } from "@/lib/auth/auth-user";
-import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
+import { getOrCreateReadOnlyPortfolioProfile } from "@/features/trader/trader-queries";
 import { getTraderExchangeConnections } from "@/features/exchange/exchange-queries";
-import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -33,7 +32,7 @@ export default async function ExchangeConnectionsPage() {
   const session = await getRequiredUser();
 
   // Fetch full user from DB to get planName
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id: session.id },
     select: {
       id: true,
@@ -41,17 +40,13 @@ export default async function ExchangeConnectionsPage() {
     },
   });
 
-  if (!user) {
-    redirect("/");
-  }
-
-  // Check if user is a trader
-  const traderProfile = await getTraderProfileByUserId(user.id);
-
-  if (!traderProfile) {
-    // Redirect non-traders to become-trader page
-    redirect("/account/become-trader");
-  }
+  // ExchangeConnection still points to TraderProfile in the historical
+  // schema. Create an internal private owner without exposing a trader profile
+  // or changing the user's role.
+  const traderProfile = await getOrCreateReadOnlyPortfolioProfile({
+    id: user.id,
+    name: session.name,
+  });
 
   // Fetch existing connections
   const connectionsRaw = await getTraderExchangeConnections(traderProfile.id);

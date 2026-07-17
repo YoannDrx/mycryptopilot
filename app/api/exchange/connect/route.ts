@@ -37,6 +37,7 @@ import {
   syncConnectionTrades,
   type ConnectionWithPlan,
 } from "@/lib/exchange/sync-service";
+import { getOrCreateReadOnlyPortfolioProfile } from "@/features/trader/trader-queries";
 
 export async function POST(request: Request) {
   try {
@@ -60,8 +61,11 @@ export async function POST(request: Request) {
       exchange,
     });
 
-    // Check if user has a trader profile
-    const traderProfile = await prisma.traderProfile.findUnique({
+    await getOrCreateReadOnlyPortfolioProfile({
+      id: user.id,
+      name: user.name,
+    });
+    const traderProfile = await prisma.traderProfile.findUniqueOrThrow({
       where: { userId: user.id },
       include: {
         user: {
@@ -72,16 +76,6 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!traderProfile) {
-      return NextResponse.json(
-        {
-          error:
-            "You need a trader profile to connect an exchange. Create one first.",
-        },
-        { status: 403 },
-      );
-    }
-
     // Check plan limits
     const planName = traderProfile.user.planName;
     const connectionLimit = getExchangeConnectionLimit(planName);
@@ -89,7 +83,7 @@ export async function POST(request: Request) {
     if (connectionLimit === 0) {
       return NextResponse.json(
         {
-          error: "Exchange connections require a Pro or Ultra plan",
+          error: "Exchange connections are unavailable for this account",
           upgrade: true,
           requiredPlan: "pro",
         },
@@ -191,7 +185,15 @@ export async function POST(request: Request) {
     // Calculate next sync time based on plan
     const nextSyncAt = calculateNextSyncAt(planName);
 
-    // Store connection in DB and mark trader as verified
+    const isPrivateReadOnlyProfile =
+      (
+        traderProfile.statsJson as {
+          visibility?: string;
+        } | null
+      )?.visibility === "PRIVATE";
+
+    // Store the connection. A private portfolio owner never becomes a public
+    // verified trader merely because credentials were validated.
     const connection = await prisma.$transaction(async (tx) => {
       let updatedConnection;
 
@@ -236,12 +238,12 @@ export async function POST(request: Request) {
         });
       }
 
-      // Mark trader as verified (has at least one active exchange connection)
+      // Public trader verification is an explicit, separate product flow.
       await tx.traderProfile.update({
         where: { id: traderProfile.id },
         data: {
-          verified: true,
-          verifiedAt: new Date(),
+          verified: isPrivateReadOnlyProfile ? false : true,
+          verifiedAt: isPrivateReadOnlyProfile ? null : new Date(),
         },
       });
 
@@ -259,7 +261,7 @@ export async function POST(request: Request) {
         traderProfileId: traderProfile.id,
         connectionId: connection.id,
         exchange,
-        traderVerified: true,
+        traderVerified: !isPrivateReadOnlyProfile,
         wasReactivated,
       },
     );
