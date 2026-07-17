@@ -156,8 +156,14 @@ export async function POST(request: Request) {
     }
 
     if (!apiValidation.isValid) {
+      logger.warn(`${exchange} rejected the supplied read-only credentials`, {
+        userId: user.id,
+        exchange,
+      });
       return NextResponse.json(
-        { error: apiValidation.errorMessage ?? "Invalid API keys" },
+        {
+          error: `Failed to validate ${exchange} API keys. Check that the keys exist and are read-only, then try again.`,
+        },
         { status: 400 },
       );
     }
