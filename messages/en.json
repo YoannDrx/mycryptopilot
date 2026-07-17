@@ -41,9 +41,9 @@
   },
   "hero": {
     "headline": "Don't Trade Without Radar",
-    "subheadline": "Follow verified traders. Get real-time signals. Manage your risk like a pro.",
+    "subheadline": "Simulate exposure and inspect sourced data without entrusting funds or authorizing a single order.",
     "cta": {
-      "primary": "View Traders",
+      "primary": "Open the demo",
       "secondary": "How it works"
     },
     "stats": {
@@ -53,22 +53,22 @@
     }
   },
   "features": {
-    "title": "Everything you need to trade with confidence",
+    "title": "A focused risk and traceability demonstrator",
     "signals": {
-      "title": "Real-Time Signals",
-      "description": "Get signals from verified traders instantly on Discord and in the app."
+      "title": "Attributed signals",
+      "description": "Inspect dated scenarios, their source and expiry before simulating them."
     },
     "risk": {
       "title": "Risk Console",
-      "description": "Calculate your position size, set your SL/TP, and stick to your trading plan."
+      "description": "Calculate size, potential loss and risk/reward without creating an order."
     },
     "journal": {
-      "title": "Trading Journal",
-      "description": "Track all your positions, analyze your performance, identify your mistakes."
+      "title": "Read-only portfolio",
+      "description": "Separate balances, realized and unrealized PnL with visible source and freshness."
     },
     "verified": {
-      "title": "Verified Traders",
-      "description": "Connect to traders' APIs to see their real performance, not screenshots."
+      "title": "Strictly read-only keys",
+      "description": "Trading scopes are rejected and exchange mutations are blocked server-side."
     }
   },
   "pricing": {
@@ -119,12 +119,13 @@
     "comingSoon": "Coming Soon"
   },
   "footer": {
-    "description": "The crypto trading platform to follow verified traders and receive real-time signals.",
+    "description": "A risk-first demonstrator with sourced data, read-only keys and no financial execution.",
     "product": "Product",
     "company": "Company",
     "legal": "Legal",
     "links": {
       "marketplace": "Marketplace",
+      "console": "Risk Console",
       "pricing": "Pricing",
       "docs": "Documentation",
       "about": "About",

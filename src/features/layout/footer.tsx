@@ -30,13 +30,6 @@ export function Footer() {
                       variant="link"
                       className="h-auto justify-start p-0"
                     >
-                      <Link href="/posts">Blog</Link>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="link"
-                      className="h-auto justify-start p-0"
-                    >
                       <Link href="/docs">Documentation</Link>
                     </Button>
                     <Button
@@ -44,14 +37,27 @@ export function Footer() {
                       variant="link"
                       className="h-auto justify-start p-0"
                     >
-                      <Link href="/dashboard">Dashboard</Link>
+                      <Link href="/auth/signin?callbackUrl=/risk-console">
+                        Risk Console
+                      </Link>
                     </Button>
                     <Button
                       asChild
                       variant="link"
                       className="h-auto justify-start p-0"
                     >
-                      <Link href="/account">Account</Link>
+                      <Link href="/auth/signin?callbackUrl=/signals">
+                        Signals
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="link"
+                      className="h-auto justify-start p-0"
+                    >
+                      <Link href="/auth/signin?callbackUrl=/traders">
+                        Traders
+                      </Link>
                     </Button>
                   </nav>
                 </div>
@@ -100,9 +106,6 @@ export function Footer() {
 
             <div className="flex flex-col gap-4 pt-8 md:flex-row md:items-center md:justify-between">
               <div className="flex flex-col gap-1">
-                <p className="text-muted-foreground text-sm">
-                  {SiteConfig.company.address}
-                </p>
                 <p className="text-muted-foreground text-sm">
                   © {new Date().getFullYear()} {SiteConfig.company.name}. All
                   rights reserved.

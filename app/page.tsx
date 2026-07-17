@@ -3,8 +3,6 @@ import { getMessages } from "next-intl/server";
 import {
   Hero,
   FeaturesBento,
-  PricingSection,
-  MobileAppCta,
   FaqSection,
   Navbar,
   Footer,
@@ -14,9 +12,9 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "MyCryptoPilot - Ne Tradez Pas Sans Radar",
+  title: "MyCryptoPilot - Console de risque crypto en lecture seule",
   description:
-    "Suivez des traders vérifiés. Recevez leurs signaux en temps réel. Gérez votre risque comme un pro.",
+    "Simulez une exposition, inspectez des signaux et connectez Binance ou Bybit en lecture seule. Aucun ordre, paiement ou dépôt.",
 };
 
 export default async function HomePage() {
@@ -29,8 +27,6 @@ export default async function HomePage() {
         <main>
           <Hero />
           <FeaturesBento />
-          <PricingSection />
-          <MobileAppCta />
           <FaqSection />
         </main>
         <Footer />

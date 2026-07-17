@@ -22,7 +22,7 @@ describe("mycryptopilot plans helpers", () => {
   });
 
   it("checks feature availability for limits", () => {
-    expect(canPerformAction("free", "riskConsole")).toBe(false);
+    expect(canPerformAction("free", "riskConsole")).toBe(true);
     expect(canPerformAction("pro", "riskConsole")).toBe(true);
     expect(canPerformAction("ultra", "tradersFollow")).toBe(true);
   });

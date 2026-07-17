@@ -55,6 +55,12 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+// Exercise the archived copy-trade algorithm in isolation. Production keeps
+// this feature disabled through the product manifest and adapter guard.
+vi.mock("@/config/product-features", () => ({
+  isMyCryptoPilotFeatureActive: vi.fn(() => true),
+}));
+
 describe("CopyTradeIntegration", () => {
   beforeEach(() => {
     vi.clearAllMocks();

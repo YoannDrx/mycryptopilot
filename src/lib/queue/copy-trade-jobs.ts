@@ -14,6 +14,7 @@
 import type { Queue } from "bullmq";
 import { getQueue, QueueNames } from "./config";
 import { logger } from "@/lib/logger";
+import { rejectFinancialExecution } from "@/config/product-features";
 
 // ============= Job Types =============
 
@@ -101,6 +102,8 @@ let copyTradeQueue: Queue<CopyTradeJobData> | null = null;
  * Creates queue on first call, returns cached instance on subsequent calls
  */
 export function getCopyTradeQueue(): Queue<CopyTradeJobData> {
+  rejectFinancialExecution("Copy-trade queue initialization");
+
   if (!copyTradeQueue) {
     copyTradeQueue = getQueue<CopyTradeJobData>(QueueNames.COPY_TRADES);
     logger.info("Copy trade queue initialized");
@@ -131,6 +134,8 @@ export async function queueCopyTrade(
     delay?: number; // Delay in milliseconds (default: 0)
   },
 ): Promise<string> {
+  rejectFinancialExecution("Copy-trade queueing");
+
   const queue = getCopyTradeQueue();
 
   // Calculate priority based on amount (smaller trades = higher priority)
@@ -184,6 +189,8 @@ export async function queueCopyTrade(
 export async function batchQueueCopyTrades(
   jobs: CopyTradeJobData[],
 ): Promise<{ created: number; failed: number }> {
+  rejectFinancialExecution("Batch copy-trade queueing");
+
   logger.info("Batch queueing copy trades", {
     count: jobs.length,
   });

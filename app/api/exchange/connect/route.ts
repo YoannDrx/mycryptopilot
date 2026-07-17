@@ -37,6 +37,7 @@ import {
   syncConnectionTrades,
   type ConnectionWithPlan,
 } from "@/lib/exchange/sync-service";
+import { getOrCreateReadOnlyPortfolioProfile } from "@/features/trader/trader-queries";
 
 export async function POST(request: Request) {
   try {
@@ -53,15 +54,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const { exchange, apiKey, secretKey, passphrase } = validation.data;
+    const { exchange, apiKey, secretKey } = validation.data;
 
     logger.info("Exchange connection request", {
       userId: user.id,
       exchange,
     });
 
-    // Check if user has a trader profile
-    const traderProfile = await prisma.traderProfile.findUnique({
+    await getOrCreateReadOnlyPortfolioProfile({
+      id: user.id,
+      name: user.name,
+    });
+    const traderProfile = await prisma.traderProfile.findUniqueOrThrow({
       where: { userId: user.id },
       include: {
         user: {
@@ -72,16 +76,6 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!traderProfile) {
-      return NextResponse.json(
-        {
-          error:
-            "You need a trader profile to connect an exchange. Create one first.",
-        },
-        { status: 403 },
-      );
-    }
-
     // Check plan limits
     const planName = traderProfile.user.planName;
     const connectionLimit = getExchangeConnectionLimit(planName);
@@ -89,7 +83,7 @@ export async function POST(request: Request) {
     if (connectionLimit === 0) {
       return NextResponse.json(
         {
-          error: "Exchange connections require a Pro or Ultra plan",
+          error: "Exchange connections are unavailable for this account",
           upgrade: true,
           requiredPlan: "pro",
         },
@@ -127,12 +121,11 @@ export async function POST(request: Request) {
     const currentConnections = await countTraderConnections(traderProfile.id);
 
     if (currentConnections >= connectionLimit) {
-      const needsUpgrade = planName === "pro";
       return NextResponse.json(
         {
           error: `You have reached your plan limit (${connectionLimit} connection${connectionLimit > 1 ? "s" : ""})`,
-          upgrade: needsUpgrade,
-          requiredPlan: needsUpgrade ? "ultra" : null,
+          upgrade: false,
+          requiredPlan: null,
         },
         { status: 403 },
       );
@@ -145,13 +138,7 @@ export async function POST(request: Request) {
       exchange,
     });
 
-    const normalizedPassphrase = passphrase?.trim().length
-      ? passphrase.trim()
-      : null;
-
-    const exchangeService = createExchangeService(exchange, apiKey, secretKey, {
-      passphrase: normalizedPassphrase,
-    });
+    const exchangeService = createExchangeService(exchange, apiKey, secretKey);
 
     let apiValidation;
     try {
@@ -169,8 +156,14 @@ export async function POST(request: Request) {
     }
 
     if (!apiValidation.isValid) {
+      logger.warn(`${exchange} rejected the supplied read-only credentials`, {
+        userId: user.id,
+        exchange,
+      });
       return NextResponse.json(
-        { error: apiValidation.errorMessage ?? "Invalid API keys" },
+        {
+          error: `Failed to validate ${exchange} API keys. Check that the keys exist and are read-only, then try again.`,
+        },
         { status: 400 },
       );
     }
@@ -185,10 +178,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Extract Bitget account mode if applicable
-    const bitgetAccountMode =
-      exchange === "BITGET" ? (apiValidation.bitgetAccountMode ?? "UTA") : null;
-
     // Encrypt API keys
     logger.info("Encrypting API keys", {
       userId: user.id,
@@ -198,14 +187,19 @@ export async function POST(request: Request) {
     const encryptedApiKey = encryptApiKey(apiKey);
     const encryptedSecretKey = encryptApiKey(secretKey);
     const secretKeyPayload = serializeEncryptedPayload(encryptedSecretKey);
-    const passphrasePayload = normalizedPassphrase
-      ? serializeEncryptedPayload(encryptApiKey(normalizedPassphrase))
-      : null;
 
     // Calculate next sync time based on plan
     const nextSyncAt = calculateNextSyncAt(planName);
 
-    // Store connection in DB and mark trader as verified
+    const isPrivateReadOnlyProfile =
+      (
+        traderProfile.statsJson as {
+          visibility?: string;
+        } | null
+      )?.visibility === "PRIVATE";
+
+    // Store the connection. A private portfolio owner never becomes a public
+    // verified trader merely because credentials were validated.
     const connection = await prisma.$transaction(async (tx) => {
       let updatedConnection;
 
@@ -216,14 +210,14 @@ export async function POST(request: Request) {
           data: {
             encryptedApiKey: encryptedApiKey.encrypted,
             encryptedSecretKey: secretKeyPayload,
-            encryptedPassphrase: passphrasePayload,
+            encryptedPassphrase: null,
             keyIv: encryptedApiKey.iv,
             keyTag: encryptedApiKey.tag,
             isActive: true,
             nextSyncAt,
             lastSyncError: null, // Clear previous errors
             updatedAt: new Date(),
-            bitgetAccountMode,
+            bitgetAccountMode: null,
           },
         });
 
@@ -240,22 +234,22 @@ export async function POST(request: Request) {
             exchange,
             encryptedApiKey: encryptedApiKey.encrypted,
             encryptedSecretKey: secretKeyPayload,
-            encryptedPassphrase: passphrasePayload,
+            encryptedPassphrase: null,
             keyIv: encryptedApiKey.iv,
             keyTag: encryptedApiKey.tag,
             isActive: true,
             nextSyncAt,
-            bitgetAccountMode,
+            bitgetAccountMode: null,
           },
         });
       }
 
-      // Mark trader as verified (has at least one active exchange connection)
+      // Public trader verification is an explicit, separate product flow.
       await tx.traderProfile.update({
         where: { id: traderProfile.id },
         data: {
-          verified: true,
-          verifiedAt: new Date(),
+          verified: isPrivateReadOnlyProfile ? false : true,
+          verifiedAt: isPrivateReadOnlyProfile ? null : new Date(),
         },
       });
 
@@ -273,7 +267,7 @@ export async function POST(request: Request) {
         traderProfileId: traderProfile.id,
         connectionId: connection.id,
         exchange,
-        traderVerified: true,
+        traderVerified: !isPrivateReadOnlyProfile,
         wasReactivated,
       },
     );

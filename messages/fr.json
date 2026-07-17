@@ -41,9 +41,9 @@
   },
   "hero": {
     "headline": "Ne Tradez Pas Sans Radar",
-    "subheadline": "Suivez des traders vérifiés. Recevez leurs signaux en temps réel. Gérez votre risque comme un pro.",
+    "subheadline": "Simulez votre exposition et inspectez des données sourcées sans confier de fonds ni autoriser un seul ordre.",
     "cta": {
-      "primary": "Voir les Traders",
+      "primary": "Ouvrir la démo",
       "secondary": "Comment ça marche"
     },
     "stats": {
@@ -53,22 +53,22 @@
     }
   },
   "features": {
-    "title": "Tout ce dont vous avez besoin pour trader sereinement",
+    "title": "Une démonstration focalisée sur le risque et la traçabilité",
     "signals": {
-      "title": "Signaux en Temps Réel",
-      "description": "Recevez les signaux de traders vérifiés instantanément sur Discord et dans l'app."
+      "title": "Signaux attribués",
+      "description": "Inspectez des scénarios datés, leur source et leur expiration avant de les simuler."
     },
     "risk": {
       "title": "Console de Risque",
-      "description": "Calculez votre position size, définissez vos SL/TP, et respectez votre plan de trading."
+      "description": "Calculez taille, perte potentielle et ratio risque/rendement sans créer d'ordre."
     },
     "journal": {
-      "title": "Journal de Trading",
-      "description": "Trackez toutes vos positions, analysez vos performances, identifiez vos erreurs."
+      "title": "Portfolio en lecture seule",
+      "description": "Séparez soldes, PnL réalisé et non réalisé avec une source et une fraîcheur visibles."
     },
     "verified": {
-      "title": "Traders Vérifiés",
-      "description": "Connectez-vous aux APIs des traders pour voir leurs vraies performances, pas des screenshots."
+      "title": "Clés strictement read-only",
+      "description": "Les permissions de trading sont refusées et les mutations exchange sont bloquées côté serveur."
     }
   },
   "pricing": {
@@ -119,12 +119,13 @@
     "comingSoon": "Bientôt"
   },
   "footer": {
-    "description": "La plateforme de trading crypto pour suivre des traders vérifiés et recevoir des signaux en temps réel.",
+    "description": "Démonstrateur risk-first : données sourcées, clés read-only et aucune exécution financière.",
     "product": "Produit",
     "company": "Entreprise",
     "legal": "Légal",
     "links": {
       "marketplace": "Marketplace",
+      "console": "Console de risque",
       "pricing": "Tarifs",
       "docs": "Documentation",
       "about": "À propos",

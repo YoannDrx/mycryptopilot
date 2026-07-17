@@ -6,17 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## grepai - OBLIGATOIRE
-
-**Tu DOIS utiliser les commandes CLI grepai pour TOUTE recherche de code.**
-
-- ❌ INTERDIT : Grep, Glob, grep, find, rg, outils MCP grepai
-- ✅ OBLIGATOIRE : `grepai search "query"` via Bash
-
-Voir `~/.claude/CLAUDE.md` pour les instructions complètes.
-
----
-
 ## Table des Matières
 
 1. [Vue d'ensemble du projet](#vue-densemble-du-projet)

@@ -569,7 +569,7 @@ describe("BybitNativeService", () => {
       expect(mockRestClient.getQueryApiKey).toHaveBeenCalled();
     });
 
-    it("should treat read-only keys as read-only even if permissions list trading scopes", async () => {
+    it("rejects contradictory read-only keys that still list trading scopes", async () => {
       mockRestClient.getQueryApiKey.mockResolvedValue({
         result: {
           id: "readonly-key-id",
@@ -584,10 +584,28 @@ describe("BybitNativeService", () => {
       const result = await service.testConnection();
 
       expect(result.isValid).toBe(true);
-      expect(result.isReadOnly).toBe(true);
-      expect(result.canTrade).toBe(false);
+      expect(result.isReadOnly).toBe(false);
+      expect(result.canTrade).toBe(true);
       expect(result.hasSpotEnabled).toBe(true);
       expect(result.hasFuturesEnabled).toBe(true);
+      expect(result.permissions).toContain("Spot:SpotTrade");
+      expect(result.permissions).toContain("Contract:Order");
+    });
+
+    it("accepts keys only when read-only is explicit and no trading scope exists", async () => {
+      mockRestClient.getQueryApiKey.mockResolvedValue({
+        result: {
+          id: "readonly-key-id",
+          permissions: { Wallet: ["AccountTransfer"] },
+          readOnly: 1,
+        },
+      });
+
+      const result = await service.testConnection();
+
+      expect(result.isValid).toBe(true);
+      expect(result.isReadOnly).toBe(true);
+      expect(result.canTrade).toBe(false);
     });
 
     it("should handle invalid API keys", async () => {

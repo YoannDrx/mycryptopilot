@@ -13,17 +13,17 @@ const FAQ_ITEMS = [
   {
     question: "Comment fonctionnent les signaux de trading ?",
     answer:
-      "Les signaux sont envoyés en temps réel par nos traders vérifiés. Chaque signal inclut le symbole (ex: BTC/USDT), le type de trade (LONG/SHORT), le prix d'entrée, le stop loss et les objectifs de take profit. Vous recevez les signaux sur Discord et dans l'application.",
+      "Les signaux sont des scénarios de démonstration ou des données attribuées à leur source. Ils servent à tester une exposition dans la Console de Risque ; MyCryptoPilot ne transmet aucun ordre à un exchange.",
   },
   {
     question: "Comment sont vérifiés les traders ?",
     answer:
-      "Nous connectons directement aux APIs des exchanges (Binance, Bybit) pour récupérer les vraies performances des traders. Pas de screenshots modifiables, uniquement des données vérifiées on-chain. Chaque trader doit avoir un historique d'au moins 30 trades avec un winrate minimum de 55%.",
+      "Une statistique est marquée comme vérifiée uniquement lorsqu'elle provient d'un historique synchronisé via une clé Binance ou Bybit strictement en lecture seule. Les jeux d'exemple sont toujours étiquetés Démo / Testnet et ne constituent pas une preuve de performance future.",
   },
   {
-    question: "Quels moyens de paiement acceptez-vous ?",
+    question: "Faut-il payer ou déposer des fonds ?",
     answer:
-      "Nous acceptons uniquement les paiements en crypto : USDC sur Base et USDT sur Tron (TRC-20). Pas de carte bancaire requise. Les paiements sont calculés au pro-rata si vous upgradez en cours de mois.",
+      "Non. Cette version est un démonstrateur technique gratuit. Elle n'accepte ni carte, ni paiement crypto, ni dépôt et ne conserve jamais vos fonds.",
   },
   {
     question: "Qu'est-ce que la Console de Risque ?",
@@ -31,14 +31,14 @@ const FAQ_ITEMS = [
       "La Console de Risque est un outil qui calcule automatiquement la taille de votre position en fonction de votre capital et de votre risque maximum (ex: règle des 2%). Elle vous aide à définir vos SL/TP et à respecter votre plan de trading.",
   },
   {
-    question: "Puis-je annuler mon abonnement ?",
+    question: "Mes clés peuvent-elles exécuter un trade ?",
     answer:
-      "Oui, vous pouvez annuler à tout moment. Votre abonnement restera actif jusqu'à la fin de la période payée. Aucun remboursement n'est possible pour les périodes entamées.",
+      "Non. Les clés avec une permission de trading sont refusées, les méthodes de création et d'annulation d'ordre sont bloquées dans l'adaptateur commun, et les anciens workers d'exécution ne peuvent pas démarrer.",
   },
   {
     question: "Le copy-trading automatique est-il disponible ?",
     answer:
-      "Le copy-trading manuel est disponible dès maintenant : vous recevez les signaux et exécutez les trades vous-même. Le copy-trading automatique (exécution automatique sur votre exchange) est en développement et sera disponible prochainement pour les plans Pro et Ultra.",
+      "Non. Le copy-trading réel est hors périmètre : il n'est ni vendu, ni annoncé, ni accessible par deep-link. La Console de Risque simule uniquement la taille et la perte potentielle d'une position.",
   },
 ];
 

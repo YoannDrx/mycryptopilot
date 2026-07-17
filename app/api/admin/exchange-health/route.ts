@@ -5,8 +5,6 @@ import {
   decryptSerializedPayload,
   decryptOptionalSerializedPayload,
 } from "@/lib/crypto/encryption-service";
-import { BinanceService } from "@/lib/exchange/binance-service";
-import { BybitService } from "@/lib/exchange/bybit-service";
 import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
 import { logger } from "@/lib/logger";
 import type { NextRequest } from "next/server";
@@ -188,26 +186,18 @@ export async function GET(request: NextRequest) {
     let validationResult;
 
     try {
-      if (connection.exchange === "BINANCE") {
-        const service = new BinanceService(apiKey, secretKey);
-        validationResult = await service.validateApiKeys();
-        await service.close();
-      } else if (connection.exchange === "BYBIT") {
-        // BYBIT
-        const service = new BybitService(apiKey, secretKey);
-        validationResult = await service.validateApiKeys();
-        await service.close();
-      } else {
-        const service = createExchangeService(
-          connection.exchange,
-          apiKey,
-          secretKey,
-          {
-            passphrase,
-            bitgetAccountMode: connection.bitgetAccountMode ?? undefined,
-          },
-        );
+      const service = createExchangeService(
+        connection.exchange,
+        apiKey,
+        secretKey,
+        {
+          passphrase,
+          bitgetAccountMode: connection.bitgetAccountMode ?? undefined,
+        },
+      );
+      try {
         validationResult = await service.testConnection();
+      } finally {
         await service.close();
       }
     } catch (error) {

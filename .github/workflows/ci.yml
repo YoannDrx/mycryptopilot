@@ -137,7 +137,7 @@ jobs:
       BETTER_AUTH_URL: "http://localhost:3000"
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       RESEND_API_KEY: "test-resend-key"
-      EMAIL_FROM: "MyCryptoPilot <noreply@do-not-reply.app>"
+      EMAIL_FROM: "MyCryptoPilot <contact@do-not-reply.app>"
       STRIPE_SECRET_KEY: "sk_test_dummy_key_for_ci"
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_dummy_key_for_ci"
       NEXT_PUBLIC_EMAIL_CONTACT: "hello@mycryptopilot.app"
@@ -210,7 +210,7 @@ jobs:
       NEXT_PUBLIC_APP_URL: "http://localhost:3000"
       # Email
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      EMAIL_FROM: "MyCryptoPilot <noreply@do-not-reply.app>"
+      EMAIL_FROM: "MyCryptoPilot <contact@do-not-reply.app>"
       NEXT_PUBLIC_EMAIL_CONTACT: "hello@mycryptopilot.app"
       # Stripe
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -228,18 +228,12 @@ jobs:
       # Analytics
       NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
       NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
-      # Crypto payments (required for E2E checkout tests)
+      # Testnet-only safety boundary for the risk-first release
       CRYPTO_NETWORK: "testnet"
       BASE_RPC_URL: "https://mainnet.base.org"
       TRON_RPC_URL: "https://api.trongrid.io"
       BASE_RPC_URL_TESTNET: "https://sepolia.base.org"
       TRON_RPC_URL_TESTNET: "https://api.shasta.trongrid.io"
-      CRYPTO_XPUB_BASE: ${{ secrets.CRYPTO_XPUB_BASE }}
-      CRYPTO_XPUB_TRON: ${{ secrets.CRYPTO_XPUB_TRON }}
-      CRYPTO_XPUB_BASE_TESTNET: ${{ secrets.CRYPTO_XPUB_BASE_TESTNET }}
-      CRYPTO_XPUB_TRON_TESTNET: ${{ secrets.CRYPTO_XPUB_TRON_TESTNET }}
-      BINANCE_MASTER_WALLET_BASE: ${{ secrets.BINANCE_MASTER_WALLET_BASE }}
-      BINANCE_MASTER_WALLET_TRON: ${{ secrets.BINANCE_MASTER_WALLET_TRON }}
       # Playwright specific
       PLAYWRIGHT_TEST_BASE_URL: "http://localhost:3000"
       HEADLESS: "true"

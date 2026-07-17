@@ -6,6 +6,7 @@ import { SiteConfig } from "@/site-config";
 import { Contract, JsonRpcProvider } from "ethers";
 import { calculateDaysGranted, getPlanFromAmount } from "./mycryptopilot-plans";
 import { activateSubscription } from "@/lib/subscription/subscription-manager";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
 import { sendEmail } from "@/lib/mail/send-email";
 import { TestPaymentSuccessEmail } from "@email/test-payment-success";
 
@@ -489,6 +490,11 @@ export async function processPayment(
  * @returns Promise<void>
  */
 export async function startPaymentWatcher(intervalMs = 60000): Promise<void> {
+  if (!isMyCryptoPilotFeatureActive("publicPayments")) {
+    logger.warn("Crypto payment watcher disabled by product feature manifest");
+    return;
+  }
+
   logger.info("Starting payment watcher", { intervalMs });
 
   const watchPayments = async (): Promise<void> => {

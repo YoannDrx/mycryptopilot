@@ -5,8 +5,7 @@
  *
  * Responsibilities:
  * - Run exchange sync cron every 5 minutes
- * - Run expiration reminders, tier check, and active invitees jobs daily
- * - Continuously watch crypto payments (Base + Tron)
+ * It intentionally runs only read-only exchange synchronization.
  */
 
 import fs from "node:fs";
@@ -38,11 +37,6 @@ if (process.env.NODE_ENV !== "production") {
 
 import { logger } from "../src/lib/logger";
 import { runExchangeSyncCronJob } from "../src/lib/cron/exchange-sync-job";
-import { runExpirationReminderJob } from "../src/lib/cron/expiration-reminder-job";
-import { runActiveInviteesJob } from "../src/lib/cron/active-invitees-job";
-import { runTierCheckJob } from "../src/lib/cron/tier-check-job";
-import { startPaymentWatcher } from "../src/lib/crypto/payment-watcher";
-import { discordBot } from "../src/lib/discord/bot-client";
 
 type JobHandler<T = unknown> = () => Promise<{ success?: boolean } & T>;
 
@@ -96,87 +90,15 @@ function scheduleIntervalJob(
   }, intervalMs);
 }
 
-function scheduleDailyUtcJob(
-  name: string,
-  hourUtc: number,
-  minuteUtc: number,
-  handler: JobHandler,
-) {
-  let running = false;
-
-  const scheduleNext = () => {
-    const now = new Date();
-    const next = new Date(now);
-    next.setUTCHours(hourUtc, minuteUtc, 0, 0);
-
-    if (next <= now) {
-      next.setUTCDate(next.getUTCDate() + 1);
-    }
-
-    const delay = next.getTime() - now.getTime();
-
-    logger.info(`${name} next run scheduled at ${next.toISOString()}`);
-
-    setTimeout(async () => {
-      if (running) {
-        logger.warn(`${name} job skipped because previous run is still active`);
-        scheduleNext();
-        return;
-      }
-
-      running = true;
-      try {
-        await executeJob(name, handler);
-      } finally {
-        running = false;
-        scheduleNext();
-      }
-    }, delay);
-  };
-
-  scheduleNext();
-}
-
 async function main() {
-  logger.info("🚀 Starting Fly.io background worker");
-
-  // Discord bot (same machine as worker)
-  const startDiscordBot = async () => {
-    if (!discordBot.isEnabled()) {
-      logger.info("Discord bot disabled, skipping start on Fly worker");
-      return;
-    }
-
-    const client = await discordBot.initialize();
-    if (client) {
-      logger.info(
-        `Discord bot running as ${client.user?.tag ?? "unknown"} on Fly worker`,
-      );
-    }
-  };
-  void startDiscordBot();
-
-  // Payment watcher (interval configurable via env)
-  const watcherIntervalMs = Number(
-    process.env.PAYMENT_WATCHER_INTERVAL_MS ?? 60_000,
-  );
-  logger.info("Starting crypto payment watcher", {
-    intervalMs: watcherIntervalMs,
-  });
-  void startPaymentWatcher(watcherIntervalMs);
+  logger.info("Starting read-only MyCryptoPilot background worker");
 
   // High-frequency cron
   scheduleIntervalJob("exchange-sync", 5 * 60 * 1000, runExchangeSyncCronJob);
 
-  // Daily crons
-  scheduleDailyUtcJob("expiration-reminders", 9, 0, runExpirationReminderJob);
-  scheduleDailyUtcJob("tier-check", 3, 0, runTierCheckJob);
-  scheduleDailyUtcJob("active-invitees", 2, 0, runActiveInviteesJob);
-
   // Graceful shutdown for Fly machines
   const shutdown = async () => {
     logger.info("Shutting down Fly worker (received signal)");
-    await discordBot.shutdown();
     process.exit(0);
   };
 

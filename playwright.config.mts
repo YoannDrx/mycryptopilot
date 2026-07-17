@@ -79,6 +79,10 @@ const config: PlaywrightTestConfig = {
     navigationTimeout: process.env.CI ? 30000 : 15000,
   },
   testDir: "e2e",
+  // The public release is now a risk-first, read-only demonstrator. Historical
+  // copy-trading, crypto checkout and growth tests remain in the repository as
+  // migration evidence but no longer define the supported product contract.
+  testMatch: "**/release-risk-first.spec.ts",
   // Only start the web server if PLAYWRIGHT_TEST_BASE_URL is not set
   ...(!process.env.PLAYWRIGHT_TEST_BASE_URL
     ? {

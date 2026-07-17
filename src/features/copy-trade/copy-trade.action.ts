@@ -21,6 +21,7 @@ import {
   getTradeCopies,
   getUserCopyStats,
 } from "@/lib/trading/copy-trade.service";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
 
 // ============= Schemas =============
 
@@ -59,6 +60,14 @@ const GetTradeCopiesSchema = z.object({
   originalTradeId: z.string(),
 });
 
+function assertCopyTradingEnabled(): void {
+  if (!isMyCryptoPilotFeatureActive("copyTrading")) {
+    throw new ActionError(
+      "Copy trading is disabled. Use the Risk Console to simulate exposure.",
+    );
+  }
+}
+
 // ============= Actions =============
 
 /**
@@ -67,6 +76,7 @@ const GetTradeCopiesSchema = z.object({
 export const createCopyTradeAction = authAction
   .inputSchema(CreateCopyTradeSchema)
   .action(async ({ parsedInput, ctx: { user } }) => {
+    assertCopyTradingEnabled();
     // Check user subscription (copy trading requires PRO or ULTRA)
     const userPlan = await prisma.user.findUnique({
       where: { id: user.id },
@@ -136,6 +146,7 @@ export const createCopyTradeAction = authAction
 export const executeCopyTradeAction = authAction
   .inputSchema(ExecuteCopyTradeSchema)
   .action(async ({ parsedInput, ctx: { user } }) => {
+    assertCopyTradingEnabled();
     // Verify ownership
     const copyTrade = await prisma.copyTrade.findFirst({
       where: {
@@ -175,6 +186,7 @@ export const executeCopyTradeAction = authAction
 export const cancelCopyTradeAction = authAction
   .inputSchema(CancelCopyTradeSchema)
   .action(async ({ parsedInput, ctx: { user } }) => {
+    assertCopyTradingEnabled();
     // Verify ownership
     const copyTrade = await prisma.copyTrade.findFirst({
       where: {
@@ -322,6 +334,8 @@ export const enableAutoCopyAction = authAction
     }),
   )
   .action(async ({ parsedInput, ctx: { user } }) => {
+    assertCopyTradingEnabled();
+
     // Check user subscription
     const userPlan = await prisma.user.findUnique({
       where: { id: user.id },

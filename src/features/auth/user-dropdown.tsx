@@ -17,8 +17,6 @@ import {
 import { useSession } from "@/lib/auth-client";
 import {
   BarChart3,
-  BookOpen,
-  FileText,
   Monitor,
   Moon,
   Shield,
@@ -62,18 +60,6 @@ export const UserDropdown = ({ children }: PropsWithChildren) => {
           <Link href="/dashboard">
             <BarChart3 className="mr-2 size-4" />
             Trading
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/school/courses">
-            <BookOpen className="mr-2 size-4" />
-            Crypto School
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/tax/import">
-            <FileText className="mr-2 size-4" />
-            Tax & Declaration
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

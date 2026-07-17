@@ -47,7 +47,7 @@ export const SignUpCredentialsForm = () => {
     },
     onSuccess: () => {
       // Process full-refresh
-      const newUrl = window.location.origin + getCallbackUrl("/dashboard");
+      const newUrl = window.location.origin + getCallbackUrl("/risk-console");
       window.location.href = newUrl;
     },
   });

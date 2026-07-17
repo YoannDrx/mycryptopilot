@@ -40,7 +40,7 @@ export function Hero() {
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2 text-sm backdrop-blur-sm">
               <span className="size-2 animate-pulse rounded-full bg-[var(--accent-emerald)]" />
               <span className="text-[var(--text-secondary)]">
-                Plateforme de trading risk-first
+                Démo / Testnet • Risk-first
               </span>
             </div>
 
@@ -65,7 +65,7 @@ export function Hero() {
                 size="lg"
                 className="h-12 px-8 text-base"
               >
-                <Link href="/auth/signin">
+                <Link href="/auth/signup">
                   {t("cta.primary")}
                   <ArrowRight className="ml-2 size-5" />
                 </Link>
@@ -86,14 +86,18 @@ export function Hero() {
             {/* Stats */}
             <div className="mt-12 grid grid-cols-3 gap-6">
               {[
-                { value: "50+", label: t("stats.traders"), icon: Users },
-                { value: "200+", label: t("stats.signals"), icon: TrendingUp },
-                { value: "68%", label: t("stats.winrate"), icon: Shield },
+                { value: "0", label: "fonds confiés", icon: Shield },
+                { value: "Read-only", label: "clés exchange", icon: Users },
+                {
+                  value: "Exemple",
+                  label: "données affichées",
+                  icon: TrendingUp,
+                },
               ].map((stat) => (
                 <div key={stat.label} className="text-center lg:text-left">
                   <div className="flex items-center justify-center gap-2 lg:justify-start">
                     <stat.icon className="size-5 text-[var(--accent-emerald)]" />
-                    <span className="text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
+                    <span className="text-xl font-bold whitespace-nowrap text-[var(--text-primary)] sm:text-2xl xl:text-3xl">
                       {stat.value}
                     </span>
                   </div>
@@ -117,7 +121,7 @@ export function Hero() {
                 <div className="size-3 rounded-full bg-[#f59e0b]" />
                 <div className="size-3 rounded-full bg-[var(--accent-emerald)]" />
                 <span className="ml-3 text-xs text-[var(--text-muted)]">
-                  Risk Console • BTC/USDT
+                  Risk Console • EXEMPLE TESTNET
                 </span>
               </div>
 
@@ -199,8 +203,10 @@ export function Hero() {
                 </div>
 
                 {/* Action Button */}
-                <Button variant="emerald" className="w-full">
-                  Execute Trade
+                <Button asChild variant="emerald" className="w-full">
+                  <Link href="/auth/signup?callbackUrl=/risk-console">
+                    Simuler le risque
+                  </Link>
                 </Button>
               </div>
             </HyperBorder>

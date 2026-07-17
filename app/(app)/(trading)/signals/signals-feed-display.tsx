@@ -56,6 +56,7 @@ export function SignalsFeedDisplay({ signals }: SignalsFeedDisplayProps) {
             expiresAt={signal.expiresAt}
             className="h-full"
             compact={true}
+            showCopyButton={true}
           />
         );
       })}

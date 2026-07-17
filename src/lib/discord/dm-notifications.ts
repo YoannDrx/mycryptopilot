@@ -574,22 +574,22 @@ export async function sendWelcomeMessage(
         name: "🔗 Liens Utiles",
         value:
           `• **Site web**: ${SiteConfig.appUrl}\n` +
-          `• **Dashboard**: ${SiteConfig.appUrl}/dashboard\n` +
-          `• **Marketplace**: ${SiteConfig.appUrl}/traders\n` +
-          `• **Pricing**: ${SiteConfig.appUrl}/pricing`,
+          `• **Console de risque**: ${SiteConfig.appUrl}/risk-console\n` +
+          `• **Signaux**: ${SiteConfig.appUrl}/signals\n` +
+          `• **Traders**: ${SiteConfig.appUrl}/traders`,
         inline: false,
       },
       {
         name: "📧 Contact & Support",
         value:
-          `• **Email**: contact@mycryptopilot.app\n` +
-          `• **Twitter**: ${SiteConfig.team.twitter}\n` +
+          `• **Email**: ${SiteConfig.email.contact}\n` +
+          `• **Support**: ${SiteConfig.team.supportUrl}\n` +
           `• **Discord**: Pose tes questions dans les channels appropriés`,
         inline: false,
       },
     )
     .setFooter({
-      text: `${SiteConfig.team.name} | contact@mycryptopilot.app`,
+      text: `${SiteConfig.team.name} | ${SiteConfig.email.contact}`,
       iconURL: `${SiteConfig.appUrl}${SiteConfig.appIcon}`,
     })
     .setTimestamp();

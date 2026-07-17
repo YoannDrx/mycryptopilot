@@ -16,6 +16,8 @@ import { generateCryptoAddress } from "@/lib/crypto/address-generator";
 import { getPlanByName } from "@/lib/crypto/mycryptopilot-plans";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
+import { ActionError } from "@/lib/errors/action-error";
 
 const GenerateAddressSchema = z.object({
   plan: z.enum(["test", "pro", "ultra"]),
@@ -24,6 +26,12 @@ const GenerateAddressSchema = z.object({
 export const generateAddressAction = authAction
   .schema(GenerateAddressSchema)
   .action(async ({ parsedInput, ctx }) => {
+    if (!isMyCryptoPilotFeatureActive("publicPayments")) {
+      throw new ActionError(
+        "Crypto payments are disabled in the demo environment.",
+      );
+    }
+
     const { plan } = parsedInput;
     const userId = ctx.user.id;
 
@@ -44,8 +52,6 @@ export const generateAddressAction = authAction
     logger.info("Crypto addresses generated successfully", {
       userId,
       plan,
-      baseAddress: baseAddress.address,
-      tronAddress: tronAddress.address,
       expiresAt,
     });
 

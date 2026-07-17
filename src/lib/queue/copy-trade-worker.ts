@@ -49,6 +49,7 @@ import {
   assertSlippageWithinThreshold,
   SlippageExceededError,
 } from "./slippage-guard";
+import { rejectFinancialExecution } from "@/config/product-features";
 
 // ============= Worker Configuration =============
 
@@ -389,6 +390,8 @@ export async function processCopyTradeJobForTest(
  * });
  */
 export function startCopyTradeWorker(): Worker<CopyTradeJobData> {
+  rejectFinancialExecution("Copy-trade worker startup");
+
   logger.info("Starting copy trade worker", {
     concurrency: WORKER_CONCURRENCY,
     timeout: JOB_TIMEOUT,

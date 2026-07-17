@@ -1,7 +1,6 @@
 import { getRequiredUser } from "@/lib/auth/auth-user";
-import { getTraderProfileByUserId } from "@/features/trader/trader-queries";
+import { getOrCreateReadOnlyPortfolioProfile } from "@/features/trader/trader-queries";
 import { getTraderExchangeConnections } from "@/features/exchange/exchange-queries";
-import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -10,12 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  AlertCircle,
-  PlusCircle,
-  TrendingUp,
-  Link as LinkIcon,
-} from "lucide-react";
+import { PlusCircle, Link as LinkIcon, ShieldCheck } from "lucide-react";
 import { ConnectExchangeForm } from "./_components/connect-exchange-form";
 import { ExchangeConnectionsList } from "./_components/exchange-connections-list";
 import { Badge } from "@/components/ui/badge";
@@ -27,18 +21,18 @@ import {
   LayoutDescription,
   LayoutContent,
 } from "@/features/page/layout";
+import { getExchangeConnectionLimit } from "@/features/exchange/exchange-plan-limits";
 
 export const metadata: Metadata = {
   title: "Exchange Connections - MyCryptoPilot",
-  description:
-    "Connect your exchanges to sync trades and display verified stats",
+  description: "Connect one exchange using strictly read-only API credentials",
 };
 
 export default async function ExchangeConnectionsPage() {
   const session = await getRequiredUser();
 
   // Fetch full user from DB to get planName
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id: session.id },
     select: {
       id: true,
@@ -46,17 +40,13 @@ export default async function ExchangeConnectionsPage() {
     },
   });
 
-  if (!user) {
-    redirect("/");
-  }
-
-  // Check if user is a trader
-  const traderProfile = await getTraderProfileByUserId(user.id);
-
-  if (!traderProfile) {
-    // Redirect non-traders to become-trader page
-    redirect("/account/become-trader");
-  }
+  // ExchangeConnection still points to TraderProfile in the historical
+  // schema. Create an internal private owner without exposing a trader profile
+  // or changing the user's role.
+  const traderProfile = await getOrCreateReadOnlyPortfolioProfile({
+    id: user.id,
+    name: session.name,
+  });
 
   // Fetch existing connections
   const connectionsRaw = await getTraderExchangeConnections(traderProfile.id);
@@ -74,10 +64,9 @@ export default async function ExchangeConnectionsPage() {
 
   // Check plan limits
   const planName = user.planName?.toLowerCase() ?? "free";
-  const connectionLimit = planName === "ultra" ? 3 : planName === "pro" ? 1 : 0;
+  const connectionLimit = getExchangeConnectionLimit(planName);
 
   const canAddConnection = connections.length < connectionLimit;
-  const isFreePlan = planName === "free";
 
   return (
     <>
@@ -88,43 +77,29 @@ export default async function ExchangeConnectionsPage() {
         <div>
           <LayoutTitle>Exchange Connections</LayoutTitle>
           <LayoutDescription>
-            Connect your exchange accounts to automatically sync trades and
-            display verified performance stats
+            Import balances and history with a read-only key. Order creation and
+            cancellation are disabled at the adapter boundary.
           </LayoutDescription>
         </div>
       </LayoutHeader>
 
       <LayoutContent className="space-y-8">
-        {/* Plan Info */}
+        {/* Product safety boundary */}
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="size-5" />
-              Your Plan: {user.planName ?? "Free"}
-              <Badge variant={isFreePlan ? "secondary" : "default"}>
+              <ShieldCheck className="size-5" />
+              Read-only connection
+              <Badge variant="secondary">
                 {connections.length} / {connectionLimit} connections
               </Badge>
             </CardTitle>
             <CardDescription>
-              {isFreePlan
-                ? "Upgrade to Pro to connect exchanges and display verified stats"
-                : `You can connect up to ${connectionLimit} exchange${connectionLimit > 1 ? "s" : ""}`}
+              Demo / Testnet policy · one Binance or Bybit connection per
+              account · no paid tier and no execution permission.
             </CardDescription>
           </CardHeader>
         </Card>
-
-        {/* Free Plan Blocker */}
-        {isFreePlan && (
-          <Alert>
-            <AlertCircle className="size-4" />
-            <AlertDescription>
-              <strong>Exchange connections require a Pro or Ultra plan.</strong>
-              <br />
-              Upgrade to sync your trades automatically and display verified
-              stats on your profile.
-            </AlertDescription>
-          </Alert>
-        )}
 
         {/* Existing Connections */}
         {connections.length > 0 && (
@@ -143,7 +118,7 @@ export default async function ExchangeConnectionsPage() {
         )}
 
         {/* Add New Connection */}
-        {!isFreePlan && canAddConnection && (
+        {canAddConnection && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -151,7 +126,8 @@ export default async function ExchangeConnectionsPage() {
                 Connect New Exchange
               </CardTitle>
               <CardDescription>
-                Add a new exchange connection to sync trades automatically
+                Credentials are accepted only after their read-only scope is
+                verified by the exchange.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -161,15 +137,13 @@ export default async function ExchangeConnectionsPage() {
         )}
 
         {/* Connection Limit Reached */}
-        {!isFreePlan && !canAddConnection && (
+        {!canAddConnection && (
           <Alert>
-            <AlertCircle className="size-4" />
+            <ShieldCheck className="size-4" />
             <AlertDescription>
               <strong>Connection limit reached.</strong>
               <br />
-              {planName === "pro"
-                ? "Upgrade to Ultra to connect up to 3 exchanges."
-                : "You have reached the maximum number of connections for your plan."}
+              Disconnect the current exchange before connecting another one.
             </AlertDescription>
           </Alert>
         )}
@@ -183,7 +157,7 @@ export default async function ExchangeConnectionsPage() {
             <p>
               <strong>How it works:</strong> Connect your exchange with
               read-only API keys. We automatically sync your trades every 5
-              minutes (Pro) or 1 minute (Ultra).
+              minutes in the demonstrator.
             </p>
             <p>
               <strong>Security:</strong> Your API keys are encrypted with
@@ -192,7 +166,8 @@ export default async function ExchangeConnectionsPage() {
             </p>
             <p>
               <strong>Privacy:</strong> Your trade history is used to calculate
-              verified performance stats displayed on your public profile.
+              sourced performance summaries. Values remain labelled with their
+              exchange source and last synchronization time.
             </p>
           </CardContent>
         </Card>

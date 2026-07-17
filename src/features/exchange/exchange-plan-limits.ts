@@ -3,16 +3,16 @@ import type { MyCryptoPilotPlanName } from "@/lib/crypto/mycryptopilot-plans";
 /**
  * Exchange connection limits by plan
  *
- * FREE: 0 connections (blocked - upsell to Pro)
- * PRO: 1 connection (Binance)
- * ULTRA: 3 connections (Binance + future exchanges)
+ * The risk-first demonstrator supports one read-only connection per account.
+ * Legacy paid plans keep the same single-connection boundary so the public
+ * product cannot imply a paid execution or multi-exchange service.
  */
 export const EXCHANGE_CONNECTION_LIMITS: Record<MyCryptoPilotPlanName, number> =
   {
-    free: 0,
-    test: 0, // Test plan has same limits as free
+    free: 1,
+    test: 1,
     pro: 1,
-    ultra: 3,
+    ultra: 1,
   };
 
 /**
@@ -22,10 +22,10 @@ export const EXCHANGE_CONNECTION_LIMITS: Record<MyCryptoPilotPlanName, number> =
  * ULTRA: 1 minute
  */
 export const SYNC_INTERVAL_MINUTES: Record<MyCryptoPilotPlanName, number> = {
-  free: 0, // N/A
-  test: 0, // N/A - Test plan has no exchange features
-  pro: 5,
-  ultra: 1,
+  free: 15,
+  test: 15,
+  pro: 15,
+  ultra: 15,
 };
 
 /**

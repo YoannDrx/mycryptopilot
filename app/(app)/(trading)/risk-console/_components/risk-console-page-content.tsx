@@ -27,7 +27,6 @@ export function RiskConsolePageContent({
 }: RiskConsolePageContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const planLabel = `${planName.slice(0, 1).toUpperCase()}${planName.slice(1)}`;
 
   const handlePresetSaved = () => {
     // Refresh to get updated presets list
@@ -78,8 +77,8 @@ export function RiskConsolePageContent({
         <div>
           <LayoutTitle>Risk Console</LayoutTitle>
           <LayoutDescription>
-            Calculate position sizing, risk amount, and risk / reward ratios in
-            seconds. This tool is available on the {planLabel} plan.
+            Simulate position sizing, loss exposure and risk / reward before
+            acting elsewhere. MyCryptoPilot never sends an order.
           </LayoutDescription>
         </div>
       </LayoutHeader>
@@ -96,7 +95,7 @@ export function RiskConsolePageContent({
       <LayoutContent>
         <Separator className="mb-10" />
         <RiskConsoleCalculator
-          description="Adjust your capital, entry, stop loss, and take profit to validate your setup before sending a signal."
+          description={`Demo / Testnet · ${planName.toUpperCase()} account · Adjust capital, entry, stop loss and take profit to inspect a scenario. No order is created.`}
           userPresets={userPresets}
           onPresetSaved={handlePresetSaved}
           defaultCapital={defaultCapital}

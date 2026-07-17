@@ -12,6 +12,7 @@ import { logger } from "@/lib/logger";
 import { authAction } from "@/lib/actions/safe-actions";
 import { ActionError } from "@/lib/errors/action-error";
 import { z } from "zod";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
 
 const CreateTradeFromSignalSchema = z.object({
   signalId: z.string(),
@@ -33,6 +34,12 @@ const CreateTradeFromSignalSchema = z.object({
 export const createTradeFromSignalAction = authAction
   .inputSchema(CreateTradeFromSignalSchema)
   .action(async ({ parsedInput, ctx: { user } }) => {
+    if (!isMyCryptoPilotFeatureActive("copyTrading")) {
+      throw new ActionError(
+        "Trade journaling from signals is disabled in this demonstrator.",
+      );
+    }
+
     // Check user subscription (copy trading requires PRO or ULTRA)
     const userPlan = await prisma.user.findUnique({
       where: { id: user.id },

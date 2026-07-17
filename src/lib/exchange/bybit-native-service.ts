@@ -333,7 +333,8 @@ export class BybitNativeService implements ExchangeAdapter {
           instrumentType: "FUTURES_USDT",
           realizedPnl: exec.closedSize ? Number(exec.closedSize) : null,
           positionSide: this.mapPositionIdx(
-            (exec as { positionIdx?: number | string | null }).positionIdx ?? null,
+            (exec as { positionIdx?: number | string | null }).positionIdx ??
+              null,
           ),
           raw: exec,
         }),
@@ -398,8 +399,14 @@ export class BybitNativeService implements ExchangeAdapter {
 
       const readOnlyFlag = interpretReadOnlyFlag(rawReadOnly);
       const hasTradingPermission = hasSpotTrading || hasFuturesTrading;
-      const isReadOnly = readOnlyFlag || !hasTradingPermission;
-      const canTrade = !isReadOnly;
+      // Fail closed: a read-only flag cannot override explicit order/position
+      // scopes. Contradictory responses must be rejected, not trusted.
+      const isReadOnly = readOnlyFlag && !hasTradingPermission;
+      const canTrade = hasTradingPermission || !readOnlyFlag;
+      const flattenedPermissions = [
+        ...spotPermissions.map((permission) => `Spot:${permission}`),
+        ...contractPermissions.map((permission) => `Contract:${permission}`),
+      ];
 
       logger.info("Connection test successful", {
         canTrade,
@@ -415,6 +422,7 @@ export class BybitNativeService implements ExchangeAdapter {
         hasSpotEnabled: hasSpotTrading,
         hasFuturesEnabled: hasFuturesTrading,
         canTrade,
+        permissions: flattenedPermissions,
       };
     } catch (error) {
       logger.error("Connection test failed", { error });

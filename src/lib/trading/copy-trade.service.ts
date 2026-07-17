@@ -25,6 +25,7 @@ import { logger } from "@/lib/logger";
 import { recordLoss } from "@/lib/queue/circuit-breaker.service";
 import type { CopyTrade, TraderTrade, User } from "@/generated/prisma";
 import { invalidateCachedBalance } from "@/lib/exchange/balance-cache.service";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
 
 // ============= Types =============
 
@@ -58,6 +59,14 @@ export type CopyTradeStats = {
   totalVolume: number;
   averageSlippage: number;
 };
+
+function assertCopyTradingEnabled(): void {
+  if (!isMyCryptoPilotFeatureActive("copyTrading")) {
+    throw new Error(
+      "Copy trading is disabled. MyCryptoPilot is a read-only demonstrator.",
+    );
+  }
+}
 
 // ============= Validation =============
 
@@ -166,6 +175,9 @@ export async function createCopyTrade(
     }
   }
 
+  // Keep historical validation testable while blocking the first mutation.
+  assertCopyTradingEnabled();
+
   // Create copy trade entry
   const copyTrade = await prisma.copyTrade.create({
     data: {
@@ -231,6 +243,9 @@ export async function executeCopyTrade(
     const originalPrice = Number(copyTrade.originalTrade.averageEntry);
     slippage = ((input.executedPrice - originalPrice) / originalPrice) * 100;
   }
+
+  // Never persist an execution while the product is read-only.
+  assertCopyTradingEnabled();
 
   // Update copy trade with execution details
   const updatedCopy = await prisma.copyTrade.update({

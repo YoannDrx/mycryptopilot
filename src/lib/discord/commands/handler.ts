@@ -137,7 +137,7 @@ export async function handleCommand(
     // Si l'interaction n'a pas encore été répondue
     if (!interaction.replied && !interaction.deferred) {
       await interaction.reply({
-        content: `❌ Erreur: ${errorMessage}\n\nContacte le support: ${SiteConfig.team.twitter}`,
+        content: `❌ Erreur: ${errorMessage}\n\nContacte le support: ${SiteConfig.team.supportUrl}`,
         ephemeral: true,
       });
     } else {

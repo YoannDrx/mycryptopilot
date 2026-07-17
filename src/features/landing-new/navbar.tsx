@@ -10,10 +10,9 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 const NAV_LINKS = [
-  { key: "marketplace", href: "/traders" },
-  { key: "signals", href: "#signals" },
-  { key: "console", href: "#console" },
-  { key: "pricing", href: "#pricing" },
+  { key: "marketplace", href: "/auth/signin?callbackUrl=/traders" },
+  { key: "signals", href: "/auth/signin?callbackUrl=/signals" },
+  { key: "console", href: "/auth/signin?callbackUrl=/risk-console" },
 ] as const;
 
 export function Navbar() {

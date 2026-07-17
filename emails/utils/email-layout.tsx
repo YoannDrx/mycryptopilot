@@ -162,7 +162,7 @@ export const EmailLayout = (
                   margin: "12px 0 0 0",
                 }}
               >
-                Crypto trading signals with a risk-first approach.
+                Read-only crypto data and risk simulation. No order execution.
               </Text>
 
               <Hr
@@ -185,10 +185,10 @@ export const EmailLayout = (
                         marginRight: "16px",
                       }}
                     >
-                      Marketplace
+                      Traders
                     </Link>
                     <Link
-                      href={`${SiteConfig.prodUrl}/orgs/pricing`}
+                      href={`${SiteConfig.prodUrl}/risk-console`}
                       style={{
                         color: "#64748b",
                         fontSize: "12px",
@@ -196,17 +196,17 @@ export const EmailLayout = (
                         marginRight: "16px",
                       }}
                     >
-                      Pricing
+                      Risk Console
                     </Link>
                     <Link
-                      href="https://discord.gg/mycryptopilot"
+                      href={`${SiteConfig.prodUrl}/docs`}
                       style={{
                         color: "#64748b",
                         fontSize: "12px",
                         textDecoration: "none",
                       }}
                     >
-                      Discord
+                      Documentation
                     </Link>
                   </td>
                 </tr>
@@ -227,7 +227,7 @@ export const EmailLayout = (
                   margin: "0 0 4px 0",
                 }}
               >
-                {SiteConfig.company.name} • {SiteConfig.company.address}
+                {SiteConfig.company.name}
               </Text>
               <Text
                 style={{

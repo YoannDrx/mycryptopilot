@@ -11,6 +11,7 @@ import { logger } from "@/lib/logger";
 import { checkUserHasTraderProfile } from "../trader/trader-queries";
 import { signalHashExists } from "./signal-queries";
 import { CreateSignalSchema } from "./signal.schema";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
 
 /**
  * Génère un hash SHA256 pour un signal
@@ -156,22 +157,24 @@ export const createSignalAction = authAction
     }
 
     // Queue auto-copy trades for followers (ne pas bloquer en cas d'erreur)
-    try {
-      const autoCopyResult = await queueAutoCopyTradesForSignal(
-        signal.id,
-        user.id,
-      );
-      logger.info(`Auto-copy trades queued for signal ${signal.id}`, {
-        created: autoCopyResult.created,
-        queued: autoCopyResult.queued,
-        errors: autoCopyResult.errors,
-      });
-    } catch (error) {
-      logger.error(
-        `Failed to queue auto-copy trades for signal ${signal.id}:`,
-        error,
-      );
-      // Ne pas throw d'erreur car le signal a été créé avec succès
+    if (isMyCryptoPilotFeatureActive("copyTrading")) {
+      try {
+        const autoCopyResult = await queueAutoCopyTradesForSignal(
+          signal.id,
+          user.id,
+        );
+        logger.info(`Auto-copy trades queued for signal ${signal.id}`, {
+          created: autoCopyResult.created,
+          queued: autoCopyResult.queued,
+          errors: autoCopyResult.errors,
+        });
+      } catch (error) {
+        logger.error(
+          `Failed to queue auto-copy trades for signal ${signal.id}:`,
+          error,
+        );
+        // Ne pas throw d'erreur car le signal a été créé avec succès
+      }
     }
 
     return signal;

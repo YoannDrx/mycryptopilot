@@ -78,7 +78,7 @@ export const SignInWithEmailOTP = (props: {
     },
     onSuccess: () => {
       toast.success("Signed in successfully");
-      const cb = getCallbackUrl(props.callbackUrl ?? "/dashboard");
+      const cb = getCallbackUrl(props.callbackUrl ?? "/risk-console");
       window.location.href = cb;
     },
   });
