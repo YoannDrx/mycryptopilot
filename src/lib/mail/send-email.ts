@@ -91,6 +91,7 @@ export const sendEmail = async (params: SendEmailParams) => {
   const result = await mailAdapter.send({
     ...params,
     from: params.from ?? env.EMAIL_FROM,
+    replyTo: params.replyTo ?? env.NEXT_PUBLIC_EMAIL_CONTACT,
     html,
   });
 
