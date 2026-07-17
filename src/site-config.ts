@@ -1,7 +1,7 @@
 export const SiteConfig = {
   title: "MyCryptoPilot",
   description:
-    "Signaux de trading crypto risk-first. Analyse temps réel, plans explicables, console de risque.",
+    "Démonstrateur crypto risk-first : données sourcées, clés read-only et simulation sans exécution financière.",
   prodUrl: "https://mycryptopilot.app",
   appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://mycryptopilot.app",
   appId: "mycryptopilot",
@@ -9,7 +9,6 @@ export const SiteConfig = {
   appIcon: "/images/icon.png",
   company: {
     name: "MyCryptoPilot",
-    address: "123 Avenue des Champs-Élysées, 75008 Paris, France",
   },
   brand: {
     primary: "#00ffaa", // Emerald color for crypto theme
@@ -17,7 +16,7 @@ export const SiteConfig = {
   team: {
     image: "/images/team.jpg",
     website: "https://mycryptopilot.app",
-    twitter: "https://twitter.com/mycryptopilot",
+    supportUrl: "https://mycryptopilot.app/contact",
     name: "MyCryptoPilot Team",
   },
   email: {

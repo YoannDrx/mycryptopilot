@@ -14,7 +14,6 @@ const FOOTER_LINKS = {
   company: [
     { key: "about", href: "/about" },
     { key: "contact", href: "/contact" },
-    { key: "blog", href: "/posts" },
   ],
   legal: [
     { key: "terms", href: "/legal/terms" },

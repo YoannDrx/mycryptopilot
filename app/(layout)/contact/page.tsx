@@ -9,18 +9,18 @@ import { ContactSupportSchema } from "@/features/contact/support/contact-support
 import { env } from "@/lib/env";
 import { serverToast } from "@/lib/server-toast";
 import { SiteConfig } from "@/site-config";
-import { Building2, Mail, MessageSquare } from "lucide-react";
+import { Mail, MessageSquare } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: `Contact ${SiteConfig.title}`,
   description:
-    "Get in touch with the CryptoPilot team. We're here to help with any questions about crypto trading signals, platform features, or technical support.",
+    "Contact the MyCryptoPilot team about the read-only risk demonstrator, data sources, or technical support.",
   keywords: ["contact", "support", "help", "testimonials", "questions"],
   openGraph: {
     title: `Contact ${SiteConfig.title}`,
     description:
-      "Get in touch with the CryptoPilot team. We're here to help with any questions about crypto trading signals, platform features, or technical support.",
+      "Contact the MyCryptoPilot team about the read-only risk demonstrator, data sources, or technical support.",
     url: `${SiteConfig.prodUrl}/contact`,
     type: "website",
   },
@@ -48,20 +48,11 @@ export default function ContactPage() {
             >
               Have questions about{" "}
               <span className="text-primary font-semibold">MyCryptoPilot</span>?
-              Need help with trading signals or want to share feedback? I'm here
-              to help and always excited to hear from our community.
+              Need help with a read-only exchange connection, a data source or
+              the Risk Console? Share the context without including an API key
+              or other secret.
             </Typography>
             <dl className="text-muted-foreground mt-10 flex flex-col gap-4 text-base/7">
-              <div className="flex gap-x-4">
-                <dt className="flex-none">
-                  <span className="sr-only">Location</span>
-                  <Building2
-                    aria-hidden="true"
-                    className="text-muted-foreground h-6 w-6"
-                  />
-                </dt>
-                <dd>{SiteConfig.company.address}</dd>
-              </div>
               <div className="flex gap-x-4">
                 <dt className="flex-none">
                   <span className="sr-only">Email</span>
@@ -88,9 +79,9 @@ export default function ContactPage() {
                   />
                 </dt>
                 <dd>
-                  Usually respond within 24 hours
+                  Usually respond within two business days
                   <br />
-                  Monday - Friday, 9 AM - 6 PM ICT
+                  Technical support only — no investment advice
                 </dd>
               </div>
             </dl>

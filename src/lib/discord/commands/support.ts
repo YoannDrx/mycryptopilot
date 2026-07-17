@@ -16,8 +16,8 @@ export async function handleSupportCommand(
         inline: true,
       },
       {
-        name: "🐦 Twitter",
-        value: SiteConfig.team.twitter,
+        name: "🌐 Support",
+        value: SiteConfig.team.supportUrl,
         inline: true,
       },
       {

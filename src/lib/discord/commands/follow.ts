@@ -186,7 +186,7 @@ export async function handleFollowCommand(
       .setTitle("❌ Erreur")
       .setDescription(
         `Une erreur est survenue lors du suivi de ce trader.\n\n` +
-          `Contacte le support: ${SiteConfig.team.twitter}`,
+          `Contacte le support: ${SiteConfig.team.supportUrl}`,
       )
       .setFooter({ text: SiteConfig.title })
       .setTimestamp();
