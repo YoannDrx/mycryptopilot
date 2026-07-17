@@ -97,7 +97,7 @@ export function Hero() {
                 <div key={stat.label} className="text-center lg:text-left">
                   <div className="flex items-center justify-center gap-2 lg:justify-start">
                     <stat.icon className="size-5 text-[var(--accent-emerald)]" />
-                    <span className="text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
+                    <span className="text-xl font-bold whitespace-nowrap text-[var(--text-primary)] sm:text-2xl xl:text-3xl">
                       {stat.value}
                     </span>
                   </div>
@@ -203,8 +203,10 @@ export function Hero() {
                 </div>
 
                 {/* Action Button */}
-                <Button variant="emerald" className="w-full">
-                  Simuler le risque
+                <Button asChild variant="emerald" className="w-full">
+                  <Link href="/auth/signup?callbackUrl=/risk-console">
+                    Simuler le risque
+                  </Link>
                 </Button>
               </div>
             </HyperBorder>
