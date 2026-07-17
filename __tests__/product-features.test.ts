@@ -20,6 +20,11 @@ describe("MyCryptoPilot feature manifest", () => {
     expect(isMyCryptoPilotPathEnabled("/school/courses")).toBe(false);
     expect(isMyCryptoPilotPathEnabled("/checkout/pro")).toBe(false);
     expect(isMyCryptoPilotPathEnabled("/dashboard")).toBe(false);
+    expect(isMyCryptoPilotPathEnabled("/home")).toBe(false);
+    expect(isMyCryptoPilotPathEnabled("/posts/legacy-article")).toBe(false);
+    expect(isMyCryptoPilotPathEnabled("/invite/referral-code")).toBe(false);
+    expect(isMyCryptoPilotPathEnabled("/follow/trader-id")).toBe(false);
+    expect(isMyCryptoPilotPathEnabled("/account/become-trader")).toBe(false);
     expect(isMyCryptoPilotPathEnabled("/account/payments")).toBe(false);
     expect(isMyCryptoPilotPathEnabled("/payment/success")).toBe(false);
     expect(isMyCryptoPilotPathEnabled("/account/exchanges")).toBe(true);

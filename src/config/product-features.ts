@@ -11,6 +11,12 @@ export const MY_CRYPTO_PILOT_FEATURES = {
     status: "hidden",
     paths: ["/dashboard", "/following", "/analytics", "/trader-tools"],
   },
+  legacyGrowth: {
+    status: "hidden",
+    paths: ["/invite", "/follow", "/account/become-trader"],
+  },
+  legacyEditorial: { status: "hidden", paths: ["/posts"] },
+  legacyHome: { status: "hidden", paths: ["/home"] },
   copyTrading: { status: "hidden", paths: ["/my-trades"] },
   cryptoSchool: { status: "hidden", paths: ["/school"] },
   tax: { status: "hidden", paths: ["/tax"] },
