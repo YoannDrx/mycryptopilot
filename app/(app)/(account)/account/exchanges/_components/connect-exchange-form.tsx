@@ -22,6 +22,7 @@ import { upfetch } from "@/lib/up-fetch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Link2, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { isResponseError } from "up-fetch";
 
 type ConnectExchangeFormProps = {
   onSuccess?: () => void;
@@ -30,6 +31,22 @@ type ConnectExchangeFormProps = {
 const exchangeDisplayName: Record<"BINANCE" | "BYBIT", string> = {
   BINANCE: "Binance",
   BYBIT: "Bybit",
+};
+
+const getExchangeConnectionError = (error: unknown) => {
+  if (
+    isResponseError(error) &&
+    typeof error.data === "object" &&
+    error.data !== null &&
+    "error" in error.data &&
+    typeof error.data.error === "string"
+  ) {
+    return error.data.error;
+  }
+
+  return error instanceof Error
+    ? error.message
+    : "The exchange connection could not be validated. Please try again.";
 };
 
 export const ConnectExchangeForm = ({
@@ -73,8 +90,8 @@ export const ConnectExchangeForm = ({
 
       onSuccess?.();
     },
-    onError: (error: Error) => {
-      toast.error(error.message);
+    onError: (error) => {
+      toast.error(getExchangeConnectionError(error));
     },
   });
 
@@ -146,7 +163,6 @@ export const ConnectExchangeForm = ({
                         </div>
                       </Label>
                     </div>
-
                   </RadioGroup>
                 </FormControl>
                 <FormMessage />
@@ -275,7 +291,7 @@ export const ConnectExchangeForm = ({
             <Alert variant="destructive">
               <AlertCircle className="size-4" />
               <AlertDescription>
-                {connectMutation.error.message}
+                {getExchangeConnectionError(connectMutation.error)}
               </AlertDescription>
             </Alert>
           )}

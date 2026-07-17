@@ -30,7 +30,9 @@ test("simulates risk without exposing an execution action", async ({
   await page.getByLabel("Risk Per Trade (%)").fill("1");
   await page.getByLabel("Entry Price (USD)").fill("50000");
   await page.getByLabel("Stop Loss (USD)").fill("49000");
-  await expect(page.getByText(/Risk Amount:/i)).toContainText("100");
+  await expect(page.getByText(/Risk Amount:/i).locator("..")).toContainText(
+    "$100.00",
+  );
   await expect(
     page.getByRole("button", { name: /execute|buy|sell|place order/i }),
   ).toHaveCount(0);
@@ -63,7 +65,17 @@ test("rejects unverified credentials and stores no exchange secret", async ({
   await expect(page.getByText(/Read-only connection/i).first()).toBeVisible();
   await page.getByLabel("API Key *").fill("invalid-read-only-key");
   await page.getByLabel("Secret Key *").fill("invalid-secret");
+  const failedValidation = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/exchange/connect") &&
+      response.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "Connect Exchange" }).click();
+  const response = await failedValidation;
+  expect(response.status()).toBe(400);
+  await expect(response.json()).resolves.toMatchObject({
+    error: expect.stringMatching(/failed to validate|invalid api/i),
+  });
   await expect(
     page.getByText(/failed to validate|invalid api/i).first(),
   ).toBeVisible({
