@@ -1,6 +1,5 @@
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
-import { SiteConfig } from "@/site-config";
 import { pretty, render } from "@react-email/render";
 import { nanoid } from "nanoid";
 import { resendMailAdapter } from "./resend";

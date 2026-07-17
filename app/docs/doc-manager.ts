@@ -5,6 +5,12 @@ import path from "path";
 import { z } from "zod";
 
 const docsDirectory = path.join(process.cwd(), "content/docs");
+const PUBLIC_DOC_SLUGS = new Set([
+  "getting-started",
+  "binance-setup",
+  "bybit-setup",
+  "portfolio-analytics",
+]);
 
 const AttributeSchema = z.object({
   title: z.string(),
@@ -36,6 +42,7 @@ export async function getDocs(tags?: string[]) {
 
     for await (const fileName of fileNames) {
       if (!fileName.endsWith(".mdx")) continue;
+      if (!PUBLIC_DOC_SLUGS.has(fileName.replace(".mdx", ""))) continue;
 
       const fullPath = path.join(docsDirectory, fileName);
       const fileContents = await fs.readFile(fullPath, "utf8");
@@ -70,6 +77,8 @@ export async function getDocs(tags?: string[]) {
 }
 
 export async function getCurrentDoc(slug: string): Promise<DocType | null> {
+  if (!PUBLIC_DOC_SLUGS.has(slug)) return null;
+
   try {
     const filePath = path.join(docsDirectory, `${slug}.mdx`);
     const fileContents = await fs.readFile(filePath, "utf8");

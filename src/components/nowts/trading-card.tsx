@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { TradingCardPayloadType } from "@/features/signal/signal.schema";
 import {
@@ -10,11 +11,12 @@ import {
   TrendingDown,
   TrendingUp,
   ChevronDown,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { ChartImageViewer } from "./chart-image-viewer";
-import { CopyTradeButton } from "./copy-trade-button";
+import Link from "next/link";
 
 export type TradingCardProps = {
   symbol: string;
@@ -40,8 +42,6 @@ export const TradingCard = ({
   expiresAt,
   className,
   compact = false,
-  signalId,
-  userPlan,
   showCopyButton = false,
 }: TradingCardProps) => {
   const [isExpanded, setIsExpanded] = useState(!compact);
@@ -53,6 +53,19 @@ export const TradingCard = ({
   const timeLeft = expiresAt ? expiresAt.getTime() - now.getTime() : null;
   const hoursLeft = timeLeft ? Math.floor(timeLeft / (1000 * 60 * 60)) : null;
   const isExpired = timeLeft !== null && timeLeft <= 0;
+  const riskConsoleHref = `/risk-console?${new URLSearchParams({
+    symbol,
+    entryPrice: String(payload.entry),
+    stopLoss: String(payload.invalidation),
+    positionType: payload.bias,
+    takeProfits: JSON.stringify(
+      payload.tps.map((price, index) => ({
+        price,
+        allocation: 100 / payload.tps.length,
+        label: `TP${index + 1}`,
+      })),
+    ),
+  }).toString()}`;
 
   return (
     <div className={cn("relative", className)} data-testid="trading-card">
@@ -265,16 +278,15 @@ export const TradingCard = ({
               {isExpired && <Badge variant="crimson">❌ Expired</Badge>}
             </div>
 
-            {/* Copy Trade Button */}
-            {showCopyButton && signalId && traderName && !isExpired && (
+            {/* Risk simulation hand-off — never executes an order. */}
+            {showCopyButton && !isExpired && (
               <div className="mt-4 border-t pt-4">
-                <CopyTradeButton
-                  signalId={signalId}
-                  symbol={symbol}
-                  traderName={traderName}
-                  entryPrice={payload.entry}
-                  userPlan={userPlan ?? null}
-                />
+                <Button asChild className="w-full" size="sm">
+                  <Link href={riskConsoleHref}>
+                    <Calculator className="mr-2 size-4" />
+                    Simulate risk
+                  </Link>
+                </Button>
               </div>
             )}
           </CardContent>

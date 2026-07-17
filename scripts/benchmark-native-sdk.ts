@@ -33,10 +33,12 @@ import { BinanceService } from "@/lib/exchange/binance-service"; // CCXT
 import { BinanceNativeServicePOC } from "@/lib/exchange/binance-native-service.POC"; // Native SDK
 import type { CreateOrderParams } from "@/lib/exchange/types";
 import { logger } from "@/lib/logger";
+import { rejectFinancialExecution } from "@/config/product-features";
 
 // ============= Configuration =============
 
-const DRY_RUN = !process.argv.includes("--real");
+const REAL_MODE_REQUESTED = process.argv.includes("--real");
+const DRY_RUN = !REAL_MODE_REQUESTED;
 const NUM_ITERATIONS = DRY_RUN ? 10 : 100; // Fewer iterations in dry-run
 const TESTNET = true; // Always use testnet for safety
 
@@ -237,6 +239,10 @@ async function benchmarkNativeSDK(
 // ============= Main Benchmark =============
 
 async function runBenchmark() {
+  if (REAL_MODE_REQUESTED) {
+    rejectFinancialExecution("Exchange order benchmark");
+  }
+
   logger.info("Starting Phase 2.3 POC Benchmark", {
     mode: DRY_RUN ? "DRY-RUN (Mock)" : "REAL (Testnet)",
     iterations: NUM_ITERATIONS,

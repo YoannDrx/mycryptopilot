@@ -9,7 +9,7 @@ import { getSessionWithHeaders } from "./get-session";
  * Middleware Utils - Big Bang (Issue #77 Phase 3)
  *
  * Simplified utilities without organization logic:
- * - Root redirect to /dashboard (not /orgs)
+ * - Root redirect to the read-only Risk Console
  * - Admin route validation
  * - No org slug extraction, no org switching
  */
@@ -25,7 +25,7 @@ export const handleRootRedirect = (request: NextRequest) => {
     if (!session) return null;
 
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/risk-console";
     return NextResponse.redirect(url);
   } catch (error) {
     // Si erreur parsing cookie (corrompu ou invalide), ne pas bloquer

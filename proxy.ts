@@ -1,3 +1,4 @@
+import { isMyCryptoPilotPathEnabled } from "@/config/product-features";
 import {
   handleRootRedirect,
   isAdminRoute,
@@ -8,31 +9,28 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 /**
- * Middleware - Big Bang (Issue #77 Phase 3)
- *
- * Simplified middleware without organization switching logic:
- * - Root redirect
- * - Admin route protection
- * - No organization validation (user-centric architecture)
+ * Product and access boundary for the Next.js application.
+ * Hidden demonstrator modules redirect to the Risk Console before rendering.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Root redirect
+  if (!isMyCryptoPilotPathEnabled(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/risk-console";
+    url.searchParams.set("notice", "demo-only");
+    return NextResponse.redirect(url);
+  }
+
   if (pathname === "/") {
     return handleRootRedirect(request) ?? NextResponse.next();
   }
 
-  // Admin route protection
   if (isAdminRoute(pathname)) {
     const adminUser = await validateAdminAccess(request);
-    if (!adminUser) {
-      return redirectToRoot(request);
-    }
-    return NextResponse.next();
+    if (!adminUser) return redirectToRoot(request);
   }
 
-  // No organization logic needed
   return NextResponse.next();
 }
 
@@ -40,5 +38,4 @@ export const config = {
   matcher: [
     "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
-  runtime: "nodejs",
 };

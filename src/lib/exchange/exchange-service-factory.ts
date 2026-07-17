@@ -59,6 +59,32 @@ export type ExchangeService =
   | (BybitNativeService & ExchangeAdapter)
   | (BitgetNativeService & ExchangeAdapter);
 
+export const PUBLIC_READ_ONLY_EXCHANGES = ["BINANCE", "BYBIT"] as const;
+
+export class ExchangeMutationDisabledError extends Error {
+  constructor(operation: "createOrder" | "cancelOrder") {
+    super(
+      `${operation} is disabled: MyCryptoPilot only supports read-only exchange access.`,
+    );
+    this.name = "ExchangeMutationDisabledError";
+  }
+}
+
+function enforceReadOnlyAdapter(service: ExchangeService): ExchangeService {
+  return new Proxy(service, {
+    get(target, property) {
+      if (property === "createOrder" || property === "cancelOrder") {
+        return async () => {
+          throw new ExchangeMutationDisabledError(property);
+        };
+      }
+
+      const value = Reflect.get(target, property, target) as unknown;
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
+}
+
 /**
  * Create exchange service instance based on exchange type
  *
@@ -80,17 +106,21 @@ export function createExchangeService(
 ): ExchangeService {
   switch (exchange) {
     case "BINANCE":
-      return new BinanceNativeService(apiKey, secretKey);
+      return enforceReadOnlyAdapter(
+        new BinanceNativeService(apiKey, secretKey),
+      );
     case "BYBIT":
-      return new BybitNativeService(apiKey, secretKey);
+      return enforceReadOnlyAdapter(new BybitNativeService(apiKey, secretKey));
     case "BITGET":
-      return new BitgetNativeService(
-        apiKey,
-        secretKey,
-        options?.passphrase ?? null,
-        {
-          accountMode: options?.bitgetAccountMode ?? null,
-        },
+      return enforceReadOnlyAdapter(
+        new BitgetNativeService(
+          apiKey,
+          secretKey,
+          options?.passphrase ?? null,
+          {
+            accountMode: options?.bitgetAccountMode ?? null,
+          },
+        ),
       );
     default: {
       // TypeScript exhaustiveness check
@@ -117,4 +147,10 @@ export function getSupportedExchanges(): Exchange[] {
  */
 export function isExchangeSupported(exchange: string): exchange is Exchange {
   return ["BINANCE", "BYBIT", "BITGET"].includes(exchange);
+}
+
+export function isPublicReadOnlyExchange(
+  exchange: string,
+): exchange is (typeof PUBLIC_READ_ONLY_EXCHANGES)[number] {
+  return PUBLIC_READ_ONLY_EXCHANGES.some((item) => item === exchange);
 }

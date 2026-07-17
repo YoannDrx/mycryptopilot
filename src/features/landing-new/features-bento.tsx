@@ -124,7 +124,7 @@ export function FeaturesBento() {
   ];
 
   return (
-    <section className="bg-[var(--bg-obsidian)] py-20">
+    <section id="how-it-works" className="bg-[var(--bg-obsidian)] py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="mb-12 text-center">

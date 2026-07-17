@@ -35,12 +35,16 @@ import {
   decryptSerializedPayload,
   decryptOptionalSerializedPayload,
 } from "@/lib/crypto/encryption-service";
-import { createExchangeService } from "@/lib/exchange/exchange-service-factory";
+import {
+  createExchangeService,
+  isPublicReadOnlyExchange,
+} from "@/lib/exchange/exchange-service-factory";
 import type {
   UserExchangeConnection,
   Exchange,
   CopyMode,
 } from "@/generated/prisma";
+import { isMyCryptoPilotFeatureActive } from "@/config/product-features";
 
 export type CreateUserExchangeConnectionInput = {
   /** User ID */
@@ -103,6 +107,12 @@ export type UpdateUserExchangeConnectionInput = {
 export async function createUserExchangeConnection(
   input: CreateUserExchangeConnectionInput,
 ): Promise<UserExchangeConnection> {
+  if (!isMyCryptoPilotFeatureActive("copyTrading")) {
+    throw new Error(
+      "User execution connections are disabled in the read-only demonstrator.",
+    );
+  }
+
   const { userId, exchange, apiKey, apiSecret, passphrase, mode } = input;
 
   // Validation
@@ -270,6 +280,12 @@ export async function updateUserExchangeConnection(
   input: UpdateUserExchangeConnectionInput,
 ): Promise<UserExchangeConnection> {
   const { connectionId, apiKey, apiSecret, passphrase, mode, isActive } = input;
+
+  if (mode === "AUTO" && !isMyCryptoPilotFeatureActive("copyTrading")) {
+    throw new Error(
+      "Automatic exchange execution is disabled in the read-only demonstrator.",
+    );
+  }
 
   // Check if connection exists
   const existing = await prisma.userExchangeConnection.findUnique({
@@ -518,6 +534,8 @@ export async function testUserExchangeConnection(
     permissions: string[];
   };
 }> {
+  let service: ReturnType<typeof createExchangeService> | null = null;
+
   try {
     const credentials = await getDecryptedCredentials(connectionId);
 
@@ -526,12 +544,45 @@ export async function testUserExchangeConnection(
       exchange: credentials.exchange,
     });
 
-    // TODO: Implement actual exchange API validation
-    // For now, just verify decryption worked
-    if (!credentials.apiKey || !credentials.apiSecret) {
+    if (!isPublicReadOnlyExchange(credentials.exchange)) {
       return {
         success: false,
-        message: "Invalid credentials format",
+        message:
+          "This exchange is not available for new read-only connections.",
+      };
+    }
+
+    service = createExchangeService(
+      credentials.exchange,
+      credentials.apiKey,
+      credentials.apiSecret,
+      { passphrase: credentials.passphrase },
+    );
+    const status = await service.testConnection();
+
+    if (!status.isValid) {
+      return {
+        success: false,
+        message: status.errorMessage ?? "Exchange rejected the credentials.",
+      };
+    }
+
+    if (!status.isReadOnly || status.canTrade === true) {
+      await prisma.userExchangeConnection.update({
+        where: { id: connectionId },
+        data: {
+          isActive: false,
+          lastError: "Trading permissions detected; connection disabled.",
+        },
+      });
+      return {
+        success: false,
+        message:
+          "Trading permissions were detected. Create a new read-only API key.",
+        accountInfo: {
+          canTrade: true,
+          permissions: status.permissions ?? [],
+        },
       };
     }
 
@@ -548,8 +599,8 @@ export async function testUserExchangeConnection(
       success: true,
       message: "Connection test successful",
       accountInfo: {
-        canTrade: true,
-        permissions: ["SPOT", "FUTURES"], // TODO: Get from actual API
+        canTrade: false,
+        permissions: status.permissions ?? ["READ_ONLY"],
       },
     };
   } catch (error) {
@@ -563,5 +614,7 @@ export async function testUserExchangeConnection(
       message:
         error instanceof Error ? error.message : "Connection test failed",
     };
+  } finally {
+    await service?.close();
   }
 }

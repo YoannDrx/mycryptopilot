@@ -16,6 +16,7 @@ import type { SerializableGroup } from "../../_navigation/global-search-command"
 import { SidebarUserButton } from "@/features/sidebar/sidebar-user-button";
 import { GlobalSearchCommand } from "../../_navigation/global-search-command";
 import { ACCOUNT_LINKS } from "./account-links";
+import { isMyCryptoPilotPathEnabled } from "@/config/product-features";
 
 /**
  * Account Sidebar
@@ -35,7 +36,9 @@ export function AccountSidebar({
 }) {
   const navigationGroup: NavigationGroup = {
     title: "Account Settings",
-    links: ACCOUNT_LINKS,
+    links: ACCOUNT_LINKS.filter((link) =>
+      isMyCryptoPilotPathEnabled(link.href),
+    ),
   };
 
   return (

@@ -24,6 +24,7 @@ import { resolve } from "path";
 import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
 import type { CryptoNetwork } from "@/generated/prisma";
+import { rejectFinancialExecution } from "@/config/product-features";
 
 // Load sweep configuration from .env.sweep
 config({ path: resolve(process.cwd(), ".env.sweep") });
@@ -202,6 +203,8 @@ async function confirmSweep(): Promise<boolean> {
 }
 
 export async function sweepAllAddresses(): Promise<SweepResult[]> {
+  rejectFinancialExecution("Crypto custody sweep");
+
   console.log("🧹 Starting sweep of all crypto addresses to Binance...\n");
 
   // Show configuration and ask for confirmation

@@ -18,7 +18,7 @@ export const FollowTraderButton = ({
 
   const handleFollowSuccess = () => {
     // Redirect to dashboard after successful follow
-    router.push("/dashboard");
+    router.push("/traders");
     router.refresh();
   };
 

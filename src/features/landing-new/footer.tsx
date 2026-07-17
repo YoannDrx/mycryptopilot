@@ -2,14 +2,13 @@
 
 import { Logo } from "@/components/brand";
 import { GrainOverlay, MeshGradient } from "@/components/design-system";
-import { Twitter, MessageCircle, Github } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 const FOOTER_LINKS = {
   product: [
-    { key: "marketplace", href: "/traders" },
-    { key: "pricing", href: "/pricing" },
+    { key: "console", href: "/auth/signin?callbackUrl=/risk-console" },
+    { key: "marketplace", href: "/auth/signin?callbackUrl=/traders" },
     { key: "docs", href: "/docs" },
   ],
   company: [
@@ -22,20 +21,6 @@ const FOOTER_LINKS = {
     { key: "privacy", href: "/legal/privacy" },
   ],
 };
-
-const SOCIAL_LINKS = [
-  {
-    icon: Twitter,
-    href: "https://twitter.com/mycryptopilot",
-    label: "Twitter",
-  },
-  {
-    icon: MessageCircle,
-    href: "https://discord.gg/mycryptopilot",
-    label: "Discord",
-  },
-  { icon: Github, href: "https://github.com/mycryptopilot", label: "GitHub" },
-];
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -53,21 +38,6 @@ export function Footer() {
             <p className="mb-6 max-w-xs text-sm text-[var(--text-muted)]">
               {t("description")}
             </p>
-            {/* Social links */}
-            <div className="flex gap-3">
-              {SOCIAL_LINKS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex size-10 items-center justify-center rounded-lg border border-[var(--glass-border)] text-[var(--text-muted)] transition-colors hover:border-[var(--accent-emerald)] hover:text-[var(--accent-emerald)]"
-                  aria-label={social.label}
-                >
-                  <social.icon className="size-5" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Product links */}

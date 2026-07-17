@@ -1,5 +1,4 @@
 import { getServerUrl } from "@/lib/server-url";
-import { prisma } from "@/lib/prisma";
 import type { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -26,18 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/pricing`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/traders`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/docs`,
       lastModified: new Date(),
       changeFrequency: "weekly",
@@ -57,29 +44,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Dynamic trader profiles (public)
-  let traderRoutes: MetadataRoute.Sitemap = [];
-  try {
-    const traders = await prisma.traderProfile.findMany({
-      where: {
-        verified: true, // Only include verified traders
-      },
-      select: {
-        userId: true,
-        updatedAt: true,
-      },
-      take: 100, // Limit to prevent sitemap from being too large
-    });
-
-    traderRoutes = traders.map((trader) => ({
-      url: `${baseUrl}/traders/${trader.userId}`,
-      lastModified: trader.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    }));
-  } catch {
-    // Silently fail - sitemap will just not include dynamic trader routes
-  }
-
-  return [...staticRoutes, ...traderRoutes];
+  return staticRoutes;
 }

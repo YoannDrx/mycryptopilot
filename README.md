@@ -1,16 +1,20 @@
 # MyCryptoPilot
 
-Plateforme de trading crypto « risk-first » permettant aux utilisateurs de suivre des traders vérifiés, de recevoir leurs signaux en temps réel et de consulter des performances vérifiées (Binance + Bybit).
+Démonstrateur crypto « risk-first » exclusivement en démo/testnet. Il permet d'étudier des signaux, de simuler le risque et de connecter Binance ou Bybit en lecture seule. Aucun copy trading réel, aucune garde de fonds et aucune promesse de rendement.
 
 ---
 
 ## ✨ Points forts
 
-- **Trading social complet** : profils traders, publication de signaux (TradingCard JSON), feed avec filtres, marketplace et dashboards.
-- **Paiements crypto natifs** : génération d’adresses HD (Base/Tron), watcher on-chain, activation d’abonnement automatique, script de sweep vers Binance.
-- **Portfolio tracking vérifié** : intégration API read-only Binance & Bybit, calcul de KPI (winrate, profit factor, drawdown) et snapshots par période.
-- **Automations Discord** : bot 24/7 (Fly worker), slash commands (user + admin), rôles dynamiques, notifications de signaux et DM plan.
-- **Tooling dev** : scripts `scripts/` + `scripts/dev-tools/`, workflows GitHub Actions (lint/tests), commandes `.claude/commands/*.md` pour audit, env sync, TDD.
+- **Risk Console** : simulation de taille de position et de scénarios de risque.
+- **Signaux et traders** : données réelles sourcées ou dataset déterministe marqué comme exemple.
+- **Portfolio read-only** : intégration Binance & Bybit sans permission de trading, avec sources de prix explicites.
+- **Sécurité explicite** : permissions exchange inspectées en mode fail-closed, mutations bloquées à l'adaptateur et anciennes API de paiement retirées.
+- **Worker minimal** : synchronisation read-only uniquement ; aucun watcher de paiement, bot commercial, sweep ou worker de copy-trading.
+- **Tooling dev** : TypeScript strict, Vitest, Playwright et build Next.js de production.
+
+La décision d'architecture et son modèle de menace sont documentés dans
+[`docs/architecture-security-case-study.md`](docs/architecture-security-case-study.md).
 
 ---
 
@@ -56,14 +60,14 @@ pnpm dev
 
 ## 🧪 Tests & QA
 
-| Commande                                | Description                                                |
-| --------------------------------------- | ---------------------------------------------------------- |
-| `pnpm test`                             | Tests Vitest (unitaires/intégration).                      |
-| `pnpm test:ci`                          | Vitest en mode CI (utilisé dans GitHub Actions).           |
-| `pnpm test:e2e`                         | Playwright en local (requires `scripts/setup-test-db.sh`). |
+| Commande                                | Description                                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `pnpm test`                             | Tests Vitest (unitaires/intégration).                                                            |
+| `pnpm test:ci`                          | Vitest en mode CI (utilisé dans GitHub Actions).                                                 |
+| `pnpm test:e2e`                         | Playwright en local (requires `scripts/setup-test-db.sh`).                                       |
 | `pnpm test:e2e:ci`                      | Pipeline complet (reset DB + Playwright headless). `--reuse-db`/`--reuse-server` pour accélérer. |
-| `./scripts/dev-tools/check-test-env.sh` | Diagnostic (Postgres, Prisma, Playwright, pnpm).           |
-| `./scripts/dev-tools/test-*.ts`         | Scripts ciblés (checkout, RPC, crypto addresses, etc.).    |
+| `./scripts/dev-tools/check-test-env.sh` | Diagnostic (Postgres, Prisma, Playwright, pnpm).                                                 |
+| `./scripts/dev-tools/test-*.ts`         | Scripts ciblés (checkout, RPC, crypto addresses, etc.).                                          |
 
 Plus de détails dans `.claude/docs/TESTING.md`.
 

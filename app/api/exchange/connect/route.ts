@@ -53,7 +53,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { exchange, apiKey, secretKey, passphrase } = validation.data;
+    const { exchange, apiKey, secretKey } = validation.data;
 
     logger.info("Exchange connection request", {
       userId: user.id,
@@ -127,12 +127,11 @@ export async function POST(request: Request) {
     const currentConnections = await countTraderConnections(traderProfile.id);
 
     if (currentConnections >= connectionLimit) {
-      const needsUpgrade = planName === "pro";
       return NextResponse.json(
         {
           error: `You have reached your plan limit (${connectionLimit} connection${connectionLimit > 1 ? "s" : ""})`,
-          upgrade: needsUpgrade,
-          requiredPlan: needsUpgrade ? "ultra" : null,
+          upgrade: false,
+          requiredPlan: null,
         },
         { status: 403 },
       );
@@ -145,13 +144,7 @@ export async function POST(request: Request) {
       exchange,
     });
 
-    const normalizedPassphrase = passphrase?.trim().length
-      ? passphrase.trim()
-      : null;
-
-    const exchangeService = createExchangeService(exchange, apiKey, secretKey, {
-      passphrase: normalizedPassphrase,
-    });
+    const exchangeService = createExchangeService(exchange, apiKey, secretKey);
 
     let apiValidation;
     try {
@@ -185,10 +178,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Extract Bitget account mode if applicable
-    const bitgetAccountMode =
-      exchange === "BITGET" ? (apiValidation.bitgetAccountMode ?? "UTA") : null;
-
     // Encrypt API keys
     logger.info("Encrypting API keys", {
       userId: user.id,
@@ -198,9 +187,6 @@ export async function POST(request: Request) {
     const encryptedApiKey = encryptApiKey(apiKey);
     const encryptedSecretKey = encryptApiKey(secretKey);
     const secretKeyPayload = serializeEncryptedPayload(encryptedSecretKey);
-    const passphrasePayload = normalizedPassphrase
-      ? serializeEncryptedPayload(encryptApiKey(normalizedPassphrase))
-      : null;
 
     // Calculate next sync time based on plan
     const nextSyncAt = calculateNextSyncAt(planName);
@@ -216,14 +202,14 @@ export async function POST(request: Request) {
           data: {
             encryptedApiKey: encryptedApiKey.encrypted,
             encryptedSecretKey: secretKeyPayload,
-            encryptedPassphrase: passphrasePayload,
+            encryptedPassphrase: null,
             keyIv: encryptedApiKey.iv,
             keyTag: encryptedApiKey.tag,
             isActive: true,
             nextSyncAt,
             lastSyncError: null, // Clear previous errors
             updatedAt: new Date(),
-            bitgetAccountMode,
+            bitgetAccountMode: null,
           },
         });
 
@@ -240,12 +226,12 @@ export async function POST(request: Request) {
             exchange,
             encryptedApiKey: encryptedApiKey.encrypted,
             encryptedSecretKey: secretKeyPayload,
-            encryptedPassphrase: passphrasePayload,
+            encryptedPassphrase: null,
             keyIv: encryptedApiKey.iv,
             keyTag: encryptedApiKey.tag,
             isActive: true,
             nextSyncAt,
-            bitgetAccountMode,
+            bitgetAccountMode: null,
           },
         });
       }

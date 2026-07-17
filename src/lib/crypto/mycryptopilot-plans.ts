@@ -40,7 +40,7 @@ export const MYCRYPTOPILOT_PLANS: MyCryptoPilotPlan[] = [
       tradersFollow: 1,
       screenerRefreshSec: 300, // 5min
       customAlerts: false,
-      riskConsole: false,
+      riskConsole: true,
       journaling: false,
       advancedFilters: false,
       cryptoSchool: false, // Pas d'accès Crypto School en Free

@@ -91,8 +91,8 @@ describe("SignUpCredentialsForm", () => {
       });
     });
 
-    // Check if redirect happened (B2C: default is /dashboard)
-    expect(window.location.href).toBe("http://localhost:3000/dashboard");
+    // The read-only product starts on its core simulation surface.
+    expect(window.location.href).toBe("http://localhost:3000/risk-console");
   });
 
   it("should use custom callback URL from searchParams", async () => {
@@ -120,7 +120,6 @@ describe("SignUpCredentialsForm", () => {
       expect(authClient.signUp.email).toHaveBeenCalled();
     });
 
-    // Check if redirected to custom URL (B2C: /dashboard)
-    expect(window.location.href).toBe("http://localhost:3000/dashboard");
+    expect(window.location.href).toBe("http://localhost:3000/risk-console");
   });
 });

@@ -1,8 +1,7 @@
 import type { SerializableGroup } from "./global-search-command";
 import { getTradingNavigationGroups } from "../(trading)/_navigation/trading-links";
 import { ACCOUNT_LINKS } from "../(account)/_navigation/account-links";
-import { SCHOOL_LINKS } from "../(school)/_navigation/school-links";
-import { TAX_LINKS } from "../(tax)/_navigation/tax-links";
+import { isMyCryptoPilotPathEnabled } from "@/config/product-features";
 
 /**
  * Navigation Helpers
@@ -40,30 +39,10 @@ export function getAllNavigationLinks(
   // Account links
   const accountLinks: SerializableGroup = {
     title: "Account Settings",
-    links: ACCOUNT_LINKS.map((link) => ({
-      href: link.href,
-      label: link.label,
-    })),
+    links: ACCOUNT_LINKS.filter((link) =>
+      isMyCryptoPilotPathEnabled(link.href),
+    ).map((link) => ({ href: link.href, label: link.label })),
   };
 
-  // School links
-  const schoolLinks: SerializableGroup = {
-    title: "Crypto School",
-    links: SCHOOL_LINKS.map((link) => ({
-      href: link.href,
-      label: link.label,
-    })),
-  };
-
-  // Tax links
-  const taxLinks: SerializableGroup = {
-    title: "Tax & Declaration",
-    links: TAX_LINKS.map((link) => ({
-      href: link.href,
-      label: link.label,
-    })),
-  };
-
-  // Combine all links
-  return [...tradingLinks, accountLinks, schoolLinks, taxLinks];
+  return [...tradingLinks, accountLinks];
 }

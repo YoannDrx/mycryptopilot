@@ -1,26 +1,15 @@
 import { z } from "zod";
 
 /**
- * Schema for connecting an exchange (Binance, Bybit, Bitget)
+ * Public read-only exchange connection schema.
+ * Bitget remains supported internally for legacy connections but is excluded
+ * until its API scopes can be verified reliably.
  */
-export const ConnectExchangeSchema = z
-  .object({
-    exchange: z.enum(["BINANCE", "BYBIT", "BITGET"]),
-    apiKey: z.string().min(1, "API Key is required"),
-    secretKey: z.string().min(1, "Secret Key is required"),
-    passphrase: z.string().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.exchange === "BITGET") {
-      if (!data.passphrase || data.passphrase.trim().length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Passphrase is required for Bitget",
-          path: ["passphrase"],
-        });
-      }
-    }
-  });
+export const ConnectExchangeSchema = z.object({
+  exchange: z.enum(["BINANCE", "BYBIT"]),
+  apiKey: z.string().trim().min(1, "API Key is required"),
+  secretKey: z.string().trim().min(1, "Secret Key is required"),
+});
 
 export type ConnectExchangeInput = z.infer<typeof ConnectExchangeSchema>;
 

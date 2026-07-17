@@ -23,12 +23,12 @@ const RISK_FAQS = [
   {
     question: "How do you verify Binance/Bybit stats?",
     answer:
-      "Traders connect their exchange accounts via read-only API keys. We fetch real trade history, calculate win rate, payoff ratio, and max drawdown directly from Binance/Bybit APIs. No screenshots, no manual input—just on-chain proof of performance. All verified traders display a badge and transparent stats.",
+      "A verified statistic comes from trade history synchronized through strictly read-only Binance or Bybit credentials. Every value keeps its source and freshness context; demo datasets are labelled and are never presented as live performance.",
   },
   {
     question: "Is the risk console really free?",
     answer:
-      "The risk console demo on our landing page is completely free for everyone (no login required). For the full authenticated version with calculation history, custom presets, and live capital integration from your exchanges, you'll need a Pro or Ultra plan. This ensures serious traders have unlimited access to professional risk management tools.",
+      "Yes. The authenticated demonstrator includes calculation history, presets and an optional read-only exchange connection. There is no paid tier, crypto checkout or custody flow in this release.",
   },
   {
     question: "Can I use the risk console without following traders?",
@@ -48,7 +48,7 @@ const RISK_FAQS = [
   {
     question: "How is MyCryptoPilot different from Telegram signal groups?",
     answer:
-      "Telegram groups rely on screenshots (easily faked) and don't provide risk management tools. MyCryptoPilot verifies stats with Binance/Bybit APIs, includes an automated risk console, tracks your performance with a trading journal, and offers copy-trading automation. We're a complete risk-first ecosystem, not just a signal provider.",
+      "MyCryptoPilot is a focused architecture and security case study: it labels demo data, can source read-only history from Binance or Bybit, and simulates risk without placing an order. It does not claim to replace an exchange, adviser or execution platform.",
   },
 ];
 
