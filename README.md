@@ -126,7 +126,7 @@ Tous les détails (secrets requis, commandes, monitoring) sont décrits dans `.c
 
 ## 🧭 Roadmap rapide
 
-Les priorités courantes (2 nov 2025) sont listées dans `.claude/CLAUDE.md` et `.claude/docs/DEVELOPMENT.md` : validation API réelle pour les connexions utilisateurs, queue copy-trading, notifications tier-check/email hebdo, observabilité sweep.
+Les limites produit et les décisions de sécurité actuelles sont documentées dans `docs/architecture-security-case-study.md`. Les anciens parcours de copy trading, paiement crypto et sweep ne font pas partie du produit public.
 
 ---
 
