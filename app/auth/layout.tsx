@@ -22,8 +22,8 @@ const VALUE_PROPS = [
   },
   {
     icon: Lock,
-    title: "Crypto Payments",
-    description: "USDC sur Base, USDT sur Tron",
+    title: "Lecture Seule",
+    description: "Aucun ordre, retrait ou fonds confié",
   },
 ] as const;
 
@@ -82,7 +82,7 @@ export default function RouteLayout(props: PropsWithChildren) {
                 <span className="text-[#00ffaa]">sans radar</span>
               </h2>
               <p className="mt-2 text-sm text-[var(--text-muted)]">
-                Votre écosystème risk-first 360°
+                Simulez le risque sans exécuter d’ordre
               </p>
             </div>
           </div>
