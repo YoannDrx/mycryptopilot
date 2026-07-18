@@ -18,7 +18,7 @@
     "stripe-webhooks": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
     "discord-bot": "NODE_ENV=development tsx scripts/start-discord-bot.ts",
     "ts": "tsc --noEmit",
-    "vercel-build": "set -e; echo '🔧 Generating Prisma client...' && prisma generate && if [ \"${SKIP_DB_MIGRATIONS:-0}\" = \"1\" ] || [ \"${VERCEL_ENV:-}\" = \"preview\" ] || [ -z \"${DATABASE_URL:-}\" ]; then echo '⏭️  Skipping prisma migrate deploy (preview/skip flag/no DATABASE_URL)'; else echo '🗄️  Deploying migrations...'; prisma migrate deploy; echo '✅ Migrations deployed!'; fi && echo '🏗️  Building Next.js app...' && pnpm build",
+    "vercel-build": "set -e; echo '🔧 Generating Prisma client...' && prisma generate && if [ \"${SKIP_DB_MIGRATIONS:-0}\" = \"1\" ] || [ \"${VERCEL_ENV:-}\" = \"preview\" ] || [ -z \"${DATABASE_URL:-}\" ]; then echo '⏭️  Skipping prisma migrate deploy (preview/skip flag/no DATABASE_URL)'; else echo '🗄️  Deploying migrations...'; prisma migrate deploy || { echo '❌ Database migration failed; aborting deployment.'; exit 1; }; echo '✅ Migrations deployed!'; fi && echo '🏗️  Building Next.js app...' && pnpm build",
     "test": "vitest",
     "worker": "tsx scripts/start-fly-worker.ts",
     "worker:deploy": "fly deploy --config fly.worker.toml --ha=false",
