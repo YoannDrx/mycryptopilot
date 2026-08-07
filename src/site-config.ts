@@ -20,7 +20,7 @@ export const SiteConfig = {
     name: "MyCryptoPilot Team",
   },
   email: {
-    from: process.env.EMAIL_FROM ?? "MyCryptoPilot <noreply@do-not-reply.app>",
+    from: process.env.EMAIL_FROM ?? "MyCryptoPilot <mycryptopilot@yodev.fr>",
     contact: process.env.NEXT_PUBLIC_EMAIL_CONTACT ?? "hello@mycryptopilot.app",
   },
   features: {
